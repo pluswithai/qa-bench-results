@@ -1,0 +1,424 @@
+{
+  "area": "profiles-account-settings",
+  "reviewer": "Claude Fable 5.2",
+  "bugs": [
+    {
+      "id": "profiles-1",
+      "title": "\"Update Avatar\" with no file chosen answers \"Your avatar has been updated.\"",
+      "findings": [
+        "run1-03",
+        "run2-04",
+        "run3-03"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "The avatar form is a settings form whose file is optional: the handler explicitly supports a submit with no upload (it saves the avatar-source radio and has a commented branch for \"No avatar is uploaded but setting has been changed\"), so the success flash is the normal answer to a save with nothing new, like \"Update Profile\" with no edits. No data is lost or altered wrongly; asking for a \"no file chosen\" error is a preference.",
+      "evidence": [
+        "run1-03/shot-3.png",
+        "run3-03/shot-4.png",
+        "run3-03/shot-3.png"
+      ],
+      "source": [
+        "routers/web/user/setting/profile.go (UpdateAvatarSetting, AvatarPost)",
+        "templates/user/settings/profile.tmpl (avatar form: source radio + optional file)"
+      ],
+      "rejection_kind": "product-decision",
+      "rejection_note": "behaviour is deliberate in Gitea 1.24.7 (see reason and source)"
+    },
+    {
+      "id": "profiles-2",
+      "title": "Follow on a profile with a block relationship fails with the raw toast \"Error 400 when calling /<user>?action=follow\"",
+      "findings": [
+        "run1-07",
+        "run3-07"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "The profile offers a normal Follow button, the click does nothing and the only feedback is the generic htmx failure toast with the HTTP status and request path. Refusing the follow is deliberate (FollowUser returns ErrBlockedUser), but the handler turns it into a bare 400 with no user message, while other blocked actions in Gitea have proper texts (e.g. repo.action.blocked_user).",
+      "evidence": [
+        "run1-07/shot-2.png",
+        "run3-07/shot-2.png"
+      ],
+      "source": [
+        "routers/web/user/profile.go (ActionUserFollow -> ctx.HTTPError 400)",
+        "models/user/follow.go (FollowUser -> ErrBlockedUser)",
+        "web_src/js/htmx.ts:20 (\"Error ${status} when calling ${path}\")",
+        "templates/shared/user/profile_big_avatar.tmpl (Follow button shown to the blocked viewer)"
+      ]
+    },
+    {
+      "id": "profiles-3",
+      "title": "Simplified-Chinese \"Hidden comment types\" description is a broken sentence (placeholders vanish, stray quotes)",
+      "findings": [
+        "run1-09"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "The zh-CN string writes the placeholders as <user> and <label>, which are stripped as HTML tags, so the page shows \"… 添加/删除的 \" 注释\" with nothing inside the quotes; the English and German strings use {user}/{label} and render fine.",
+      "evidence": [
+        "run1-09/shot-2.png"
+      ],
+      "source": [
+        "options/locale/locale_zh-CN.ini:752 (hidden_comment_types_description)",
+        "options/locale/locale_en-US.ini:755"
+      ]
+    },
+    {
+      "id": "profiles-4",
+      "title": "/<user>?tab=packages shows the repository list with no tab highlighted",
+      "findings": [
+        "run1-10"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "?tab=packages is not an address the app produces (the Packages tab links to /<user>/-/packages); it only appears when typed by hand. The handler deliberately falls back to the repository list for any unknown tab value, and the missing highlight for an unsupported value is a nit, not a failure a user meets through the UI.",
+      "evidence": [
+        "run1-10/shot-1.png"
+      ],
+      "source": [
+        "routers/web/user/profile.go (prepareUserProfileTabData: \"default: // default to repositories\")",
+        "templates/user/overview/header.tmpl (Packages tab href = {{.ContextUser.HomeLink}}/-/packages)"
+      ],
+      "rejection_kind": "unsupported-input",
+      "rejection_note": "hand-typed ?tab= value"
+    },
+    {
+      "id": "profiles-5",
+      "title": "German heading \"Ausgeblendeter Kommentartypen\" is ungrammatical",
+      "findings": [
+        "run1-11"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "The shipped German string for \"Hidden comment types\" is \"Ausgeblendeter Kommentartypen\" (wrong adjective ending for a plural heading; correct is \"Ausgeblendete Kommentartypen\"). Visible on /user/settings/appearance in German.",
+      "evidence": [
+        "run1-11/shot-2.png"
+      ],
+      "source": [
+        "options/locale/locale_de-DE.ini:743 (hidden_comment_types=Ausgeblendeter Kommentartypen)"
+      ]
+    },
+    {
+      "id": "profiles-6",
+      "title": "Blocking an already blocked user answers \"Failed to block user: cannot block the user\"",
+      "findings": [
+        "run1-12"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "This is the handled, deliberate refusal: the service returns ErrCanNotBlock for an already blocked user and the page shows it in the designed error banner with the translated prefix; nothing is saved wrongly. A more specific sentence (\"already blocked\"), a translated error tail and filtering the autocomplete are improvements, not broken behaviour.",
+      "evidence": [
+        "run1-12/shot-4.png"
+      ],
+      "source": [
+        "routers/web/shared/user/block.go:46-48 (Flash.Error(Tr(\"user.block.block.failure\", err.Error())))",
+        "services/user/block.go:75 (ErrCanNotBlock)",
+        "models/user/block.go:19"
+      ],
+      "rejection_kind": "product-decision",
+      "rejection_note": "behaviour is deliberate in Gitea 1.24.7 (see reason and source)"
+    },
+    {
+      "id": "profiles-7",
+      "title": "Profile card says \"1 Followers\"",
+      "findings": [
+        "run1-13"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "With exactly one follower the card reads \"1 Followers\": the template prints the number followed by the fixed plural label, with no singular form, although Gitea has plural-aware translation helpers.",
+      "evidence": [
+        "run1-13/shot-2.png"
+      ],
+      "source": [
+        "templates/shared/user/profile_big_avatar.tmpl ({{.NumFollowers}} {{ctx.Locale.Tr \"user.followers\"}})",
+        "options/locale/locale_en-US.ini:668 (followers = Followers)"
+      ]
+    },
+    {
+      "id": "profiles-8",
+      "title": "Profile repository search treats \"%\" and \"_\" as wildcards and lists repositories that do not contain them",
+      "findings": [
+        "run2-05",
+        "run3-16"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "Searching \"%\" or \"_\" returns harbor-handbook, whose name and description contain neither character, while a non-matching word (zzz) correctly gives \"No matching results found.\" The keyword is passed unescaped into SQL LIKE conditions, so the search returns wrong results.",
+      "evidence": [
+        "run2-05/shot-3.png",
+        "run3-16/shot-2.png"
+      ],
+      "source": [
+        "models/repo/repo_list.go:467-480 (builder.Like{\"lower_name\", strings.ToLower(v)} with no wildcard escaping)"
+      ]
+    },
+    {
+      "id": "profiles-9",
+      "title": "\"Unblock\" on a blocked user's profile opens the blocked-users settings page instead of unblocking",
+      "findings": [
+        "run2-08"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Deliberate: on a blocked profile the template renders \"Unblock\" as a plain link to /user/settings/blocked_users, where the real Unblock button (a POST form) sits next to the user. The link works as built and the unblock is one click away on the page it opens.",
+      "evidence": [
+        "run2-08/shot-3.png"
+      ],
+      "source": [
+        "templates/shared/user/profile_big_avatar.tmpl (<a class=\"muted\" href=\"{{AppSubUrl}}/user/settings/blocked_users\">{{ctx.Locale.Tr \"user.block.unblock\"}}</a>)",
+        "templates/shared/user/blocked_users.tmpl (unblock form)"
+      ],
+      "rejection_kind": "product-decision",
+      "rejection_note": "behaviour is deliberate in Gitea 1.24.7 (see reason and source)"
+    },
+    {
+      "id": "profiles-10",
+      "title": "Profile RSS feed claimed to be served as text/html and shown as escaped markup",
+      "findings": [
+        "run2-09"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Not shown by the evidence: the screenshot displays the XML tags themselves (<channel>, <title>, <item>), which a text/html response would not show, and no response header was captured. Gitea sets Content-Type application/rss+xml for this route; Chromium has no feed viewer and prints RSS as plain text, and the &lt; / &#34; entities are normal XML escaping inside the feed. One check would settle it: curl -I /eval.rss.",
+      "evidence": [
+        "run2-09/shot-2.png"
+      ],
+      "source": [
+        "routers/web/feed/profile.go:82-93 (writeFeed sets application/rss+xml;charset=utf-8)"
+      ],
+      "rejection_kind": "false-positive",
+      "rejection_note": "evidence contradicts the claim (the feed is XML)"
+    },
+    {
+      "id": "profiles-11",
+      "title": "\"admin\" label overlaps the avatar in the top navigation",
+      "findings": [
+        "run2-10"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Deliberate design: the admin label is a corner badge placed with position:absolute (top:-1px; left:18px) over the 24px account avatar in Gitea's stock stylesheet, the same way on every page and width.",
+      "evidence": [
+        "run2-10/shot-2.png"
+      ],
+      "source": [
+        "web_src/css/modules/navbar.css:104-115 (#navbar .ui.dropdown .navbar-profile-admin)"
+      ],
+      "rejection_kind": "product-decision",
+      "rejection_note": "behaviour is deliberate in Gitea 1.24.7 (see reason and source)",
+      "accessibility_related": true
+    },
+    {
+      "id": "profiles-12",
+      "title": "Heatmap caption says \"1 contributions in the last 12 months\"",
+      "findings": [
+        "run2-12"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "With a single contribution the caption under the activity heatmap reads \"1 contributions in the last 12 months\"; the one string is used for every count and has no singular form.",
+      "evidence": [
+        "run2-12/shot-2.png"
+      ],
+      "source": [
+        "options/locale/locale_en-US.ini:207 (number_of_contributions_in_the_last_12_months = %s contributions in the last 12 months)",
+        "templates/user/heatmap.tmpl:4"
+      ]
+    },
+    {
+      "id": "profiles-13",
+      "title": "Location saved as spaces only leaves an empty location row (pin icon, no text) on the profile",
+      "findings": [
+        "run2-13"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "A whitespace-only Location is stored untrimmed and the profile card then shows a row with only the map-pin icon, because the template tests the raw value for non-empty; a whitespace-only full name is trimmed (GetDisplayName) and an empty bio shows no row, so Location is the odd one out.",
+      "evidence": [
+        "run2-13/shot-3.png"
+      ],
+      "source": [
+        "templates/shared/user/profile_big_avatar.tmpl ({{if .ContextUser.Location}})",
+        "routers/web/user/setting/profile.go (ProfilePost: Location passed through without trimming)",
+        "models/user/user.go (GetDisplayName trims FullName)"
+      ]
+    },
+    {
+      "id": "profiles-14",
+      "title": "Private profile's RSS feed (/eval.rss) readable by a user who gets 404 on the profile page",
+      "findings": [
+        "run3-06"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "The evidence proves only half: the video and shot-1 show alex getting 404 on /eval, but the feed screenshots carry no sign of who was signed in or of the profile's visibility at that moment, and other agents were editing the same eval profile in parallel (a stale profile form resets visibility to Public). In the 1.24.7 source the .rss route runs the same IsUserVisibleToViewer check as the profile page, so both should give 404. A human should check on a clean instance: set eval to Private, sign in as alex (not admin, no shared organization, eval not following alex), open /eval (404) and then /eval.rss in the same session; if the feed returns 200 this is a real privacy leak (accept, severity 3), if 404 reject.",
+      "evidence": [
+        "run3-06/shot-1.png",
+        "run3-06/shot-2.png",
+        "run3-06/video.webm"
+      ],
+      "source": [
+        "routers/web/user/home.go:718-764 (UsernameSubRoute: reloadParam checks IsUserVisibleToViewer before ShowUserFeedRSS)",
+        "routers/web/user/profile.go:56-61 (userProfile: same check)",
+        "models/user/user.go:1344 (IsUserVisibleToViewer)"
+      ],
+      "fable": {
+        "verdict": "unsure",
+        "severity": null
+      },
+      "override_reason": "Not proven: the feed screenshot shows neither the signed-in user nor the profile visibility, other agents were editing the same profile, and the .rss route runs the same visibility check as the profile page.",
+      "override_by": "owner review 2026-11-23 (Claude Opus 5.5, evidence + source; no live retest)",
+      "rejection_kind": "false-positive",
+      "rejection_note": "not proven: visibility and signed-in user not shown; profile edited in parallel"
+    },
+    {
+      "id": "profiles-15",
+      "title": "Persian (فارسی) UI is laid out left-to-right: no RTL direction",
+      "findings": [
+        "run3-08"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "Gitea lists فارسی among its built-in languages, but the page shell only sets lang and never a text direction, so with Persian selected the sidebar, headings, labels and checkboxes stay left-aligned in left-to-right order. Persian is written right-to-left, and nothing in the source marks the left-to-right layout as intended for it.",
+      "evidence": [
+        "run3-08/shot-2.png"
+      ],
+      "source": [
+        "templates/base/head.tmpl:2 (<html lang=\"{{ctx.Locale.Lang}}\" …> with no dir attribute)",
+        "modules/setting/i18n.go:32 (\"fa-IR\", \"فارسی\" in the default language list)"
+      ]
+    },
+    {
+      "id": "profiles-16",
+      "title": "Biography longer than 255 characters ends up cut to 255 with a success message",
+      "findings": [
+        "run3-09"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "The 255-character limit is deliberate and enforced in the field itself: the Biography textarea carries maxlength=\"255\" (the finding's \"no maxlength\" contradicts the 1.24.7 template), so the browser stops the text at 255 before it is sent, and the server form has the same MaxSize(255) rule. What reached the server was saved in full; a visible counter or warning is a preference.",
+      "evidence": [
+        "run3-09/shot-3.png",
+        "run3-09/frame-6.jpg"
+      ],
+      "source": [
+        "templates/user/settings/profile.tmpl:34 (<textarea id=\"description\" … maxlength=\"255\">)",
+        "services/forms/user_form.go:219 (Description binding:\"MaxSize(255)\")"
+      ],
+      "rejection_kind": "false-positive",
+      "rejection_note": "evidence contradicts the claim (the field has maxlength)"
+    },
+    {
+      "id": "profiles-17",
+      "title": "Browser Back after signing out shows the previous settings page again",
+      "findings": [
+        "run3-11"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "The page shown is the browser's own stored copy of a page this browser already displayed; the server session is ended (a reload goes to /user/login, as the finding notes). Gitea chooses this cache policy on purpose: its code comment says \"max-age=0 + must-revalidate\" is preferred instead of \"no-store\" so browsers can restore pages on navigate-back.",
+      "evidence": [
+        "run3-11/shot-3.png",
+        "run3-11/frame-6.jpg"
+      ],
+      "source": [
+        "modules/httpcache/httpcache.go:27-28 (SetCacheControlInHeader comment)"
+      ],
+      "rejection_kind": "product-decision",
+      "rejection_note": "behaviour is deliberate in Gitea 1.24.7 (see reason and source)"
+    },
+    {
+      "id": "profiles-18",
+      "title": "Submitting a form from a stale tab after sign-out answers a bare \"Invalid CSRF token.\" page",
+      "findings": [
+        "run3-12"
+      ],
+      "verdict": "accept",
+      "severity": 5,
+      "reason": "The POST is answered with HTTP 400 and a blank white page holding only the text \"Invalid CSRF token.\": no layout, no explanation that the session ended, no link to sign in. Refusing the stale token is correct, but the bare response is not intended for pages: the source carries a FIXME that it does not distinguish HTML page requests from fetch calls. Severity follows the bare-error-page rule; a reviewer who weighs the stale-tab trigger may prefer 3.",
+      "evidence": [
+        "run3-12/shot-3.png",
+        "run3-12/frame-6.jpg"
+      ],
+      "source": [
+        "services/context/csrf.go:140-146 (validateToken: \"FIXME: distinguish what the response is for: HTML (web page) or JSON (fetch)\"; http.Error(…, \"Invalid CSRF token.\", 400))"
+      ]
+    },
+    {
+      "id": "profiles-19",
+      "title": "Persian UI leaves many strings in English (menu entries, Hidden comment types panel); German keeps \"Account\"",
+      "findings": [
+        "run3-14"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "Deliberate fallback, not a malfunction: the community fa-IR translation file is incomplete (about 2,300 lines against 3,700 in English; of the comment-type labels only comment_type_group_title exists) and Gitea shows the default-language text for every missing key by design. The German \"Account\" is the actual German translation value, not a missing one.",
+      "evidence": [
+        "run3-14/shot-2.png",
+        "run3-08/shot-2.png"
+      ],
+      "source": [
+        "modules/translation/i18n/localestore.go (defaultLang fallback for missing keys)",
+        "options/locale/locale_fa-IR.ini (only comment_type_group_title at line 510)",
+        "options/locale/locale_de-DE.ini:706 (account=Account)"
+      ],
+      "fable": {
+        "verdict": "reject",
+        "severity": null
+      },
+      "override_reason": "Owner review: the Persian UI ships with many visible strings still in English (menu entries, the hidden comment types panel and most of its checkbox labels). The fallback is designed, but the user sees an untranslated interface: a localization defect, cosmetic. The German \"Account\" is correct and is not part of the defect.",
+      "override_by": "owner review 2026-11-24"
+    },
+    {
+      "id": "profiles-20",
+      "title": "Whitespace-only block note is saved and shows a dangling \"Note:\" label with no text",
+      "findings": [
+        "run3-17"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "A note of three spaces is stored as it is and the blocked-user row then shows the label \"Anmerkung:\" with nothing after it, also after reload; a cleared note removes the label, so a blank note should too. The note is saved without trimming and the template only tests it for non-empty.",
+      "evidence": [
+        "run3-17/shot-3.png"
+      ],
+      "source": [
+        "routers/web/shared/user/block.go:64-72 (UpdateBlockingNote(ctx, block.ID, form.Note) with no trim)",
+        "templates/shared/user/blocked_users.tmpl ({{if .Note}} … {{ctx.Locale.Tr \"user.block.note\"}}: {{.Note}})"
+      ]
+    }
+  ],
+  "rejections": [
+    {
+      "kind": "false-positive",
+      "label": "False positive (agent was wrong)",
+      "count": 3,
+      "bugs": [
+        "profiles-10",
+        "profiles-14",
+        "profiles-16"
+      ]
+    },
+    {
+      "kind": "unsupported-input",
+      "label": "Address or input the app never produces",
+      "count": 1,
+      "bugs": [
+        "profiles-4"
+      ]
+    },
+    {
+      "kind": "product-decision",
+      "label": "Product decision (real behaviour Gitea chose on purpose)",
+      "count": 6,
+      "bugs": [
+        "profiles-1",
+        "profiles-6",
+        "profiles-9",
+        "profiles-11",
+        "profiles-17",
+        "profiles-19"
+      ]
+    }
+  ]
+}

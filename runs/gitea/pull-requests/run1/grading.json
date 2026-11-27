@@ -1,0 +1,212 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "findings": 16,
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 12,
+        "reproStepsIndex": 0,
+        "findingIndex": 6,
+        "reason": "Bulk Open bypasses the identical-open-PR restriction that the detail page enforces, leaving duplicate open PRs through the same Closed-list flow."
+      },
+      {
+        "groundTruthIndex": 5,
+        "reproStepsIndex": null,
+        "findingIndex": 7,
+        "reason": "Matches global keyword search hiding a matching assigned PR. It uses an explicit Assignee filter rather than the entry's Assigned to you navigation."
+      },
+      {
+        "groundTruthIndex": 8,
+        "reproStepsIndex": 0,
+        "findingIndex": 9,
+        "reason": "The demonstrated Author selection is lost when text search is submitted, removing poster and broadening results through the same global-dashboard flow."
+      },
+      {
+        "groundTruthIndex": 0,
+        "reproStepsIndex": 0,
+        "findingIndex": 12,
+        "reason": "The one-commit PR summary says '1 commits', matching the entry. Additional singular/plural examples do not change that match."
+      },
+      {
+        "groundTruthIndex": 14,
+        "reproStepsIndex": 0,
+        "findingIndex": 13,
+        "reason": "Saved review messages appear in Conversation while its badge and the PR-list comment count omit them, matching the review-count defect."
+      }
+    ],
+    "invalidMatches": [],
+    "unverified": [
+      {
+        "findingIndex": 0,
+        "reason": "The error text matches groundTruth 16 and 30, but this reports Split View failing on an existing populated diff, not Files Changed failing on a zero-commit PR."
+      },
+      {
+        "findingIndex": 1,
+        "reason": "No entry covers Open linking to state=all when open PRs exist. knownInvalid 9 concerns the intentional default fallback when no PRs are open."
+      },
+      {
+        "findingIndex": 2,
+        "reason": "No entry describes Escape failing to close the reviewer picker after a selection."
+      },
+      {
+        "findingIndex": 3,
+        "reason": "No entry describes Newest using an incorrect creation-time order. groundTruth 47 concerns stale due-date ordering instead."
+      },
+      {
+        "findingIndex": 4,
+        "reason": "This reports an extraneous file in the actual diff. groundTruth 32 concerns temporarily incorrect header totals while Files Changed remains correct."
+      },
+      {
+        "findingIndex": 5,
+        "reason": "No entry covers an unsubstituted filename template in the new-file commit-message field."
+      },
+      {
+        "findingIndex": 8,
+        "reason": "No entry covers nonzero header statistics after another PR incorporates the branch. groundTruth 32 describes transient overcounting immediately after a rebase update."
+      },
+      {
+        "findingIndex": 10,
+        "reason": "No entry covers aggregate diff totals failing to reflect whitespace filtering. This differs from groundTruth 32's post-rebase header overcount."
+      },
+      {
+        "findingIndex": 11,
+        "reason": "No entry describes individual commit pages reporting additions and deletions absent from their displayed diffs."
+      },
+      {
+        "findingIndex": 14,
+        "reason": "No entry covers an extraneous, inert Label item in the Sort menu."
+      },
+      {
+        "findingIndex": 15,
+        "reason": "Retargeting restamps and reorders an existing commit event. groundTruth 26 instead reports rebases or force-pushes incorrectly appearing as added commits."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 5,
+        "reason": "The entire PR page is replaced by a bare error without navigation."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 3,
+        "reason": "The Open filter returns pull requests with incorrect states."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 1,
+        "reason": "This is a keyboard-accessibility defect; the dropdown still closes through its header."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 3,
+        "reason": "The selected sort produces an incorrect result order."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 3,
+        "reason": "The diff incorrectly attributes an unrelated file to the pull request."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 1,
+        "reason": "The placeholder is misleading, but the committed message is described as correct."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 3,
+        "reason": "The header reports incorrect change totals for a zero-commit pull request."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 3,
+        "reason": "Displayed aggregate counts disagree with the filtered diff and per-file counts."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 3,
+        "reason": "Commit summaries report incorrect change counts."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 1,
+        "reason": "The stray menu item is a presentation and minor usability defect; legitimate sorting is not reported broken."
+      },
+      {
+        "findingIndex": 15,
+        "severity": 3,
+        "reason": "The timeline displays an incorrect event timestamp and chronological order."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [
+      {
+        "findingIndex": 1,
+        "reference": {
+          "name": "Initial Open issues control includes closed issues",
+          "summary": "Clicking the Open count from the unfiltered issue list navigates to state=all and includes a closed issue.",
+          "expected": "Clicking Open should display only open issues.",
+          "actual": "Clicking the Open count from the unfiltered issue list navigates to state=all and includes a closed issue.",
+          "reproSteps": [
+            [
+              "Open the seeded repository Issues list with no state filter and note the separate Open and Closed counts.",
+              "Click Open and observe state=all in the URL and a closed issue in the resulting list."
+            ]
+          ],
+          "severity": 3
+        },
+        "reason": "Matches the initial Open count navigating to state=all and including closed items, through the same repository-list interaction on pull requests."
+      },
+      {
+        "findingIndex": 5,
+        "reference": {
+          "name": "New-file commit message placeholder exposes {filename} token",
+          "summary": "After entering a filename in the New File editor, the commit-message placeholder still displays the literal template token {filename}.",
+          "expected": "The commit-message placeholder should use the entered filename or generic wording without an unresolved template token.",
+          "actual": "The Commit Changes form displays the literal placeholder “Add '{filename}'”.",
+          "reproSteps": [
+            [
+              "Sign in as eval with password momentic-eval-1 and open eval/harbor-handbook.",
+              "Create a disposable branch from main using the branch selector.",
+              "Choose Add File > New File and enter a Markdown filename and a line of content.",
+              "Scroll to Commit Changes without submitting and inspect the commit-message placeholder.",
+              "Observe the literal {filename} token in the placeholder instead of the entered filename."
+            ]
+          ],
+          "severity": 1
+        },
+        "reason": "Matches the New File commit-message placeholder retaining the literal {filename} token after a filename is entered."
+      }
+    ],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

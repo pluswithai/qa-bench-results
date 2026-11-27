@@ -1,0 +1,382 @@
+{
+  "bugs": [
+    {
+      "name": "\\\"Create new branch\\\" dialog closes with no validation message when Branch Name is empty",
+      "summary": "The modal closes immediately and nothing happens: no message next to \"Branch Name\", no branch is created (the list still shows only main and docs/release-owners and the tab still says \\\"2 Branches\\\"). The console logs an uncaught validation error: \\\"An invalid form control with name='new_branch_name' is not focusable.\\\" The dialog takes the branch name away with it, so the person has to reopen it and start again. (on /eval/harbor-handbook/branches)",
+      "expected": "The dialog stays open, keeps focus in the Branch Name field and shows a message that Branch Name is required (it is marked with *).",
+      "actual": "The modal closes immediately and nothing happens: no message next to \"Branch Name\", no branch is created (the list still shows only main and docs/release-owners and the tab still says \\\"2 Branches\\\"). The console logs an uncaught validation error: \\\"An invalid form control with name='new_branch_name' is not focusable.\\\" The dialog takes the branch name away with it, so the person has to reopen it and start again.",
+      "reproSteps": [
+        "Open https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/branches",
+        "In the \"Default Branch\" block click the \"Create new branch from \"main\"\" icon (the branch icon to the right of the main row)",
+        "In the \"Create new branch\" dialog leave the \"Branch Name *\" field empty and click \"Confirm\""
+      ]
+    },
+    {
+      "name": "Invalid regexp in Regexp mode returns a 500 error page with raw internal error instead of a validation message",
+      "summary": "The whole page is replaced by \\\"500 Internal Server Error\\\" with the raw internal message: \\\"gitgrep.PerformSearch, git.GrepSearch: unable to run git grep: exit status 128, stderr: fatal: -e option, '[': missing terminating ] for character class\\\". The search form is gone, so the user cannot correct the query; the request to /eval/harbor-handbook/search?q=%5B&search_mode=regexp returns HTTP 500. (on /eval/harbor-handbook/search)",
+      "expected": "The page should keep the search form and tell the user the regular expression is invalid (a message next to the field), the way other invalid input is handled.",
+      "actual": "The whole page is replaced by \\\"500 Internal Server Error\\\" with the raw internal message: \\\"gitgrep.PerformSearch, git.GrepSearch: unable to run git grep: exit status 128, stderr: fatal: -e option, '[': missing terminating ] for character class\\\". The search form is gone, so the user cannot correct the query; the request to /eval/harbor-handbook/search?q=%5B&search_mode=regexp returns HTTP 500.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /eval/harbor-handbook/search",
+        "Type [ (a single opening square bracket) in the \"Search code...\" box",
+        "Open the \"Search type\" dropdown and choose Regexp",
+        "Click the \"Search...\" button"
+      ]
+    },
+    {
+      "name": "Tag creation error shows internal form key \"form.TagName\" instead of a plain message",
+      "summary": "A red banner reads: \\\"form.TagName must be a well-formed Git reference name.\\\" — the internal form field key \\\"form.TagName\\\" is exposed to the user instead of a human-readable message. (on /eval/harbor-handbook/releases/new)",
+      "expected": "A readable validation message next to the field, e.g. \\\"Tag name must be a well-formed Git reference name.\\\"",
+      "actual": "A red banner reads: \\\"form.TagName must be a well-formed Git reference name.\\\" — the internal form field key \\\"form.TagName\\\" is exposed to the user instead of a human-readable message.",
+      "reproSteps": [
+        "Sign in as eval, open /eval/harbor-handbook/tags and click \"New Release\" on the v1.0.0 row (or open /eval/harbor-handbook/releases/new).",
+        "In the \"Tag name\" field type a name with spaces: agent13 probe tag.",
+        "Leave the target at any branch and click \"Create Tag Only\"."
+      ]
+    },
+    {
+      "name": "Branch rename error shows the internal form key \\\"form.To\\\" instead of a plain message",
+      "summary": "A red banner appears above the branch tabs reading: \\\"form.To must be a well-formed Git reference name.\\\" — the internal form field key \\\"form.To\\\" is shown instead of a wording for the person. The rename does not happen, and the dialog closes so the typed name is lost. (on /eval/harbor-handbook/branches)",
+      "expected": "A plain message that the new branch name is not a valid Git reference name, without the internal field key.",
+      "actual": "A red banner appears above the branch tabs reading: \\\"form.To must be a well-formed Git reference name.\\\" — the internal form field key \\\"form.To\\\" is shown instead of a wording for the person. The rename does not happen, and the dialog closes so the typed name is lost.",
+      "reproSteps": [
+        "Open https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/branches (signed in as eval)",
+        "Pick any non-default branch (I used agent11-test, created earlier from the \"Create new branch from main\" icon)",
+        "Click the \"Rename Branch\" pencil icon of that branch",
+        "In the \"Rename branch\" dialog type a name with a space, e.g. \"agent11 renamed\", and click \"Confirm\""
+      ]
+    },
+    {
+      "name": "Search for a term that starts with a dash (\\\"-v\\\", \\\"-i\\\") in Exact mode returns every line of every file instead of no results",
+      "summary": "The search returns matches from README.md (lines 7-9), docs/contributing.md (lines 4-6), docs/releases.md (lines 2-6) and more files, i.e. the term is ignored and every line of every file is listed as a match, exactly as for the query \\\"-i\\\". None of those lines contains \\\"-v\\\". (on /eval/harbor-handbook/search)",
+      "expected": "No matching results found., because \\\"-v\\\" (and \\\"-i\\\") does not occur in the repository's files.",
+      "actual": "The search returns matches from README.md (lines 7-9), docs/contributing.md (lines 4-6), docs/releases.md (lines 2-6) and more files, i.e. the term is ignored and every line of every file is listed as a match, exactly as for the query \\\"-i\\\". None of those lines contains \\\"-v\\\".",
+      "reproSteps": [
+        "Open /eval/harbor-handbook/search",
+        "Type -v in the \"Search code...\" box (leave \"Search type\" on Exact)",
+        "Click the \"Search...\" button"
+      ]
+    },
+    {
+      "name": "After deleting a file, the code page shows the delete commit but its commit count stays one short",
+      "summary": "The page shows the success banner 'File \"agent4-second.md\" has been deleted.' and the newest commit row 'Delete agent4-second.md', but the count stays '4 Commits', the same number as before the deletion. Opening /eval/harbor-handbook/commits/branch/main immediately afterwards shows '5 Commits' and 5 rows, so the two views of the same branch disagree. The same happened with the earlier file: after deleting tmp/agent4-delete-me.md the count stayed 2 while the commit list had 3; a plain reload of the repository home then showed the correct number. (on /eval/harbor-handbook/src/branch/main/)",
+      "expected": "The commit count in the Code tab should include the delete commit and go up by one (4 -> 5 Commits), matching the number of commits listed on /eval/harbor-handbook/commits/branch/main",
+      "actual": "The page shows the success banner 'File \"agent4-second.md\" has been deleted.' and the newest commit row 'Delete agent4-second.md', but the count stays '4 Commits', the same number as before the deletion. Opening /eval/harbor-handbook/commits/branch/main immediately afterwards shows '5 Commits' and 5 rows, so the two views of the same branch disagree. The same happened with the earlier file: after deleting tmp/agent4-delete-me.md the count stayed 2 while the commit list had 3; a plain reload of the repository home then showed the correct number.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook",
+        "Note the commit count in the Code tab (e.g. '4 Commits') and create a file: Add File > New File, name it agent4-second.md, type any content, click Commit Changes; the add commit does raise the count correctly",
+        "Open https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/_delete/main/agent4-second.md and click Commit Changes to delete the file",
+        "On the page you land on (/eval/harbor-handbook/src/branch/main/), read the commit count in the tab strip and the newest commit row",
+        "Open https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/commits/branch/main and compare its 'N Commits' header and rows with the count you just read"
+      ]
+    },
+    {
+      "name": "Tag search treats % and _ as wildcards and returns tags whose names do not contain the query",
+      "summary": "The search treats % and _ as SQL wildcards: q=ag%1 lists agent13-probe-tag-1 and q=v1_0_0 lists v1.0.0, each shown as \\\"1 Tags\\\", although no tag name contains those literal strings. q=% lists every tag (\\\"2 Tags\\\"). (on /eval/harbor-handbook/tags)",
+      "expected": "The tag search matches tag names literally: a query that no tag name contains (\\\"ag%1\\\", \\\"v1_0_0\\\", \\\"%\\\") shows \\\"No results found.\\\" and a count of 0 Tags.",
+      "actual": "The search treats % and _ as SQL wildcards: q=ag%1 lists agent13-probe-tag-1 and q=v1_0_0 lists v1.0.0, each shown as \\\"1 Tags\\\", although no tag name contains those literal strings. q=% lists every tag (\\\"2 Tags\\\").",
+      "reproSteps": [
+        "Sign in as eval and open /eval/harbor-handbook/tags (the repository has tags v1.0.0 and agent13-probe-tag-1).",
+        "Type v1_0_0 in the \"Search tags...\" box and press Enter (or open /eval/harbor-handbook/tags?q=v1_0_0).",
+        "The list shows v1.0.0 as \"1 Tags\".",
+        "Repeat with ag%1 in the box: the list shows agent13-probe-tag-1 as \"1 Tags\".",
+        "Repeat with % alone: the list shows both tags as \"2 Tags\"."
+      ]
+    },
+    {
+      "name": "Compare commits heading shows \\\"1 Commits\\\" instead of \\\"1 Commit\\\"",
+      "summary": "The heading above the commit table reads \\\"1 Commits\\\" with a singular count. The same app pluralises correctly elsewhere (the repo tab bar on /eval/harbor-handbook/branches shows \\\"1 Commit\\\"), so the two disagree. (on /eval/harbor-handbook/compare/main..docs/release-owners)",
+      "expected": "The heading reads \\\"1 Commit\\\" for a single commit, as the repo tab bar does.",
+      "actual": "The heading above the commit table reads \\\"1 Commits\\\" with a singular count. The same app pluralises correctly elsewhere (the repo tab bar on /eval/harbor-handbook/branches shows \\\"1 Commit\\\"), so the two disagree.",
+      "reproSteps": [
+        "Open https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/compare/main..docs/release-owners",
+        "Look at the heading of the commit table above the \"Author | SHA1 | Message | Date\" table (base eval:main, compare eval:docs/release-owners, exactly one commit)"
+      ]
+    },
+    {
+      "name": "Escape does not close the \\\"Code\\\" clone dropdown, unlike the \\\"Add File\\\" menu",
+      "summary": "The Code menu stays open after Escape; only a second click on \\\"Code\\\" or a click elsewhere closes it. Reproduced twice (Escape pressed twice each time). The \\\"Add File\\\" menu next to it does close with Escape, so the two menus behave differently. (on /eval/harbor-handbook)",
+      "expected": "Escape closes the open Code menu, as it does for the neighbouring \\\"Add File\\\" menu on the same page.",
+      "actual": "The Code menu stays open after Escape; only a second click on \\\"Code\\\" or a click elsewhere closes it. Reproduced twice (Escape pressed twice each time). The \\\"Add File\\\" menu next to it does close with Escape, so the two menus behave differently.",
+      "reproSteps": [
+        "Open https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook (signed in as eval).",
+        "Click the \"Code\" button on the right of the \"Go to file / Add File\" row so the Clone panel (HTTPS / Tea CLI, clone URL, Download ZIP / TAR.GZ / BUNDLE) opens.",
+        "Press Escape once, then again (the button keeps focus)."
+      ]
+    },
+    {
+      "name": "Compare page says \"These branches are equal.\" when the base is ahead of the compare side and the refs differ",
+      "summary": "The page shows only the box \"These branches are equal.\" and no commit list and no diff, although the two refs differ (the page's own title states it is comparing two different commits, and the opposite direction of the same comparison lists the commits that exist on one side only). (on /eval/harbor-handbook/compare/main..v1.0.0)",
+      "expected": "The page should say that there are no commits on the compare side that are missing from the base (e.g. that the compare side is behind), or show the diff, and must not claim the two refs are equal when they are on different commits with different content.",
+      "actual": "The page shows only the box \"These branches are equal.\" and no commit list and no diff, although the two refs differ (the page's own title states it is comparing two different commits, and the opposite direction of the same comparison lists the commits that exist on one side only).",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Open https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/compare/main..docs/release-owners and note it lists the commit 698207d676 of docs/release-owners, which main does not contain.",
+        "Change the address to https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/compare/main..v1.0.0 (base: eval:main, compare: eval:v1.0.0) and press Enter.",
+        "Read the only content of the page: a box saying 'These branches are equal.'.",
+        "Same failure with the roles reversed: open https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/compare/docs/release-owners..v1.0.0, or click the switch base/head icon between the two dropdowns on the docs/release-owners comparison."
+      ]
+    },
+    {
+      "name": "After \"Sync fork\", the \"N Commits\" counter above the file list stays at the old number until the page is reloaded",
+      "summary": "The counter keeps the pre-sync value (\\\"2 Commits\\\" for docs/release-owners, \\\"2 Commits\\\" for main) while the head commit, the file list and the \\\"behind\\\" banner are already updated to the post-sync state; only a browser reload makes it show the right number (\\\"3 Commits\\\", \\\"7 Commits\\\"). The count therefore contradicts the commit list shown one click away (History shows 3 resp. 7 entries). (on /alex/harbor-handbook/src/branch/docs/release-owners (and /alex/harbor-handbook))",
+      "expected": "The counter above the file list should show the real number of commits of the branch as soon as the sync finishes, because the page already shows the new head commit and the new file list — here 3 commits for docs/release-owners and 7 for main.",
+      "actual": "The counter keeps the pre-sync value (\\\"2 Commits\\\" for docs/release-owners, \\\"2 Commits\\\" for main) while the head commit, the file list and the \\\"behind\\\" banner are already updated to the post-sync state; only a browser reload makes it show the right number (\\\"3 Commits\\\", \\\"7 Commits\\\"). The count therefore contradicts the commit list shown one click away (History shows 3 resp. 7 entries).",
+      "reproSteps": [
+        "Sign in as alex / momentic-contributor-1 and open the fork https://5503-if6f6j5z691kuklo2xtor.e2b.app/alex/harbor-handbook/branches (this fork was made from eval/harbor-handbook).",
+        "Open the non-default branch page https://5503-if6f6j5z691kuklo2xtor.e2b.app/alex/harbor-handbook/src/branch/docs/release-owners — the bar shows \"This branch is 1 commit behind eval/harbor-handbook:docs/release-owners\" and the counter above the file list reads \"2 Commits\".",
+        "Click the \"Sync fork\" button, then click \"Confirm\" in the \"Sync fork\" dialog.",
+        "Look at the commit counter above the file list, then reload the page with the browser's reload.",
+        "Same on the default branch: open https://5503-if6f6j5z691kuklo2xtor.e2b.app/alex/harbor-handbook with \"This branch is 5 commits behind eval/harbor-handbook:main\", click \"Sync fork\" then \"Confirm\", and read the counter before and after a reload."
+      ]
+    },
+    {
+      "name": "Tags page: tab shows \\\"1 Tag\\\" while the list header shows \\\"1 Tags\\\" for the same single tag",
+      "summary": "On the same screen the tab reads \\\"1 Tag\\\" (singular) but the list panel header right below it reads \\\"1 Tags\\\" (plural). Same count, two different labels. (on /eval/harbor-handbook/tags)",
+      "expected": "Both places use the same wording for a single tag, e.g. \\\"1 Tag\\\" in the tab and \\\"1 Tag\\\" as the list header.",
+      "actual": "On the same screen the tab reads \\\"1 Tag\\\" (singular) but the list panel header right below it reads \\\"1 Tags\\\" (plural). Same count, two different labels.",
+      "reproSteps": [
+        "Sign in as eval and open /eval/harbor-handbook/tags in a repository that has exactly one tag (here v1.0.0).",
+        "Compare the tab above the list (\"1 Tag\") with the panel header of the list (\"1 Tags\")."
+      ]
+    },
+    {
+      "name": "Single-file commit page says \"1 changed files\"",
+      "summary": "It shows \"1 changed files with 5 additions and 0 deletions\" (and \"1 changed files with 0 additions and 3 deletions\" on the other commit) — plural \"files\" with the count 1. (on /eval/harbor-handbook/commit/698207d676)",
+      "expected": "The summary should use the singular for one file, e.g. \"1 changed file with 5 additions and 0 deletions\".",
+      "actual": "It shows \"1 changed files with 5 additions and 0 deletions\" (and \"1 changed files with 0 additions and 3 deletions\" on the other commit) — plural \"files\" with the count 1.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/commit/698207d676",
+        "Read the summary line above the diff, left side of the toolbar.",
+        "Also open https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/commit/9a83b39090 (a commit that touches one file) and read the same line."
+      ]
+    },
+    {
+      "name": "Searching branches for \\\"%\\\" returns every branch instead of filtering",
+      "summary": "The branch list shows every branch (docs/release-owners, agent3-patch, agent8-history and the deleted ones) — the input \\\"%\\\" filters nothing, although the box and the URL q=%25 act as if a search is in effect. The same box with \\\"m_in\\\" or \\\"zzzznothing\\\" does filter, so the app treats terms differently. (on /eval/harbor-handbook/branches)",
+      "expected": "The list shows the branches whose name contains \\\"%\\\" (none here), i.e. the search filters like it does for any other term.",
+      "actual": "The branch list shows every branch (docs/release-owners, agent3-patch, agent8-history and the deleted ones) — the input \\\"%\\\" filters nothing, although the box and the URL q=%25 act as if a search is in effect. The same box with \\\"m_in\\\" or \\\"zzzznothing\\\" does filter, so the app treats terms differently.",
+      "reproSteps": [
+        "Open https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/branches (signed in as eval)",
+        "Type a single percent sign \"%\" into the \"Search branches...\" box and press Enter, or open https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/branches?q=%25 directly"
+      ]
+    },
+    {
+      "name": "Tag row actions are cut off and unreachable on a phone-sized screen",
+      "summary": "On a 390 px wide screen the tag row's action links run past the right edge: \\\"New Release\\\" is cut to \\\"New R…\\\" and \\\"Delete Tag\\\" is completely outside the viewport. Neither the page nor the list scrolls horizontally (swiping right changes nothing), so \\\"Delete Tag\\\" cannot be clicked or reached at all on a phone-sized screen. (on /eval/harbor-handbook/tags)",
+      "expected": "The tag row fits or wraps at phone width, or the list scrolls sideways so every action (commit, ZIP, TAR.GZ, New Release, Delete Tag) can be reached.",
+      "actual": "On a 390 px wide screen the tag row's action links run past the right edge: \\\"New Release\\\" is cut to \\\"New R…\\\" and \\\"Delete Tag\\\" is completely outside the viewport. Neither the page nor the list scrolls horizontally (swiping right changes nothing), so \\\"Delete Tag\\\" cannot be clicked or reached at all on a phone-sized screen.",
+      "reproSteps": [
+        "Sign in as eval and open /eval/harbor-handbook/tags.",
+        "Set the browser window to a phone size, 390 x 844.",
+        "Look at the v1.0.0 row: the actions end with a cut-off \"New R…\"; try to scroll the list or the page to the right."
+      ]
+    },
+    {
+      "name": "Choosing \"Create a new branch\" with an existing branch name commits straight into that branch instead of creating a branch or warning",
+      "summary": "No error is shown about the existing branch name: the commit is written directly into main (the new file appears at src/branch/main/agent1-notes/branch-file4.md, commit abbf833a12 'Add agent1-notes/branch-file4.md') and the user is redirected to /compare/main...main which only says \"These branches are equal. There is no need to create a pull request.\" — so a change meant for a new branch/PR silently landed on main and the page contradicts what was chosen. Reproduced twice (agent1-notes/branch-file.md earlier, agent1-notes/branch-file4.md now). (on /eval/harbor-handbook/_new/main/)",
+      "expected": "The page should refuse the branch name because a branch called main already exists (\"branch already exists\") and keep the typed content, or create a separate branch and open a comparison/PR with the change on that branch. Nothing should be written to main, since the user explicitly asked for a new branch.",
+      "actual": "No error is shown about the existing branch name: the commit is written directly into main (the new file appears at src/branch/main/agent1-notes/branch-file4.md, commit abbf833a12 'Add agent1-notes/branch-file4.md') and the user is redirected to /compare/main...main which only says \"These branches are equal. There is no need to create a pull request.\" — so a change meant for a new branch/PR silently landed on main and the page contradicts what was chosen. Reproduced twice (agent1-notes/branch-file.md earlier, agent1-notes/branch-file4.md now).",
+      "reproSteps": [
+        "Go to https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/_new/main/ (signed in as eval).",
+        "Type a new file path in the 'Name your file…' field, e.g. agent1-notes/branch-file4.md.",
+        "Click in the code editor below the New File/Preview tabs and type some content, e.g. x.",
+        "In the Commit Changes box select the radio 'Create a new branch for this commit and start a pull request.'",
+        "In the 'New branch name…' field that appears replace the default with main (an existing branch name).",
+        "Click the button 'Propose file change'.",
+        "Now open https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/src/branch/main/agent1-notes/branch-file4.md."
+      ]
+    },
+    {
+      "name": "Web-edit commit made with \"Create a new branch\" swallows other people's changes pushed meanwhile (stale parent)",
+      "summary": "The commit says '3 changed files with 4 additions and 0 deletions' and its diff adds agent1-notes/branch-file4.md and agent4-branchtest.md — files other users created on main after I opened the edit page — while its 'parent' is the stale head 0881bb63dc, so the commits made in between are not ancestors of my branch (history is rewritten) and my commit claims changes I never made. The same thing happened on an earlier attempt: commit e906f9620f ('agent8: add history line one to README') also deleted tmp/agent4-delete-me.md, which another user had deleted on main in the meantime (see its .patch). Seen twice, twice with the 'Create a new branch' option; a direct commit to main is guarded ('The push appears to be out of date'). (on /eval/harbor-handbook/_edit/main/README.md)",
+      "expected": "The new commit contains only my change (README.md, +1 line), with its parent being the current head of main; if the branch moved while the edit page was open, the commit is either refused with the 'The push appears to be out of date' / 'file contents have changed' message or rebased onto the new head.",
+      "actual": "The commit says '3 changed files with 4 additions and 0 deletions' and its diff adds agent1-notes/branch-file4.md and agent4-branchtest.md — files other users created on main after I opened the edit page — while its 'parent' is the stale head 0881bb63dc, so the commits made in between are not ancestors of my branch (history is rewritten) and my commit claims changes I never made. The same thing happened on an earlier attempt: commit e906f9620f ('agent8: add history line one to README') also deleted tmp/agent4-delete-me.md, which another user had deleted on main in the meantime (see its .patch). Seen twice, twice with the 'Create a new branch' option; a direct commit to main is guarded ('The push appears to be out of date').",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Open https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/_edit/main/README.md and leave the page open (it captures branch main's current head as the base).",
+        "Add a line at the end of the README in the editor, e.g. 'agent8 race base line.'.",
+        "While that tab stays open, let branch main move forward: in a second tab commit any change to main (e.g. create /eval/harbor-handbook/_new/main/agent8-race-probe.md) or simply wait, since other users push to main constantly.",
+        "Back in the first tab choose 'Create a new branch for this commit and start a pull request', name it agent8-race-branch, commit message 'agent8: race base line on README', and click 'Propose file change'.",
+        "Open the resulting commit https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/commit/d5e23875c0 and read the diff header and file list."
+      ]
+    },
+    {
+      "name": "A long tag name is cut off and widens the whole Tags page beyond the window",
+      "summary": "The tag name is cut off at the right edge of the list with no ellipsis and no tooltip, and it stretches the table wider than the window: the page's scroll width becomes 1922 px in a 1280 px window, so the whole Tags page gets a horizontal scrollbar and the row content runs off screen. (on /eval/harbor-handbook/tags)",
+      "expected": "A long tag name wraps or is shortened with an ellipsis and a tooltip, and the tag list never widens the page beyond the window.",
+      "actual": "The tag name is cut off at the right edge of the list with no ellipsis and no tooltip, and it stretches the table wider than the window: the page's scroll width becomes 1922 px in a 1280 px window, so the whole Tags page gets a horizontal scrollbar and the row content runs off screen.",
+      "reproSteps": [
+        "Sign in as eval, open /eval/harbor-handbook/tags and click \"New Release\" (or open /eval/harbor-handbook/releases/new).",
+        "Type the long tag name agent13- followed by 236 times the letter a (total 244 characters) into \"Tag name\".",
+        "Click \"Create Tag Only\", then open /eval/harbor-handbook/tags and look at the new row at a 1280 px wide window."
+      ]
+    },
+    {
+      "name": "Delete page renders a normal delete form for a file that does not exist instead of a not-found answer",
+      "summary": "A fully working 'Commit Changes' form is rendered: commit message prefilled 'Delete agent4-does-not-exist.md', the branch radios and an active 'Commit Changes' button. Nothing on the page says the file is missing; only after clicking 'Commit Changes' does the page answer 'The file being deleted, \\\"agent4-does-not-exist.md\\\", no longer exists in this repository.' while still showing the same form. (on /eval/harbor-handbook/_delete/main/agent4-does-not-exist.md)",
+      "expected": "The page should say that the file does not exist (the repository file view of a missing path answers '404 Not Found — Path agent4-does-not-exist.md doesn't exist in branch/main') instead of offering a delete form for it",
+      "actual": "A fully working 'Commit Changes' form is rendered: commit message prefilled 'Delete agent4-does-not-exist.md', the branch radios and an active 'Commit Changes' button. Nothing on the page says the file is missing; only after clicking 'Commit Changes' does the page answer 'The file being deleted, \\\"agent4-does-not-exist.md\\\", no longer exists in this repository.' while still showing the same form.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/_delete/main/agent4-does-not-exist.md (a path that does not exist in the repository)",
+        "Read the page: it is the normal delete-file form with the message 'Delete agent4-does-not-exist.md' and a 'Commit Changes' button",
+        "Compare with the same missing path in the file view: https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/src/branch/main/agent4-does-not-exist.md answers '404 Not Found'",
+        "Click 'Commit Changes' to see that the app only then complains that the file no longer exists"
+      ]
+    },
+    {
+      "name": "Long tag name on a commit row is not wrapped and makes the commit history page scroll sideways",
+      "summary": "The tag label is rendered as one unbroken 1449 px-wide label, so the commit table grows to 1690 px on a 1280 px window: the label is cut off at the right edge, the \\\"Date\\\" column of every row is pushed out of view, and the whole page scrolls sideways. (on /eval/harbor-handbook/commits/branch/main)",
+      "expected": "A long tag name is truncated (with an ellipsis or tooltip) or wraps, so the commit table stays inside the page width and the Date column stays visible.",
+      "actual": "The tag label is rendered as one unbroken 1449 px-wide label, so the commit table grows to 1690 px on a 1280 px window: the label is cut off at the right edge, the \\\"Date\\\" column of every row is pushed out of view, and the whole page scrolls sideways.",
+      "reproSteps": [
+        "Open https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/commits/branch/main (signed in as eval, 1280 px wide window).",
+        "Look at the first row of the commit list: commit \"Add agent1-notes/branch-file4.md\" carries the tag \"agent13-aaaa…\" (the repository has a tag whose name is 'agent13-' followed by about 200 'a' characters)."
+      ]
+    },
+    {
+      "name": "After a failed Apply Patch, the \\\"Commit Changes\\\" button stays greyed out and cannot be clicked again",
+      "summary": "The 'Commit Changes' button is rendered disabled (greyed out) even though the editor still holds the patch and the summary field is filled; clicking it does nothing. The user has to type another character into the editor before the button becomes clickable again. The same happens after the 'The file contents have changed since you started editing… Commit Changes again to overwrite them' warning, where the message asks the user to press a button that is disabled. (on /eval/harbor-handbook/_diffpatch/agent3-patch)",
+      "expected": "The patch content stays in the editor and the 'Commit Changes' button stays enabled, so the user can correct the patch and submit again.",
+      "actual": "The 'Commit Changes' button is rendered disabled (greyed out) even though the editor still holds the patch and the summary field is filled; clicking it does nothing. The user has to type another character into the editor before the button becomes clickable again. The same happens after the 'The file contents have changed since you started editing… Commit Changes again to overwrite them' warning, where the message asks the user to press a button that is disabled.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/_diffpatch/agent3-patch (branch agent3-patch).",
+        "Click into the empty code editor and type a patch that will not apply, e.g. the two lines: 'this is not a patch' and 'second line of garbage'.",
+        "Scroll down and type 'agent3 garbage patch' into the commit summary field (placeholder 'Apply Patch').",
+        "Click the blue 'Commit Changes' button at the bottom of the form.",
+        "The page comes back with the red error 'Unable to apply patch \"Error: Stdout: Stderr: ...\"' and the editor still holds the typed patch; look at the 'Commit Changes' button at the bottom of the form.",
+        "Try to click 'Commit Changes' again."
+      ]
+    },
+    {
+      "name": "Upload page: \\\"Commit Changes\\\" with no file selected silently returns to the code page without any message",
+      "summary": "The page jumps straight back to the branch code page (/eval/harbor-handbook/src/branch/agent3-patch/) with no message of any kind — no error, no hint that no file was chosen and nothing was committed. Nothing is created, so the user cannot tell whether the upload worked. (on /eval/harbor-handbook/_upload/agent3-patch/)",
+      "expected": "The form refuses the submit with a visible message (e.g. that at least one file must be added / the commit message must not be empty) and keeps the user on the upload page.",
+      "actual": "The page jumps straight back to the branch code page (/eval/harbor-handbook/src/branch/agent3-patch/) with no message of any kind — no error, no hint that no file was chosen and nothing was committed. Nothing is created, so the user cannot tell whether the upload worked.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/_upload/agent3-patch/ (the Upload File page).",
+        "Do not choose any file and leave the commit summary field ('Upload files to \"\"') empty.",
+        "Click the blue 'Commit Changes' button at the bottom of the form."
+      ]
+    },
+    {
+      "name": "Upload page commit message placeholder shows an empty branch name: 'Upload files to \\\"\\\"'",
+      "summary": "The commit summary field shows the placeholder 'Upload files to \\\"\\\"' — the quotes are empty — while the option further down the same form reads 'Commit directly to the agent3-patch branch.' The target branch name is missing from the placeholder. (on /eval/harbor-handbook/_upload/agent3-patch/)",
+      "expected": "The placeholder names the branch the files go to, e.g. 'Upload files to \\\"agent3-patch\\\"', the same branch the radio option below names.",
+      "actual": "The commit summary field shows the placeholder 'Upload files to \\\"\\\"' — the quotes are empty — while the option further down the same form reads 'Commit directly to the agent3-patch branch.' The target branch name is missing from the placeholder.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/_upload/agent3-patch/",
+        "Look at the commit summary field of the 'Commit Changes' form (first field, below the drop area).",
+        "Compare it with the radio option 'Commit directly to the agent3-patch branch.' further down."
+      ]
+    },
+    {
+      "name": "New File page's commit summary placeholder shows the raw template \"Add '{filename}'\" instead of the file name",
+      "summary": "The commit summary field shows the unsubstituted template text \"Add '{filename}'\" as its placeholder, even after the path agent1-notes/probe-1.md is typed and after the editor/preview has loaded; the field's accessible name is also \"Add '{filename}'\". On the same repository's Edit File page (/eval/harbor-handbook/_edit/main/agent1-notes/branch-file4.md) the same field is correctly filled in: placeholder \"Update agent1-notes/branch-file4.md\". (on /eval/harbor-handbook/_new/main/)",
+      "expected": "The placeholder should name the file being created, e.g. Add 'probe-1.md' (as the Edit File page does with Update '<path>'), and should update as the file name is typed.",
+      "actual": "The commit summary field shows the unsubstituted template text \"Add '{filename}'\" as its placeholder, even after the path agent1-notes/probe-1.md is typed and after the editor/preview has loaded; the field's accessible name is also \"Add '{filename}'\". On the same repository's Edit File page (/eval/harbor-handbook/_edit/main/agent1-notes/branch-file4.md) the same field is correctly filled in: placeholder \"Update agent1-notes/branch-file4.md\".",
+      "reproSteps": [
+        "Go to https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/_new/main/ (signed in as eval).",
+        "Type agent1-notes/probe-1.md into the 'Name your file…' field.",
+        "Scroll down to the Commit Changes box and look at the empty first field (the commit summary).",
+        "Compare with the Edit File page of an existing file, e.g. /eval/harbor-handbook/_edit/main/agent1-notes/branch-file4.md, where the same field reads Update agent1-notes/branch-file4.md."
+      ]
+    },
+    {
+      "name": "Commit diff hides the removed line when the last line has no trailing newline, so its counters and hunk header contradict the patch",
+      "summary": "The rendered diff drops the deletion: the last line that really was removed and re-added is drawn as unchanged context, only one green added line is shown, and the hunk header is \"@@ -6,3 +6,4 @@\" — while the page's own summary says \"2 additions and 1 deletions\" and the raw patch of the same commit shows \"2 insertions(+), 1 deletion(-)\" with hunk \"@@ -5,4 +5,5 @@\" and a removed line. A reader sees a pure 1-line addition that the counters contradict. (on /eval/harbor-handbook/commit/22b462e308e54da9ed9dbdb1e880527ff05f7cfa)",
+      "expected": "The rendered diff shows the same change as the raw patch: hunk header @@ -5,4 +5,5 @@, the removed line \"-6. agent2 double submit test line.\" (with the no-newline marker) drawn in red, and the two added lines, so \"2 additions and 1 deletions\" matches the lines drawn and the hunk header.",
+      "actual": "The rendered diff drops the deletion: the last line that really was removed and re-added is drawn as unchanged context, only one green added line is shown, and the hunk header is \"@@ -6,3 +6,4 @@\" — while the page's own summary says \"2 additions and 1 deletions\" and the raw patch of the same commit shows \"2 insertions(+), 1 deletion(-)\" with hunk \"@@ -5,4 +5,5 @@\" and a removed line. A reader sees a pure 1-line addition that the counters contradict.",
+      "reproSteps": [
+        "Open https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/commit/22b462e308e54da9ed9dbdb1e880527ff05f7cfa (commit \"agent2 signed-off trailer test\" by eval on branch docs/release-owners, one file: docs/contributing.md).",
+        "Read the summary line above the diff: \"1 changed files with 2 additions and 1 deletions\".",
+        "Look at the rendered diff: hunk header \"@@ -6,3 +6,4 @@\"; lines 6, 7 and 8 (\"4. Merge after review…\", \"5. agent2 release-owners…\", \"6. agent2 double submit test line.\") are drawn as unchanged context on both sides; there is exactly one green added line \"7. agent2 signed-off trailer test.\" and no red removed line.",
+        "Open the raw patch of the same commit: https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/commit/22b462e308.patch — it lists 2 insertions(+), 1 deletion(-), hunk \"@@ -5,4 +5,5 @@\", the removed line \"-6. agent2 double submit test line.\" with \"\\ No newline at end of file\", and two added lines."
+      ]
+    },
+    {
+      "name": "Blame page reports one line more than the file has (\"7 lines\" for a 6-line file)",
+      "summary": "The blame header says \"7 lines | 231 B\" while the blame table and the raw file show only 6 lines (lines 1–6), and the commit that created the file, 4ff25d14a0, shows the hunk \"@@ -0,0 +1,6 @@\" — 6 lines. The same off-by-one appears on README.md: blame header \"10 lines\" for a file whose creating hunk is \"@@ -0,0 +1,9 @@\" and whose blame rows end at line 9. (on /eval/harbor-handbook/blame/branch/main/docs/contributing.md)",
+      "expected": "The line count in the blame header should be the number of lines the file has, 6 for docs/contributing.md and 9 for README.md, matching the blame rows and the commit diff.",
+      "actual": "The blame header says \"7 lines | 231 B\" while the blame table and the raw file show only 6 lines (lines 1–6), and the commit that created the file, 4ff25d14a0, shows the hunk \"@@ -0,0 +1,6 @@\" — 6 lines. The same off-by-one appears on README.md: blame header \"10 lines\" for a file whose creating hunk is \"@@ -0,0 +1,9 @@\" and whose blame rows end at line 9.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/blame/branch/main/docs/contributing.md",
+        "Read the count in the header bar above the blame table (between the branch breadcrumb and the Raw/Permalink buttons, left side).",
+        "Compare it with the numbered lines in the blame table and with the Raw view of the same file (https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/raw/branch/main/docs/contributing.md).",
+        "Repeat on https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/blame/branch/main/README.md and compare with the hunk header of commit 4ff25d14a0."
+      ]
+    },
+    {
+      "name": "Long tag names in the commit page's \\\"This commit is contained in\\\" panel overflow the window",
+      "summary": "The two long tag names (\\\"repro-aaa…a\\\" and \\\"repro-agent13-aaa…a\\\", both created as test tags in this repo) are not wrapped or clipped: each label is drawn 1442 px and 1633 px wide inside the panel, runs past the right edge of the 1280 px window and over the diff area, and the whole commit page widens to 1681 px so it scrolls sideways. (on /eval/harbor-handbook/commit/4ff25d14a0c71fb629f63a4a48ec556389c136eb)",
+      "expected": "The tag labels wrap or are shortened (with the full name in a tooltip) inside the \\\"This commit is contained in:\\\" panel, and the commit page stays inside the window width.",
+      "actual": "The two long tag names (\\\"repro-aaa…a\\\" and \\\"repro-agent13-aaa…a\\\", both created as test tags in this repo) are not wrapped or clipped: each label is drawn 1442 px and 1633 px wide inside the panel, runs past the right edge of the 1280 px window and over the diff area, and the whole commit page widens to 1681 px so it scrolls sideways.",
+      "reproSteps": [
+        "Open https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/commit/4ff25d14a0c71fb629f63a4a48ec556389c136eb",
+        "Click the small \"...\" button (Load branches and tags referencing this commit) just under the commit title, left of \"Browse Source\"",
+        "Look at the \"This commit is contained in:\" block that appears: the tags \"repro-aaa…\" and \"repro-agent13-aaa…\" overflow the window and the page scrolls sideways"
+      ]
+    },
+    {
+      "name": "Repository RSS feed entry titles contain escaped HTML anchor markup instead of plain text",
+      "summary": "The item titles (and descriptions) carry an HTML fragment as escaped text, e.g. <title>eval pushed &lt;a href=&#34;https://…/src/branch/agent15-retry&#34;&gt;agent15-retry&lt;/a&gt; at &lt;a href=&#34;…&#34;&gt;eval/harbor-handbook&lt;/a&gt;</title>, and <description>&lt;a href=…&gt;db2da13bb…&lt;/a&gt; &#x3A; agent15 double submit probe</description>. After XML unescaping a feed reader gets \"eval pushed <a href=\"…\">agent15-retry</a> at <a href=\"…\">eval/harbor-handbook</a>\" as the title text and shows the markup literally, so every entry in this feed reads as raw markup. The per-branch feed of the same repository (/eval/harbor-handbook/rss/branch/main) has clean plain-text titles, so the two feeds of the same site disagree on the format. (on /eval/harbor-handbook.rss)",
+      "expected": "Each entry title should be plain readable text such as \"eval pushed to agent15-retry at eval/harbor-handbook\", like the branch feed's titles (\"Add agent7-rolecheck.md\"), with any link markup kept out of the title.",
+      "actual": "The item titles (and descriptions) carry an HTML fragment as escaped text, e.g. <title>eval pushed &lt;a href=&#34;https://…/src/branch/agent15-retry&#34;&gt;agent15-retry&lt;/a&gt; at &lt;a href=&#34;…&#34;&gt;eval/harbor-handbook&lt;/a&gt;</title>, and <description>&lt;a href=…&gt;db2da13bb…&lt;/a&gt; &#x3A; agent15 double submit probe</description>. After XML unescaping a feed reader gets \"eval pushed <a href=\"…\">agent15-retry</a> at <a href=\"…\">eval/harbor-handbook</a>\" as the title text and shows the markup literally, so every entry in this feed reads as raw markup. The per-branch feed of the same repository (/eval/harbor-handbook/rss/branch/main) has clean plain-text titles, so the two feeds of the same site disagree on the format.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Open the repository's RSS feed at https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook.rss (it is the target of the \"RSS Feed\" icon button in the repository header).",
+        "Read the <title> and <description> lines of the first three <item> elements."
+      ]
+    },
+    {
+      "name": "Branch RSS feed's channel link points to a page that answers 404",
+      "summary": "Both branch feeds advertise a channel link of the form https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/branch/main and …/branch/docs/release-owners, and opening either address answers \"404 Not Found — The page you are trying to reach either does not exist or you are not authorized to view it.\" The working branch pages live under a different address (/eval/harbor-handbook/src/branch/…), so the feed's own link leads to an error page. (on /eval/harbor-handbook/rss/branch/main)",
+      "expected": "The feed's channel link should open the branch's code page, i.e. a working address such as /eval/harbor-handbook/src/branch/main, so a reader's \"open site\" action reaches the repository instead of an error.",
+      "actual": "Both branch feeds advertise a channel link of the form https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/branch/main and …/branch/docs/release-owners, and opening either address answers \"404 Not Found — The page you are trying to reach either does not exist or you are not authorized to view it.\" The working branch pages live under a different address (/eval/harbor-handbook/src/branch/…), so the feed's own link leads to an error page.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Open the branch feed linked on the commit history page: https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/rss/branch/main (also reachable as /eval/harbor-handbook/rss/branch/docs/release-owners).",
+        "Read the channel <link> element: https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/branch/main.",
+        "Open that address in the same tab."
+      ]
+    },
+    {
+      "name": "New File from a file's blame page opens the editor inside the file itself (docs/releases.md/ instead of docs/)",
+      "summary": "The editor opens at \"harbor-handbook / docs / releases.md /\" — the file releases.md is used as the directory, so a new file would be created as docs/releases.md/<name>, which cannot exist next to the file docs/releases.md. The Apply Patch entry on the same menu has the same wrong path (/_diffpatch/main/docs/releases.md). (on /eval/harbor-handbook/blame/branch/main/docs/releases.md)",
+      "expected": "New File from a file's page should open the editor in the file's containing folder, i.e. breadcrumb \"harbor-handbook / docs /\" (the same control on the folder page docs opens /_new/main/docs), so the new file is created as docs/<name>.",
+      "actual": "The editor opens at \"harbor-handbook / docs / releases.md /\" — the file releases.md is used as the directory, so a new file would be created as docs/releases.md/<name>, which cannot exist next to the file docs/releases.md. The Apply Patch entry on the same menu has the same wrong path (/_diffpatch/main/docs/releases.md).",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/blame/branch/main/docs/releases.md",
+        "Click the \"Add File\" button above the file header and choose \"New File\".",
+        "Read the breadcrumb on the page that opens: \"harbor-handbook / docs / releases.md /\" with the \"Name your file…\" box after it.",
+        "For comparison, open https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/src/branch/main/docs (the folder) and use Add File -> New File: there the editor opens at \"harbor-handbook / docs /\"."
+      ]
+    },
+    {
+      "name": "Whitespace-ignoring diff shows a blank area with no message while its summary still counts \"1 additions and 1 deletions\"",
+      "summary": "With whitespace=ignore-all the diff area below the summary is completely empty — no file box, no hunk, no line saying that a whitespace-only change was hidden — while the summary still reads \"1 changed files with 1 additions and 1 deletions\" in the same page. The same page with \"Show all changes\" shows the file docs/contributing.md and the removed/added line 4. The empty state also survives a reload of the ?whitespace=ignore-all URL. (on /eval/harbor-handbook/commit/c1104fae80)",
+      "expected": "Either the diff should still be listed with its counts consistent with what is shown (e.g. the file listed with 0 additions/0 deletions, or the summary reduced), or the page should say in words that the only change in this commit is whitespace and is hidden by the selected option — never a blank area with an \"1 additions and 1 deletions\" claim above it.",
+      "actual": "With whitespace=ignore-all the diff area below the summary is completely empty — no file box, no hunk, no line saying that a whitespace-only change was hidden — while the summary still reads \"1 changed files with 1 additions and 1 deletions\" in the same page. The same page with \"Show all changes\" shows the file docs/contributing.md and the removed/added line 4. The empty state also survives a reload of the ?whitespace=ignore-all URL.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/commit/c1104fae80 (a commit that only adds two leading spaces to line 4 of docs/contributing.md on branch agent1-push-1).",
+        "With the default 'Show all changes' the page shows docs/contributing.md with 1 addition and 1 deletion.",
+        "Open the Whitespace dropdown (the small icon row above the diff, next to the view-style buttons) and choose 'Ignore whitespace when comparing lines'.",
+        "Look at the page: the summary line still says '1 changed files with 1 additions and 1 deletions' but the diff area below it is empty.",
+        "Reload the page (the URL now ends with ?whitespace=ignore-all): the empty area with the same count line comes back."
+      ]
+    },
+    {
+      "name": "Commit graph at phone width hides every commit message and clips the dates",
+      "summary": "Every row shows only the short SHA, the branch labels, the author avatar and a date cut at the window edge (\"eval Nov 23, 2026, 5:23:\", \"Maya Chen Nov 23, 2026,\"). The commit messages are not visible at all — the message text is in the page but no column width is left for it, and it stays invisible after scrolling the page sideways (where the Mono/Color toggles and the rest of the dates only then come into reach). The page has to be scrolled left and right to read even the remaining columns, and the dates are still clipped at the right edge. At 1280 px the same page shows message, labels, author and full date on one row. (on /eval/harbor-handbook/graph)",
+      "expected": "At 390 px wide the commit graph shows each commit's message (wrapped or elided with an ellipsis) together with its SHA, branch labels and a complete date, without the page needing sideways scrolling to reach the message or the Mono/Color toggles.",
+      "actual": "Every row shows only the short SHA, the branch labels, the author avatar and a date cut at the window edge (\"eval Nov 23, 2026, 5:23:\", \"Maya Chen Nov 23, 2026,\"). The commit messages are not visible at all — the message text is in the page but no column width is left for it, and it stays invisible after scrolling the page sideways (where the Mono/Color toggles and the rest of the dates only then come into reach). The page has to be scrolled left and right to read even the remaining columns, and the dates are still clipped at the right edge. At 1280 px the same page shows message, labels, author and full date on one row.",
+      "reproSteps": [
+        "Set the browser viewport to 390 × 844 (phone).",
+        "Open https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-book/graph (or open the commit history page and press \"Commit Graph\") — use the real address https://5503-if6f6j5z691kuklo2xtor.e2b.app/eval/harbor-handbook/graph.",
+        "Read the commit rows: SHA, branch label, avatar and a date cut at the right edge, with no commit message anywhere.",
+        "Scroll the page to the right: the Mono/Color toggle buttons and more of the dates appear, but the commit messages still never appear.",
+        "Compare with the same page at 1280 × 720, where every row shows SHA, message, labels, author and the full date."
+      ]
+    }
+  ]
+}

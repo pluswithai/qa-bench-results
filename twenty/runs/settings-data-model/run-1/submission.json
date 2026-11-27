@@ -1,0 +1,212 @@
+{
+  "fixture": "twenty/areas/settings-data-model",
+  "run": 1,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 485,
+      "name": "Reconnect in the \"Sync lost with mailbox\" banner throws you out of Settings and only shows a raw error",
+      "summary": "The app leaves Settings, goes through /verify?errorMessage=Google+apis+auth+is+not+enabled and lands on the workspace home (Companies) with a red toast reading the raw technical text 'Google apis auth is not enabled'. The sync banner is still there afterwards, so nothing was reconnected and the settings page the person was on is lost. (on /settings/general)",
+      "expected": "Reconnect re-authorises the mailbox and keeps the person on Settings > General (the banner disappears or an explanatory message appears in place).",
+      "actual": "The app leaves Settings, goes through /verify?errorMessage=Google+apis+auth+is+not+enabled and lands on the workspace home (Companies) with a red toast reading the raw technical text 'Google apis auth is not enabled'. The sync banner is still there afterwards, so nothing was reconnected and the settings page the person was on is lost.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev and open Settings > General (/settings/general).",
+        "In the blue banner 'Sync lost with mailbox tim@apple.dev. Please reconnect for updates:' click 'Reconnect'.",
+        "Observe the address bar and the page after the redirect."
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 556,
+      "name": "Skills list is not sorted alphabetically by Name in either direction",
+      "summary": "The list follows neither order for two skills. Ascending: 'Word Documents' appears between 'Data Manipulation' and 'Metadata Building', and 'Excel & Spreadsheets' is the last row of the list. Descending: 'Excel & Spreadsheets' is the first row, and 'Metadata Building' is listed above 'Word Documents'. The 15 rows are otherwise in the correct order, so the sort indicator contradicts what the list shows. (on /settings/ai#skills)",
+      "expected": "With the up arrow the skills are in alphabetical order by name: ... Data Manipulation, Excel & Spreadsheets, Metadata Building, PDF Processing, PowerPoint, Research, View Building, View Filters & Sorts, Workflow Building, Word Documents, Workspace Demo Seeding. With the down arrow the same list reversed, starting with Workspace Demo Seeding and ending with Excel & Spreadsheets.",
+      "actual": "The list follows neither order for two skills. Ascending: 'Word Documents' appears between 'Data Manipulation' and 'Metadata Building', and 'Excel & Spreadsheets' is the last row of the list. Descending: 'Excel & Spreadsheets' is the first row, and 'Metadata Building' is listed above 'Word Documents'. The 15 rows are otherwise in the correct order, so the sort indicator contradicts what the list shows.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open Settings > AI, then the Skills tab (URL /settings/ai#skills).",
+        "Click the 'Name' column header once so it shows the up arrow (ascending).",
+        "Read the list from top to bottom.",
+        "Click the 'Name' column header again so it shows the down arrow (descending) and read the list again."
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 602,
+      "name": "Clearing the First Name is silently discarded — no error shown, the old value comes back after reload",
+      "summary": "No message of any kind: the field simply stays empty with its placeholder, and after the reload the previously saved value (\\\"Timothy\\\") is back. The edit is dropped silently, so the person believes the name was cleared/saved when it was not. Also tried with a spaces-only value: same silent revert. (on /settings/profile)",
+      "expected": "The page either refuses the empty name with a message next to the field (\\\"First name is required\\\") and keeps the typed value, or saves the change and shows it after reload. A change the app refuses must say so.",
+      "actual": "No message of any kind: the field simply stays empty with its placeholder, and after the reload the previously saved value (\\\"Timothy\\\") is back. The edit is dropped silently, so the person believes the name was cleared/saved when it was not. Also tried with a spaces-only value: same silent revert.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev and open https://5500-ihwe0ejky0mc6llacv6bz.e2b.app/settings/profile",
+        "Note the saved First Name value (I set it to \"Timothy\" beforehand)",
+        "Clear the First Name field completely (or type only spaces) and press Tab to leave the field",
+        "Observe: the field is now empty, no validation message appears anywhere, no toast, nothing",
+        "Reload the page (F5) and read the First Name field again"
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 724,
+      "name": "Role selector is disabled on the API key create page, so every API key is Admin",
+      "summary": "The Role field is greyed out with a not-allowed cursor and does not react to clicks or keyboard: no list opens. The role is fixed to Admin, so no API key can be created with the Member role and every key gets full Admin permissions, while the API Keys list shows a \\\"Role\\\" column and the help text says the role is selectable. (on /settings/mcp-apis/apis/new)",
+      "expected": "The Role field opens a list of the workspace roles (Admin, Member — both exist under Settings > Members > Roles) so the key's permissions can be chosen, as the field's own help text says: \\\"What this API can do: Select a user role to define its permissions.\\\"",
+      "actual": "The Role field is greyed out with a not-allowed cursor and does not react to clicks or keyboard: no list opens. The role is fixed to Admin, so no API key can be created with the Member role and every key gets full Admin permissions, while the API Keys list shows a \\\"Role\\\" column and the help text says the role is selectable.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev.",
+        "Open Settings > MCP & APIs and click the API tab.",
+        "Click \"Create API key\" (link at the bottom right of the API Keys list) — URL /settings/mcp-apis/apis/new.",
+        "Type a name in the Name field, then click the Role field that shows \"Admin\"."
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 795,
+      "name": "Workspace Name field shows a stale placeholder \"Apple\" that is not the workspace's name, and an empty name is silently rejected",
+      "summary": "The field shows a grey 'Apple' in it while the workspace is actually named 'agent10-Supercalifragilistic…'. The empty name is rejected silently (no message), the field is left empty rather than restored, and the text 'Apple' is a placeholder from the workspace's old name — a person reading the form believes the workspace is called Apple. Reloading the page shows the real name again. The placeholder 'Apple' stays even when the workspace has a different name. (on /settings/general)",
+      "expected": "After clearing the Name and leaving the field, either the saved name comes back in the field (with a message that a name is required), or the field stays empty with a neutral placeholder — never a different workspace name.",
+      "actual": "The field shows a grey 'Apple' in it while the workspace is actually named 'agent10-Supercalifragilistic…'. The empty name is rejected silently (no message), the field is left empty rather than restored, and the text 'Apple' is a placeholder from the workspace's old name — a person reading the form believes the workspace is called Apple. Reloading the page shows the real name again. The placeholder 'Apple' stays even when the workspace has a different name.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev and open Settings > General (/settings/general).",
+        "In the Name field, set the workspace name to 'agent10-Supercalifragilisticexpialidocious-Workspace-Name-That-Is-Very-Long-Indeed-For-Layout-Testing' and press Tab (it is saved).",
+        "Clear the Name field completely and press Tab.",
+        "Look at the Name field: it now displays a grey 'Apple' although the workspace name is the agent10-… value."
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 924,
+      "name": "The Type column of the skills table is empty for every skill",
+      "summary": "For every one of the 15 rows the Type cell is blank: only the header word \"Type\" is drawn, at the same height as the Name header, with an empty area of about 120 px under it in every row, including the custom skill 'agent15-cancelled-name' I created. No row ever shows a Type value, at desktop (1280), tablet (768) and phone (390) widths. (on /settings/ai#skills)",
+      "expected": "Each skill row shows a Type value under the Type column header (for example whether the skill is built-in or custom, or the type of its deactivated state).",
+      "actual": "For every one of the 15 rows the Type cell is blank: only the header word \"Type\" is drawn, at the same height as the Name header, with an empty area of about 120 px under it in every row, including the custom skill 'agent15-cancelled-name' I created. No row ever shows a Type value, at desktop (1280), tablet (768) and phone (390) widths.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open Settings > AI, then the Skills tab (/settings/ai#skills).",
+        "Look at the 'Type' column: the header is drawn on the right of 'Name' (around x=590 at 768 px width, x=965 at 1280 px).",
+        "Read the rows below the header, including a skill created in this session ('agent15-cancelled-name')."
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 939,
+      "name": "Logs tab shows its filters but never any log list or empty state",
+      "summary": "Nothing is listed at all: below the filter card there is only the \"Upgrade to access audit logs\" card. No table, no rows, no loading indicator and no \"no results\" message, with any filter combination (default filters, and with Start date = Nov 1, 2026 set). (on /settings/general#logs)",
+      "expected": "The Logs tab shows the application log entries for the selected period, or at least an explicit empty state (\"No logs found for this period\") telling the person the filters matched nothing.",
+      "actual": "Nothing is listed at all: below the filter card there is only the \"Upgrade to access audit logs\" card. No table, no rows, no loading indicator and no \"no results\" message, with any filter combination (default filters, and with Start date = Nov 1, 2026 set).",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open Settings > General > Logs (/settings/general#logs).",
+        "Look at the page below the filter card (Table: Page Views, Page name, Workspace members, Period).",
+        "Set a Start date (e.g. Nov 1 of the current year in the calendar) and look below the filters again."
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 986,
+      "name": "New Webhook: the Description field shows the Endpoint URL's helper text",
+      "summary": "The Description field's helper text reads \\\"We will send a POST request to this endpoint for each new event in application/json format.\\\" — the same sentence as the Endpoint URL helper, which describes the URL and not a description. It tells the user nothing about what the Description field is for. (on /settings/mcp-apis/webhooks/new)",
+      "expected": "The Description field has its own helper text describing a description (e.g. \\\"Optional note to recognise this webhook\\\"), not a copy of the Endpoint URL helper.",
+      "actual": "The Description field's helper text reads \\\"We will send a POST request to this endpoint for each new event in application/json format.\\\" — the same sentence as the Endpoint URL helper, which describes the URL and not a description. It tells the user nothing about what the Description field is for.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev and open Settings > MCP & APIs.",
+        "Click the \"Webhooks\" tab, then \"Create webhook\" (URL /settings/mcp-apis/webhooks/new).",
+        "Read the helper text under the \"Endpoint URL\" heading and under the \"Description\" heading."
+      ]
+    },
+    {
+      "index": 8,
+      "reported_at_seconds": 998,
+      "name": "Renaming a field in one tab throws another tab's open field page to \"Off the beaten path\" 404",
+      "summary": "Tab B silently navigates itself to /not-found and shows the 404 page \\\"Off the beaten path — The page you're seeking is either gone or never was\\\", although the field still exists under its new name (agent12-fourth) and any edit in progress in that tab is discarded with no message. Seen twice out of two tries (with agent12-renamed and agent12-second). (on /settings/objects/agent12Things/agent12Second)",
+      "expected": "Tab B either keeps the field form (the field still exists, only renamed) or tells the user the field was renamed and refreshes to it. It should not claim the record is gone.",
+      "actual": "Tab B silently navigates itself to /not-found and shows the 404 page \\\"Off the beaten path — The page you're seeking is either gone or never was\\\", although the field still exists under its new name (agent12-fourth) and any edit in progress in that tab is discarded with no message. Seen twice out of two tries (with agent12-renamed and agent12-second).",
+      "reproSteps": [
+        "Tab B: open https://5500-ihwe0ejky0mc6llacv6bz.e2b.app/settings/objects/agent12Things/agent12Second — the edit page of the custom Text field \"agent12-second\" of the object \"Agent12 Things\" (created with Settings > Data model > + Add object, singular \"agent12 Thing\").",
+        "Tab B stays on that page; it shows the field form with Name = agent12-second.",
+        "Tab A: open https://5500-ihwe0ejky0mc6llacv6bz.e2b.app/settings/objects/agent12Things and click the field row \"agent12-second\".",
+        "Tab A: change Name from \"agent12-second\" to \"agent12-fourth\" and click Save; the list shows agent12-fourth.",
+        "Return to tab B without touching it."
+      ]
+    },
+    {
+      "index": 9,
+      "reported_at_seconds": 1037,
+      "name": "Object Settings tab shows leftover \\\"Lorem ipsum\\\" filler text in the Preview card",
+      "summary": "The preview card's body line reads \\\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum magna enim, dapibus non e...\\\" — leftover placeholder text. An object that has records (People) shows a real record instead, so the empty case exposes the mock copy. (on /settings/objects/agent4Things#settings)",
+      "expected": "The preview shows a neutral sample or a clean empty state, not lorem ipsum filler text in a shipping product.",
+      "actual": "The preview card's body line reads \\\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum magna enim, dapibus non e...\\\" — leftover placeholder text. An object that has records (People) shows a real record instead, so the empty case exposes the mock copy.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev and open Settings > Data model (/settings/objects).",
+        "Click \"+ Add object\", type agent4 Thing in Singular, click Save (this creates the custom object \"Agent4 Things\" with no records).",
+        "On the object's page click the \"Settings\" tab (/settings/objects/agent4Things#settings).",
+        "Look at the \"Options\" section: in the \"Preview\" card under \"Person/Agent4 Thing\" the record line reads \"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum magna enim, dapibus non e...\"."
+      ]
+    },
+    {
+      "index": 10,
+      "reported_at_seconds": 1054,
+      "name": "Data model list shows 0 records for a custom object that has 1 record",
+      "summary": "The Records column for Agent8 Bookings shows 0, while the object's own list view shows a count of 1 with one record in it. Still 0 after a reload of the data model page. (on /settings/objects)",
+      "expected": "The Records column for Agent8 Bookings shows 1, matching the single record listed in the object's record list.",
+      "actual": "The Records column for Agent8 Bookings shows 0, while the object's own list view shows a count of 1 with one record in it. Still 0 after a reload of the data model page.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev.",
+        "Go to Settings > Data model and create a custom object with singular name \"Agent8 Booking\" (plural \"Agent8 Bookings\").",
+        "Open it in the left navigation (or /objects/agent8Bookings) and create one record, named \"agent8 booking one\".",
+        "Confirm the record list shows the record: the header reads \"All Agent8 Bookings 1\" and the row \"agent8 booking one\" is listed.",
+        "Go back to Settings > Data model (/settings/objects) and read the \"Records\" column of the \"Agent8 Bookings\" row (also after a full page reload)."
+      ]
+    },
+    {
+      "index": 11,
+      "reported_at_seconds": 1202,
+      "name": "/settings with no subpage shows an empty content pane instead of the settings pages",
+      "summary": "The settings UI is never rendered: the page shows the normal workspace sidebar (Companies, People, Tasks, ...) next to an empty main area, with no settings navigation, no default settings page, no not-found message and no way on. Reloading keeps the same blank state. (on /settings)",
+      "expected": "Opening /settings with no subpage opens Settings on a sensible default page (e.g. Settings > Profile) with the settings navigation, or answers a clear not-found page with a link back.",
+      "actual": "The settings UI is never rendered: the page shows the normal workspace sidebar (Companies, People, Tasks, ...) next to an empty main area, with no settings navigation, no default settings page, no not-found message and no way on. Reloading keeps the same blank state.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev.",
+        "Enter the address https://5500-ihwe0ejky0mc6llacv6bz.e2b.app/settings (Settings with no subpage) and press Enter.",
+        "Look at the main content area of the page."
+      ]
+    },
+    {
+      "index": 12,
+      "reported_at_seconds": 1242,
+      "name": "Unknown settings address shows an empty content pane instead of a not-found page",
+      "summary": "Settings opens with its navigation on the left but the whole content area is empty: no \"page not found\" wording, no explanation, nothing highlighted in the settings navigation and no link back. Reloading gives the same empty pane; no console error and no failed request. (on /settings/does-not-exist)",
+      "expected": "The app shows its own not-found screen (the \"Off the beaten path\" page it uses for unknown records) with a way back to a real settings page.",
+      "actual": "Settings opens with its navigation on the left but the whole content area is empty: no \"page not found\" wording, no explanation, nothing highlighted in the settings navigation and no link back. Reloading gives the same empty pane; no console error and no failed request.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev.",
+        "Enter the address https://5500-ihwe0ejky0mc6llacv6bz.e2b.app/settings/does-not-exist and press Enter.",
+        "Look at the content area to the right of the settings navigation."
+      ]
+    },
+    {
+      "index": 13,
+      "reported_at_seconds": 1327,
+      "name": "Editing the Singular name silently overwrites an already-saved custom Plural name",
+      "summary": "The Plural field is immediately replaced with the derived 'Agent1 Things' while typing the Singular; on blur that derived value is saved (the object becomes 'Agent1 Things' everywhere). The user's saved custom plural is lost without notice. (on /settings/objects/agent1Zorbs#settings)",
+      "expected": "Editing the Singular name keeps the Plural name the user saved earlier ('Agent1 Zorbs'), or asks before replacing it.",
+      "actual": "The Plural field is immediately replaced with the derived 'Agent1 Things' while typing the Singular; on blur that derived value is saved (the object becomes 'Agent1 Things' everywhere). The user's saved custom plural is lost without notice.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and go to Settings > Data model, open the custom object created for this test (object 'Agent1 Gadget', address /settings/objects/agent1Gadgets#settings).",
+        "Open the Settings tab of the object. Set Plural to 'agent1 Zorbs' and click outside the field (the save is automatic; the address becomes /settings/objects/agent1Zorbs and the breadcrumb reads 'Agent1 Zorbs').",
+        "Now click into the Singular field and type 'agent1 Thing'."
+      ]
+    },
+    {
+      "index": 14,
+      "reported_at_seconds": 1432,
+      "name": "Record page layout editor at phone width: the record position indicator is cut off and overlapped by the \"Edit actions\" button",
+      "summary": "At 390px the position indicator is cut mid-value ('Companies / Housecall Pro (443/6') and on the record 'agent3-NumberTest' the 'Edit actions' button (with its pencil icon) is drawn on top of the indicator, so the record's position cannot be read. At desktop width the same header shows the full '(443/600)'. (on /object/company/:id (Companies layout edition, reached from Settings > Data model > Companies > Layout > Customize record page))",
+      "expected": "The record header shows the object and record name plus its position (e.g. 'Companies / Housecall Pro (443/600)') and the 'Edit actions' button without overlapping or cutting the text.",
+      "actual": "At 390px the position indicator is cut mid-value ('Companies / Housecall Pro (443/6') and on the record 'agent3-NumberTest' the 'Edit actions' button (with its pencil icon) is drawn on top of the indicator, so the record's position cannot be read. At desktop width the same header shows the full '(443/600)'.",
+      "reproSteps": [
+        "Set the browser window to 390 x 844 (phone).",
+        "Open Settings > Data model > Companies, click the Layout tab, then click 'Customize record page'.",
+        "Look at the record header line under the blue 'Companies layout edition' bar, next to the record name."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,309 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "metabase/areas/data-modeling",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "8f1679af7b62acc177a410f419ceb8657f12ad4ecb69edd82f64f9504f3fcaf9",
+    "known_invalid_sha256": "82b6192aa124b29a30d795070102fc5485f2d38e00f3837f2c18e439983f6000",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "115",
+    "bugs": "24",
+    "flags": "0",
+    "known_hits": "5",
+    "extra_known_hits": "0",
+    "unverified": "15",
+    "outside_area_known_hits": "0",
+    "outside_area_known_invalid": "1",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "0",
+    "outside_area_ground_truth_sha256": "18765609374b28bc9ff8c4d574f183a1cec470472e42a7e8bae343da32e17da8",
+    "outside_area_known_invalid_sha256": "bda5fa1dae2abd3dbc884c784d0bd82ccd854fe93bc63cc4126be5e14c0b4c18",
+    "duplicates": "0",
+    "duplicate_known_hits": "0",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "3",
+    "known_misses": "3",
+    "precision": "0.625",
+    "recall": "0.043478260869565216",
+    "findings_per_minute": "0.8047866924049373",
+    "correct_findings_per_minute": "0.16766389425102862",
+    "severity_1": "4",
+    "severity_3": "1",
+    "severity_5": "0",
+    "severity_sum": "7",
+    "score": "4",
+    "duration_seconds": "1789.294",
+    "partial": "false",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 9,
+        "reproStepsIndex": 0,
+        "findingIndex": 1,
+        "reason": "Describes the same overlapping and clipped Field type/Data type columns in the Data Reference field schema, using a different table and viewport."
+      },
+      {
+        "groundTruthIndex": 92,
+        "reproStepsIndex": 0,
+        "findingIndex": 2,
+        "reason": "Matches the seeded Orders + People model History entry displaying “undefined modified this.”"
+      },
+      {
+        "groundTruthIndex": 112,
+        "reproStepsIndex": 0,
+        "findingIndex": 6,
+        "reason": "Exactly matches the model duplication Name placeholder incorrectly asking for a dashboard name."
+      },
+      {
+        "groundTruthIndex": 27,
+        "reproStepsIndex": 0,
+        "findingIndex": 9,
+        "reason": "The description-only edit produces the same spurious pin-position and metadata-change claims in History."
+      },
+      {
+        "groundTruthIndex": 44,
+        "reproStepsIndex": 0,
+        "findingIndex": 12,
+        "reason": "Matches duplicate glossary-term submission failing silently, closing the editor, and losing the draft definition."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 16,
+        "reproStepsIndex": 0,
+        "findingIndex": 5,
+        "reason": "Matches the rejected claim that a numeric field's distinct-values suggestion incorrectly returns automatically binned ranges."
+      },
+      {
+        "knownInvalidIndex": 5,
+        "reproStepsIndex": 0,
+        "findingIndex": 11,
+        "reason": "Matches the rejected expectation that clicking the Models catalog Description header should sort the rows."
+      },
+      {
+        "knownInvalidIndex": 28,
+        "reproStepsIndex": null,
+        "findingIndex": 19,
+        "reason": "Matches the rejected metadata-reset claim associated with converting a model to a saved question. This finding stops at the question rather than converting back."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 0,
+        "reason": "No reviewed entry describes table cards overflowing the content area and clipping their descriptions."
+      },
+      {
+        "findingIndex": 3,
+        "reason": "No reviewed entry covers a nonexistent database rendering an empty detail shell. The hidden-metadata rejection concerns a different condition."
+      },
+      {
+        "findingIndex": 4,
+        "reason": "The table ID does not exist; knownInvalid 4 instead concerns existing metadata deliberately hidden from Data Reference."
+      },
+      {
+        "findingIndex": 7,
+        "reason": "No reviewed entry covers database cards overflowing horizontally when the navigation sidebar is open."
+      },
+      {
+        "findingIndex": 8,
+        "reason": "Calling a renamed metric a “Card” is distinct from the reviewed conversion-history issue exposing raw type values."
+      },
+      {
+        "findingIndex": 10,
+        "reason": "No reviewed entry covers long glossary terms overlapping definitions; the reviewed length issue concerns rejected saves instead."
+      },
+      {
+        "findingIndex": 13,
+        "reason": "No reviewed entry addresses the “A model” fallback displayed for an empty model description."
+      },
+      {
+        "findingIndex": 14,
+        "reason": "No reviewed entry covers a new model displaying “Saved” before its save dialog is submitted."
+      },
+      {
+        "findingIndex": 15,
+        "reason": "No reviewed entry describes the glossary's responsive layout collapsing and making its contents unreadable."
+      },
+      {
+        "findingIndex": 16,
+        "reason": "No reviewed entry covers obsolete “pulses” terminology in the metric archive confirmation."
+      },
+      {
+        "findingIndex": 17,
+        "reason": "No reviewed entry describes phone-width clipping in the Move dialog."
+      },
+      {
+        "findingIndex": 18,
+        "reason": "No reviewed entry covers the saved model's Created At header failing to open its column actions."
+      },
+      {
+        "findingIndex": 20,
+        "reason": "Missing phone-width Filter and Summarize actions is distinct from the reviewed tablet-width metric header wrapping defect."
+      },
+      {
+        "findingIndex": 21,
+        "reason": "No reviewed entry covers /metric/new opening a question editor and creating the wrong entity type."
+      },
+      {
+        "findingIndex": 22,
+        "reason": "No reviewed entry covers item ID 0 opening a creation editor. The reviewed numeric-zero issue concerns record keys within an existing model."
+      },
+      {
+        "findingIndex": 23,
+        "reason": "Silently restoring an archived metric through a stale-tab rename is distinct from knownInvalid 19's stale definition overwriting a description."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 1,
+        "reason": "Description clipping is a presentation defect without a described functional failure."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 3,
+        "reason": "A failed resource lookup incorrectly displays an editable record state instead of a not-found state."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 3,
+        "reason": "The page treats a nonexistent table as an existing record and offers invalid table actions."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 3,
+        "reason": "The claimed impact is an incorrect query result: ranges rather than individual distinct values."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 1,
+        "reason": "Clipped cards and unwanted horizontal scrolling are layout and minor usability defects."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 1,
+        "reason": "The finding describes inappropriate terminology in history copy."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 1,
+        "reason": "The saved text overlaps visually without a described persistence or interaction failure."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 3,
+        "reason": "As described, an apparently interactive sorting control does not perform its expected action."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 1,
+        "reason": "The claim concerns misleading fallback copy, not altered stored descriptions or broken functionality."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 3,
+        "reason": "The interface displays a false saved state during an incomplete save operation."
+      },
+      {
+        "findingIndex": 15,
+        "severity": 5,
+        "reason": "At the reported phone width, essentially the entire glossary is hidden and the page is unusable."
+      },
+      {
+        "findingIndex": 16,
+        "severity": 1,
+        "reason": "This is inconsistent product terminology in confirmation copy."
+      },
+      {
+        "findingIndex": 17,
+        "severity": 1,
+        "reason": "Dialog labels are clipped, but no failed collection selection or move is demonstrated."
+      },
+      {
+        "findingIndex": 18,
+        "severity": 3,
+        "reason": "The column action control does not work, blocking sorting and filtering through that header."
+      },
+      {
+        "findingIndex": 19,
+        "severity": 3,
+        "reason": "The described impact is loss of a saved custom column display name during conversion."
+      },
+      {
+        "findingIndex": 20,
+        "severity": 3,
+        "reason": "Filtering and summarizing become unavailable at the reported viewport."
+      },
+      {
+        "findingIndex": 21,
+        "severity": 3,
+        "reason": "The reported route creates a saved question instead of the requested metric."
+      },
+      {
+        "findingIndex": 22,
+        "severity": 3,
+        "reason": "An invalid item URL routes to the wrong application state instead of showing not found."
+      },
+      {
+        "findingIndex": 23,
+        "severity": 3,
+        "reason": "Renaming unexpectedly changes the metric's archived state and restores it to active listings."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [],
+    "knownInvalid": [
+      {
+        "findingIndex": 18,
+        "reference": {
+          "name": "Products Title column header does not open query actions",
+          "summary": "Products Title column header does not open query actions.",
+          "expected": "Clicking the Title header should open the column action menu, including sorting and filtering, as adjacent Products columns do.",
+          "actual": "Clicking either the Title columnheader or its parent button opens no menu or dialog. Category immediately beside it opens the normal menu with sorting, Filter by this column, Distribution, and Distinct values. The Title header remains inert with all default columns or with only Title, Title+Price, or Title+Price+ID selected.",
+          "reproSteps": [
+            [
+              "Sign in and choose New > Question > Sample Database > Products.",
+              "Click Visualize, leaving the default selected columns.",
+              "Click the Title column header. Observe that nothing opens.",
+              "Click the adjacent Category column header. Observe the normal column actions menu, confirming header actions are available in this question."
+            ]
+          ],
+          "reason": "Cannot reproduce on human review: the report clicked the column area, not the header button, which opens the menu."
+        },
+        "reason": "Same reported result-header failure: one column opens no actions while adjacent headers work. The model and column are different test targets."
+      }
+    ],
+    "duplicates": []
+  }
+}

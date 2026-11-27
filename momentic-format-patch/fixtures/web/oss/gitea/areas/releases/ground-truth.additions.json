@@ -1,0 +1,119 @@
+{
+  "bugs": [
+    {
+      "name": "Page number past the last page shows an empty list while the pager highlights the last page (releases list has no message at all)",
+      "summary": "The whole list area is empty (white space) with no wording at all, while the header still says \\\"15 Releases\\\"; the pager at the same time marks page \\\"2\\\" as active even though the address asks for page 99, and \\\"Next\\\"/\\\"Last\\\" are still clickable-looking. (on /eval/harbor-handbook/releases)",
+      "expected": "An out-of-range page either redirects to the last real page or shows a wording such as \\\"no releases on this page\\\" with a way back to the list; the pager marks the page actually shown.",
+      "actual": "The whole list area is empty (white space) with no wording at all, while the header still says \\\"15 Releases\\\"; the pager at the same time marks page \\\"2\\\" as active even though the address asks for page 99, and \\\"Next\\\"/\\\"Last\\\" are still clickable-looking.",
+      "reproSteps": [
+        "Sign in as eval and open /eval/harbor-handbook/releases (15 releases exist, so the pager has 2 pages).",
+        "In the address bar change the address to /eval/harbor-handbook/releases?page=2 when only one page of releases exists, or /eval/harbor-handbook/releases?page=99 at any time, and press Enter."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "'Create Tag Only' button does not follow the tag name in the field: gone after a duplicate-release error, offered for an existing tag typed by hand",
+      "summary": "After the error the button row contains only “Save Draft” and “Publish Release”; “Create Tag Only” is no longer in the page at all (not hidden, removed from the DOM). The form values are kept, but the only way to get the button back is to reload the page, which throws away the typed tag name, title and notes. (on /eval/harbor-handbook/releases/new)",
+      "expected": "The form keeps all three buttons (“Create Tag Only”, “Save Draft”, “Publish Release”) together with the error, so the person can still choose to create only the tag without losing the values they typed.",
+      "actual": "After the error the button row contains only “Save Draft” and “Publish Release”; “Create Tag Only” is no longer in the page at all (not hidden, removed from the DOM). The form values are kept, but the only way to get the button back is to reload the page, which throws away the typed tag name, title and notes.",
+      "reproSteps": [
+        "Go to https://5503-i1oztpwgvm7yuf0jcznbw.e2b.app/eval/harbor-handbook/releases/new (signed in as eval). On the fresh form the bottom-right row has three buttons: “Create Tag Only”, “Save Draft”, “Publish Release”.",
+        "Type the tag name agent1-rel-v1-1432 (a tag that already has a release on this repo) into “Tag name”, and type any text such as “agent1 dup check 2” into “Release title”.",
+        "Click “Save Draft”.",
+        "Read the red banner “A release with this tag name already exists.” and scroll to the bottom-right button row."
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Repository activity RSS feed: item titles carry HTML anchor markup (and HTML-escaped names) instead of plain text",
+      "summary": "The titles contain escaped HTML anchors and double-escaped tag names: <title>eval pushed tag &lt;a href=&#34;https://.../src/tag/agent10-feed-%3Cx%3E-tag&#34;&gt;agent10-feed-&amp;lt;x&amp;gt;-tag&lt;/a&gt; to &lt;a href=&#34;https://.../eval/harbor-handbook&#34;&gt;eval/harbor-handbook&lt;/a&gt;</title>. A feed reader shows the raw markup, and a tag named agent10-feed-<x>-tag is shown as \"agent10-feed-&lt;x&gt;-tag\". Deleting a tag produces the same markup in the title (\"eval deleted tag agent7-tag-c from &lt;a href=…&gt;eval/harbor-handbook&lt;/a&gt;\"). (on /eval/harbor-handbook.rss)",
+      "expected": "Each item <title> is plain text describing the event, e.g. \"eval pushed tag agent10-feed-<x>-tag to eval/harbor-handbook\", with tag names shown as the characters the user typed (as the tags feed /tags.rss does with proper escaping).",
+      "actual": "The titles contain escaped HTML anchors and double-escaped tag names: <title>eval pushed tag &lt;a href=&#34;https://.../src/tag/agent10-feed-%3Cx%3E-tag&#34;&gt;agent10-feed-&amp;lt;x&amp;gt;-tag&lt;/a&gt; to &lt;a href=&#34;https://.../eval/harbor-handbook&#34;&gt;eval/harbor-handbook&lt;/a&gt;</title>. A feed reader shows the raw markup, and a tag named agent10-feed-<x>-tag is shown as \"agent10-feed-&lt;x&gt;-tag\". Deleting a tag produces the same markup in the title (\"eval deleted tag agent7-tag-c from &lt;a href=…&gt;eval/harbor-handbook&lt;/a&gt;\").",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Create a tag, e.g. open /eval/harbor-handbook/releases/new, type a tag name such as agent10-feed-<x>-tag and click \"Create Tag Only\" (a tag created by another run works too).",
+        "Open the repository activity feed at /eval/harbor-handbook.rss.",
+        "Read the <title> of the newest <item>."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Draft release is labelled '<user> released this now' although it was never published",
+      "summary": "The draft's page shows the yellow \"Draft\" badge and directly beneath it \"eval released this now\", and the same \"eval released this\" wording appears on the Releases list entry of every draft. (on /eval/harbor-handbook/releases/tag/agent5-tagonly-1)",
+      "expected": "A release that is still a draft (badge \"Draft\", never published) should not claim it was released; the line should say it was saved/created as a draft, or show nothing about releasing.",
+      "actual": "The draft's page shows the yellow \"Draft\" badge and directly beneath it \"eval released this now\", and the same \"eval released this\" wording appears on the Releases list entry of every draft.",
+      "reproSteps": [
+        "Signed in as eval, go to https://5503-i1oztpwgvm7yuf0jcznbw.e2b.app/eval/harbor-handbook/releases/new",
+        "Fill Tag name with agent5-tagonly-1 (an existing tag), Release title with \"agent5 Secret Draft Title\" and click Save Draft",
+        "On the Releases list click the release title \"agent5 Secret Draft Title\" (or open /eval/harbor-handbook/releases/tag/agent5-tagonly-1)",
+        "Read the metadata line under the title, and compare it with the Releases list entry for the same release"
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Edit form opens for a tag that has no release, and submitting it ends on a 404 page with the typed text lost",
+      "summary": "The form is rendered as if a release existed (empty title and notes, \"Delete Release\" and \"Update Release\" buttons), but clicking \"Update Release\" posts to the edit address, the server answers 404 and the person is thrown onto a bare \"404 Not Found — The page you are trying to reach either does not exist or you are not authorized to view it.\" page. The typed title/notes are lost. Happens both with an empty and with a filled title. (on /eval/harbor-handbook/releases/edit/agent4-tagonly-1)",
+      "expected": "Either the edit form is not offered for a tag that has no release, or submitting it creates/validates the release and shows a readable message; it must never end on a bare 404 page.",
+      "actual": "The form is rendered as if a release existed (empty title and notes, \"Delete Release\" and \"Update Release\" buttons), but clicking \"Update Release\" posts to the edit address, the server answers 404 and the person is thrown onto a bare \"404 Not Found — The page you are trying to reach either does not exist or you are not authorized to view it.\" page. The typed title/notes are lost. Happens both with an empty and with a filled title.",
+      "reproSteps": [
+        "Sign in as eval. On https://5503-i1oztpwgvm7yuf0jcznbw.e2b.app/eval/harbor-handbook/releases/new type tag name 'agent4-tagonly-1' and click 'Create Tag Only' (this makes a tag with no release, as the Releases list already has, e.g. agent5-tagonly-1).",
+        "On the Releases list click the pencil (edit) icon of a tag that has no release — the list links it to /eval/harbor-handbook/releases/edit/agent4-tagonly-1.",
+        "The 'Update Release' form loads with an empty 'Release title' and empty notes.",
+        "Type any title, e.g. 'agent4 tagonly release title'.",
+        "Click 'Update Release'."
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Pressing Enter in the Release title field runs 'Create Tag Only': a tag is created and the typed title/notes are discarded",
+      "summary": "Pressing Enter in the Release title field submits the form with \"Create Tag Only\", not Save Draft: the page jumps to /eval/harbor-handbook/src/tag/agent15-sub-d4 showing 'Tag \"agent15-sub-d4\" has been created.', no release is created (the Releases counter stays at 30, the Tags counter grows), and the typed title \"agent15 enter submit d4 title\" is lost — /eval/harbor-handbook/releases/tag/agent15-sub-d4 shows the bare tag name as its heading with no release. A \"leave site?\" browser confirmation also pops up on this Enter submit (it does not when clicking Save Draft). Same result twice (agent15-sub-d3, agent15-sub-d4). (on /eval/harbor-handbook/releases/new)",
+      "expected": "Enter in the Release title field should submit the release like the primary action (Save Draft) and keep the typed title, or at least do nothing; it must not quietly create a tag only and throw away the release title and notes.",
+      "actual": "Pressing Enter in the Release title field submits the form with \"Create Tag Only\", not Save Draft: the page jumps to /eval/harbor-handbook/src/tag/agent15-sub-d4 showing 'Tag \"agent15-sub-d4\" has been created.', no release is created (the Releases counter stays at 30, the Tags counter grows), and the typed title \"agent15 enter submit d4 title\" is lost — /eval/harbor-handbook/releases/tag/agent15-sub-d4 shows the bare tag name as its heading with no release. A \"leave site?\" browser confirmation also pops up on this Enter submit (it does not when clicking Save Draft). Same result twice (agent15-sub-d3, agent15-sub-d4).",
+      "reproSteps": [
+        "Sign in as maya / momentic-eval-1 and open https://5503-i1oztpwgvm7yuf0jcznbw.e2b.app/eval/harbor-handbook/releases/new",
+        "Type agent15-sub-d4 in the 'Tag name' field",
+        "Type 'agent15 enter submit d4 title' in the 'Release title' field (screenshot: both filled)",
+        "Press Enter while the cursor is still in the Release title field"
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Tags RSS feed leaves out a real tag (v1.0.0) once a draft release is saved on it, while the Tags page still lists it",
+      "summary": "The feed contains only one <item>: agent15-tag-alpha. The tag v1.0.0, listed prominently on the tags page with its own ZIP / TAR.GZ links, has no entry in the feed at all — subscribers of the tags feed never see it. (When v1.0.0 was the only tag, the feed was completely empty.) (on /eval/harbor-handbook/tags.rss)",
+      "expected": "The tags feed should have one <item> per tag shown on the tags page (2 items: agent15-tag-alpha and v1.0.0), each with title, link to the tag page and a date.",
+      "actual": "The feed contains only one <item>: agent15-tag-alpha. The tag v1.0.0, listed prominently on the tags page with its own ZIP / TAR.GZ links, has no entry in the feed at all — subscribers of the tags feed never see it. (When v1.0.0 was the only tag, the feed was completely empty.)",
+      "reproSteps": [
+        "Open https://5503-ix53mp4wf8f2notzyki52.e2b.app/eval/harbor-handbook/tags (signed in as eval) and note the list shows '2 Tags': agent15-tag-alpha and v1.0.0",
+        "Click the 'RSS Feed' button at the top right of the tags page (it opens /eval/harbor-handbook/tags.rss)",
+        "Read the returned XML feed and count the <item> elements"
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Tags/releases RSS feed: <guid> is '<id>: <url>' but is not marked isPermaLink=\"false\"",
+      "summary": "Every item's identifier is written as \"guid<number>: https://…\" — e.g. <guid>guid22: https://5503-…/releases/tag/agent15-tag-msg</guid> and <guid>guid7: …/releases/tag/agent15-tag-alpha</guid>. The internal record id leaks into the identifier and the value is not a URL, although the element carries no isPermaLink=\"false\" and so is declared to be a permalink. (on /eval/harbor-handbook/tags.rss)",
+      "expected": "Each item's <guid> should hold just the tag page URL (e.g. https://5503-…/eval/harbor-handbook/releases/tag/agent15-tag-alpha), so readers treat it as a permalink; no internal id prefix should appear.",
+      "actual": "Every item's identifier is written as \"guid<number>: https://…\" — e.g. <guid>guid22: https://5503-…/releases/tag/agent15-tag-msg</guid> and <guid>guid7: …/releases/tag/agent15-tag-alpha</guid>. The internal record id leaks into the identifier and the value is not a URL, although the element carries no isPermaLink=\"false\" and so is declared to be a permalink.",
+      "reproSteps": [
+        "Open https://5503-ix53mp4wf8f2notzyki52.e2b.app/eval/harbor-handbook/tags (signed in as eval)",
+        "Click the 'RSS Feed' button at the top right of the tags page (opens /eval/harbor-handbook/tags.rss)",
+        "Read the <guid> line of any <item> in the returned XML"
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Deleting an already-deleted tag from a stale Tags page fails silently: no message and the tag stays listed",
+      "summary": "The \"Delete Tag\" dialog closes and nothing else happens: no error banner and no success message appears any where on the page, and the tags list still shows \"agent8/rel-3\" as if it existed. The delete request is answered 404 (POST /eval/harbor-handbook/tags/delete → 404). The person cannot tell whether the tag was deleted or not. (on /eval/harbor-handbook/tags)",
+      "expected": "The page tells the person the tag no longer exists (an error message about the failed delete) and refreshes the list so the deleted tag disappears, instead of silence.",
+      "actual": "The \"Delete Tag\" dialog closes and nothing else happens: no error banner and no success message appears any where on the page, and the tags list still shows \"agent8/rel-3\" as if it existed. The delete request is answered 404 (POST /eval/harbor-handbook/tags/delete → 404). The person cannot tell whether the tag was deleted or not.",
+      "reproSteps": [
+        "Create a disposable tag: open https://5503-i0nu88zwwdqru3h8fkrol.e2b.app/eval/harbor-handbook/releases/new, type a new tag name in \"Tag name\" (here: agent8/rel-3), click \"Create Tag Only\".",
+        "Open https://5503-i0nu88zwwdqru3h8fkrol.e2b.app/eval/harbor-handbook/tags in two browser tabs (tab A and tab B) so that both list the new tag.",
+        "In tab A, click \"Delete Tag\" on the row of that tag and confirm with \"Yes\". The green banner \"The tag has been deleted.\" appears.",
+        "Switch to tab B, which still lists the tag, and click \"Delete Tag\" on that same row, then confirm with \"Yes\".",
+        "Observe the page in tab B: the dialog closes, no message appears, the tag is still listed."
+      ],
+      "severity": 3
+    }
+  ]
+}

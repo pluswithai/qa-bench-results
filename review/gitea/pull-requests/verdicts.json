@@ -1,0 +1,323 @@
+{
+  "area": "pull-requests",
+  "reviewer": "Claude Fable 5.2",
+  "bugs": [
+    {
+      "id": "pull-requests-1",
+      "title": "Sidebar Reviewers dropdown no longer closes on Escape once a user has been clicked",
+      "findings": [
+        "run1-03"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "The video ends with several seconds of 'Pressing Escape' while the dropdown stays open with maya checked, and it only closes (and saves) when the Reviewers header is clicked; the same dropdown does close on Escape before any pick. The bundled dropdown has an explicit 'escape (close menu)' handler and the combo list only saves on close, so staying open is not intended.",
+      "evidence": [
+        "run1-03/frame-6.jpg",
+        "run1-03/shot-2.png",
+        "run1-03/video.webm"
+      ],
+      "source": [
+        "web_src/fomantic/build/components/dropdown.js (lines 1642-1646: escape closes the menu)",
+        "web_src/js/features/repo-issue-sidebar-combolist.ts (onHide -> doUpdate for multiple mode)",
+        "web_src/js/features/repo-issue-sidebar.md"
+      ]
+    },
+    {
+      "id": "pull-requests-2",
+      "title": "Global /pulls with sort=newest is ordered like Recently updated",
+      "findings": [
+        "run1-04"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "The reported address uses sort=newest, a value the page never produces: the Sort > Newest link sends sort=latest, which maps to creation time descending, and any unknown value falls back to updated-descending, exactly the order seen. No screenshot or frame shows the menu being used, so the claim about the UI path is not shown.",
+      "evidence": [
+        "run1-04/shot-1.png",
+        "run1-04/frame-1.jpg"
+      ],
+      "source": [
+        "templates/user/dashboard/issues.tmpl (line 99: sort=latest)",
+        "modules/indexer/issues/dboptions.go (lines 84-110: 'latest' -> SortByCreatedDesc, default -> SortByUpdatedDesc)"
+      ],
+      "rejection_kind": "unsupported-input",
+      "rejection_note": "hand-typed ?sort= value"
+    },
+    {
+      "id": "pull-requests-3",
+      "title": "A web-editor commit made on a new branch absorbs files that landed on main meanwhile, so the commit and its pull request list other people's files as its own changes",
+      "findings": [
+        "run1-05",
+        "run3-03"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "Both pull requests show 'Commits 1' next to more changed files than the user created, and run3-03's commit page lists another user's file as added by that commit (reproduced again as PR #25). The source builds the commit tree from the branch's current tip but sets the parent to the form's older last_commit, so anything pushed to main between opening the form and submitting is folded into the user's commit; run1-05's own explanation (main moved after the PR was opened) is not the trigger, but its screenshots show the same result.",
+      "evidence": [
+        "run3-03/shot-2.png",
+        "run3-03/shot-3.png",
+        "run3-03/shot-1.png",
+        "run1-05/shot-1.png",
+        "run1-05/shot-2.png"
+      ],
+      "source": [
+        "services/repository/files/update.go (lines 221-237 and 269-272: ParentCommitID = opts.LastCommitID while the index comes from the current branch tip)",
+        "routers/web/repo/editor.go (line 286: LastCommitID: form.LastCommit)"
+      ]
+    },
+    {
+      "id": "pull-requests-4",
+      "title": "Pull request header shows a '+5' diffstat while the same header says 0 commits and the Commits / Files Changed badges are empty",
+      "findings": [
+        "run1-09"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "The screenshot shows 'wants to merge 0 commits', '-' on both tab badges and '+5' in the same header. The diffstat is computed from the stored merge base while the commit and file counts come from a live comparison with the base branch, so the header contradicts itself once the head commit is already in main; nothing in the source marks that as intended.",
+      "evidence": [
+        "run1-09/shot-1.png"
+      ],
+      "source": [
+        "routers/web/repo/pull.go (lines 185-211 GetPullDiffStats uses pull.MergeBase; lines 520-554 NumCommits/NumFiles from GetCompareInfo)",
+        "templates/repo/pulls/tab_menu.tmpl"
+      ]
+    },
+    {
+      "id": "pull-requests-5",
+      "title": "Diff summary ('N changed files with X additions and Y deletions') ignores the active whitespace filter, so it disagrees with the diff shown below it",
+      "findings": [
+        "run1-11",
+        "run1-12"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "With 'Ignore changes in whitespace at EOL' on, the PR page still says 17 additions / 1 deletion while the listed files add up to 16 / 0, and the commit page says 2 additions / 1 deletion above a diff with one added line (the hidden change is the missing end-of-file newline, checked with git: plain shortstat gives +2 -1, with --ignore-space-at-eol +1). The summary comes from a shortstat call that is never given the whitespace flag the rendered diff uses, and the whitespace choice is remembered per user, which is why run1-12 saw it on commit pages.",
+      "evidence": [
+        "run1-11/shot-5.png",
+        "run1-11/frame-6.jpg",
+        "run1-12/shot-1.png"
+      ],
+      "source": [
+        "routers/web/repo/pull.go (line 742 WhitespaceBehavior for the diff vs line 764 GetDiffShortStat without it)",
+        "routers/web/repo/commit.go (lines 326 and 332)",
+        "services/gitdiff/gitdiff.go (lines 1321-1340 GetDiffShortStat, 1447-1458 GetWhitespaceFlag)",
+        "routers/web/repo/middlewares.go (lines 64-90: whitespace choice saved as a user setting)"
+      ]
+    },
+    {
+      "id": "pull-requests-6",
+      "title": "Sort menu of the repository pull request list ends with an empty 'Label' heading",
+      "findings": [
+        "run1-15"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "The open Sort menu shows a divider and a lone 'Label' entry under 'Farthest due date'. It is the heading of the sort-by-scoped-label group, printed even when the repository has no scoped labels; the current upstream template wraps it in an 'if .ExclusiveLabelScopes' check, so the empty heading was a defect (it is a heading, so the 'does nothing on click' part is expected).",
+      "evidence": [
+        "run1-15/shot-2.png"
+      ],
+      "source": [
+        "templates/repo/issue/filter_list.tmpl (v1.24.7 lines 136-141: divider + header with no guard)",
+        "https://raw.githubusercontent.com/go-gitea/gitea/main/templates/repo/issue/filter_list.tmpl (lines 114-121: guarded by {{if .ExclusiveLabelScopes}})"
+      ]
+    },
+    {
+      "id": "pull-requests-7",
+      "title": "Changing a pull request's target branch re-creates the 'added 1 commit' event at the end of the timeline with a new time",
+      "findings": [
+        "run1-16"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Deliberate: when the target branch changes, the code deletes every push event of the pull request and creates a fresh one against the new base ('Delete all old push comments and insert new push comments'), because the set of commits in the pull request depends on the base.",
+      "evidence": [
+        "run1-16/shot-3.png"
+      ],
+      "source": [
+        "services/pull/pull.go (lines 334-343 in ChangeTargetBranch)"
+      ],
+      "rejection_kind": "product-decision",
+      "rejection_note": "behaviour is deliberate in Gitea 1.24.7 (see reason and source)"
+    },
+    {
+      "id": "pull-requests-8",
+      "title": "Repository settings accept a disabled merge style as 'Default Merge Style'; pull requests then silently use another style",
+      "findings": [
+        "run2-06"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "After saving with only 'Create squash commit' ticked and default 'Create merge commit', the settings page keeps showing the disabled style as default while the pull request offers 'Create squash commit'. The form lists all five styles unconditionally and the handler stores the value without checking it against the enabled styles; the pull request page only falls back quietly, so the saved setting can never take effect and nothing tells the user.",
+      "evidence": [
+        "run2-06/shot-1.png",
+        "run2-06/shot-3.png",
+        "run2-06/shot-2.png"
+      ],
+      "source": [
+        "templates/repo/settings/options.tmpl (lines 584-590: all styles always offered)",
+        "routers/web/repo/setting/setting.go (line 634: stored without validation)",
+        "routers/web/repo/issue_view.go (lines 892-912: fallback when the default is not allowed)"
+      ]
+    },
+    {
+      "id": "pull-requests-9",
+      "title": "Author filter on the global pull request list keeps the label 'Author' and shows the chosen user only as prefilled search text",
+      "findings": [
+        "run2-10"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "By design: the control always prints its fixed title, and the script puts the selected username into the search box when the menu opens; 'All users' clears it. The source also notes this page has no user list to offer and takes usernames directly, so a missing 'alex' row is the stated limitation, not a failure, and the filter can be both seen and cleared.",
+      "evidence": [
+        "run2-10/shot-3.png",
+        "run2-10/frame-6.jpg"
+      ],
+      "source": [
+        "templates/repo/issue/filter_item_user_fetch.tmpl",
+        "web_src/js/features/repo-issue-list.ts (initDropdownUserRemoteSearch: elSearchInput.value = selectedUsername)",
+        "routers/web/user/home.go (lines 438-443 comment on poster/assignee filters)"
+      ],
+      "rejection_kind": "product-decision",
+      "rejection_note": "behaviour is deliberate in Gitea 1.24.7 (see reason and source)"
+    },
+    {
+      "id": "pull-requests-10",
+      "title": "Dashboard sidebar counters ('In your repositories', 'Created by you') do not follow the Author filter",
+      "findings": [
+        "run2-11"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Deliberate: the code that computes the left sidebar numbers explicitly clears the author and assignee filters ('Below stats are for the left sidebar'), because those entries are themselves author/assignee views; only the Open/Closed tabs follow the filter, which is what the screenshot shows.",
+      "evidence": [
+        "run2-11/shot-2.png"
+      ],
+      "source": [
+        "routers/web/user/home.go (lines 817-824 in getUserIssueStats)"
+      ],
+      "rejection_kind": "product-decision",
+      "rejection_note": "behaviour is deliberate in Gitea 1.24.7 (see reason and source)"
+    },
+    {
+      "id": "pull-requests-11",
+      "title": "Global /pulls with state=all lists only open pull requests",
+      "findings": [
+        "run3-04"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "state=all is a hand-typed value this page does not offer: the dashboard only has Open and Closed tabs and treats anything other than 'closed' as open, and the screenshot shows the Open tab active with the matching 1 open row and the '2 Closed' count on the other tab. The repository list is a different page with its own state handling.",
+      "evidence": [
+        "run3-04/shot-1.png"
+      ],
+      "source": [
+        "routers/web/user/home.go (line 519: isShowClosed := ctx.FormString(\"state\") == \"closed\")",
+        "templates/user/dashboard/issues.tmpl (lines 43-47: only open/closed links)"
+      ],
+      "rejection_kind": "unsupported-input",
+      "rejection_note": "hand-typed ?state= value"
+    },
+    {
+      "id": "pull-requests-12",
+      "title": "Assignee picked in the sidebar dropdown is not saved",
+      "findings": [
+        "run3-05"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "The recording clicks 'eval' and then reads the panel and reloads while the dropdown is still open; it is never closed. Multi-select sidebar lists are documented to defer the update until the dropdown is hidden, so nothing was submitted (run1-03 on the same control shows the choice is saved once the dropdown closes).",
+      "evidence": [
+        "run3-05/shot-1.png",
+        "run3-05/frame-6.jpg"
+      ],
+      "source": [
+        "web_src/js/features/repo-issue-sidebar.md ('multiple: ... defers the update until the dropdown is hidden')",
+        "web_src/js/features/repo-issue-sidebar-combolist.ts (onHide -> doUpdate)"
+      ],
+      "rejection_kind": "false-positive",
+      "rejection_note": "test procedure: page reloaded with the picker still open (Gitea saves on close)"
+    },
+    {
+      "id": "pull-requests-13",
+      "title": "Creating a pull request without permission answers 'Push Failed: The push was rejected. Review the Git Hooks…' although nothing was pushed",
+      "findings": [
+        "run3-06"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "The red message blames a rejected push and Git hooks, then adds 'You must be a collaborator to create pull request.' The permission check runs before any git work, and the handler simply reuses the push-rejected text as the headline for this unrelated error, so the wording states something that did not happen; the refusal itself is intended.",
+      "evidence": [
+        "run3-06/shot-2.png"
+      ],
+      "source": [
+        "routers/web/repo/pull.go (lines 1377-1386: ErrMustCollaborator rendered with repo.pulls.push_rejected)",
+        "services/pull/pull.go (lines 66-85: collaborator check before createTemporaryRepoForPR)",
+        "options/locale/locale_en-US.ini (pulls.push_rejected, pulls.new.must_collaborator)"
+      ]
+    },
+    {
+      "id": "pull-requests-14",
+      "title": "At phone width the compare page's branch dropdown is wider than the screen with a long branch name and the page scrolls sideways",
+      "findings": [
+        "run3-07"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "At 390 px the open branch menu runs past the right edge, the long branch name is cut off, and the whole page is shifted sideways with the form clipped on the left. The app has a phone layout (collapsed navigation is visible in the same screenshots), so a menu that does not fit the screen is a layout defect.",
+      "evidence": [
+        "run3-07/shot-2.png",
+        "run3-07/shot-3.png"
+      ],
+      "source": []
+    },
+    {
+      "id": "pull-requests-15",
+      "title": "After signing out, the browser Back button shows the previously viewed private pull request pages",
+      "findings": [
+        "run3-08"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "This is the browser redisplaying pages it already had; no new data is served and a reload goes to the sign-in page. The source states the choice on purpose: pages are sent with 'max-age=0, private, must-revalidate' instead of 'no-store' so that browsers can restore form input when navigating back.",
+      "evidence": [
+        "run3-08/shot-1.png",
+        "run3-08/frame-6.jpg"
+      ],
+      "source": [
+        "modules/httpcache/httpcache.go (lines 27-33 and comment)",
+        "services/context/context.go (line 194)"
+      ],
+      "rejection_kind": "product-decision",
+      "rejection_note": "behaviour is deliberate in Gitea 1.24.7 (see reason and source)"
+    }
+  ],
+  "rejections": [
+    {
+      "kind": "false-positive",
+      "label": "False positive (agent was wrong)",
+      "count": 1,
+      "bugs": [
+        "pull-requests-12"
+      ]
+    },
+    {
+      "kind": "unsupported-input",
+      "label": "Address or input the app never produces",
+      "count": 2,
+      "bugs": [
+        "pull-requests-2",
+        "pull-requests-11"
+      ]
+    },
+    {
+      "kind": "product-decision",
+      "label": "Product decision (real behaviour Gitea chose on purpose)",
+      "count": 4,
+      "bugs": [
+        "pull-requests-7",
+        "pull-requests-9",
+        "pull-requests-10",
+        "pull-requests-15"
+      ]
+    }
+  ]
+}

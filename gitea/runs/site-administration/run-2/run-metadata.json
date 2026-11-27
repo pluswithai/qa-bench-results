@@ -1,0 +1,15 @@
+{
+  "fixture": "gitea/areas/site-administration",
+  "run": 2,
+  "started_at": "2026-11-23T17:22:10.282Z",
+  "duration_seconds": 1628.882,
+  "time_limit_seconds": 1800,
+  "stop_reason": "completed",
+  "credits": {
+    "total": 1127,
+    "testing_team": 881,
+    "verification": 246,
+    "findings_verified": 41
+  },
+  "team_container_errors": 0
+}

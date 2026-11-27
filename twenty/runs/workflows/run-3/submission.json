@@ -1,0 +1,157 @@
+{
+  "fixture": "twenty/areas/workflows",
+  "run": 3,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 1020,
+      "name": "Filter \"Name contains\" treats % and _ as wildcards: typing \"%\" lists every named workflow instead of none",
+      "summary": "The filter returns every workflow that has a name: the tab reads \"All Workflows · 8\" and all 8 named workflows are listed (agent4-Activate Flow, agent9-editor, agent6-Create Te…, agent15-Shared C…, agent10-ZZ Test F…, Quick Lead, Create company…, agent13-Tablet Flow). \"%\" and \"_\" are passed to the backend as SQL LIKE wildcards instead of literal characters, so the \"Contains\" filter matches everything. (on /objects/workflows)",
+      "expected": "No workflow name contains a literal \"%\" (or \"_\"), so the filter should show 0 records and the tab should read \"All Workflows · 0\" with the \"No Workflow found\" empty state — the same as for the value \"agent5\".",
+      "actual": "The filter returns every workflow that has a name: the tab reads \"All Workflows · 8\" and all 8 named workflows are listed (agent4-Activate Flow, agent9-editor, agent6-Create Te…, agent15-Shared C…, agent10-ZZ Test F…, Quick Lead, Create company…, agent13-Tablet Flow). \"%\" and \"_\" are passed to the backend as SQL LIKE wildcards instead of literal characters, so the \"Contains\" filter matches everything.",
+      "reproSteps": [
+        "Go to /objects/workflows (signed in as tim@apple.dev).",
+        "Click Filter (top right of the list).",
+        "Click Name in the filter field menu.",
+        "Leave the operator as Contains and type % into the value box (placeholder \"Name\").",
+        "Click outside the filter popup and read the list and the tab count.",
+        "Repeat with _ as the value."
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 1028,
+      "name": "Invalid cron expression still shows \"Upcoming execution time\" with three identical timestamps",
+      "summary": "The page shows 'Failed to describe cron expression: Invalid cron expression. Expected 4-6 fields, got 3' and at the same time an 'Upcoming execution time (UTC)' block listing 'Nov 25, 2026 12:00 AM' three times — identical timestamps for an expression the app says is invalid. Seen twice in two tries. (on /object/workflow/d7367ac5-9535-4d90-85e6-251df920675d (workflow editor, Trigger side panel))",
+      "expected": "The page refuses the invalid expression and shows only the validation message; no execution schedule is shown for an expression it just declared invalid.",
+      "actual": "The page shows 'Failed to describe cron expression: Invalid cron expression. Expected 4-6 fields, got 3' and at the same time an 'Upcoming execution time (UTC)' block listing 'Nov 25, 2026 12:00 AM' three times — identical timestamps for an expression the app says is invalid. Seen twice in two tries.",
+      "reproSteps": [
+        "Open /objects/workflows and click '+ New Workflow' (workflow agent6-Create Test Flow).",
+        "Click the 'Add a Trigger' node on the canvas, then choose 'On a schedule'.",
+        "In the trigger panel set 'Trigger interval' to 'Cron (Custom)'.",
+        "Clear the Expression field and type '* * *', then click on the 'Expression' label to blur the field."
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 1140,
+      "name": "Reloading the workflow editor blanks the name field and the next click renames the workflow to \"Untitled\"",
+      "summary": "After the reload the name field is empty (only the 'Name' placeholder) while the document title says 'agent9-editor - Workflow'; the click on the canvas fires an UpdateOneWorkflow save and the workflow is renamed: the breadcrumb becomes 'Workflows / Untitled' and the Workflows list shows it as 'Untitled'. The saved name is lost by a reload plus one ordinary click. (on /object/workflow/471352f4-272f-42d4-97ab-a5a0ae0e0ebd (workflow editor))",
+      "expected": "After a reload the name field shows the workflow's saved name 'agent9-editor', and clicking on the canvas changes nothing about the name.",
+      "actual": "After the reload the name field is empty (only the 'Name' placeholder) while the document title says 'agent9-editor - Workflow'; the click on the canvas fires an UpdateOneWorkflow save and the workflow is renamed: the breadcrumb becomes 'Workflows / Untitled' and the Workflows list shows it as 'Untitled'. The saved name is lost by a reload plus one ordinary click.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open /objects/workflows.",
+        "Create a workflow with '+ New Workflow' and type the name 'agent9-editor' in the name field in the top bar.",
+        "Add a trigger ('Launch manually') and an action so the editor has content; the browser URL is /object/workflow/471352f4-272f-42d4-97ab-a5a0ae0e0ebd.",
+        "Reload the page (F5) and wait until the canvas shows the Trigger and the Action nodes.",
+        "Look at the name field in the top breadcrumb: it is empty (placeholder 'Name') although the tab title still reads 'agent9-editor - Workflow'.",
+        "Click once on an empty part of the canvas background."
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 1146,
+      "name": "Select-type form field's custom Label is ignored: Test form shows the object field's name (\"Status\") instead",
+      "summary": "The rendered form labels the field \"Status\" — the name of the underlying object field (Task > Status) — while the action configuration still stores and shows \"agent8 status\". The same happens on a second Test run: the form always says \"Status\" while the settings show \"agent8 status\". The rest of the form and the dropdown itself (\"No Status\") render fine. (on /object/workflow/c95c78b4-48d2-56f6-8e15-36ff8572f1d8 (Quick Lead → Quick Lead Form action))",
+      "expected": "The rendered test form should label the field exactly as configured: \"agent8 status\", just as the six Text fields show their configured labels (First name, Last Name, Email, Job title, Company name, Company domain).",
+      "actual": "The rendered form labels the field \"Status\" — the name of the underlying object field (Task > Status) — while the action configuration still stores and shows \"agent8 status\". The same happens on a second Test run: the form always says \"Status\" while the settings show \"agent8 status\". The rest of the form and the dropdown itself (\"No Status\") render fine.",
+      "reproSteps": [
+        "Go to /objects/workflows and open the workflow 'Quick Lead'.",
+        "Click the 'Quick Lead Form' action node in the canvas to open its side panel (6 fields: First name, Last Name, Email, Job title, Company name, Company domain).",
+        "Click 'Add Field' at the bottom of the panel. A new field is appended with default label 'Text'; its 'Input settings' box opens.",
+        "In the new field's Input settings, open the 'Type' dropdown and choose 'Select' (Select Type stays 'Existing Field', Field stays 'Opportunity > Stage').",
+        "In the same Input settings, replace the 'Label' value with 'agent8 status' and click outside the field: the collapsed row header and the Label input both read 'agent8 status'.",
+        "Click 'Test' in the workflow toolbar at the top. The side panel now shows the rendered fill-in form.",
+        "Read the label above the last field of the rendered form."
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 1228,
+      "name": "Opening a workflow address that does not exist shows an empty editor and a raw UUID error",
+      "summary": "The editor opens empty: breadcrumb 'Workflows / Untitled (0/0)', no canvas, no tool buttons and no message explaining that the workflow does not exist. With the all-zero id two red toasts show the raw server text 'Invalid value for UUID: \"00000000-0000-0000-0000-000000000000\"' (console: 'useFindManyRecords for \"workflows\" error : CombinedGraphQLErrors: Invalid UUID value ... for field \"id\"'). The user is left on a dead page with no way on. (on /object/workflow/<non-existent id>)",
+      "expected": "A clear 'Workflow not found' message with a way back to the workflows list, and no raw server error shown.",
+      "actual": "The editor opens empty: breadcrumb 'Workflows / Untitled (0/0)', no canvas, no tool buttons and no message explaining that the workflow does not exist. With the all-zero id two red toasts show the raw server text 'Invalid value for UUID: \"00000000-0000-0000-0000-000000000000\"' (console: 'useFindManyRecords for \"workflows\" error : CombinedGraphQLErrors: Invalid UUID value ... for field \"id\"'). The user is left on a dead page with no way on.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev.",
+        "Enter the address /object/workflow/00000000-0000-0000-0000-000000000000 in the browser and press Enter.",
+        "Wait about 6 seconds.",
+        "Repeat with a well-formed but unused id: /object/workflow/a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d."
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 1254,
+      "name": "Choosing \"Descending\" in the Sort menu does not reverse the list — it stays sorted ascending and the panel reopens on Ascending",
+      "summary": "The row order does not change — it stays agent1-canvas, agent10-Renamed Flow, agent10-Renamed Flow (Duplicate), agent11-Restore Me, agent13-Tablet Flow, agent15-Shared Check Flow, agent4-Activate Flow, agent6-Create Test Flow (ascending). The sort chip above the list still shows an up arrow (\"↑ Name\"), and when the Sort panel is opened again the direction reads \"Ascending\" — the Descending choice was dropped. There is no way to sort a list in descending order. (on /objects/workflows)",
+      "expected": "The list is re-sorted in descending order (agent6-Create Test Flow … agent1-canvas), the sort chip shows a down arrow, and reopening the Sort panel keeps \"Descending\" selected.",
+      "actual": "The row order does not change — it stays agent1-canvas, agent10-Renamed Flow, agent10-Renamed Flow (Duplicate), agent11-Restore Me, agent13-Tablet Flow, agent15-Shared Check Flow, agent4-Activate Flow, agent6-Create Test Flow (ascending). The sort chip above the list still shows an up arrow (\"↑ Name\"), and when the Sort panel is opened again the direction reads \"Ascending\" — the Descending choice was dropped. There is no way to sort a list in descending order.",
+      "reproSteps": [
+        "Go to /objects/workflows (signed in as tim@apple.dev).",
+        "Click Filter, click Name, type agent in the value box, close the filter popup (8 workflows are listed, sorted by name ascending).",
+        "Click Sort, click Name in the field list — the list becomes sorted by name ascending and a chip \"↑ Name\" appears above the list.",
+        "Click Sort again, click the direction button that reads \"Ascending\", and choose \"Descending\" from the list.",
+        "Close the Sort panel (Esc) and look at the row order and at the arrow in the \"Name\" chip.",
+        "Open the Sort panel again and read the direction."
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 1385,
+      "name": "Workflow version \"Version trigger\" field shows the raw JSON blob instead of the trigger name",
+      "summary": "The field shows the raw serialized object, hard-truncated with no ellipsis: {\"name\":\"Record is created or u (desktop shows {\"name\":\"Launch manually\",\"typ for Quick Lead v1). A person cannot read the trigger name or type from the record. (on /object/workflowVersion/6766a511-cf95-5255-866c-e23c1a8cc5f9)",
+      "expected": "The \"Version trigger\" field shows a readable value, e.g. the trigger name \"Record is created or updated\" as the flow view shows; if the whole value cannot fit, it is readable via a tooltip or expandable cell.",
+      "actual": "The field shows the raw serialized object, hard-truncated with no ellipsis: {\"name\":\"Record is created or u (desktop shows {\"name\":\"Launch manually\",\"typ for Quick Lead v1). A person cannot read the trigger name or type from the record.",
+      "reproSteps": [
+        "Sign in and open https://5500-i6ld7xztybx9b54kyq3mz.e2b.app/objects/workflowVersions",
+        "Open the version row of the workflow \"Create company when adding a new person\" (v1)",
+        "Read the Fields section on the record's Home tab"
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 1411,
+      "name": "At phone width the version's Flow view cuts off the trigger node",
+      "summary": "The canvas opens at desktop pan/zoom: the trigger node sits half outside the left edge so only \"ed or updated\" of \"Record is created or updated\" is visible, its \"Trigger\" label and icon are gone, and the connector to the next step starts off-screen. No zoom-to-fit control is visible; the graph has to be dragged by hand to read the first step. (on /object/workflowVersion/6766a511-cf95-5255-866c-e23c1a8cc5f9)",
+      "expected": "The whole flow, starting with the trigger node, fits the canvas at phone width (or the canvas opens scrolled so that the first node is fully visible).",
+      "actual": "The canvas opens at desktop pan/zoom: the trigger node sits half outside the left edge so only \"ed or updated\" of \"Record is created or updated\" is visible, its \"Trigger\" label and icon are gone, and the connector to the next step starts off-screen. No zoom-to-fit control is visible; the graph has to be dragged by hand to read the first step.",
+      "reproSteps": [
+        "Sign in, set the browser to 390 x 844 CSS pixels",
+        "Open https://5500-i6ld7xztybx9b54kyq3mz.e2b.app/objects/workflowVersions and open the v1 row of \"Create company when adding a new person\"",
+        "On the version record, open the \"Flow\" tab",
+        "Look at the first (trigger) node on the left of the canvas"
+      ]
+    },
+    {
+      "index": 8,
+      "reported_at_seconds": 1429,
+      "name": "Workflow editor opened by address without access shows a blank \"Untitled (0/0)\" canvas instead of \"Object not shared\"",
+      "summary": "The page renders the full workflow editor shell with the breadcrumb \\\"Workflows / Untitled (0/0)\\\" and a blank canvas with a small lock icon, and no message at all. The name shown is \\\"Untitled\\\", not the workflow's real name, and \\\"(0/0)\\\" suggests an existing empty workflow, so the user cannot tell they were denied access. The console and network show no error. (on /object/workflow/a0fd3d2e-dbce-4fbe-aaa3-c2403d241e19)",
+      "expected": "The editor should explain the denial the way the Workflows list does — an \\\"Object not shared / You don't have access to this object\\\" state (or an error), not an editor UI.",
+      "actual": "The page renders the full workflow editor shell with the breadcrumb \\\"Workflows / Untitled (0/0)\\\" and a blank canvas with a small lock icon, and no message at all. The name shown is \\\"Untitled\\\", not the workflow's real name, and \\\"(0/0)\\\" suggests an existing empty workflow, so the user cannot tell they were denied access. The console and network show no error.",
+      "reproSteps": [
+        "Sign in at /welcome as jony.ive@apple.dev with password tim@apple.dev (workspace member, no access to the Workflows object).",
+        "Open /objects/workflows — it correctly shows the lock illustration and \"Object not shared / You don't have access to this object.\"",
+        "Now open the workflow editor by address: /object/workflow/a0fd3d2e-dbce-4fbe-aaa3-c2403d241e19 (the workflow \"agent15-Shared Check Flow\" created by tim@apple.dev).",
+        "Wait for the page to load."
+      ]
+    },
+    {
+      "index": 9,
+      "reported_at_seconds": 1527,
+      "name": "Restoring a deleted workflow brings it back \"Deactivated\" instead of \"Active\"",
+      "summary": "The workflow comes back with status \"Deactivated\": the editor shows a grey \"Deactivated\" chip where \"Active\" was before deletion, and on /objects/workflowVersions the row for this workflow (v1) shows \"Deactivated\" where it showed \"Active\" before the delete. The workflow therefore no longer runs its trigger after a restore, and nothing tells the user it lost its activation. (on /object/workflow/42c238c1-0b0e-4d86-88b1-eea6f1553038)",
+      "expected": "The restored workflow comes back exactly as it was before deletion, including its status: the editor chip reads \"Active\" and the Workflow Versions list shows the version's Version status as \"Active\", so its trigger still runs.",
+      "actual": "The workflow comes back with status \"Deactivated\": the editor shows a grey \"Deactivated\" chip where \"Active\" was before deletion, and on /objects/workflowVersions the row for this workflow (v1) shows \"Deactivated\" where it showed \"Active\" before the delete. The workflow therefore no longer runs its trigger after a restore, and nothing tells the user it lost its activation.",
+      "reproSteps": [
+        "Open /objects/workflows and click \"+ New Workflow\".",
+        "Type the name \"agent11-Delete Me Flow\", press Enter.",
+        "Click the \"Add a Trigger\" node, choose \"Launch manually\"; click the \"Add a step\" (+) button, choose \"Code - Logic Function\", then click \"Activate\" in the header (chip shows \"Active\").",
+        "Open the \"Command Menu\" button (⋯ at top right of the editor) and click \"Delete Workflow\" — the record shows the red banner \"This record has been deleted\" and a \"Restore\" button.",
+        "Click \"Restore\" in the banner and confirm in the dialog with \"Restore Workflow\".",
+        "Reload the page."
+      ]
+    }
+  ]
+}

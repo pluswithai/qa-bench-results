@@ -1,0 +1,190 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "findings": 15,
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 17,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Matches negative manual hours being rejected with raw RangeError feedback; the different negative value is insignificant."
+      },
+      {
+        "groundTruthIndex": 4,
+        "reproStepsIndex": 0,
+        "findingIndex": 2,
+        "reason": "Matches a saved due date appearing as a dash in both new and previous timeline values while the sidebar remains correct; the boundary date differs."
+      },
+      {
+        "groundTruthIndex": 8,
+        "reproStepsIndex": 0,
+        "findingIndex": 6,
+        "reason": "Matches clicking the repository Open counter navigating to state=all and displaying closed issues."
+      },
+      {
+        "groundTruthIndex": 71,
+        "reproStepsIndex": 0,
+        "findingIndex": 7,
+        "reason": "Matches a plain bulk-label click removing a label from a mixed selection rather than adding it to all selected issues."
+      },
+      {
+        "groundTruthIndex": 34,
+        "reproStepsIndex": 0,
+        "findingIndex": 10,
+        "reason": "Matches keyboard highlighting followed by Alt+Enter including the label instead of excluding it."
+      },
+      {
+        "groundTruthIndex": 40,
+        "reproStepsIndex": 0,
+        "findingIndex": 13,
+        "reason": "Matches clicking Start timer in a stale tab stopping and logging the timer already started in another tab."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 4,
+        "reproStepsIndex": 0,
+        "findingIndex": 12,
+        "reason": "Matches the rejected expectation that Fuzzy mode tolerates a one-character omission; fixture configuration disables fuzziness by default."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 1,
+        "reason": "No entry describes Escape failing to dismiss the New Issue sidebar dropdowns."
+      },
+      {
+        "findingIndex": 3,
+        "reason": "No entry describes sidebar unassignment failing to persist. The steps also do not test dismissing the dropdown before reload."
+      },
+      {
+        "findingIndex": 4,
+        "reason": "No entry describes emoji-title searches returning no matches; the rejected fuzzy and phrase-search claims describe different behavior."
+      },
+      {
+        "findingIndex": 5,
+        "reason": "No entry describes Add dependency saving the first suggestion instead of the typed issue number."
+      },
+      {
+        "findingIndex": 8,
+        "reason": "No entry describes Clear assignees failing to persist. The reproduction reloads without testing dropdown dismissal."
+      },
+      {
+        "findingIndex": 9,
+        "reason": "No entry covers assignment changes being deferred until dropdown dismissal and lost when reloading beforehand."
+      },
+      {
+        "findingIndex": 11,
+        "reason": "No entry describes the mobile bulk Label dropdown opening offscreen; the rejected mobile pagination claim is unrelated."
+      },
+      {
+        "findingIndex": 14,
+        "reason": "No entry covers an empty Time Tracker sidebar. The steps do not open the gear menu or establish the account's tracking permissions."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 1,
+        "reason": "Keyboard-dismissal usability defect; the menus remain dismissible with an outside click."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 3,
+        "reason": "Reports an assignment removal that appears selected but is not saved."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 3,
+        "reason": "Search omits an issue containing the submitted query."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 3,
+        "reason": "The action saves a dependency on an unintended issue."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 3,
+        "reason": "Reports that clearing assignments changes local ticks but leaves the saved assignments intact."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 3,
+        "reason": "Describes assignment changes being lost after the control visibly changes selection."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 1,
+        "reason": "Describes clipped dropdown presentation without demonstrating a failed label action."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 3,
+        "reason": "The claimed impact is search failing to return matching issues, although this behavior was reviewed as intended."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 1,
+        "reason": "Establishes missing sidebar content, but not that an authorized tracking action is unusable."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [
+      {
+        "findingIndex": 11,
+        "reference": {
+          "name": "Long label pushes the mobile Label filter menu off the left edge",
+          "summary": "At phone width, once a repository has a valid long label (up to the 50-character limit), the issue list Label filter dropdown opens leftward and mostly off screen, so its search box, label options and Show archived labels control cannot be reached or scrolled into view.",
+          "expected": "The Label filter menu stays within the viewport at 390px, constraining or wrapping long label names, and its search, options and Show archived labels control remain reachable.",
+          "actual": "With a 50-character label present, opening the Label filter on the repository Issues list at 390px placed the menu at x=-319 with width 403: the search input (x=-307) and the Show archived labels checkbox (x=-308) were off the left edge, and the page could not scroll horizontally to reveal them. With only short labels, or at 412px and wider, the menu opened inside the viewport.",
+          "reproSteps": [
+            [
+              "Sign in as eval and create a repository label with a 50-character unbroken name.",
+              "Set the viewport to 390×844 and open the repository Issues list.",
+              "Open the Label filter dropdown.",
+              "Observe the menu opening mostly off the left edge, with its search box and Show archived labels control unreachable."
+            ]
+          ],
+          "severity": 3
+        },
+        "reason": "Matches long labels causing a mobile Label dropdown to open off the left edge. The bulk-action menu is a different reproduction path from the recorded list-filter case."
+      }
+    ],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

@@ -1,0 +1,382 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "gitea/areas/repository-code",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "954e9c30da4e66f83fcf722aa1ae7677a179755c833328c1d69c5fcb760c087c",
+    "known_invalid_sha256": "31be65e5a16f0e03d29644373c00e0122623a1dc8132470a6767973f436e660b",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "65",
+    "bugs": "27",
+    "flags": "0",
+    "known_hits": "13",
+    "extra_known_hits": "0",
+    "unverified": "11",
+    "outside_area_known_hits": "3",
+    "outside_area_known_invalid": "0",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "1",
+    "outside_area_ground_truth_sha256": "47db07b83af13b7c7dd75acd1b523ed86e8107b60e6f33878e8fb5b68a2acbe2",
+    "outside_area_known_invalid_sha256": "72e79c4023c85c9101fbf2b7613d3daf78b07fded510d117ab5b26f6ac3103f9",
+    "duplicates": "0",
+    "duplicate_known_hits": "0",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "0",
+    "known_misses": "0",
+    "precision": "1",
+    "recall": "0.2",
+    "findings_per_minute": "1.0113123400706296",
+    "correct_findings_per_minute": "0.48692816373771053",
+    "severity_1": "6",
+    "severity_3": "5",
+    "severity_5": "2",
+    "severity_sum": "31",
+    "score": "31",
+    "duration_seconds": "1601.879",
+    "partial": "false",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 23,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Matches the Branches dialog closing without validation or branch creation when Confirm is clicked with an empty name."
+      },
+      {
+        "groundTruthIndex": 8,
+        "reproStepsIndex": 0,
+        "findingIndex": 3,
+        "reason": "Matches submitting an empty upload queue with a new directory and reaching its nonexistent path. Enter submits the same form as Commit Changes."
+      },
+      {
+        "groundTruthIndex": 64,
+        "reproStepsIndex": 0,
+        "findingIndex": 4,
+        "reason": "Matches sidebar code search using Words mode while displaying Exact, then producing different results when resubmitted explicitly as Exact."
+      },
+      {
+        "groundTruthIndex": 22,
+        "reproStepsIndex": 0,
+        "findingIndex": 5,
+        "reason": "Matches invalid branch-rename validation exposing the internal field key form.To."
+      },
+      {
+        "groundTruthIndex": 0,
+        "reproStepsIndex": 0,
+        "findingIndex": 6,
+        "reason": "Matches malformed regular expressions replacing repository search with a 500 page. The different malformed expression is insignificant."
+      },
+      {
+        "groundTruthIndex": 10,
+        "reproStepsIndex": 0,
+        "findingIndex": 7,
+        "reason": "Matches reversing the comparison and falsely reporting distinct branches as equal when the head has no commits ahead."
+      },
+      {
+        "groundTruthIndex": 6,
+        "reproStepsIndex": 0,
+        "findingIndex": 8,
+        "reason": "Matches the New File commit-summary placeholder retaining the literal {filename} token after a filename is entered."
+      },
+      {
+        "groundTruthIndex": 52,
+        "reproStepsIndex": null,
+        "findingIndex": 11,
+        "reason": "Matches Apply Patch's post-error submit-button lockout, recoverable only by editing patch text. This reproduction uses a stale-head conflict rather than an invalid branch name."
+      },
+      {
+        "groundTruthIndex": 14,
+        "reproStepsIndex": 0,
+        "findingIndex": 14,
+        "reason": "Matches branch-row controls overflowing at 768px width, including the delete icon extending beyond the available boundary."
+      },
+      {
+        "groundTruthIndex": 36,
+        "reproStepsIndex": null,
+        "findingIndex": 19,
+        "reason": "Matches creating a supposedly new branch with the current branch's name, committing directly to it, and opening a self-comparison. The recorded case uses file editing rather than Apply Patch."
+      },
+      {
+        "groundTruthIndex": 9,
+        "reproStepsIndex": null,
+        "findingIndex": 20,
+        "reason": "Matches the singular commit-count label incorrectly reading '1 Commits', reached through commit search rather than file History."
+      },
+      {
+        "groundTruthIndex": 61,
+        "reproStepsIndex": 0,
+        "findingIndex": 22,
+        "reason": "Matches newline-terminated files showing a header count one greater than their numbered source lines. Existing files replace the case's test-file setup."
+      },
+      {
+        "groundTruthIndex": 60,
+        "reproStepsIndex": 0,
+        "findingIndex": 26,
+        "reason": "Matches code-search line links opening rendered Markdown without source-line targets or highlighting, rather than the rejected no-navigation claim."
+      }
+    ],
+    "invalidMatches": [],
+    "unverified": [
+      {
+        "findingIndex": 1,
+        "reason": "No entry covers wildcard interpretation in tag search. The literal-percent branch-search bug describes missing matches, not extra tag matches."
+      },
+      {
+        "findingIndex": 2,
+        "reason": "No entry describes the file finder accepting a nonexistent branch and reporting misleading empty results."
+      },
+      {
+        "findingIndex": 9,
+        "reason": "No entry covers addition/deletion totals ignoring whitespace filtering. The filtered-diff entries concern selected-file filtering instead."
+      },
+      {
+        "findingIndex": 10,
+        "reason": "No entry covers singular/plural grammar in the tags-list heading; the reviewed grammar bugs concern different labels."
+      },
+      {
+        "findingIndex": 12,
+        "reason": "No entry describes Apply Patch accepting a malformed hunk and committing an empty file while discarding the pasted text."
+      },
+      {
+        "findingIndex": 13,
+        "reason": "No entry covers raw error responses for nonexistent archive refs. The archive ground-truth bug instead serves the wrong existing ref's contents."
+      },
+      {
+        "findingIndex": 15,
+        "reason": "No entry describes tag badges disappearing from commit-search result rows."
+      },
+      {
+        "findingIndex": 16,
+        "reason": "No entry covers technical error wording for rejected Apply Patch input."
+      },
+      {
+        "findingIndex": 17,
+        "reason": "No entry covers HTML markup embedded in repository activity-feed titles; the reviewed RSS bugs concern broken channel URLs."
+      },
+      {
+        "findingIndex": 18,
+        "reason": "No entry covers an empty quoted root path in the upload-summary placeholder. The New File placeholder bug exposes a different unresolved token."
+      },
+      {
+        "findingIndex": 21,
+        "reason": "No entry covers phone-width clipping and missing lane lines in the commit graph."
+      },
+      {
+        "findingIndex": 23,
+        "reason": "This reports scope loss after submitting an empty query. KnownInvalid 1 instead concerns expecting a scope-dropdown change alone to filter history."
+      },
+      {
+        "findingIndex": 24,
+        "reason": "No entry covers branch-scoped Raw URLs serving stale file contents after a commit; reviewed cache bugs concern commit counts."
+      },
+      {
+        "findingIndex": 25,
+        "reason": "No entry covers duplicate-tag validation incorrectly referring to a branch and using malformed wording."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 3,
+        "reason": "Tag search returns results that do not contain the requested characters."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "The finder displays an incorrect no-matches state instead of identifying the nonexistent branch."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 5,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 5,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 3,
+        "reason": "The summary reports incorrect totals for the displayed filtered changes."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 1,
+        "reason": "Only the singular wording is incorrect."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 3,
+        "reason": "The operation succeeds with unintended empty content and no warning."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 5,
+        "reason": "The response is an unlabeled raw internal error page without application navigation."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 15,
+        "severity": 1,
+        "reason": "The commit remains present; its tag badge is missing from the presentation."
+      },
+      {
+        "findingIndex": 16,
+        "severity": 1,
+        "reason": "Invalid patches are correctly rejected, and the error has an 'Unable to apply patch' label; the defect is technical, poorly formatted wording."
+      },
+      {
+        "findingIndex": 17,
+        "severity": 1,
+        "reason": "The described impact is markup appearing in feed text, not broken feed navigation or operations."
+      },
+      {
+        "findingIndex": 18,
+        "severity": 1,
+        "reason": "The observed defect is awkward placeholder wording; the claimed resulting commit message is not tested."
+      },
+      {
+        "findingIndex": 19,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 20,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 21,
+        "severity": 1,
+        "reason": "The described defects concern responsive presentation and readability, without demonstrated operational failure."
+      },
+      {
+        "findingIndex": 22,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 23,
+        "severity": 3,
+        "reason": "As described, submission discards the selected scope and does not produce the requested result state."
+      },
+      {
+        "findingIndex": 24,
+        "severity": 3,
+        "reason": "Raw returns outdated file contents instead of the current branch version."
+      },
+      {
+        "findingIndex": 25,
+        "severity": 1,
+        "reason": "Duplicate creation is correctly refused; only the error message is defective."
+      },
+      {
+        "findingIndex": 26,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [
+      {
+        "findingIndex": 1,
+        "reference": {
+          "name": "Tag search treats underscores and percent signs as wildcards",
+          "summary": "The Tags page search passes the query to the database LIKE pattern unescaped, so '_' matches any single character and '%' matches anything. Searching a_b also lists a-b and axb tags, v1_0_0 finds v1.0.0, and searching % or _ lists every tag.",
+          "expected": "Tag search treats '_' and '%' as literal characters, so it only lists tags whose names contain them.",
+          "actual": "With tags rel-a_b, rel-a-b and rel-axb, searching a_b listed all three ('3 Tags'), while a-b listed only rel-a-b. Searching % or _ listed all 5 tags, including ones with no percent sign or underscore. On harbor-handbook, v1_0_0 returned v1.0.0.",
+          "reproSteps": [
+            [
+              "In a repository, create tags rel-a_b, rel-a-b and rel-axb (New Release > Create Tag Only).",
+              "Open the repository's Tags page, search for a_b and note the results.",
+              "Search for a-b and compare.",
+              "Search for % and check whether tags without a percent sign are listed."
+            ]
+          ],
+          "severity": 3
+        },
+        "reason": "Matches tag search interpreting % and _ as wildcards and returning tags without those literal characters."
+      },
+      {
+        "findingIndex": 10,
+        "reference": {
+          "name": "Tags page uses plural grammar when one tag is listed",
+          "summary": "A repository with one tag displays the heading `1 Tags` while the nearby tab correctly displays `1 Tag`.",
+          "expected": "The tag heading should use singular grammar when exactly one tag exists.",
+          "actual": "A repository with one tag displays the heading `1 Tags` while the nearby tab correctly displays `1 Tag`.",
+          "reproSteps": [
+            [
+              "Open an authenticated repository that contains exactly one tag.",
+              "Open the repository's Tags page.",
+              "Observe that the list heading says `1 Tags` while the nearby tab says `1 Tag`."
+            ]
+          ],
+          "severity": 1
+        },
+        "reason": "Matches the Tags list heading using '1 Tags' while the nearby tab correctly uses '1 Tag'."
+      },
+      {
+        "findingIndex": 25,
+        "reference": {
+          "name": "Duplicate-tag creation error describes the attempted operation as branch creation",
+          "summary": "Repeating Operations > Create tag with an existing tag name correctly rejects the duplicate but describes the attempted operation as creating a branch.",
+          "expected": "Duplicate-tag feedback identifies the attempted operation as tag creation and explains that the tag already exists.",
+          "actual": "The validation message says: Branch \"<tag-name>\" cannot be created as a tag with same name already exists in the repository.",
+          "reproSteps": [
+            [
+              "Use the English locale and sign in with write access to an initialized, unarchived repository. Use a unique disposable tag name; the original observation used a 390×844 viewport.",
+              "Open a commit from the repository’s main branch, choose Operations > Create tag, enter the disposable tag name, and create it.",
+              "Return to the same commit, choose Operations > Create tag again, and submit the identical tag name.",
+              "Inspect the validation message. It says Branch \"<tag-name>\" cannot be created as a tag with same name already exists in the repository, despite the attempted operation being tag creation."
+            ]
+          ],
+          "severity": 1
+        },
+        "reason": "Matches Operations > Create tag rejecting an existing tag with feedback incorrectly describing branch creation."
+      }
+    ],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "fixture": "saleor/areas/vouchers",
+  "run": 2,
+  "started_at": "2026-11-24T00:12:15.578Z",
+  "duration_seconds": 1799.995,
+  "time_limit_seconds": 1800,
+  "stop_reason": "time_limit",
+  "credits": {
+    "total": 1535,
+    "testing_team": 1283,
+    "verification": 252,
+    "findings_verified": 42
+  },
+  "team_container_errors": 0
+}

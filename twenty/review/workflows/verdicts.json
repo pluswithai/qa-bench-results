@@ -1,0 +1,381 @@
+{
+  "area": "workflows",
+  "bugs": [
+    {
+      "id": "workflows-1",
+      "title": "Record page for a workflow id that does not exist renders an empty \"Untitled (0/0)\" shell with no not-found state",
+      "findings": [
+        "run1-04",
+        "run2-04",
+        "run3-05"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "A workflow id that does not exist renders an empty \"Untitled (0/0)\" shell with no not-found state. Counted under the rule for addresses the app does not generate.",
+      "evidence": [
+        "run1-04/shot-1.png",
+        "run1-04/shot-3.png",
+        "run1-04/shot-4.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/pages/object-record/RecordShowPage.tsx#L20-L85",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/record-show/components/RecordShowEffect.tsx#L31-L55",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/record-title-cell/components/RecordTitleCellTextFieldDisplay.tsx#L64-L66"
+      ]
+    },
+    {
+      "id": "workflows-2",
+      "title": "Sort panel \"Descending\" selector does not flip an existing sort",
+      "findings": [
+        "run1-05",
+        "run2-05",
+        "run3-06"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Designed behaviour. In the Sort dropdown the Ascending/Descending select only stores a pending direction (handleSortDirectionClick sets selectedRecordSortDirection and nothing else); a sort is written only when a field row is clicked (handleAddSort -> upsertRecordSort with that direction), and the pending direction is reset to ASC every time the dropdown opens or closes (useResetSortDropdown). The agent chose \"Descending\" and pressed Escape without picking a field (shot-1/shot-3 show the panel open on \"Descending\" with the chip still \"↑ Name\"), so no sort change was ever requested; the reset to \"Ascending\" on reopen is the same coded reset. Flipping an existing sort is done from the sort chip, which the agent confirms works.",
+      "evidence": [
+        "run1-05/shot-1.png",
+        "run1-05/shot-2.png",
+        "run1-05/shot-3.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/object-sort-dropdown/components/ObjectSortDropdownButton.tsx#L107-L141",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/object-sort-dropdown/hooks/useResetSortDropdown.ts#L15-L18"
+      ]
+    },
+    {
+      "id": "workflows-3",
+      "title": "Schedule trigger said to accept hour 25 and activate with it",
+      "findings": [
+        "run1-09"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "The evidence contradicts the claim. The agent's own video ends (t=196 s, same state as frame-6) by reopening the trigger of the now Active workflow: \"Trigger at hour (UTC)\" is 0 and the schedule reads \"at 00:00 UTC every day\" - 25 was never saved. That matches the source: the hour onChange rejects values outside 0-23, stores the message \"Invalid hour value '25'. Should be integer between 0 and 23\" and returns before onTriggerUpdate, and the schedule preview is hidden while an error is pending (isVisible). The message is rendered only after the field loses focus (onBlur -> setErrorMessagesVisible(true)); shot-2/shot-5 were taken while the field was still focused, and the agent's next click (the \"+\" under the trigger) replaced the panel with the action picker, so the inline error was never on screen. Validation on blur, not a missing validation.",
+      "evidence": [
+        "run1-09/shot-2.png",
+        "run1-09/shot-5.png",
+        "run1-09/frame-6.jpg",
+        "run1-09/video.webm"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/workflow/workflow-trigger/components/WorkflowEditTriggerCronForm.tsx#L58-L60",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/workflow/workflow-trigger/components/WorkflowEditTriggerCronForm.tsx#L192-L240",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/workflow/workflow-trigger/components/WorkflowEditTriggerCronForm.tsx#L292-L299"
+      ]
+    },
+    {
+      "id": "workflows-4",
+      "title": "Test runs of a workflow with a Form step stay \"Running\" when the form is not submitted",
+      "findings": [
+        "run1-10"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Designed behaviour. Quick Lead contains a Form action (shot-1). The form action is a human-input step: its executor returns `pendingEvent: true`, the step is recorded as PENDING and the run stays RUNNING until someone submits the form; the run can be reopened later and submitted. Each Test click starting a new run of the draft is what Test does. The claim that nothing can end such a run is wrong: a pinned \"Stop\" command exists for workflow runs whose status is NOT_STARTED, ENQUEUED or RUNNING (shown on record selection); the agent never selected a run row (shot-4/shot-5 show no selection). Runs #1-#3 completed because their form was submitted.",
+      "evidence": [
+        "run1-10/shot-1.png",
+        "run1-10/shot-4.png",
+        "run1-10/shot-5.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/modules/workflow/workflow-executor/workflow-actions/form/form.workflow-action.ts#L16-L35",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/modules/workflow/workflow-executor/workspace-services/workflow-executor.workspace-service.ts#L375-L387",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/engine/workspace-manager/twenty-standard-application/constants/standard-command-menu-item.constant.ts#L531-L546"
+      ]
+    },
+    {
+      "id": "workflows-5",
+      "title": "Overflow tooltip has no height limit: a very long name opens a tooltip that covers the page and runs off the bottom of the window",
+      "findings": [
+        "run1-14"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "shot-1 (version record, Workflow field) and shot-2 (editor breadcrumb) show the hover tooltip as a ~500 px wide dark block from the top bar past the bottom edge of the window, hiding the canvas and header buttons; the text is cut by the viewport, so the tooltip cannot even show the full value it exists to reveal. Source confirms the cause: the shared tooltip style sets `overflow: visible`, `width: max-content`, `max-width: 100%`, `word-break: break-word` and no max-height or line clamp, and OverflowingTextWithTooltip passes the whole text into it. Cosmetic only (disappears on mouse-out, pointer-events none) and it needs an extreme value (a name of thousands of characters created by a test agent), hence severity 1; the root cause is in the shared component, so any long text value triggers it.",
+      "evidence": [
+        "run1-14/shot-1.png",
+        "run1-14/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-ui/src/surfaces/AppTooltip/AppTooltip.module.scss#L8-L20",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-ui/src/surfaces/OverflowingTextWithTooltip/OverflowingTextWithTooltip.tsx#L124-L138"
+      ]
+    },
+    {
+      "id": "workflows-6",
+      "title": "Workflow Version \"Version trigger\" field shows truncated raw JSON",
+      "findings": [
+        "run1-15",
+        "run2-13",
+        "run3-07"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Designed behaviour of the generic JSON field. `trigger` on workflowVersion is declared as a RAW_JSON field labelled \"Version trigger\" with isUIEditable: false, and every RAW_JSON field is displayed as the stringified value on one truncated line (JsonFieldDisplay -> JsonDisplay). The claim that the rest cannot be read is contradicted by the source: a read-only JSON field opens an expandable JSON tree viewer on click (handleClick -> ExpandedFieldDisplay + JsonTree), and isUIEditable: false makes the field read-only. The video does not show any click on the value (the only clicks are on navigation and \"New chat\"; the value is only pointed at), so the \"click does not expand\" statement is unsupported. The trigger is also shown readably on the Flow canvas of the same page (\"Launch manually\" node in shot-1). The missing ellipsis glyph at the cut is a trivial styling nit, not enough for a defect.",
+      "evidence": [
+        "run1-15/shot-1.png",
+        "run1-15/shot-3.png",
+        "run1-15/video.webm"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-workflow-version-standard-flat-field-metadata.util.ts#L175-L185",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/record-field/ui/meta-types/display/components/JsonFieldDisplay.tsx#L18-L55",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/read-only/utils/isRecordFieldReadOnly.ts#L52-L58"
+      ]
+    },
+    {
+      "id": "workflows-7",
+      "title": "Failed run shows \"Workflow run started at\" as its own label and the workflow name as \"Executed by\"",
+      "findings": [
+        "run2-02"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Misread of two designed displays. (1) The grey text \"Workflow run started at\" in shot-1/shot-2 is the empty-field placeholder, not a value: an empty inline cell renders its own label as placeholder (`emptyPlaceHolder = label ?? 'Empty'`), exactly like the grey \"Job Title\"/\"Phones\" placeholders elsewhere. The field is empty because this run never started: the run job builds the Code steps before it calls startWorkflowRun (the only place startedAt is written), and in this instance logic functions are not configured, so the build throws (\"Logic function ... is disabled\", visible as State {\"workflowRunError\":\"Logic fun...) and the catch ends the run as FAILED with only endedAt (the Nov 24 5:40 AM value shown). The Completed Quick Lead run has no Code step, so it started normally. Environment-driven and coherent: a run that never started has no start time. (2) \"Executed by\" is an actor field; a run launched by a database-event trigger is created with actor source WORKFLOW and the workflow's name, which is what the chip with the workflow icon shows. The manually launched Quick Lead run shows Tim Apple for the same reason.",
+      "evidence": [
+        "run2-02/shot-1.png",
+        "run2-02/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/modules/workflow/workflow-runner/jobs/run-workflow.job.ts#L70-L125",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/modules/workflow/workflow-runner/workflow-run/workflow-run.workspace-service.ts#L143-L213",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/modules/workflow/workflow-trigger/jobs/workflow-trigger.job.ts#L84-L97",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/record-inline-cell/components/RecordInlineCellDisplayMode.tsx#L89-L106"
+      ]
+    },
+    {
+      "id": "workflows-8",
+      "title": "Quick Lead default workflow drops the form's \"Job title\": the created Person has an empty Job Title",
+      "findings": [
+        "run2-09"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "Real defect in the workflow shipped with every workspace. shot-1 shows the Quick Lead Form asking for \"Job title\" (filled with repro-jobtitle); shot-3 and shot-5 show the People records created by two runs (repro-first repro-last, agent5b-first agent5b-last) with name, email and company set but Job Title still the grey placeholder. The source confirms it is not another agent's edit: the seeded Quick Lead definition declares the form field `jobTitle` and its output, but the \"Create Person\" step maps only name.firstName/lastName, emails.primaryEmail and companyId - jobTitle is never used by any step. A value the form explicitly asks for is silently discarded on every run, with the run reported as Completed. Severity 3: silent loss of typed data in a built-in flow, no error.",
+      "evidence": [
+        "run2-09/shot-1.png",
+        "run2-09/shot-3.png",
+        "run2-09/shot-5.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/engine/workspace-manager/standard-objects-prefill-data/utils/prefill-workflows.util.ts#L322-L328",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/engine/workspace-manager/standard-objects-prefill-data/utils/prefill-workflows.util.ts#L435-L451"
+      ]
+    },
+    {
+      "id": "workflows-9",
+      "title": "Row context menu opens past the bottom of the window for low rows: most entries are cut off",
+      "findings": [
+        "run2-11"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "shot-1, shot-4 and shot-5 (three separate right-clicks, list also scrolled to its end in shot-5) show the row context menu starting at the click point near the bottom of a 1280x720 window and running off the window: only \"Delete Workflow\" (and \"Remove from Favorites\") are visible, the other seven entries are below the edge. The same video shows the full menu when a row higher up is right-clicked, so the entries exist and are simply clipped. The source explains it: the menu is a Dropdown with no clickable anchor, positioned by passing the click's pageX/pageY as a floating-ui offset from a fixed fallback anchor with placement bottom-start; `flip` therefore has no usable opposite placement, and `size` never lets the max height go below DROPDOWN_RESIZE_MIN_HEIGHT (200 px), so with less than that below the click the menu must overflow the window. Not an overload artifact (deterministic geometry). Severity 3: the actions of that menu cannot be clicked for rows in the lower part of the window; the same commands remain reachable through the top-right command menu, which keeps it from being higher.",
+      "evidence": [
+        "run2-11/shot-1.png",
+        "run2-11/shot-4.png",
+        "run2-11/shot-5.png",
+        "run2-11/video.webm"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/command-menu-item/components/RecordIndexCommandMenuDropdown.tsx#L69-L77",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/record-table/record-table-cell/hooks/useTriggerCommandMenuDropdown.ts#L43-L49",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/ui/layout/dropdown/components/Dropdown.tsx#L144-L173",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/ui/layout/dropdown/constants/DropdownResizeMinHeight.ts#L1"
+      ]
+    },
+    {
+      "id": "workflows-10",
+      "title": "Clearing the schedule trigger's cron expression is saved in the draft without an inline error",
+      "findings": [
+        "run2-14"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "An incomplete draft, not a schedule that can go live. The video shows the whole test on a Draft workflow (yellow Draft chip throughout) and the agent never pressed Activate. Draft edits are autosaved field by field, and the form deliberately handles an empty pattern (the schedule helper is hidden while `!trigger.settings.pattern`). The claim that a trigger is \"left with no schedule\" is contradicted by the server: activation runs assertCronTriggerSettingsAreValid, which throws \"No pattern provided in CUSTOM cron trigger\" (with that text as the user-facing message) when the pattern is empty, so such a trigger can never be enabled. What remains is the absence of an inline hint on an emptied field of a draft, which is a wish, not a defect. (The accepted, different failure of this field - a malformed but non-empty expression being accepted and scheduled - is workflows-16.)",
+      "evidence": [
+        "run2-14/shot-4.png",
+        "run2-14/shot-5.png",
+        "run2-14/video.webm"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/modules/workflow/workflow-trigger/utils/assert-version-can-be-activated.util.ts#L111-L134",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/workflow/workflow-trigger/components/WorkflowEditTriggerCronForm.tsx#L92-L138"
+      ]
+    },
+    {
+      "id": "workflows-11",
+      "title": "Mailbox banner \"Reconnect\" said to lead to a blank page with no message",
+      "findings": [
+        "run2-16"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "The agent's own video contradicts the claim, and the cause is the test instance's configuration. After the click the video shows the transition (\"Verifying your login token\"), then the app shell loading again with a red toast at the bottom right reading \"Google apis auth is not enabled\" (final seconds of video.webm) - so there is a message, in the app, and the user is back in the app. shot-2/shot-4 are blank because they were captured during the redirect on an overloaded instance (the video shows skeleton loaders for many seconds before and after). The behaviour matches the source: the OAuth guard throws 'Google apis auth is not enabled' when neither MESSAGING_PROVIDER_GMAIL_ENABLED nor CALENDAR_PROVIDER_GOOGLE_ENABLED is set (evidently the case in this test instance) and redirects with ?errorMessage=..., and ErrorMessageEffect turns that query value into an error toast and removes it from the address. Environment (Google not configured) plus a screenshot taken mid-redirect.",
+      "evidence": [
+        "run2-16/shot-2.png",
+        "run2-16/shot-4.png",
+        "run2-16/video.webm"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/engine/core-modules/auth/guards/google-apis-oauth-request-code.guard.ts#L60-L68",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/error-handler/components/ErrorMessageEffect.tsx#L7-L24"
+      ]
+    },
+    {
+      "id": "workflows-12",
+      "title": "Clicking \"Test\" twice starts two test runs",
+      "findings": [
+        "run2-17"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "Checked by hand on a clean instance: a quick double-click on Test starts two runs and the Create Record step runs twice (duplicate records). The Test button has no guard or running state, so a common double-click duplicates real data.",
+      "evidence": [
+        "run2-17/shot-1.png",
+        "run2-17/shot-2.png",
+        "run2-17/video.webm"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/command-menu-item/engine-command/record/single-record/workflow/components/TestWorkflowSingleRecordCommand.tsx#L25-L41",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/workflow/hooks/useRunWorkflowVersion.tsx#L77-L94"
+      ]
+    },
+    {
+      "id": "workflows-13",
+      "title": "Command menu said not to find existing workflows by name",
+      "findings": [
+        "run2-18"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "No record search was ever run. The \"Type anything...\" box of the command menu filters the list of commands, not records: SidePanelCommandMenuItemDisplayPage filters commandMenuItems by label/shortcut and, when no command matches, shows the group \"Fallback\" with the command \"Search\" (searchRecordsFallback) - exactly what shot-1 and shot-5 show (\"Fallback / Search / No results found\"). The agent never clicked that \"Search\" entry (nor the Search command / the magnifier), so the record search page was not opened; the video only shows typing. The names that did \"work\" confirm it: agent7-status and Quick Lead are listed in the menu before any typing (video, menu opened with an empty box) because active manually-launched workflows are commands, so typing \"agent7\" matched a command, not a record. \"No results found\" refers to commands. Designed behaviour, test misread.",
+      "evidence": [
+        "run2-18/shot-1.png",
+        "run2-18/shot-5.png",
+        "run2-18/video.webm"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/command-menu-item/display/components/SidePanelCommandMenuItemDisplayPage.tsx#L87-L123",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/side-panel/pages/root/hooks/useFilterCommandMenuItemsWithSidePanelSearch.ts#L44-L58",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/engine/workspace-manager/twenty-standard-application/constants/standard-command-menu-item.constant.ts#L641-L653"
+      ]
+    },
+    {
+      "id": "workflows-14",
+      "title": "\"Add a Node\" adds an unconnected step and Activate accepts it",
+      "findings": [
+        "run2-19"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Designed behaviour of the free-form canvas. The toolbar command \"Add a Node\" only opens the step picker for the workflow with no parent step (openWorkflowCreateStepInSidePanel(workflowId)), the same as the canvas right-click \"Add node\", which creates the node with `parentStepId: undefined`; nodes are then linked by dragging between handles (onConnect on the editable canvas). To append to a step the user uses the \"+\" under that step. shot-3 shows exactly that: Delay as a free node with its own \"+\". Activation validates the trigger, that steps exist and each step's settings (assertVersionIsValid) and has no reachability rule, so publishing a flow with a spare node is allowed; the connected part (Trigger -> Create Record) keeps running. A warning for unreachable nodes would be a feature request.",
+      "evidence": [
+        "run2-19/shot-3.png",
+        "run2-19/shot-4.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/command-menu-item/engine-command/record/single-record/workflow/components/AddNodeWorkflowSingleRecordCommand.tsx#L21-L27",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/workflow/workflow-diagram/components/WorkflowDiagramRightClickCommandMenu.tsx#L52-L60",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/workflow/workflow-diagram/components/WorkflowDiagramCanvasEditable.tsx#L68",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/modules/workflow/workflow-trigger/utils/assert-version-can-be-activated.util.ts#L43-L82"
+      ]
+    },
+    {
+      "id": "workflows-15",
+      "title": "\"Duplicate Workflow\" on a draft with no trigger is refused with \"Workflow version does not contain trigger\"",
+      "findings": [
+        "run2-21"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "A coded rule with its own user-facing message, not a raw error. duplicateWorkflow asserts that the source version has a trigger (assertWorkflowVersionTriggerIsDefined) and steps before copying, and the exception carries `userFriendlyMessage: msg`Workflow version does not contain trigger``, which is the toast in shot-3; nothing is created, as intended (shot-2/shot-3: count stays 1). The message does say what is missing (the trigger), so the user can act on it. The workflow tested (agent10-list-test) was an empty draft made with \"Add New\". The only weakness is that the menu offers the command for a workflow that cannot be duplicated yet (its availability rule checks only that a current version exists) - a polish point, not a defect.",
+      "evidence": [
+        "run2-21/shot-2.png",
+        "run2-21/shot-3.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/modules/workflow/workflow-builder/workflow-version/workflow-version.workspace-service.ts#L232-L247",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/modules/workflow/common/utils/assert-workflow-version-trigger-is-defined.util.ts#L18-L26",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/engine/workspace-manager/twenty-standard-application/constants/standard-command-menu-item.constant.ts#L485-L500"
+      ]
+    },
+    {
+      "id": "workflows-16",
+      "title": "Schedule trigger accepts a malformed cron expression (\"* * *\"): the panel says it is invalid and still lists upcoming runs, three identical",
+      "findings": [
+        "run3-02"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "shot-1 and shot-3 (two tries, field already blurred) show Expression \"* * *\" with the grey hint \"Failed to describe cron expression: Invalid cron expression. Expected 4-6 fields, got 3\" and, right below, \"Upcoming execution time (UTC)\" listing Nov 25, 2026 12:00 AM three times. No red field error appears because the field's own check passed and the value was saved. Cause in source: the form (and the server's validatePattern) validate with cron-parser 5.1.1 in non-strict mode, which pads short expressions instead of rejecting them (3 atoms become \"* * 0 * * *\" = every second of hour 0, hence three timestamps one second apart that print identically), while the description uses Twenty's own parser, which requires 4-6 fields and reports the error as plain hint text. CronExpressionHelper also validates with cron-parser, so it treats the expression as valid and renders the schedule. Result: an expression the product itself calls invalid is stored on the trigger with a bogus schedule, and nothing on the server would stop its activation (same lenient parser; only an empty pattern is refused). Severity 3: input validation hole with contradictory feedback on a scheduling field.",
+      "evidence": [
+        "run3-02/shot-1.png",
+        "run3-02/shot-3.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/workflow/workflow-trigger/components/WorkflowEditTriggerCronForm.tsx#L92-L138",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/workflow/workflow-trigger/components/CronExpressionHelper.tsx#L16-L43",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/workflow/workflow-trigger/components/CronExpressionHelper.tsx#L113-L161",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/workflow/workflow-trigger/utils/cron-to-human/utils/parseCronExpression.ts#L21",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/modules/workflow/workflow-trigger/utils/compute-cron-pattern-from-schedule.ts#L10-L31"
+      ]
+    },
+    {
+      "id": "workflows-17",
+      "title": "Flow view opens with the trigger node partly outside the canvas (phone width)",
+      "findings": [
+        "run3-08"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "shot-1 (390x844) shows the Flow tab of a version opening with the first node cut by the left edge: only \"ed or updated\" of \"Record is created or updated\" is visible, its icon and \"Trigger\" label are off-canvas. The video shows the same node cut on the right on the first open and on the left after a reload, and its last frame (desktop width) shows it cut on the left there too, so the start position is not reliable. Source: the canvas is locked at zoom 1 (minZoom = maxZoom = 1) and the initial viewport is `x = containerWidth / 2 - flowBounds.width / 2`, which centres the bounding box of all nodes and ignores where the first node is; when the flow is wider than the container (always the case on a phone for the seeded workflow) x becomes negative and the trigger, the leftmost node, is pushed out of view. Nothing is lost - the canvas pans by dragging - so this is cosmetic: severity 1.",
+      "evidence": [
+        "run3-08/shot-1.png",
+        "run3-08/video.webm"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/workflow/workflow-diagram/components/WorkflowDiagramCanvasBase.tsx#L97-L100",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/workflow/workflow-diagram/components/WorkflowDiagramCanvasBase.tsx#L316-L340"
+      ]
+    },
+    {
+      "id": "workflows-18",
+      "title": "Workflow page opened by a member without access shows \"Untitled (0/0)\" and a bare lock icon, with no explanation",
+      "findings": [
+        "run3-09"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "The agent typed the address by hand; owner rule: hand-typed addresses are not counted, even when the id is real.",
+      "evidence": [
+        "run3-09/shot-1.png",
+        "run3-09/shot-3.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/page-layout/widgets/components/WidgetCardShell.tsx#L96-L144",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/page-layout/widgets/hooks/useWidgetRendererState.ts#L78-L81",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/page-layout/widgets/components/PageLayoutWidgetForbiddenDisplay.tsx#L18-L51"
+      ]
+    },
+    {
+      "id": "workflows-19",
+      "title": "A deleted Active workflow comes back \"Deactivated\" after Restore",
+      "findings": [
+        "run3-10"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Designed behaviour, written explicitly in the server. Deleting a workflow runs deactivateVersionOnDelete: the workflow status ACTIVE is replaced by DEACTIVATED and every ACTIVE version is set to DEACTIVATED, so a deleted workflow stops triggering. Restore brings back the versions, runs and automated triggers, and the same function returns early for any operation other than 'delete' (`if (operation !== 'delete') return;`) - it does not switch automation back on by itself. shot-4 shows the restored workflow as \"Deactivated\" with the \"Activate\" button one click away, which is the intended, safe outcome (a restored automation does not start firing without the user asking). Nothing is lost: trigger and steps are intact.",
+      "evidence": [
+        "run3-10/shot-4.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/modules/workflow/common/workspace-services/workflow-common.workspace-service.ts#L343-L390",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/modules/workflow/common/workspace-services/workflow-common.workspace-service.ts#L402-L471"
+      ]
+    }
+  ]
+}

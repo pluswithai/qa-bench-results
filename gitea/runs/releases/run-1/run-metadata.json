@@ -1,0 +1,15 @@
+{
+  "fixture": "gitea/areas/releases",
+  "run": 1,
+  "started_at": "2026-11-23T15:26:54.331Z",
+  "duration_seconds": 1645.052,
+  "time_limit_seconds": 1800,
+  "stop_reason": "completed",
+  "credits": {
+    "total": 1142,
+    "testing_team": 878,
+    "verification": 264,
+    "findings_verified": 44
+  },
+  "team_container_errors": 0
+}

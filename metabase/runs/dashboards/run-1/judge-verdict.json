@@ -1,0 +1,318 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "metabase/areas/dashboards",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "a29eb196c93da55c3af4643e298d77fef4d81535a124dba0c35439c999c41a90",
+    "known_invalid_sha256": "a1fbd65686f5b66009e6e0a14915dfd1b66fa897f44669a1ec7e4f29fee4465e",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "95",
+    "bugs": "27",
+    "flags": "0",
+    "known_hits": "6",
+    "extra_known_hits": "0",
+    "unverified": "18",
+    "outside_area_known_hits": "0",
+    "outside_area_known_invalid": "0",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "",
+    "outside_area_ground_truth_sha256": "18765609374b28bc9ff8c4d574f183a1cec470472e42a7e8bae343da32e17da8",
+    "outside_area_known_invalid_sha256": "bda5fa1dae2abd3dbc884c784d0bd82ccd854fe93bc63cc4126be5e14c0b4c18",
+    "duplicates": "0",
+    "duplicate_known_hits": "0",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "3",
+    "known_misses": "3",
+    "precision": "0.6666666666666666",
+    "recall": "0.06315789473684211",
+    "findings_per_minute": "0.9472759093117807",
+    "correct_findings_per_minute": "0.21050575762484017",
+    "severity_1": "2",
+    "severity_3": "4",
+    "severity_5": "0",
+    "severity_sum": "14",
+    "score": "11",
+    "duration_seconds": "1710.167",
+    "partial": "false",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 24,
+        "reproStepsIndex": 0,
+        "findingIndex": 1,
+        "reason": "Matches the sample dashboard History displaying “undefined modified this,” reached through More info > History."
+      },
+      {
+        "groundTruthIndex": 1,
+        "reproStepsIndex": 0,
+        "findingIndex": 3,
+        "reason": "Matches Product breakdown retaining every category despite a single-category dashboard selection. Widget versus Gizmo is insignificant test data."
+      },
+      {
+        "groundTruthIndex": 5,
+        "reproStepsIndex": 0,
+        "findingIndex": 5,
+        "reason": "Matches dashboard duplication omitting a URL Link card while retaining other cards and tabs."
+      },
+      {
+        "groundTruthIndex": 57,
+        "reproStepsIndex": 0,
+        "findingIndex": 8,
+        "reason": "Matches a populated tab’s Duplicate menu action doing nothing and leaving the menu open. The different tab name does not change the failure or route."
+      },
+      {
+        "groundTruthIndex": 0,
+        "reproStepsIndex": 0,
+        "findingIndex": 10,
+        "reason": "Matches More info remaining invisible in fullscreen and appearing after fullscreen is exited."
+      },
+      {
+        "groundTruthIndex": 29,
+        "reproStepsIndex": 0,
+        "findingIndex": 13,
+        "reason": "Matches the Creator and last editor card omitting the creator row for a member viewer. The accounts and prior metadata-edit setup differ, but the viewing flow and omission are the same."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 8,
+        "reproStepsIndex": 0,
+        "findingIndex": 7,
+        "reason": "Matches accepting a user-entered relative Link target that subsequently opens a not-found page. The rejected entry explicitly covers arbitrary text being accepted as relative URLs."
+      },
+      {
+        "knownInvalidIndex": 22,
+        "reproStepsIndex": 0,
+        "findingIndex": 11,
+        "reason": "Matches a stale dashboard editor overwriting a separately saved card without conflict detection. Using two tabs of one account is an insignificant setup difference."
+      },
+      {
+        "knownInvalidIndex": 10,
+        "reproStepsIndex": 0,
+        "findingIndex": 12,
+        "reason": "Matches saving an unconfigured Link card and clicking its Choose a link placeholder to navigate Home."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 0,
+        "reason": "No entry describes legend-label clicks opening the question instead of toggling a series. The navigation is explicit, though the expected label behavior is assumed."
+      },
+      {
+        "findingIndex": 2,
+        "reason": "No entry describes a nonnumeric dashboard address remaining on Loading. The eight-second observation supports a stalled load but not its claimed indefinite duration."
+      },
+      {
+        "findingIndex": 4,
+        "reason": "No entry describes the orders-by-source card displaying revenue amounts instead of order counts."
+      },
+      {
+        "findingIndex": 6,
+        "reason": "No entry describes horizontal clipping of the survey table’s Body column. The wine-review content bug concerns different behavior."
+      },
+      {
+        "findingIndex": 9,
+        "reason": "No entry describes this creation-dialog validation state. The whitespace-title entries concern inline renaming or saving an existing dashboard without explanatory validation."
+      },
+      {
+        "findingIndex": 14,
+        "reason": "No entry describes the Add a chart sidebar squeezing the mobile editor and removing its tab controls."
+      },
+      {
+        "findingIndex": 15,
+        "reason": "No entry describes excessive dashboard-title wrapping at tablet width."
+      },
+      {
+        "findingIndex": 16,
+        "reason": "No entry describes this phone-width clipping with an undisclosed but working scroll area. Unlike groundTruth 19, scrolling can reach all content."
+      },
+      {
+        "findingIndex": 17,
+        "reason": "No entry describes the Website Analysis funnel cards ignoring Date Range. Other filter-connection entries concern different cards or operations."
+      },
+      {
+        "findingIndex": 18,
+        "reason": "No entry describes an unauthenticated save blanking the app. The outcome is detailed, but the steps do not establish how to invalidate the session."
+      },
+      {
+        "findingIndex": 19,
+        "reason": "No entry describes wildcard interpretation in global search. GroundTruth 81 concerns a dashboard Starts with filter, not search."
+      },
+      {
+        "findingIndex": 20,
+        "reason": "No entry describes horizontal truncation of an unbroken token in a Text card. The heading and vertical-alignment entries describe different failures."
+      },
+      {
+        "findingIndex": 21,
+        "reason": "No entry describes the New action disappearing without a mobile replacement."
+      },
+      {
+        "findingIndex": 22,
+        "reason": "No entry describes accepting an empty iframe snippet and saving a persistently non-rendering card. Empty Link-card claims concern a different control and outcome."
+      },
+      {
+        "findingIndex": 23,
+        "reason": "No entry describes the Duplicate dialog generating a default name beyond its own length limit."
+      },
+      {
+        "findingIndex": 24,
+        "reason": "No entry describes these subscription cards disagreeing under Previous 3 months. The comparison is concrete, though equivalent underlying query windows are not established."
+      },
+      {
+        "findingIndex": 25,
+        "reason": "No entry describes the subscriptions chart’s 2022 dates conflicting with other subscription cards. The dates are explicit, but the claim assumes the cards count equivalent data."
+      },
+      {
+        "findingIndex": 26,
+        "reason": "No entry describes Rename being unavailable specifically when a dashboard has only one tab."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 3,
+        "reason": "The reported action navigates away instead of changing chart visibility."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 5,
+        "reason": "The described dashboard route is unusable and never reaches content or an error state."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 3,
+        "reason": "The finding describes the wrong metric being presented as order counts."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 1,
+        "reason": "The described defect is table layout and text clipping."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 3,
+        "reason": "The claimed impact is navigation to an unintended internal destination."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 1,
+        "reason": "The invalid name is rejected; the complaint concerns validation wording and the button’s failure label."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 3,
+        "reason": "The described stale save removes another saved card."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 3,
+        "reason": "The placeholder performs unexpected navigation away from the dashboard."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 3,
+        "reason": "The layout makes the dashboard canvas and tab-switching controls unavailable in this editor state."
+      },
+      {
+        "findingIndex": 15,
+        "severity": 1,
+        "reason": "This is a title-layout and readability defect."
+      },
+      {
+        "findingIndex": 16,
+        "severity": 1,
+        "reason": "The text remains accessible by scrolling; the issue is clipping and missing overflow indication."
+      },
+      {
+        "findingIndex": 17,
+        "severity": 3,
+        "reason": "The reported cards retain unfiltered results while a date filter is applied."
+      },
+      {
+        "findingIndex": 18,
+        "severity": 5,
+        "reason": "The entire app becomes a blank, unusable page after Save."
+      },
+      {
+        "findingIndex": 19,
+        "severity": 3,
+        "reason": "Search returns items that do not contain the requested characters."
+      },
+      {
+        "findingIndex": 20,
+        "severity": 1,
+        "reason": "The reported defect is text wrapping and presentation."
+      },
+      {
+        "findingIndex": 21,
+        "severity": 3,
+        "reason": "Users cannot reach the described content-creation actions at phone width."
+      },
+      {
+        "findingIndex": 22,
+        "severity": 3,
+        "reason": "The accepted configuration produces a nonfunctional card, while the dashboard remains usable."
+      },
+      {
+        "findingIndex": 23,
+        "severity": 3,
+        "reason": "The generated default disables duplication until the user manually repairs it."
+      },
+      {
+        "findingIndex": 24,
+        "severity": 3,
+        "reason": "The finding alleges incorrect empty results despite subscriptions within the selected window."
+      },
+      {
+        "findingIndex": 25,
+        "severity": 3,
+        "reason": "The described impact is inconsistent dated subscription results, not merely formatting."
+      },
+      {
+        "findingIndex": 26,
+        "severity": 3,
+        "reason": "The sole tab cannot be renamed through either reported interaction."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

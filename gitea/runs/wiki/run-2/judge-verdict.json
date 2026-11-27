@@ -1,0 +1,316 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "gitea/areas/wiki",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "f39aedd9aa4d06834d1a9a855a33cdb9f9208643cac559434b94663b1325e066",
+    "known_invalid_sha256": "1ee791a4ed1dc780565224fe83baae7a31d9d0f499f01d50ed315b41d9f64a1d",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "30",
+    "bugs": "22",
+    "flags": "0",
+    "known_hits": "9",
+    "extra_known_hits": "0",
+    "unverified": "10",
+    "outside_area_known_hits": "2",
+    "outside_area_known_invalid": "0",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "1",
+    "outside_area_ground_truth_sha256": "47db07b83af13b7c7dd75acd1b523ed86e8107b60e6f33878e8fb5b68a2acbe2",
+    "outside_area_known_invalid_sha256": "72e79c4023c85c9101fbf2b7613d3daf78b07fded510d117ab5b26f6ac3103f9",
+    "duplicates": "0",
+    "duplicate_known_hits": "0",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "1",
+    "known_misses": "1",
+    "precision": "0.9",
+    "recall": "0.3",
+    "findings_per_minute": "0.751975645103955",
+    "correct_findings_per_minute": "0.30762640026979976",
+    "severity_1": "4",
+    "severity_3": "5",
+    "severity_5": "0",
+    "severity_sum": "19",
+    "score": "18",
+    "duration_seconds": "1755.376",
+    "partial": "false",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 25,
+        "reproStepsIndex": 0,
+        "findingIndex": 1,
+        "reason": "Same closed Page selector overflowing the viewport and hiding its arrow, reproduced with a longer title at desktop width."
+      },
+      {
+        "groundTruthIndex": 4,
+        "reproStepsIndex": 0,
+        "findingIndex": 2,
+        "reason": "Same duplicate-title validation replacing the submitted body with the default text. Loss of the optional note is an additional detail."
+      },
+      {
+        "groundTruthIndex": 2,
+        "reproStepsIndex": 0,
+        "findingIndex": 3,
+        "reason": "Same rename-to-existing-title operation silently overwriting the target and removing the source page."
+      },
+      {
+        "groundTruthIndex": 1,
+        "reproStepsIndex": 0,
+        "findingIndex": 4,
+        "reason": "Same phone-width revision history hiding SHA links without providing another visible route to revision diffs."
+      },
+      {
+        "groundTruthIndex": 0,
+        "reproStepsIndex": 0,
+        "findingIndex": 5,
+        "reason": "Same rename causing the visible revision list and count to omit all pre-rename revisions."
+      },
+      {
+        "groundTruthIndex": 18,
+        "reproStepsIndex": 0,
+        "findingIndex": 9,
+        "reason": "Same stale editor save after a rename silently recreating the old title as a second page; leaving the body unchanged does not change the failure."
+      },
+      {
+        "groundTruthIndex": 16,
+        "reproStepsIndex": 0,
+        "findingIndex": 10,
+        "reason": "Same leading-'---' rendering defect in _Footer: the horizontal rule and following content fail to render normally, with this input producing an empty body."
+      },
+      {
+        "groundTruthIndex": 22,
+        "reproStepsIndex": 0,
+        "findingIndex": 14,
+        "reason": "Explicitly reports the missing notice when '.' becomes 'unnamed', matching the accepted feedback defect rather than merely objecting to normalization."
+      },
+      {
+        "groundTruthIndex": 21,
+        "reproStepsIndex": 0,
+        "findingIndex": 15,
+        "reason": "Same stale editor save silently recreating a page deleted in another tab."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 8,
+        "reproStepsIndex": 0,
+        "findingIndex": 18,
+        "reason": "The primary claim repeats the rejected in-page heading-link failure, here through the TOC. Fresh-load behavior is secondary; this is not the accepted address-bar fragment-change bug."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 0,
+        "reason": "No entry describes a wide Markdown table causing document-level horizontal scrolling; the recorded overflow bugs involve page-title controls."
+      },
+      {
+        "findingIndex": 6,
+        "reason": "No entry describes non-ASCII corruption in wiki commit diffs or downloaded patches."
+      },
+      {
+        "findingIndex": 7,
+        "reason": "No entry describes long titles stretching the Pages-list table; the recorded title-overflow bugs affect other controls."
+      },
+      {
+        "findingIndex": 8,
+        "reason": "No entry covers incorrect singular/plural wording in the revision count."
+      },
+      {
+        "findingIndex": 11,
+        "reason": "No entry covers the Pages-list original-file control opening rendered content instead of raw Markdown. This differs from bracket links targeting .md-titled pages."
+      },
+      {
+        "findingIndex": 12,
+        "reason": "No entry describes sidebar misalignment on short tablet-width pages; the rejected sidebar claim concerns missing content, not positioning."
+      },
+      {
+        "findingIndex": 13,
+        "reason": "No entry covers pluralization in the commit-diff summary. The quoted text shows the issue despite contradictory commentary about deletions."
+      },
+      {
+        "findingIndex": 16,
+        "reason": "No entry describes escaped HTML markup appearing in repository RSS item titles."
+      },
+      {
+        "findingIndex": 17,
+        "reason": "No entry describes an encoded-NUL wiki address returning an empty HTTP 400 response."
+      },
+      {
+        "findingIndex": 19,
+        "reason": "No entry describes whitespace-only update notes bypassing the automatic revision message."
+      },
+      {
+        "findingIndex": 20,
+        "reason": "No entry describes an inline-code table cell being clipped with no scrolling route to its remaining text."
+      },
+      {
+        "findingIndex": 21,
+        "reason": "No entry covers manually recreated pages inheriting deleted-page history. The stale-editor resurrection bug describes a different failure."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 1,
+        "reason": "Describes a layout and scrolling defect without broken page functionality."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 3,
+        "reason": "The claimed downloads contain incorrect content and paths, potentially making patches apply incorrectly."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 1,
+        "reason": "Describes table layout overflow and awkward text wrapping."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 1,
+        "reason": "This is a grammatical copy defect."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 3,
+        "reason": "The control opens a different content view than the one it promises."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 1,
+        "reason": "Describes a visual alignment defect without lost functionality."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 1,
+        "reason": "This is a grammatical copy defect."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 15,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 16,
+        "severity": 1,
+        "reason": "The described impact is malformed presentation of feed titles."
+      },
+      {
+        "findingIndex": 17,
+        "severity": 5,
+        "reason": "The described result is a completely blank, unusable page with no error explanation or navigation."
+      },
+      {
+        "findingIndex": 18,
+        "severity": 3,
+        "reason": "The claimed impact is heading navigation failing to reach its destination."
+      },
+      {
+        "findingIndex": 19,
+        "severity": 3,
+        "reason": "Saving produces an incorrect persisted revision message instead of the expected automatic message."
+      },
+      {
+        "findingIndex": 20,
+        "severity": 1,
+        "reason": "The described defect is content clipping in the mobile layout."
+      },
+      {
+        "findingIndex": 21,
+        "severity": 3,
+        "reason": "The claim describes incorrect revision history and counts being associated with a newly created page."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [
+      {
+        "findingIndex": 8,
+        "reference": {
+          "name": "File history shows the grammatically incorrect count label “1 Commits” when there is exactly one commit.",
+          "summary": "File history shows the grammatically incorrect count label “1 Commits” when there is exactly one commit.",
+          "expected": "The history count uses singular wording for one commit, such as “1 Commit.”",
+          "actual": "The history page displays “1 Commits” above its single-commit listing.",
+          "reproSteps": [
+            [
+              "/",
+              "Use only a fresh repository and file created for this reproduction; keep all seeded and other-run data read-only.",
+              "Sign in as the admin account and create a fresh, uniquely named admin-owned repository for this run; do not reuse seeded or other-run repositories or files.",
+              "On the repository Code page, choose New File and create docs/field-notes.md with short Markdown content, then commit directly to the main branch.",
+              "Open the new file's History view."
+            ]
+          ],
+          "severity": 1
+        },
+        "reason": "Matches the history heading's incorrect “1 Commits” wording. It is reached through wiki revisions rather than repository file History."
+      },
+      {
+        "findingIndex": 13,
+        "reference": {
+          "name": "Commit detail summary uses incorrect singular/plural grammar for one changed file",
+          "summary": "Commit detail and branch comparison diff summaries use plural “files” when exactly one file changed.",
+          "expected": "Diff summaries should use singular “file” when exactly one file changed.",
+          "actual": "A commit changing one file displays “1 changed files with 1 additions and 0 deletions”. Comparing docs/release-owners against main also displays “1 changed files with 5 additions and 0 deletions”.",
+          "reproSteps": [
+            [
+              "Open an authenticated repository's commit history.",
+              "Open a commit that changes exactly one file.",
+              "Read the changed-files summary above the diff and observe that it says `1 changed files with 1 additions and 0 deletions`.",
+              "Reported comparison-page variant: open eval/harbor-handbook → Branches and choose New Pull Request beside docs/release-owners, with main as the base.",
+              "Read the comparison summary and observe “1 changed files with 5 additions and 0 deletions”."
+            ]
+          ],
+          "severity": 1
+        },
+        "reason": "Matches the commit-diff summary incorrectly using plural wording for one changed file and addition. The route is through wiki revisions rather than repository commit history."
+      }
+    ],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "fixture": "gitea/areas/repository-settings",
+  "run": 2,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 589,
+      "name": "Clicking \"Update Avatar\" with no file chosen shows a raw server error \"Avatar.Open: open : no such file or directory\"",
+      "summary": "The page shows a red flash banner with the raw Go error text: \\\"Avatar.Open: open : no such file or directory\\\". The request POST /eval/agent2-basic-renamed/settings/avatar answers 303 and the error text is rendered at the top of the settings page. (on /eval/agent2-basic-renamed/settings)",
+      "expected": "The page should tell the person in plain words that no image was selected, or disable the button while no file is chosen; no internal error should be shown.",
+      "actual": "The page shows a red flash banner with the raw Go error text: \\\"Avatar.Open: open : no such file or directory\\\". The request POST /eval/agent2-basic-renamed/settings/avatar answers 303 and the error text is rendered at the top of the settings page.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-i6ydihygh8jbtdvw771a1.e2b.app/eval/agent2-basic-renamed/settings (any repository you own works).",
+        "In the Basic Settings card, leave the file picker \"Choose new avatar\" empty (\"No file chosen\").",
+        "Click the \"Update Avatar\" button."
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 658,
+      "name": "Invalid default branch shows a raw untranslated key \"form.DefaultBranch must be a well-formed Git reference name.\"",
+      "summary": "The page shows the error banner \\\"form.DefaultBranch must be a well-formed Git reference name.\\\" — a raw untranslated message key from the locale files, and the Default Branch field is not highlighted or marked as the culprit. (on /repo/create)",
+      "expected": "A readable error such as \\\"Default branch must be a well-formed Git reference name.\\\" next to/highlighting the Default Branch field.",
+      "actual": "The page shows the error banner \\\"form.DefaultBranch must be a well-formed Git reference name.\\\" — a raw untranslated message key from the locale files, and the Default Branch field is not highlighted or marked as the culprit.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-i6ydihygh8jbtdvw771a1.e2b.app/repo/create",
+        "Type \"agent1-badbranch\" in Repository Name",
+        "Tick \"Initialize Repository (Adds .gitignore, License and README)\"",
+        "In \"Default Branch\" replace \"main\" with \"bad..name\" (double dot, not a valid Git ref)",
+        "Click \"Create Repository\""
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 1099,
+      "name": "Adding a rule with an existing pattern silently wipes that rule's settings instead of being refused",
+      "summary": "The POST is accepted, the page says \"Branch protection for rule \\\"main\\\" has been updated.\" and the existing rule is overwritten with the new form's defaults: Protected file patterns \"\" (was *.md;docs/**), Unprotected file patterns \"\" (was README.md), Push \"Disable Push\" (was Allowlist Restricted Push), Require Signed Commits unchecked (was checked), Required approvals 0 (was 2), Dismiss stale approvals / Block merge on rejected reviews / Administrators must follow branch protection rules all unchecked (were checked). No warning is shown that the pattern already exists, and there is no separate \"Add\" versus \"Edit\" choice. (on /eval/agent2-basic-renamed/settings/branches/edit)",
+      "expected": "Saving a new rule whose pattern already exists should be refused with a message such as \"the rule already exists\" (shown before anything is overwritten), or the form should open that existing rule for editing instead of silently replacing its settings.",
+      "actual": "The POST is accepted, the page says \"Branch protection for rule \\\"main\\\" has been updated.\" and the existing rule is overwritten with the new form's defaults: Protected file patterns \"\" (was *.md;docs/**), Unprotected file patterns \"\" (was README.md), Push \"Disable Push\" (was Allowlist Restricted Push), Require Signed Commits unchecked (was checked), Required approvals 0 (was 2), Dismiss stale approvals / Block merge on rejected reviews / Administrators must follow branch protection rules all unchecked (were checked). No warning is shown that the pattern already exists, and there is no separate \"Add\" versus \"Edit\" choice.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-i6ydihygh8jbtdvw771a1.e2b.app/eval/agent2-basic-renamed/settings/branches (my disposable repo; any repo you own works).",
+        "Click \"Add New Rule\", fill Protected Branch Name Pattern = main, Protected file patterns = *.md;docs/**, Unprotected file patterns = README.md, choose Allowlist Restricted Push, tick Require Signed Commits and Dismiss stale approvals, set Required approvals = 2, tick \"Administrators must follow branch protection rules\", click \"Save Rule\". The list then shows the rule main.",
+        "Click \"Add New Rule\" again, type the same pattern main in Protected Branch Name Pattern, change nothing else, click \"Save Rule\".",
+        "On the branches page click \"Edit\" next to main, or open .../settings/branches/edit?rule_name=main, and read the form."
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 1159,
+      "name": "An invalid glob in the branch protection pattern (release/[) crashes with a 500 and a full stack trace on screen",
+      "summary": "The page answers 500 Internal Server Error with a full server stack trace printed on screen (\"PANIC: unexpected end of input\", runtime/panic.go, glob.go:57, models/git/protected_branch_list.go:71, routers/web/repo/setting/protected_branch.go:266 …). The POST /eval/agent2-basic-renamed/settings/branches/edit returns 500 and the console logs the failed request. The rule list is not reachable from that response. (on /eval/agent2-basic-renamed/settings/branches/edit)",
+      "expected": "The form should refuse the pattern with a message next to the field (e.g. that the glob pattern is invalid) and keep the typed values, answering 200/422, not crash.",
+      "actual": "The page answers 500 Internal Server Error with a full server stack trace printed on screen (\"PANIC: unexpected end of input\", runtime/panic.go, glob.go:57, models/git/protected_branch_list.go:71, routers/web/repo/setting/protected_branch.go:266 …). The POST /eval/agent2-basic-renamed/settings/branches/edit returns 500 and the console logs the failed request. The rule list is not reachable from that response.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-i6ydihygh8jbtdvw771a1.e2b.app/eval/agent2-basic-renamed/settings/branches (my disposable repo).",
+        "Click \"Add New Rule\".",
+        "Type release/[ into Protected Branch Name Pattern (an unterminated glob character class); leave the other options as they are.",
+        "Click \"Save Rule\"."
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 1328,
+      "name": "Settings of an archived repository can still be saved, although archiving promises the repo is entirely read-only",
+      "summary": "The settings form stays fully editable and the save is accepted: a green flash 'The repository settings have been updated.' appears, and after a reload the Description field holds the new value 'agent3 archived write test'. No read-only warning or disabled field is shown on the settings page of the archived repo. (on /eval/agent3-from-tpl-defaults/settings)",
+      "expected": "An archived repository should behave as the app says ('entirely read-only'): saving a setting should be refused with a message, as commits and issues are.",
+      "actual": "The settings form stays fully editable and the save is accepted: a green flash 'The repository settings have been updated.' appears, and after a reload the Description field holds the new value 'agent3 archived write test'. No read-only warning or disabled field is shown on the settings page of the archived repo.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Archive a disposable repository: /eval/agent3-from-tpl-defaults/settings > Danger Zone > 'Archive Repo' > 'Yes' (the page answers 'The repo was successfully archived.' and the header gets the 'Archived' badge).",
+        "Go back to /eval/agent3-from-tpl-defaults/settings (Settings > Repository).",
+        "Type a new value into the Description field (e.g. 'agent3 archived write test') and click 'Update Settings'.",
+        "Reload the settings page and read the Description field."
+      ]
+    }
+  ]
+}

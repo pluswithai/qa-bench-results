@@ -1,0 +1,345 @@
+{
+  "fixture": "metabase/areas/data-modeling",
+  "run": 1,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 299,
+      "name": "Table descriptions are cut off at the right edge on the tables list at a 1280px-wide window",
+      "summary": "The cards are wider than the window: descriptions run past the right edge of the screen and are cut mid-word (\\\"...Each account represents a new\\\", \\\"...interact with their platform\\\", \\\"...submit feedback\\\", \\\"...their pie subscriptio\\\"). The page has no horizontal scrollbar (document scrollWidth equals window width), so the hidden part of the text cannot be reached. At a 1440px-wide window the same page renders correctly, so the main content area does not shrink with the sidebar open. (on /reference/databases/1/tables)",
+      "expected": "Every table card fits the content area, and each description wraps inside the card so the whole sentence can be read.",
+      "actual": "The cards are wider than the window: descriptions run past the right edge of the screen and are cut mid-word (\\\"...Each account represents a new\\\", \\\"...interact with their platform\\\", \\\"...submit feedback\\\", \\\"...their pie subscriptio\\\"). The page has no horizontal scrollbar (document scrollWidth equals window width), so the hidden part of the text cannot be reached. At a 1440px-wide window the same page renders correctly, so the main content area does not shrink with the sidebar open.",
+      "reproSteps": [
+        "Sign in with eval@momentic.ai / momentic-eval-1.",
+        "Go to https://5501-iqe7hrnpwfb5ik85taou7.e2b.app/reference/databases",
+        "Click the \"Sample Database\" card.",
+        "In the left column of the database page click \"Tables in Sample Database\" (address /reference/databases/1/tables).",
+        "Set the browser window to 1280 x 720 (a normal laptop size) and look at the table cards."
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 303,
+      "name": "In the fields table, the Field type value is truncated and collides with the Data type column",
+      "summary": "The \\\"Field type\\\" column text is cut and runs into the \\\"Data type\\\" column: the row for Created At shows \\\"Creation timestamTIMESTAMP\\\" and the row for Canceled At shows \\\"Cancellation timeTIMESTAMP\\\", with no gap or ellipsis between the two values. It is the same at 1440px wide (\\\"Cancellation timestampTIMESTAMP\\\"), and worse at 1280px. (on /reference/databases/1/tables/6/fields)",
+      "expected": "The Field type column shows its full semantic type (\\\"Creation timestamp\\\", \\\"Cancellation timestamp\\\") with a clear gap before the Data type column, or truncates it with an ellipsis and a tooltip.",
+      "actual": "The \\\"Field type\\\" column text is cut and runs into the \\\"Data type\\\" column: the row for Created At shows \\\"Creation timestamTIMESTAMP\\\" and the row for Canceled At shows \\\"Cancellation timeTIMESTAMP\\\", with no gap or ellipsis between the two values. It is the same at 1440px wide (\\\"Cancellation timestampTIMESTAMP\\\"), and worse at 1280px.",
+      "reproSteps": [
+        "Sign in with eval@momentic.ai / momentic-eval-1.",
+        "Go to https://5501-iqe7hrnpwfb5ik85taou7.e2b.app/reference/databases/1/tables/6",
+        "In the left column click \"Fields in this table\" (address /reference/databases/1/tables/6/fields).",
+        "Look at the \"Field type\" and \"Data type\" columns of the rows Created At and Canceled At."
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 326,
+      "name": "Model History panel shows \"undefined modified this.\" instead of the author's name",
+      "summary": "The revision entry reads \\\"undefined modified this.\\\" with \\\"a few seconds ago\\\" — the author name is rendered as the raw JavaScript value \\\"undefined\\\" (and the time is shown as \\\"a few seconds ago\\\" rather than the revision's date). Reproduced twice, also after a full page reload. (on /model/1-orders-people)",
+      "expected": "The History tab lists each revision with the user who made it, e.g. \\\"Fiona Fixture modified this.\\\" plus the revision time.",
+      "actual": "The revision entry reads \\\"undefined modified this.\\\" with \\\"a few seconds ago\\\" — the author name is rendered as the raw JavaScript value \\\"undefined\\\" (and the time is shown as \\\"a few seconds ago\\\" rather than the revision's date). Reproduced twice, also after a full page reload.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open https://5501-iqe7hrnpwfb5ik85taou7.e2b.app/model/1-orders-people",
+        "Click the \"More info\" (i) button in the model toolbar on the right",
+        "In the Info sidebar, click the \"History\" tab",
+        "Read the revision entry that is listed"
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 331,
+      "name": "A database id that does not exist renders an empty database page instead of a not-found message",
+      "summary": "The page loads a blank record: the detail icon and the \\\"Edit\\\" button are shown, the left column shows \\\"Details\\\" and \\\"Tables in \\\" with an empty name, the breadcrumb ends in just \\\"DATABASES >\\\", and the panels say \\\"No description yet\\\" / \\\"Nothing interesting yet\\\" / \\\"Nothing to be aware of yet\\\" as if the database existed. The request /api/database/999999/metadata answers 404 and nothing on the page tells the person the database does not exist. No heading, no error message, no way back other than the browser. (on /reference/databases/999999)",
+      "expected": "The page says in words that the database does not exist (or that it could not be loaded) and offers a way back to the database list, instead of rendering an empty database page.",
+      "actual": "The page loads a blank record: the detail icon and the \\\"Edit\\\" button are shown, the left column shows \\\"Details\\\" and \\\"Tables in \\\" with an empty name, the breadcrumb ends in just \\\"DATABASES >\\\", and the panels say \\\"No description yet\\\" / \\\"Nothing interesting yet\\\" / \\\"Nothing to be aware of yet\\\" as if the database existed. The request /api/database/999999/metadata answers 404 and nothing on the page tells the person the database does not exist. No heading, no error message, no way back other than the browser.",
+      "reproSteps": [
+        "Sign in with eval@momentic.ai / momentic-eval-1.",
+        "Open https://5501-iqe7hrnpwfb5ik85taou7.e2b.app/reference/databases/999999 directly in the address bar."
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 359,
+      "name": "A table id that does not exist shows an empty table page, with \\\"No description yet\\\" in the \\\"Actual name in database\\\" box",
+      "summary": "The page renders an empty table record: no table name in the heading, breadcrumb ending in \\\"DATABAS... > SAMPLE DATAB... >\\\" with no table, and the box under \\\"Actual name in database\\\" contains the text \\\"No description yet\\\" (the placeholder of the Description field) instead of a database name. \\\"Potentially useful questions\\\" lists the nameless items \\\"Count of\\\" and \\\"See raw data for\\\". Buttons \\\"See this table\\\", \\\"Edit\\\", \\\"X-ray this table\\\" are offered for a table that does not exist, and nothing says it could not be found. (on /reference/databases/1/tables/999999)",
+      "expected": "The page says in words that the table does not exist and offers a way back to the table list; it never shows the description placeholder as the value of \\\"Actual name in database\\\" or empty question names.",
+      "actual": "The page renders an empty table record: no table name in the heading, breadcrumb ending in \\\"DATABAS... > SAMPLE DATAB... >\\\" with no table, and the box under \\\"Actual name in database\\\" contains the text \\\"No description yet\\\" (the placeholder of the Description field) instead of a database name. \\\"Potentially useful questions\\\" lists the nameless items \\\"Count of\\\" and \\\"See raw data for\\\". Buttons \\\"See this table\\\", \\\"Edit\\\", \\\"X-ray this table\\\" are offered for a table that does not exist, and nothing says it could not be found.",
+      "reproSteps": [
+        "Sign in with eval@momentic.ai / momentic-eval-1.",
+        "Open https://5501-iqe7hrnpwfb5ik85taou7.e2b.app/reference/databases/1/tables/999999 directly in the address bar.",
+        "Read the page: heading, the \"Actual name in database\" box and the \"Potentially useful questions\" list."
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 515,
+      "name": "Field suggestion \\\"All distinct values of Rating\\\" returns binned ranges instead of distinct values",
+      "summary": "The question opens as \"Rating: Auto binned\" with a binned breakout: 6 rows of ranges (\"0 – 0.75\", \"1.5 – 2.25\", \"2.25 – 3\", \"3 – 3.75\", \"3.75 – 4.5\", \"4.5 – 5.25\", header chip \"Rating: 8 bins\") instead of the distinct rating values. The same suggestion on a text field works as labelled: Products > Category shows the 4 real values (Doohicky, Gadget, Gizmo, Widget). (on /reference/databases/1/tables/3/fields/16)",
+      "expected": "The link \"All distinct values of Rating\" opens a table listing each distinct Rating value in the data (one row per value, no binning), like the same suggestion does for Products > Category.",
+      "actual": "The question opens as \"Rating: Auto binned\" with a binned breakout: 6 rows of ranges (\"0 – 0.75\", \"1.5 – 2.25\", \"2.25 – 3\", \"3 – 3.75\", \"3.75 – 4.5\", \"4.5 – 5.25\", header chip \"Rating: 8 bins\") instead of the distinct rating values. The same suggestion on a text field works as labelled: Products > Category shows the 4 real values (Doohicky, Gadget, Gizmo, Widget).",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open /reference/databases",
+        "Go to Sample Database > Tables in Sample Database > Products > Fields in this table",
+        "Click the \"Rating\" field (page /reference/databases/1/tables/3/fields/16)",
+        "Scroll to \"Potentially useful questions\" and click \"All distinct values of Rating\"",
+        "The question opens titled \"Rating: Auto binned\" and lists ranges, not distinct values"
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 527,
+      "name": "Duplicate-model dialog asks for the name of your \\\"dashboard\\\" in its placeholder",
+      "summary": "The empty Name field shows the placeholder \"What is the name of your dashboard?\" — dashboard wording in a dialog about a model. (on /model/1-orders-people)",
+      "expected": "The placeholder names the object being created, e.g. \"What is the name of your model?\".",
+      "actual": "The empty Name field shows the placeholder \"What is the name of your dashboard?\" — dashboard wording in a dialog about a model.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open /model/1-orders-people.",
+        "Open the \"Move, trash, and more…\" menu at the top right and click \"Duplicate\".",
+        "Clear the Name field in the \"Duplicate \\\"Orders + People\\\"\" dialog."
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 536,
+      "name": "Reference cards overflow the window when the left sidebar is open, clipping their right edge and scrolling the page sideways",
+      "summary": "The content area keeps a fixed width: the database cards start at x=653 and are 680 px wide, so their right edge sits at 1333 px, 53 px past the 1280 px window. The cards' right border and part of their text are cut off and the whole page scrolls sideways (scrolling right moves the left navigation off screen). With the sidebar collapsed the same page fits. (on /reference/databases)",
+      "expected": "With the left navigation sidebar open at a 1280 px wide window, the reference cards should fit inside the content area (text wrapped, right border visible) and the page should not scroll sideways.",
+      "actual": "The content area keeps a fixed width: the database cards start at x=653 and are 680 px wide, so their right edge sits at 1333 px, 53 px past the 1280 px window. The cards' right border and part of their text are cut off and the whole page scrolls sideways (scrolling right moves the left navigation off screen). With the sidebar collapsed the same page fits.",
+      "reproSteps": [
+        "Sign in at 1280 × 720 and open https://5501-iqe7hrnpwfb5ik85taou7.e2b.app/reference/databases",
+        "Make sure the left navigation sidebar is open (the hamburger 'Toggle sidebar' button in the top bar shows it)",
+        "Look at the right edge of the 'Release operations' and 'Sample Database' cards and scroll the page to the right"
+      ]
+    },
+    {
+      "index": 8,
+      "reported_at_seconds": 605,
+      "name": "Metric history calls the metric a \"Card\" when recording a rename",
+      "summary": "The newest entry reads: You renamed this Card from \"agent11-metric-count\" to \"agent11-metric-renamed\". The entity is called a Card, the app's internal name, on a metric's own history. (on /metric/44-agent11-metric-renamed)",
+      "expected": "The entry should name the entity the page is about, e.g. \\\"You renamed this metric from … to …\\\", as the rest of the page does (the toolbar's over‑flow menu offers \\\"Edit metric definition\\\").",
+      "actual": "The newest entry reads: You renamed this Card from \"agent11-metric-count\" to \"agent11-metric-renamed\". The entity is called a Card, the app's internal name, on a metric's own history.",
+      "reproSteps": [
+        "Go to https://5501-iqe7hrnpwfb5ik85taou7.e2b.app/browse/metrics and create a metric (\"+\" next to Metrics → Sample Database → Orders → Save, name it agent11-metric-count)",
+        "On the new metric page, click its title in the header and change it to \"agent11-metric-renamed\", then press Enter",
+        "Click the \"More info\" (i) button in the toolbar, then the \"History\" tab",
+        "Read the newest entry of the list"
+      ]
+    },
+    {
+      "index": 9,
+      "reported_at_seconds": 665,
+      "name": "Model History claims \"changed pin position\" on every edit even though the model was never pinned",
+      "summary": "Both history entries report 'changed pin position' in addition to the real changes, although the model was never pinned and its pin state never changed (the model card in the personal collection shows no pin). (on /model/50-agent4-model-people (Info > History))",
+      "expected": "The History entry describes only the changes that were actually made (default view, description/column metadata). The model was never pinned or unpinned, so no pin position change should be listed.",
+      "actual": "Both history entries report 'changed pin position' in addition to the real changes, although the model was never pinned and its pin state never changed (the model card in the personal collection shows no pin).",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and create a model: Browse > Models > the '+' (Create a new model) > Use the notebook editor > Sample Database > People > Run > Save, name it 'agent4-model-people', description 'Created by agent4 for metadata testing', Save.",
+        "On the model page open 'Edit query definition' (the '...' menu), Settings tab, choose 'List' as the default view and click 'Save changes'.",
+        "Open the model's Info panel (the 'i' icon top right) and the History tab: the new entry reads 'You edited this ... changed the visualization settings, changed the display from table to list and changed pin position.'",
+        "Click the description in Info > Overview, change it to another text and press Enter; then reopen Info > History: the newest entry reads 'You edited this ... edited the metadata, changed pin position and changed the description.'"
+      ]
+    },
+    {
+      "index": 10,
+      "reported_at_seconds": 736,
+      "name": "Long unbroken glossary term overflows the Term column and overlaps the Definition text",
+      "summary": "The Term cell does not wrap or clamp the long unbroken name: the string of A's runs past the Term column and into the Definition cell, so the term name and the definition text are drawn over each other on the same line (row of \"agent6-very-long-term-name-AAAA…\" against \"…nostrud exercitation ullamco laboris nisi ut\"). (on /reference/glossary)",
+      "expected": "The long term name wraps or is truncated inside its Term column, and the Definition column text stays readable next to it.",
+      "actual": "The Term cell does not wrap or clamp the long unbroken name: the string of A's runs past the Term column and into the Definition cell, so the term name and the definition text are drawn over each other on the same line (row of \"agent6-very-long-term-name-AAAA…\" against \"…nostrud exercitation ullamco laboris nisi ut\").",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1 and open /reference/glossary.",
+        "Click \"New term\".",
+        "In the Term field type agent6-very-long-term-name- followed by about 160 capital A (one unbroken 195-character word); in the Definition field type a long sentence.",
+        "Click the check/Save button and look at the new row in the table."
+      ]
+    },
+    {
+      "index": 11,
+      "reported_at_seconds": 800,
+      "name": "Models table: \\\"Description\\\" column header does nothing when clicked, unlike Name and Collection",
+      "summary": "Nothing happens: the rows stay grouped Examples → Our analytics in the same order, and the Description header never shows a sort arrow (no aria-sort is set either). Name and Collection both sort on click with an arrow, so the third header looks and is announced the same (\"role=button\") but is inert. (on /browse/models)",
+      "expected": "The Description column sorts ascending/descending like Name and Collection (arrow shown and rows reordered by description), or the header is presented as plainly non-sortable.",
+      "actual": "Nothing happens: the rows stay grouped Examples → Our analytics in the same order, and the Description header never shows a sort arrow (no aria-sort is set either). Name and Collection both sort on click with an arrow, so the third header looks and is announced the same (\"role=button\") but is inert.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1 and open /browse/models (the table lists several models with columns Name, Collection, Description).",
+        "Click the \"Collection\" column header twice so it is sorted descending (arrow on Collection).",
+        "Click the \"Description\" column header.",
+        "Compare the rows with the previous state."
+      ]
+    },
+    {
+      "index": 12,
+      "reported_at_seconds": 809,
+      "name": "Adding a glossary term with an existing name fails with a 500 and shows no error, losing the typed term",
+      "summary": "Clicking Save fires POST /api/glossary which returns HTTP 500. The inline row disappears, no error or explanation of any kind is shown, and the term and definition the person typed are gone (only the pre-existing agent12-term-one row remains). Nothing on the page says whether the glossary has unique terms. (on /reference/glossary)",
+      "expected": "Adding a term whose name already exists is either accepted (a second row appears) or refused with a clear message next to the row telling the person the term already exists — and the typed text is kept so nothing is lost.",
+      "actual": "Clicking Save fires POST /api/glossary which returns HTTP 500. The inline row disappears, no error or explanation of any kind is shown, and the term and definition the person typed are gone (only the pre-existing agent12-term-one row remains). Nothing on the page says whether the glossary has unique terms.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1 and open /reference/glossary (an existing term \"agent12-term-one\" is in the table).",
+        "Click \"New term\".",
+        "Type agent12-term-one in the Term field (an existing term name) and any text, e.g. agent6 duplicate definition, in the Definition field.",
+        "Click the check/Save button of the new row and watch the request and the table."
+      ]
+    },
+    {
+      "index": 13,
+      "reported_at_seconds": 825,
+      "name": "Browse > Models shows a description (\"A model\") for models that have no description",
+      "summary": "The Description column shows the text \"A model\" for every model whose description is empty — so the list invents a description that the model does not have. Seen on my two models 'agent1-nodesc' and 'agent1-maxname-…-END' (and on another agent's 'agent11-metric-dup'); the model's own page and /api/card show no description at all. (on /browse/models)",
+      "expected": "A model without a description shows an empty Description cell (or a neutral placeholder that is not data), matching the model's own page and its stored record (description = null).",
+      "actual": "The Description column shows the text \"A model\" for every model whose description is empty — so the list invents a description that the model does not have. Seen on my two models 'agent1-nodesc' and 'agent1-maxname-…-END' (and on another agent's 'agent11-metric-dup'); the model's own page and /api/card show no description at all.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai, go to /model/new, click 'Use the notebook editor'.",
+        "Choose 'Sample Database' > 'People' as the source table.",
+        "Click 'Save' (top right), type the name 'agent1-nodesc', leave the Description field empty, pick 'Our analytics' as the collection, click 'Save' in the dialog.",
+        "Go to /browse/models and look at the Description column of the row 'agent1-nodesc'.",
+        "Open the model (its own page shows no description) and read /api/card/<id> — the stored description is null."
+      ]
+    },
+    {
+      "index": 14,
+      "reported_at_seconds": 829,
+      "name": "New model editor claims \"✓ Saved\" while the Save model dialog is still open and nothing is saved",
+      "summary": "The top-right control changes to '✓ Saved' while the 'Save model' dialog is still open and nothing has been stored — the model does not exist yet (no POST /api/card has been sent). The state reverts to 'Save' only after Escape/Cancel. Seen on all three creates I ran (notebook route with Orders, People and Products). (on /model/query (new model editor))",
+      "expected": "The model is not saved yet while the 'Save model' dialog is open, so the header must not claim '✓ Saved'; it should still read 'Save' (or a neutral/unsaved state) until the dialog's 'Save' is confirmed.",
+      "actual": "The top-right control changes to '✓ Saved' while the 'Save model' dialog is still open and nothing has been stored — the model does not exist yet (no POST /api/card has been sent). The state reverts to 'Save' only after Escape/Cancel. Seen on all three creates I ran (notebook route with Orders, People and Products).",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open /model/new.",
+        "Click 'Use the notebook editor', choose 'Sample Database' > 'Products'.",
+        "Note that the top-right button reads 'Save' (nothing is saved yet).",
+        "Click 'Save' (top right): the 'Save model' dialog opens.",
+        "Look at the top-right of the page: it now reads '✓ Saved' although no model has been created and the dialog's own 'Save' has not been pressed."
+      ]
+    },
+    {
+      "index": 15,
+      "reported_at_seconds": 897,
+      "name": "Glossary table unreadable at 768px and 390px width: columns overlap and the definition column collapses",
+      "summary": "At 768×1024 the Term and Definition columns collapse onto each other: the headers render as \\\"TermDefinition\\\" with no gap, term names and definition text are drawn over each other (\\\"agent12-term-one\\\" over \\\"agent12 edited <b>x</b>…\\\"), and the Definition column shrinks to a few characters wide so each word is on its own line and the rows become extremely tall. The data reference menu labels are also cut to \\\"Seg…\\\", \\\"Our…\\\", \\\"Glo…\\\". At 390×844 the open sidebar leaves only a ~20px sliver of the glossary visible (only \\\"AA,\\\" of the table can be seen), so the page cannot be read at all. (on /reference/glossary)",
+      "expected": "At 768×1024 and 390×844 the glossary table stays readable: columns keep usable widths, term and definition text do not overlap, and the content area is wide enough to read the terms.",
+      "actual": "At 768×1024 the Term and Definition columns collapse onto each other: the headers render as \\\"TermDefinition\\\" with no gap, term names and definition text are drawn over each other (\\\"agent12-term-one\\\" over \\\"agent12 edited <b>x</b>…\\\"), and the Definition column shrinks to a few characters wide so each word is on its own line and the rows become extremely tall. The data reference menu labels are also cut to \\\"Seg…\\\", \\\"Our…\\\", \\\"Glo…\\\". At 390×844 the open sidebar leaves only a ~20px sliver of the glossary visible (only \\\"AA,\\\" of the table can be seen), so the page cannot be read at all.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1 and open /reference/glossary (it has at least two terms).",
+        "Set the browser window to 768 × 1024 and look at the glossary table.",
+        "Set the browser window to 390 × 844 and look at the glossary again."
+      ]
+    },
+    {
+      "index": 16,
+      "reported_at_seconds": 953,
+      "name": "Archive dialog for a metric calls alerts \"pulses\", while the same app's menu calls them \"Create an alert\"",
+      "summary": "The dialog says \\\"This metric will be removed from any dashboards or pulses using it.\\\" — \\\"pulses\\\" is the retired name for the same feature the menu a click earlier calls \\\"Create an alert\\\". The identical model dialog says \\\"alerts\\\", so the same action is described with two different terms. (on /metric/61-agent15-metric)",
+      "expected": "The confirmation text uses the product's own current term for alerts, the same one the menu item uses (\\\"Create an alert\\\"), e.g. \\\"This metric will be removed from any dashboards or alerts using it.\\\" — as the model version of the same dialog already says (\\\"This model will be removed from any dashboards or alerts using it.\\\").",
+      "actual": "The dialog says \\\"This metric will be removed from any dashboards or pulses using it.\\\" — \\\"pulses\\\" is the retired name for the same feature the menu a click earlier calls \\\"Create an alert\\\". The identical model dialog says \\\"alerts\\\", so the same action is described with two different terms.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open https://5501-iqe7hrnpwfb5ik85taou7.e2b.app/browse/metrics",
+        "Open the metric \"agent15-metric\" in Our analytics (e.g. https://5501-iqe7hrnpwfb5ik85taou7.e2b.app/metric/61-agent15-metric) — any metric works",
+        "Click the \"…\" (Move, trash, and more…) button at the top right of the metric page",
+        "In the menu that opens, read the entry \"Create an alert\", then click \"Move to trash\"",
+        "Read the confirmation dialog headed \"Archive this metric?\""
+      ]
+    },
+    {
+      "index": 17,
+      "reported_at_seconds": 1066,
+      "name": "Move dialog at phone width clips its title and the collection row's location text",
+      "summary": "The dialog is 310 px wide and its content does not fit: the title reads \"Where do you want …\", the collection row shows \"Harbor Admin's P…\" and its location text \"in Our analytics\" is cut off at the dialog's right edge (\"in O…\" only). The row's own element box runs from x=73 to x=395 (the item box is only 244 wide) and is clipped by the dialog, so part of the row cannot be read or reached. (on /metric/9-revenue)",
+      "expected": "At a 390 × 844 phone viewport the Move dialog should fit its content: the full dialog title, the collection's full name and its \"in …\" location readable (or wrapped) inside the dialog, with no clipped text.",
+      "actual": "The dialog is 310 px wide and its content does not fit: the title reads \"Where do you want …\", the collection row shows \"Harbor Admin's P…\" and its location text \"in Our analytics\" is cut off at the dialog's right edge (\"in O…\" only). The row's own element box runs from x=73 to x=395 (the item box is only 244 wide) and is clipped by the dialog, so part of the row cannot be read or reached.",
+      "reproSteps": [
+        "Sign in and set the browser window to 390 × 844 (phone size)",
+        "Open https://5501-iqe7hrnpwfb5ik85taou7.e2b.app/metric/9-revenue (the same happens on a model page, e.g. /model/1-orders-people)",
+        "Click the '...' (Move, trash, and more…) button in the toolbar and choose 'Move'",
+        "Look at the dialog title and at the collection row under 'Recents'"
+      ]
+    },
+    {
+      "index": 18,
+      "reported_at_seconds": 1169,
+      "name": "\"Created At\" column header does nothing while other column headers open their actions menu",
+      "summary": "Clicking the \\\"Created At\\\" header has no effect — no actions menu, no sort, no change to the grid. The other headers (Total ($), Discount ($), Quantity) open their menu on the same click, so sorting or filtering the model's rows by their date is impossible from the header. (on /model/1-orders-people)",
+      "expected": "Clicking the \\\"Created At\\\" header opens the same column actions menu as every other column header, so the rows can be sorted by date, filtered by date, or charted with Sum over time.",
+      "actual": "Clicking the \\\"Created At\\\" header has no effect — no actions menu, no sort, no change to the grid. The other headers (Total ($), Discount ($), Quantity) open their menu on the same click, so sorting or filtering the model's rows by their date is impossible from the header.",
+      "reproSteps": [
+        "Sign in with eval@momentic.ai / momentic-eval-1 and open https://5501-iqe7hrnpwfb5ik85taou7.e2b.app/model/1-orders-people (if the \"You can filter and summarize any model\" modal covers the page, open /model/1-orders-people/editor and close the side panel, or reload until the grid is visible).",
+        "In the results grid click the \"Total ($)\" column header: a column actions menu opens with the two sort arrows, Filter by this column, Distribution, Sum over time and Summarize buttons.",
+        "Press Escape to close that menu.",
+        "Click the \"Created At\" column header (the date column between Discount ($) and Quantity).",
+        "Observe the grid: nothing happens, no menu appears, the rows keep their ID order."
+      ]
+    },
+    {
+      "index": 19,
+      "reported_at_seconds": 1265,
+      "name": "Turning a model back into a saved question wipes the custom column display names",
+      "summary": "The saved column display name is lost: the column header goes back to \"Name\" (the underlying table column name), and /api/card/50 result_metadata shows display_name \"Name\" instead of the renamed value. The column description is kept. (on /model/50-agent4-model-people (menu 'Turn back to saved question'))",
+      "expected": "The converted question keeps the model's column metadata, so the renamed column still reads \"agent4 Third Name\".",
+      "actual": "The saved column display name is lost: the column header goes back to \"Name\" (the underlying table column name), and /api/card/50 result_metadata shows display_name \"Name\" instead of the renamed value. The column description is kept.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open the model /model/50-agent4-model-people (created with Browse > Models > '+' > notebook editor > Sample Database > People).",
+        "Open its '...' menu (top right) > 'Edit metadata' > Columns tab, click the 'Name' column header and set Display name to 'agent4 Third Name', then click 'Save changes'. The model page shows the column header 'agent4 Third Name'.",
+        "Still on the model page open the '...' menu (top right) and click 'Turn back to saved question'.",
+        "Look at the converted question page (and at /api/card/50 result_metadata): the column header is back to 'Name'."
+      ]
+    },
+    {
+      "index": 20,
+      "reported_at_seconds": 1291,
+      "name": "Metric page loses its Filter and Summarize actions entirely at phone width",
+      "summary": "At 390x844 the toolbar holds only \"Editor\", the refresh/sharing/bookmark/info/\"...\" buttons, and the View/by controls. Neither \"Filter\" nor \"Summarize\" is on the page, and the \\\"...\\\" (Move, trash, and more…) menu contains only Add to dashboard, Create an alert, Edit metric definition, Turn into a model, Move, Duplicate, Move to trash — so a phone user cannot filter or summarize the metric at all. Widening the window to 820px brings both buttons back. (on /metric/49-agent10-revenue-copy-v2)",
+      "expected": "The metric page offers its Filter and Summarize actions at a phone width too (or provides them in the \\\"...\\\" menu), as it does at 820px and 1280px.",
+      "actual": "At 390x844 the toolbar holds only \"Editor\", the refresh/sharing/bookmark/info/\"...\" buttons, and the View/by controls. Neither \"Filter\" nor \"Summarize\" is on the page, and the \\\"...\\\" (Move, trash, and more…) menu contains only Add to dashboard, Create an alert, Edit metric definition, Turn into a model, Move, Duplicate, Move to trash — so a phone user cannot filter or summarize the metric at all. Widening the window to 820px brings both buttons back.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1 and open a metric page, e.g. /metric/49-agent10-revenue-copy-v2.",
+        "Set the browser window to a phone size, 390 x 844.",
+        "Look at the metric's toolbar row (only \"Editor\" plus icons) and open the \"...\" (Move, trash, and more…) menu.",
+        "Widen the window to 820 x 1180 and look at the same toolbar row."
+      ]
+    },
+    {
+      "index": 21,
+      "reported_at_seconds": 1370,
+      "name": "/metric/new opens the question editor and saves a question instead of creating a metric",
+      "summary": "The address is replaced by the plain question editor: the URL becomes /question#… with type \"query\", the page is 'New question' and the save dialog is titled 'Save new question'. Saving creates a saved QUESTION (/question/73-agent1-from-metric-new), not a metric — the user who asked for a new metric silently ends up with a question. The real metric flow is elsewhere: the '+' on Browse > Metrics opens /metric/query with a 'New metric' header. (on /metric/new)",
+      "expected": "/metric/new opens the metric editor ('New metric', as the '+' on Browse > Metrics does at /metric/query) and saving creates a metric, not a question.",
+      "actual": "The address is replaced by the plain question editor: the URL becomes /question#… with type \"query\", the page is 'New question' and the save dialog is titled 'Save new question'. Saving creates a saved QUESTION (/question/73-agent1-from-metric-new), not a metric — the user who asked for a new metric silently ends up with a question. The real metric flow is elsewhere: the '+' on Browse > Metrics opens /metric/query with a 'New metric' header.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and navigate straight to /metric/new in a fresh tab.",
+        "Observe that after loading, the address has become /question#eyJkYXRhc2V0X3F1ZXJ5Ijp7ImRhdGFiYXNlIjpudWxsLCJ0eXBlIjoicXVlcnki... (type \"query\") and the page is the question editor's 'Pick your starting data' screen (its title area reads 'New question').",
+        "Choose 'Sample Database' > 'Orders', then click 'Save' (top right).",
+        "The dialog is titled 'Save new question'; type the name 'agent1-from-metric-new' and click 'Save'.",
+        "The saved item opens at /question/73-agent1-from-metric-new — a saved question. Compare with /browse/metrics, where the '+' ('Create a new metric') opens /metric/query with a 'New metric' header."
+      ]
+    },
+    {
+      "index": 22,
+      "reported_at_seconds": 1476,
+      "name": "An item address with id 0 (/metric/0-revenue, /model/0-x) opens the item creation editor instead of a not-found page",
+      "summary": "The address is silently rewritten to /question and the page shows the 'Pick your starting data' / new-question creation screen (title 'New question') with no not-found message — /model/0-x does the same. A real, unknown id does show the correct 'We're a little lost… The page you asked for couldn't be found.' page (/metric/99999-nope, /model/99999-nope), so only id 0 is mishandled and drops the user into a creation form instead of the not-found page. (on /metric/0-revenue)",
+      "expected": "Like any other non-existent id, /metric/0-revenue and /model/0-x show the 'We're a little lost… The page you asked for couldn't be found.' page.",
+      "actual": "The address is silently rewritten to /question and the page shows the 'Pick your starting data' / new-question creation screen (title 'New question') with no not-found message — /model/0-x does the same. A real, unknown id does show the correct 'We're a little lost… The page you asked for couldn't be found.' page (/metric/99999-nope, /model/99999-nope), so only id 0 is mishandled and drops the user into a creation form instead of the not-found page.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai.",
+        "Navigate directly to /metric/0-revenue in a fresh tab.",
+        "The page opens with 'Pick your starting data' and a Data picker, and the address turns into /question#… — the new-question creation screen, with no not-found message.",
+        "Compare: /metric/99999-nope and /model/99999-nope show 'We're a little lost… The page you asked for couldn't be found.', while /model/0-x also opens the creation screen."
+      ]
+    },
+    {
+      "index": 23,
+      "reported_at_seconds": 1545,
+      "name": "Renaming an archived metric from a stale tab silently restores it to the collection listing",
+      "summary": "The stale tab accepts the rename (PUT /api/card/71 → 200) with no warning, and the metric comes back out of the trash: the red \"This metric is in the trash.\" banner is gone from the metric page, and \"agent2-twotab-v3\" is listed again under Our analytics on Browse > Metrics. An archived metric is silently restored by an edit made from a page opened before the archive. (on /metric/71-agent2-twotab-v3)",
+      "expected": "Either the edit is refused (\"this metric has been archived\") or the metric stays archived; it must not reappear in the collection listing because of an edit started before the archive.",
+      "actual": "The stale tab accepts the rename (PUT /api/card/71 → 200) with no warning, and the metric comes back out of the trash: the red \"This metric is in the trash.\" banner is gone from the metric page, and \"agent2-twotab-v3\" is listed again under Our analytics on Browse > Metrics. An archived metric is silently restored by an edit made from a page opened before the archive.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai, go to Browse > Metrics and open a metric you created there (Orders / Count, saved in Our analytics) — e.g. /metric/71-agent2-twotab-metric.",
+        "Open the same metric page in a second browser tab and leave it there (this is the stale page).",
+        "In the first tab open the \"Move, trash, and more…\" menu, click \"Move to trash\", then \"Move to trash\" in the \"Archive this metric?\" dialog; the page shows the red banner \"This metric is in the trash.\" and the toast \"agent2-twotab-v1 has been moved to the trash.\"",
+        "Go back to the second tab (still showing the metric as if it were live), click the metric title at the top left, type a new name (agent2-twotab-v3) and press Enter.",
+        "Reload the first tab and open Browse > Metrics."
+      ]
+    }
+  ]
+}

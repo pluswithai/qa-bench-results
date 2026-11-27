@@ -1,0 +1,249 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "gitea/areas/repository-settings",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "a209371f7dd4ef9c8aa5278551ec2d9504eedf0c105c6a8f30cf1bc0293aafa4",
+    "known_invalid_sha256": "95a9f368681a50ab5f25123133625791908fadeedd5b61b6653423271302ff4c",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "50",
+    "bugs": "17",
+    "flags": "0",
+    "known_hits": "10",
+    "extra_known_hits": "0",
+    "unverified": "6",
+    "outside_area_known_hits": "1",
+    "outside_area_known_invalid": "0",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "1",
+    "outside_area_ground_truth_sha256": "47db07b83af13b7c7dd75acd1b523ed86e8107b60e6f33878e8fb5b68a2acbe2",
+    "outside_area_known_invalid_sha256": "72e79c4023c85c9101fbf2b7613d3daf78b07fded510d117ab5b26f6ac3103f9",
+    "duplicates": "0",
+    "duplicate_known_hits": "0",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "0",
+    "known_misses": "0",
+    "precision": "1",
+    "recall": "0.2",
+    "findings_per_minute": "0.6054702455894163",
+    "correct_findings_per_minute": "0.35615896799377433",
+    "severity_1": "2",
+    "severity_3": "8",
+    "severity_5": "0",
+    "severity_sum": "26",
+    "score": "26",
+    "duration_seconds": "1684.641",
+    "partial": "false",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 42,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Matches direct access to the Packages page after disabling the Packages unit; disabling additional units is an insignificant extra step."
+      },
+      {
+        "groundTruthIndex": 10,
+        "reproStepsIndex": 0,
+        "findingIndex": 1,
+        "reason": "Matches the branch-protection form losing entered policy values after rejecting negative required approvals."
+      },
+      {
+        "groundTruthIndex": 0,
+        "reproStepsIndex": 0,
+        "findingIndex": 2,
+        "reason": "Matches the invalid tag glob alert exposing form.NamePattern instead of the user-facing field label."
+      },
+      {
+        "groundTruthIndex": 46,
+        "reproStepsIndex": 0,
+        "findingIndex": 5,
+        "reason": "Matches generating from an empty template with Git Content selected, producing a blank default branch and incomplete Quick Guide commands."
+      },
+      {
+        "groundTruthIndex": 22,
+        "reproStepsIndex": null,
+        "findingIndex": 7,
+        "reason": "Matches accepting whitespace-only tag patterns as blank rules. The finding creates a rule, whereas the supplied case edits an existing working rule."
+      },
+      {
+        "groundTruthIndex": 5,
+        "reproStepsIndex": 0,
+        "findingIndex": 8,
+        "reason": "Matches Add New Rule silently replacing an existing pattern's saved protection settings with the new form's defaults."
+      },
+      {
+        "groundTruthIndex": 30,
+        "reproStepsIndex": 0,
+        "findingIndex": 9,
+        "reason": "Matches an archived issue detail retaining New Issue and opening a full 404 page when clicked."
+      },
+      {
+        "groundTruthIndex": 28,
+        "reproStepsIndex": null,
+        "findingIndex": 10,
+        "reason": "Matches an archived repository exposing an editable wiki form whose save returns 404. The finding uses Edit, while the supplied case uses New Page."
+      },
+      {
+        "groundTruthIndex": 29,
+        "reproStepsIndex": null,
+        "findingIndex": 11,
+        "reason": "Matches accepting a whitespace-only branch pattern as a blank rule. The finding creates one rather than editing an existing rule to whitespace."
+      },
+      {
+        "groundTruthIndex": 21,
+        "reproStepsIndex": null,
+        "findingIndex": 12,
+        "reason": "Matches losing unsaved Basic Settings edits after repository-name rejection, but uses a duplicate-name conflict rather than the supplied invalid-character case."
+      }
+    ],
+    "invalidMatches": [],
+    "unverified": [
+      {
+        "findingIndex": 3,
+        "reason": "No supplied entry describes saving a default merge style that is disabled."
+      },
+      {
+        "findingIndex": 4,
+        "reason": "No supplied entry describes long protected-tag patterns overflowing the settings table."
+      },
+      {
+        "findingIndex": 6,
+        "reason": "No supplied entry describes pull-request options resetting when the Pull Requests unit is disabled."
+      },
+      {
+        "findingIndex": 13,
+        "reason": "No supplied entry describes whitespace-only descriptions producing an empty sidebar block and dangling title punctuation."
+      },
+      {
+        "findingIndex": 14,
+        "reason": "No supplied entry describes long branch-protection patterns overflowing their card at phone width."
+      },
+      {
+        "findingIndex": 15,
+        "reason": "No supplied entry addresses whether archived repositories should permit basic or advanced configuration changes."
+      },
+      {
+        "findingIndex": 16,
+        "reason": "Recreating a deleted rule from a stale editor is distinct from the supplied duplicate-rule overwrite bug and has no matching entry."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 3,
+        "reason": "The settings save and retain an inconsistent merge configuration."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 1,
+        "reason": "The described impact is horizontal overflow and displaced controls, not failed functionality."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 3,
+        "reason": "Saving the module switch unexpectedly changes previously saved options."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 1,
+        "reason": "The described defects affect presentation and title formatting only."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 1,
+        "reason": "The impact is responsive layout overflow without described functional failure."
+      },
+      {
+        "findingIndex": 15,
+        "severity": 3,
+        "reason": "The claim describes configuration writes succeeding despite an expected read-only restriction."
+      },
+      {
+        "findingIndex": 16,
+        "severity": 3,
+        "reason": "Saving a stale form unexpectedly recreates deleted protection configuration."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [
+      {
+        "findingIndex": 6,
+        "reference": {
+          "name": "Re-enabling pull requests silently turns on branch deletion and changes merge defaults",
+          "summary": "Turning a repository's pull requests off and back on in Settings > Advanced Settings doesn't restore the previous pull request settings. While pull requests are disabled, the form shows every merge option checked and every merge style selected, so re-enabling saves those: the default merge style becomes Fast-forward only and Manually merged, Delete pull request branch after merge, and autodetect manual merge all turn on. The settings page greys these options out, rather than hiding them, while the feature is off, which tells the user they'll be kept and simply inactive; saving actually deletes them.",
+          "expected": "Re-enabling pull requests keeps the repository's previous pull request settings, as the greyed-out options shown while pull requests are disabled suggest, or applies the same defaults as a new repository, without silently turning on branch deletion and manual merge options.",
+          "actual": "A repository set to Create merge commit, with Manually merged, delete-branch-after-merge and autodetect manual merge unchecked, came back as Fast-forward only with all three checked after pull requests were disabled and re-enabled. The values stayed after reload, and a new pull request's merge confirmation used Fast-forward only with Delete Branch checked.",
+          "reproSteps": [
+            [
+              "In a repository's Settings > Advanced Settings, set Default Merge Style to Create merge commit, uncheck Manually merged, Delete pull request branch after merge by default and Enable autodetect manual merge, and save.",
+              "Uncheck Enable Repository Pull Requests and save.",
+              "Check Enable Repository Pull Requests again, save, and reload.",
+              "Compare the pull request settings with the ones saved in the first step."
+            ]
+          ],
+          "severity": 3
+        },
+        "reason": "Matches pull-request options resetting when the feature is disabled. The finding observes the reset immediately after disabling, before the reviewed case re-enables the feature."
+      }
+    ],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

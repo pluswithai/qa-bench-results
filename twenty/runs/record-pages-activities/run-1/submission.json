@@ -1,0 +1,337 @@
+{
+  "fixture": "twenty/areas/record-pages-activities",
+  "run": 1,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 735,
+      "name": "On a 390 px screen a long note title pushes the record counter and the record action buttons out of view in the header",
+      "summary": "At 390 px the title in the breadcrumb is cut with \\\"…\\\" but the record counter is clipped mid-value (shown as \\\"(2/1,80\\\") and the record's action buttons at the right end of that row (favourite / previous / next / \\\"…\\\" menu) are pushed completely outside the viewport, so they cannot be reached or scrolled to. The count and the actions stay unreachable at this width. (on /object/note/7a8282b9-36eb-4673-94da-737e357ac545)",
+      "expected": "The header row reflows at 390 px: the long title truncates with an ellipsis and the record counter and the record's action buttons stay visible and reachable, with no horizontal clipping.",
+      "actual": "At 390 px the title in the breadcrumb is cut with \\\"…\\\" but the record counter is clipped mid-value (shown as \\\"(2/1,80\\\") and the record's action buttons at the right end of that row (favourite / previous / next / \\\"…\\\" menu) are pushed completely outside the viewport, so they cannot be reached or scrolled to. The count and the actions stay unreachable at this width.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open https://5500-ixmruf4hfnd9dnfal6vzl.e2b.app/objects/notes.",
+        "Click the blue \"+ New Note\" button and type a long title, e.g. \"agent7-LongTitle-AaBbCcDdEe\" repeated until about 330 characters.",
+        "Click \"Open\" at the bottom of the side panel to open the note's record page (URL /object/note/7a8282b9-36eb-4673-94da-737e357ac545).",
+        "Set the browser viewport to 390 x 844 CSS pixels (mobile).",
+        "If the navigation panel covers the screen, click \"Collapse navigation panel\".",
+        "Look at the page header row: \"Notes / agent7-LongTitle-AaBbCcDd…\" followed by the note counter."
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 736,
+      "name": "Task cards in the record's Tasks tab are cut off at the right edge on a phone",
+      "summary": "In the IN_PROGRESS group each card runs past the right edge of the list panel: the relation chip is cut in half (the first card shows only a blue \\\"G\\\") and the second card's chip is cut to a sliver, so the linked company is unreadable. The card titles are squeezed to about 9 characters (\\\"agent4-t...\\\", \\\"C... Comp...\\\") although the row has free space, because the date and the chip are pinned to a fixed position. (on /object/company/20202020-a305-41e7-8c72-ba44072a4c58 (Tasks tab))",
+      "expected": "Each task card should fit inside the Tasks tab panel at 390 px: the title readable and the due date and relation chip fully visible, without being cut at the edge.",
+      "actual": "In the IN_PROGRESS group each card runs past the right edge of the list panel: the relation chip is cut in half (the first card shows only a blue \\\"G\\\") and the second card's chip is cut to a sliver, so the linked company is unreadable. The card titles are squeezed to about 9 characters (\\\"agent4-t...\\\", \\\"C... Comp...\\\") although the row has free space, because the date and the chip are pinned to a fixed position.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev",
+        "Set the browser viewport to 390 × 844 (phone)",
+        "Open https://5500-ixmruf4hfnd9dnfal6vzl.e2b.app/object/company/20202020-a305-41e7-8c72-ba44072a4c58#b117cefe-9778-4ed5-a09c-0cc957f2b203 (company Google, Tasks tab)",
+        "Look at the IN_PROGRESS cards: their Google relation chip is cut off at the right edge of the panel",
+        "Reload the page — the cards are still clipped"
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 876,
+      "name": "Same note in two tabs: the Fields panel updates live but the body editor keeps the old text, and saving from the stale tab silently discards the other tab's text",
+      "summary": "The Fields panel is updated live by the other tab while the body editor keeps the stale text, so one screen shows two different values of the same field (Body = agent9-VERSION-A in the panel, \\\"a\\\" in the editor; later Body = agent9-VERSION-B-STALE in the panel, agent9-VERSION-A in the editor). Editing in the stale tab then saves the whole stale body with no warning and silently replaces the other tab's text. (on /object/note/14611a41-c44e-4294-9ac5-0acdaff3ffa8)",
+      "expected": "Both tabs show one consistent value for the body (either the editor follows the live update, or the editor keeps the old text and the Fields panel does too), and a save from a tab whose editor is stale should be flagged as a conflict instead of silently overwriting the other tab's text.",
+      "actual": "The Fields panel is updated live by the other tab while the body editor keeps the stale text, so one screen shows two different values of the same field (Body = agent9-VERSION-A in the panel, \\\"a\\\" in the editor; later Body = agent9-VERSION-B-STALE in the panel, agent9-VERSION-A in the editor). Editing in the stale tab then saves the whole stale body with no warning and silently replaces the other tab's text.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev, open /object/note/14611a41-c44e-4294-9ac5-0acdaff3ffa8 (note \"agent9-note-UNSAVED\") in tab A and in a second tab B, both on the Note tab.",
+        "In tab A click into the note body, replace the text with \"agent9-VERSION-A\" and wait ~3 s until it is saved (a GraphQL UpdateOneNote request goes out).",
+        "In tab B look at the record: the left Fields panel now shows Body = \"agent9-VERSION-A\" while the body editor on the right still shows the old text (\"a\").",
+        "In tab B replace the body with \"agent9-VERSION-B-STALE\" and wait ~3 s.",
+        "In tab A look at the record: the Fields panel now shows \"agent9-VERSION-B-STALE\" while its editor still shows \"agent9-VERSION-A\"."
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 888,
+      "name": "Typing while the record \"...\" Options panel is open writes into the note body instead of the panel's search box",
+      "summary": "The panel's search field stays empty and the command list is not filtered. Both letters are inserted into the note body behind the panel (a new block \\\"zq\\\" appeared between \\\"Export Note\\\" and \\\"second paragraph agent10 export body\\\") and are autosaved, silently changing the record. Reproduced twice: after \\\"z\\\" the body got \\\"z\\\", after \\\"q\\\" it became \\\"zq\\\". (on /object/note/79938dea-a992-42da-a591-3c0445575a54)",
+      "expected": "Keystrokes go into the open panel's \\\"Type anything...\\\" search field and filter the command list; the note stays unchanged until I edit it myself.",
+      "actual": "The panel's search field stays empty and the command list is not filtered. Both letters are inserted into the note body behind the panel (a new block \\\"zq\\\" appeared between \\\"Export Note\\\" and \\\"second paragraph agent10 export body\\\") and are autosaved, silently changing the record. Reproduced twice: after \\\"z\\\" the body got \\\"z\\\", after \\\"q\\\" it became \\\"zq\\\".",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev and open https://5500-ixmruf4hfnd9dnfal6vzl.e2b.app/object/note/79938dea-a992-42da-a591-3c0445575a54 (my own note \"agent10-Note Export\", body: two blocks \"Export Note\" and \"second paragraph agent10 export body\").",
+        "Click the \"...\" button (Command Menu) at the top right of the record header — the dark side panel opens with the search field \"Type anything...\" and the command list (Delete Note, Export to PDF, Export Note, ...).",
+        "With the panel open, type the letters \"z\" then \"q\" on the keyboard.",
+        "Look at the panel's search field and at the note body in the middle of the page."
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 925,
+      "name": "Browser Back changes the record address but the record stays on the previous tab",
+      "summary": "The address bar goes back to the plain record URL with no hash, but the page keeps showing the Notes tab selected with the Notes content (same with Calendar). The URL and the shown tab disagree, and copying the address gives a different tab than the one on screen. (on /object/company/20202020-a305-41e7-8c72-ba44072a4c58)",
+      "expected": "Back returns to the state that address belongs to: the address loses the #tab hash and the record shows the Timeline tab again, so the address and the visible tab always agree (directly opening a #tab address does switch the tab, so the hash is the app's own source of truth).",
+      "actual": "The address bar goes back to the plain record URL with no hash, but the page keeps showing the Notes tab selected with the Notes content (same with Calendar). The URL and the shown tab disagree, and copying the address gives a different tab than the one on screen.",
+      "reproSteps": [
+        "Open /object/company/20202020-a305-41e7-8c72-ba44072a4c58 (Google) at desktop width.",
+        "Click the Notes tab in the right-hand tab bar (address becomes ...#f2aec1d1-738f-4456-9a4d-d8c37ecc3a6f).",
+        "Press the browser Back button.",
+        "Look at the address bar and at which tab is underlined."
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 958,
+      "name": "Text typed into the Body field popover is silently lost when the Note tab editor is used next",
+      "summary": "After the reload the body contains \\\"...bold BB then italic II end NOTEEDIT\\\" only — the \\\"POPOVER8\\\" paragraph typed in the Body field popover is gone. The Note tab editor kept the stale content it had loaded before the popover edit and its save overwrote the whole body, so the earlier edit is lost without any warning. (on /object/note/b57c3afe-cfb3-4e46-84a1-3db25c7e366f)",
+      "expected": "The note body keeps both edits: the paragraph \\\"POPOVER8\\\" added through the Body field and the \\\"NOTEEDIT\\\" text added in the Note tab editor, because both editors write the same Body field.",
+      "actual": "After the reload the body contains \\\"...bold BB then italic II end NOTEEDIT\\\" only — the \\\"POPOVER8\\\" paragraph typed in the Body field popover is gone. The Note tab editor kept the stale content it had loaded before the popover edit and its save overwrote the whole body, so the earlier edit is lost without any warning.",
+      "reproSteps": [
+        "Open the note record page /object/note/b57c3afe-cfb3-4e46-84a1-3db25c7e366f (note \"agent8-NoteA\", created by me) on the Note tab.",
+        "In the Fields panel on the left, click the Body field value (\"agent8 first line\") so the rich-text popover editor opens.",
+        "At the end of the last block in that popover type a new paragraph \" POPOVER8\" and press Escape (the popover closes; the change is saved — this same Escape-saves behaviour was confirmed earlier with \"ESC_ADDED\").",
+        "Without reloading, click at the end of the last line in the Note tab editor on the right and type \" NOTEEDIT\".",
+        "Reload the page and read the note body."
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 969,
+      "name": "Timeline entries show a broken sentence (\\\"You updated 2 fields on\\\", \\\"was created by You\\\") for a note with an empty title",
+      "summary": "The title saves as empty (record shows the \\\"Untitled\\\" placeholder in the breadcrumb and header), and the Timeline entries lose the record name and read \\\"You updated 2 fields on\\\" (the \\\"on\\\" dangles) and \\\"was created by You\\\". The Title change entry also shows \\\"Title → Empty\\\". (on /object/note/14611a41-c44e-4294-9ac5-0acdaff3ffa8)",
+      "expected": "Either an empty title is refused/kept as the previous value, or the Timeline entries still read as a complete sentence with the record placeholder name, e.g. \\\"You updated 2 fields on Untitled\\\" and \\\"Untitled was created by You\\\".",
+      "actual": "The title saves as empty (record shows the \\\"Untitled\\\" placeholder in the breadcrumb and header), and the Timeline entries lose the record name and read \\\"You updated 2 fields on\\\" (the \\\"on\\\" dangles) and \\\"was created by You\\\". The Title change entry also shows \\\"Title → Empty\\\".",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open the note record /object/note/14611a41-c44e-4294-9ac5-0acdaff3ffa8 (\"agent9-note-UNSAVED\").",
+        "Click the Timeline tab so the timeline entries are visible.",
+        "Click the record title above \"Added ...\" and clear it completely with the keyboard.",
+        "Press Enter to save the empty title.",
+        "Look at the breadcrumb/header (shows \"Untitled\") and at the Timeline entries."
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 1007,
+      "name": "Completing a task leaves no entry in the company record's Timeline",
+      "summary": "The Timeline only shows \\\"You created a related task agent6-task-alpha\\\" — no entry at all for the completion, not even after a full page reload. The record's Timeline still reads as if the task were never completed. Done twice (completed, re-opened to TODO, completed again): no entry either time. (on /object/company/586586e5-ecfe-47c9-83f5-ef0d3717043d)",
+      "expected": "The Timeline shows an activity for the task being completed (e.g. \\\"You completed a related task agent6-task-alpha\\\" with its date), so the record's history agrees with the Tasks tab where the task is now in DONE.",
+      "actual": "The Timeline only shows \\\"You created a related task agent6-task-alpha\\\" — no entry at all for the completion, not even after a full page reload. The record's Timeline still reads as if the task were never completed. Done twice (completed, re-opened to TODO, completed again): no entry either time.",
+      "reproSteps": [
+        "Open the company record /object/company/586586e5-ecfe-47c9-83f5-ef0d3717043d (company \"agent6-co-beta\").",
+        "Open the Tasks tab and click the round checkbox on the left of the task card \"agent6-task-alpha\" (created earlier from this tab): the card moves from TODO 1 to DONE 1 and the counter reads \"Tasks 1 / DONE 1\".",
+        "Click the Timeline tab of the same record (and reload the page).",
+        "Read the Timeline entries."
+      ]
+    },
+    {
+      "index": 8,
+      "reported_at_seconds": 1012,
+      "name": "Timeline field changes hide the old value and keep the first edit's timestamp",
+      "summary": "The same single entry stays \\\"You updated 3 fields on agent6-co-beta — 9 minutes ago\\\" and merely rewrites its own line to \\\"Account Owner → Phil Schiler\\\". It never records that the owner had been \\\"Jony Ive\\\" (or that it was set to Jony Ive a few minutes before), and the entry's timestamp remains the one from the first edit 9 minutes earlier even though the owner was changed seconds ago. (on /object/company/586586e5-ecfe-47c9-83f5-ef0d3717043d)",
+      "expected": "Each field change is a timeline entry that shows what the field was and what it became (old → new) and the time of that change, so the record's history shows the Account Owner went from Jony Ive to Phil Schiler just now.",
+      "actual": "The same single entry stays \\\"You updated 3 fields on agent6-co-beta — 9 minutes ago\\\" and merely rewrites its own line to \\\"Account Owner → Phil Schiler\\\". It never records that the owner had been \\\"Jony Ive\\\" (or that it was set to Jony Ive a few minutes before), and the entry's timestamp remains the one from the first edit 9 minutes earlier even though the owner was changed seconds ago.",
+      "reproSteps": [
+        "Open the company record /object/company/586586e5-ecfe-47c9-83f5-ef0d3717043d (\"agent6-co-beta\") on the Timeline tab.",
+        "In the Fields panel, set Account Owner to \"Jony Ive\" (click the Account Owner value, type Jony, pick \"Jony Ive\"); the Timeline shows \"You updated ... Account Owner → Jony Ive\" (here it first even showed \"Account Owner → Empty\").",
+        "A few minutes later set Account Owner to \"Phil Schiler\" the same way, then reload the page.",
+        "Read the Timeline: the same aggregated entry now says \"You updated 3 fields on agent6-co-beta — 9 minutes ago\" with the line \"Account Owner → Phil Schiler\" and no earlier value anywhere."
+      ]
+    },
+    {
+      "index": 9,
+      "reported_at_seconds": 1084,
+      "name": "Choosing a block type from the \\\"/\\\" menu leaves the slash in the note text",
+      "summary": "The block becomes a Heading 1 but the \"/\" typed to open the menu stays in the text: the line reads \\\"/agent8 heading text\\\" in large heading type. The slash has to be deleted by hand, and it is saved as part of the note body. (on /object/note/b57c3afe-cfb3-4e46-84a1-3db25c7e366f)",
+      "expected": "The block is turned into a Heading 1 and the \\\"/\\\" query is removed, leaving only the text typed afterwards (\\\"agent8 heading text\\\").",
+      "actual": "The block becomes a Heading 1 but the \"/\" typed to open the menu stays in the text: the line reads \\\"/agent8 heading text\\\" in large heading type. The slash has to be deleted by hand, and it is saved as part of the note body.",
+      "reproSteps": [
+        "Open the note record page /object/note/b57c3afe-cfb3-4e46-84a1-3db25c7e366f (note \"agent8-NoteA\") on the Note tab.",
+        "Click at the end of the last line in the Note tab editor and press Enter to get a new empty block.",
+        "Type \"/\" — the block-type menu opens with Heading 1 / Heading 2 / Heading 3 / Quote / Toggle List.",
+        "Click \"Heading 1\" in that menu.",
+        "Type \"agent8 heading text\" in the new heading block and read the line."
+      ]
+    },
+    {
+      "index": 10,
+      "reported_at_seconds": 1115,
+      "name": "Note created from a company record's Notes tab never appears in the Notes list",
+      "summary": "The Notes list (total 1,810 then 1,813 notes) shows every other agent's notes created 1-11 minutes ago but never \\\"agent3-note-alpha\\\", on two separate loads of the list (one of them a full reload). Searching the list rendering for \\\"agent3\\\" returns nothing; the note only exists on the company record and on its own record page. (on /objects/notes)",
+      "expected": "The note \\\"agent3-note-alpha\\\" should be listed in the Notes list like the other notes created in the same minutes (agent8-NoteA, agent10-Note Export, agent7-Note A), showing its title, Google relation and body.",
+      "actual": "The Notes list (total 1,810 then 1,813 notes) shows every other agent's notes created 1-11 minutes ago but never \\\"agent3-note-alpha\\\", on two separate loads of the list (one of them a full reload). Searching the list rendering for \\\"agent3\\\" returns nothing; the note only exists on the company record and on its own record page.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open https://5500-ixmruf4hfnd9dnfal6vzl.e2b.app/object/company/20202020-a305-41e7-8c72-ba44072a4c58 (Google).",
+        "Open the Notes tab and click the \"New note\" (+) button.",
+        "Set the title to \"agent3-note-alpha\" and type a body (\"agent3 line one\" / \"bold and # heading- item one\" / bullets \"item two\", \"last line after blank\").",
+        "Close the side panel and reload the record: the note \"agent3-note-alpha\" is listed in the record's Notes tab with its body, related to Google.",
+        "Open https://5500-ixmruf4hfnd9dnfal6vzl.e2b.app/objects/notes (All Notes, sorted by Creation date descending) and look at the rows around the time the note was created (it said \"Added 7 minutes ago\").",
+        "Its own record page https://5500-ixmruf4hfnd9dnfal6vzl.e2b.app/object/note/be953491-33e2-4b53-b51c-e464a5759f1d opens fine with the full body."
+      ]
+    },
+    {
+      "index": 11,
+      "reported_at_seconds": 1120,
+      "name": "Note card body text breaks words in the middle (\\\"rea/ch\\\", \\\"identified/.\\\")",
+      "summary": "The body preview in the note cards breaks words in the middle without any hyphen: \\\"...potential identified\\\" ends a line and its full stop starts the next one, \\\"market rea\\\" ends a line and \\\"ch and technical capabilities.\\\" continues on the next. Seen in the two-column layout at 1280 px wide and in the narrower one-column state, on every reload. (on /object/company/20202020-a305-41e7-8c72-ba44072a4c58 (Notes tab))",
+      "expected": "Words wrap at word boundaries (\\\"...potential identified. Complementary strengths in market reach and technical capabilities.\\\"); no word is split mid-word.",
+      "actual": "The body preview in the note cards breaks words in the middle without any hyphen: \\\"...potential identified\\\" ends a line and its full stop starts the next one, \\\"market rea\\\" ends a line and \\\"ch and technical capabilities.\\\" continues on the next. Seen in the two-column layout at 1280 px wide and in the narrower one-column state, on every reload.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open https://5500-ixmruf4hfnd9dnfal6vzl.e2b.app/object/company/20202020-a305-41e7-8c72-ba44072a4c58 at a 1280 px wide window.",
+        "Click the Notes tab.",
+        "Read the body text inside the note card \"Partnership Opportunity\"."
+      ]
+    },
+    {
+      "index": 12,
+      "reported_at_seconds": 1145,
+      "name": "Annual Revenue currency field silently drops cents (1234.56 saved as 1,234)",
+      "summary": "The amount box reformats to \\\"1,234\\\" the moment the decimals are typed and saves that; after reload the editor shows 1,234. With 99.99 the box shows \\\"99\\\" and that is what is saved. The decimal part of any currency amount is lost, on two different values. (on /object/company/02d7c5a7-2002-44d3-b725-7c477cd4db80)",
+      "expected": "The amount is stored as entered, 1234.56 (shown as $1,234.56 / $1.2k), and the editor reopened shows 1,234.56; 99.99 is kept as 99.99.",
+      "actual": "The amount box reformats to \\\"1,234\\\" the moment the decimals are typed and saves that; after reload the editor shows 1,234. With 99.99 the box shows \\\"99\\\" and that is what is saved. The decimal part of any currency amount is lost, on two different values.",
+      "reproSteps": [
+        "Sign in, go to /object/company/02d7c5a7-2002-44d3-b725-7c477cd4db80 (the company record \"agent1-co-alpha\")",
+        "In the Fields panel click the \"Annual Revenue\" row to open the currency editor",
+        "Type 1234.56 into the amount box next to the USD selector and press Enter",
+        "Reload the page and click the Annual Revenue value again to reopen the editor and read the stored amount",
+        "Repeat with 99.99 in the same amount box"
+      ]
+    },
+    {
+      "index": 13,
+      "reported_at_seconds": 1177,
+      "name": "Emails tab cuts every sender name mid-word with no ellipsis",
+      "summary": "In the sender column every name is cut in the middle of a word with no ellipsis and glued to the recipient-count badge, so rows read \\\"Workspace Membe 2\\\", \\\"Person 429, Alex J 2\\\", \\\"William Miller, Jame 2\\\", \\\"Maria Garcia, Mich 2\\\", \\\"John Smith, Works 2\\\", \\\"Person 403, Perso 2\\\". The full values are \\\"Workspace Member, Robert Taylor\\\", \\\"William Miller, James …\\\" etc. — the column just clips them, so the reader cannot tell which sender the mail is from. (on /object/company/20202020-a305-41e7-8c72-ba44072a4c58 (Emails tab))",
+      "expected": "The sender cell should show the sender readable — either the full name, or a clear ellipsis (\\\"Workspace Memb…\\\") — and be separated from the recipient count, so the name is distinguishable.",
+      "actual": "In the sender column every name is cut in the middle of a word with no ellipsis and glued to the recipient-count badge, so rows read \\\"Workspace Membe 2\\\", \\\"Person 429, Alex J 2\\\", \\\"William Miller, Jame 2\\\", \\\"Maria Garcia, Mich 2\\\", \\\"John Smith, Works 2\\\", \\\"Person 403, Perso 2\\\". The full values are \\\"Workspace Member, Robert Taylor\\\", \\\"William Miller, James …\\\" etc. — the column just clips them, so the reader cannot tell which sender the mail is from.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev at 1440 px",
+        "Open https://5500-ixmruf4hfnd9dnfal6vzl.e2b.app/object/company/20202020-a305-41e7-8c72-ba44072a4c58",
+        "Click the Emails tab (it lists 278 emails)",
+        "Read the first column of the rows: the sender names are cut mid-word with no ellipsis and run straight into the recipient count"
+      ]
+    },
+    {
+      "index": 14,
+      "reported_at_seconds": 1185,
+      "name": "Tasks tab groups show raw status values \"TODO\" and \"IN_PROGRESS\" while the task's Status field says \"To do\" / \"In progress\"",
+      "summary": "The group headings print raw machine values: 'TODO' and 'IN_PROGRESS' (with an underscore). The very same status is displayed as 'To do' / 'In progress' in the task record's Status field and in the Status dropdown, so the same data is worded two different ways on adjacent screens. (on /object/company/20202020-a305-41e7-8c72-ba44072a4c58 (Tasks tab))",
+      "expected": "The group headings use the same human-readable status labels the record shows everywhere else (\"To do\", \"In progress\"), i.e. the same wording as the Status field and the Status dropdown that lists 'No Status / To do / In progress / Done'.",
+      "actual": "The group headings print raw machine values: 'TODO' and 'IN_PROGRESS' (with an underscore). The very same status is displayed as 'To do' / 'In progress' in the task record's Status field and in the Status dropdown, so the same data is worded two different ways on adjacent screens.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and set the viewport to 768x1024.",
+        "Open https://5500-ixmruf4hfnd9dnfal6vzl.e2b.app/object/company/20202020-a305-41e7-8c72-ba44072a4c58",
+        "Click the 'Tasks' tab in the record's tab bar.",
+        "Read the bold group headings above the task cards: 'TODO' and 'IN_PROGRESS'.",
+        "Open a task from the IN_PROGRESS group (e.g. 'agent14-reload-check' at /object/task/420e98b6-8c02-41c5-804d-6414715fac38) and read its Status field in the Fields panel."
+      ]
+    },
+    {
+      "index": 15,
+      "reported_at_seconds": 1198,
+      "name": "The Body field editor panel is pinned to the top of the window, covering the record name, tabs and other field values",
+      "summary": "The Body editor opens as a large floating panel that is pinned to the very top of the window: at 1280 px it spans roughly x=162..622, y=0..419, so it covers the record's title (only a stray letter of \\\"agent13-task\\\" is visible), the Note/Timeline/Files tabs and the Due Date/Status/Assignee values, and it is detached from the Body row it belongs to (the row sits at y=391, near the panel's bottom edge). At 390 px the same panel is 460 px wide and runs off the right edge of the screen, so its own top-right toolbar button is not reachable. (on /object/task/af3d24ab-90a8-4f32-ad90-af7a8fc91e41)",
+      "expected": "The Body editor opens next to the Body field it belongs to (or as a dialog that can be moved/closed), stays inside the window at every width, and does not cover the record's name, its tabs or the other field values while editing.",
+      "actual": "The Body editor opens as a large floating panel that is pinned to the very top of the window: at 1280 px it spans roughly x=162..622, y=0..419, so it covers the record's title (only a stray letter of \\\"agent13-task\\\" is visible), the Note/Timeline/Files tabs and the Due Date/Status/Assignee values, and it is detached from the Body row it belongs to (the row sits at y=391, near the panel's bottom edge). At 390 px the same panel is 460 px wide and runs off the right edge of the screen, so its own top-right toolbar button is not reachable.",
+      "reproSteps": [
+        "Sign in, open the task record /object/task/af3d24ab-90a8-4f32-ad90-af7a8fc91e41 (task \"agent13-task\") at 1280 x 720 px, on the Home tab.",
+        "In the Fields panel click the Body row, then click the Body value text again (the value highlights first, the second click opens the editor).",
+        "Look at where the editor panel appears: it is pinned to the top of the window, covering the record name, the Note/Timeline/Files tabs and the Due Date/Status/Assignee values.",
+        "Repeat at 390 x 844 px: the panel is wider than the window and its top-right toolbar button is off-screen."
+      ]
+    },
+    {
+      "index": 16,
+      "reported_at_seconds": 1218,
+      "name": "Currency dropdown repeats each currency code twice in every option label",
+      "summary": "Every currency option repeats the code in brackets: \"UAE dirham (AED) (AED)\", \"Afghan afghani (AFN) (AFN)\", \"Albanian lek (ALL) (ALL)\", \"Armenian dram (AMD) (AMD)\". (on /object/company/20202020-a305-41e7-8c72-ba44072a4c58)",
+      "expected": "Each option names the currency once, e.g. \"UAE dirham (AED)\".",
+      "actual": "Every currency option repeats the code in brackets: \"UAE dirham (AED) (AED)\", \"Afghan afghani (AFN) (AFN)\", \"Albanian lek (ALL) (ALL)\", \"Armenian dram (AMD) (AMD)\".",
+      "reproSteps": [
+        "Open /object/company/20202020-a305-41e7-8c72-ba44072a4c58 (Google) at desktop width.",
+        "In the Fields panel, click the 'Annual Revenue' row to open its editor.",
+        "Open the currency dropdown that shows 'USD'.",
+        "Read the options in the list."
+      ]
+    },
+    {
+      "index": 17,
+      "reported_at_seconds": 1221,
+      "name": "Calendar tab: second month group header shows only \"July\" without a year while the first shows \"November 2026\"",
+      "summary": "The November group is headed \"November 2026\" but the second group is headed only \"July\", with no year, so a person cannot tell which year that event belongs to. (on /object/company/20202020-a305-41e7-8c72-ba44072a4c58)",
+      "expected": "Every month group header names the month and the year the same way (\"November 2026\", \"July 2026\" / \"July 2027\").",
+      "actual": "The November group is headed \"November 2026\" but the second group is headed only \"July\", with no year, so a person cannot tell which year that event belongs to.",
+      "reproSteps": [
+        "Open /object/company/20202020-a305-41e7-8c72-ba44072a4c58 (Google) at desktop width.",
+        "Click the Calendar tab in the record's tab bar.",
+        "Read the two month group headings above the two event rows."
+      ]
+    },
+    {
+      "index": 18,
+      "reported_at_seconds": 1291,
+      "name": "Escape in the open Due Date editor saves the typed date instead of cancelling it",
+      "summary": "The Escape keypress fired POST /graphql (mutation UpdateOneTask) and the field now reads \\\"Mar 15, 2026 9:00 AM\\\" in the Fields panel — the typed value was saved instead of discarded. The old value \\\"Feb 29, 2024 10:00 AM\\\" is gone, and nothing asks whether to keep the change. (on /object/task/743057ac-7c82-4cd7-9ace-52255de94b4f)",
+      "expected": "Escape should cancel the edit: the popover closes and the Due Date keeps its previous value, with nothing written to the task.",
+      "actual": "The Escape keypress fired POST /graphql (mutation UpdateOneTask) and the field now reads \\\"Mar 15, 2026 9:00 AM\\\" in the Fields panel — the typed value was saved instead of discarded. The old value \\\"Feb 29, 2024 10:00 AM\\\" is gone, and nothing asks whether to keep the change.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev",
+        "Open the task record https://5500-ixmruf4hfnd9dnfal6vzl.e2b.app/object/task/743057ac-7c82-4cd7-9ace-52255de94b4f (task agent4-task-alpha, Due Date is Feb 29, 2024 10:00 AM)",
+        "Click the Due Date row, then click the date value again so the date popover with the calendar opens",
+        "In the popover's date text field type 03/15/2026 09:00 AM (the calendar still shows February 2024)",
+        "Press Escape on the keyboard"
+      ]
+    },
+    {
+      "index": 19,
+      "reported_at_seconds": 1298,
+      "name": "An invalid record address shows an empty ghost record plus raw `Invalid value for UUID` error toasts",
+      "summary": "The app renders an empty ghost record page: the header shows \\\"Companies / Untitled (0/0)\\\", a skeleton avatar and title, an empty Fields panel with grey placeholders (Domain Name, Account Owner, Annual Revenue, Address, LinkedIn, Creation date, Created by), the full tab set (Timeline/Tasks/Notes/Files/Emails/Calendar), \\\"Send Email\\\" in the top bar and \\\"No activity yet\\\" — as if a real record existed. Over the bottom-right corner it stacks raw error toasts reading `Invalid value for UUID: \\\"does-not-exist\\\"` (three of them, one per failed request). There is no \\\"record not found\\\" message and no way back. (on /object/company/does-not-exist)",
+      "expected": "The page says the record was not found (or is invalid) with a way back to the Companies list, and does not show an editable empty record with raw `Invalid value for UUID: \"does-not-exist\"` error toasts.",
+      "actual": "The app renders an empty ghost record page: the header shows \\\"Companies / Untitled (0/0)\\\", a skeleton avatar and title, an empty Fields panel with grey placeholders (Domain Name, Account Owner, Annual Revenue, Address, LinkedIn, Creation date, Created by), the full tab set (Timeline/Tasks/Notes/Files/Emails/Calendar), \\\"Send Email\\\" in the top bar and \\\"No activity yet\\\" — as if a real record existed. Over the bottom-right corner it stacks raw error toasts reading `Invalid value for UUID: \\\"does-not-exist\\\"` (three of them, one per failed request). There is no \\\"record not found\\\" message and no way back.",
+      "reproSteps": [
+        "Open the address https://5500-ixmruf4hfnd9dnfal6vzl.e2b.app/object/company/does-not-exist in the signed-in tab.",
+        "Wait for the page to load and read the header, the Fields panel and the bottom-right corner."
+      ]
+    },
+    {
+      "index": 20,
+      "reported_at_seconds": 1302,
+      "name": "Notes tab still counts 1 note after the only note is deleted (\"No notes\" shown)",
+      "summary": "The tab header count stays \\\"Notes 1\\\" while the panel already shows the empty state \\\"No notes — There are no associated notes with this record.\\\" The stale 1 remains until the page is reloaded, when it reads \\\"Notes 0\\\". Happened both times a note was deleted from the record (with a titled note \"agent6-note-alpha\" and with a fresh empty note). (on /object/company/586586e5-ecfe-47c9-83f5-ef0d3717043d)",
+      "expected": "After deleting the only note, the Notes tab header and the panel agree: the count shows 0 (or no count) together with the \\\"No notes\\\" state.",
+      "actual": "The tab header count stays \\\"Notes 1\\\" while the panel already shows the empty state \\\"No notes — There are no associated notes with this record.\\\" The stale 1 remains until the page is reloaded, when it reads \\\"Notes 0\\\". Happened both times a note was deleted from the record (with a titled note \"agent6-note-alpha\" and with a fresh empty note).",
+      "reproSteps": [
+        "Open the company record /object/company/586586e5-ecfe-47c9-83f5-ef0d3717043d (\"agent6-co-beta\"), Notes tab.",
+        "Create a note with \"+ New note\" (title \"agent6-note-alpha\" or leave it Untitled).",
+        "Open the note card, click \"Options\" at the bottom right of the note panel, then \"Delete Note\".",
+        "Read the Notes tab header and the panel: header says \"Notes 1\", panel says \"No notes\"."
+      ]
+    },
+    {
+      "index": 21,
+      "reported_at_seconds": 1461,
+      "name": "A note card's Relations row cuts related people off at the card edge and hides the rest",
+      "summary": "The Relations row keeps all chips on one line without wrapping: the second chip is cut mid-name at the card's right edge (\"J Jeffery Grif\" at 1440, \"J Jeffery Gri\" at 390) and the third related person (\"Lee Jones\") is completely invisible — the third chip has zero width and is clipped by the card's overflow. Nothing indicates there are more relations and no way to reach them from the card. (on /object/company/20202020-a305-41e7-8c72-ba44072a4c58)",
+      "expected": "All related records of the note are readable in the card's Relations row — the chips wrap onto a new line, or the overflow is summarised (e.g. \"+1\") with a way to see the rest.",
+      "actual": "The Relations row keeps all chips on one line without wrapping: the second chip is cut mid-name at the card's right edge (\"J Jeffery Grif\" at 1440, \"J Jeffery Gri\" at 390) and the third related person (\"Lee Jones\") is completely invisible — the third chip has zero width and is clipped by the card's overflow. Nothing indicates there are more relations and no way to reach them from the card.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open the company record https://5500-ixmruf4hfnd9dnfal6vzl.e2b.app/object/company/20202020-a305-41e7-8c72-ba44072a4c58",
+        "Open the record's Notes tab (on a desktop width the tab is in the tab bar; at phone width open '+4 More' in the tab bar and choose 'Notes')",
+        "Look at the bottom Relations row of the first note card, which is related to Google and to the people Jeffery Griffin and Lee Jones"
+      ]
+    },
+    {
+      "index": 22,
+      "reported_at_seconds": 1463,
+      "name": "Task Files tab: the attached file cannot be opened — its preview shows a broken image and the file request answers 404",
+      "summary": "A preview modal opens with the title \"Product Photo.jpg\", but the preview area is empty and shows a broken-image icon in the middle. The browser console and network show GET https://5500-...e2b.app/file/files-field/f11e0000-00b5-4a7c-8001-202020201c25?token=… answered 404 (Not Found), so the attached file cannot be loaded or viewed at all. (on /object/task/20202020-0001-4e7c-8001-123456789def#d9c22766-a72e-4865-ae0f-530eac6cd992)",
+      "expected": "Clicking the attached file's name in the Files tab opens a preview (or download) of the image \"Product Photo.jpg\"; the image is displayed, not a broken-image icon.",
+      "actual": "A preview modal opens with the title \"Product Photo.jpg\", but the preview area is empty and shows a broken-image icon in the middle. The browser console and network show GET https://5500-...e2b.app/file/files-field/f11e0000-00b5-4a7c-8001-202020201c25?token=… answered 404 (Not Found), so the attached file cannot be loaded or viewed at all.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev",
+        "Open https://5500-ixmruf4hfnd9dnfal6vzl.e2b.app/object/task/20202020-0001-4e7c-8001-123456789def",
+        "Click the 'Files' tab (it shows 'Files 1' and the row 'Product Photo.jpg')",
+        "Click the file name 'Product Photo.jpg'",
+        "Look at the preview modal that opens"
+      ]
+    }
+  ]
+}

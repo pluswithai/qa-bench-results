@@ -1,0 +1,266 @@
+{
+  "area": "admin",
+  "bugs": [
+    {
+      "id": "admin-1",
+      "title": "Site url description paragraph is rendered twice when the setting comes from MB_SITE_URL",
+      "findings": [
+        "run1-02"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "shot-1 shows the sentence twice inside the Site url block. Source explains it: SiteUrlWidget renders a SettingHeader with the description (L41-50) and then wraps the input in SetByEnvVarWrapper, which, when the setting is env-set, renders a second SettingHeader with settingDetails.description (AdminSettingInput.tsx L292-300). Duplicate text is a Metabase rendering defect, not an environment effect (the env var only triggers the code path). Cosmetic.",
+      "evidence": [
+        "run1-02/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/admin/settings/components/widgets/SiteUrlWidget.tsx#L41-L51",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/admin/settings/components/widgets/AdminSettingInput.tsx#L282-L304"
+      ]
+    },
+    {
+      "id": "admin-2",
+      "title": "People search does not escape LIKE wildcards: '%' and '_' match every person",
+      "findings": [
+        "run1-04",
+        "run3-01"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "run3-01/shot-4 ('_' -> 3 people found) and run1-04/shot-5 ('%' -> 3 people found) versus run1-04/shot-3 ('zzz' -> No results found). Source: wildcard-query builds '%'+query+'%' and passes it straight into [:like ...] on first_name/last_name/email with no escaping (user.clj L537-545), so typed % and _ act as SQL wildcards. Wrong search results for literal characters that do occur in real emails (underscore). Low impact but a real functional defect.",
+      "evidence": [
+        "run1-04/shot-5.png",
+        "run1-04/shot-3.png",
+        "run3-01/shot-4.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/src/metabase/users/models/user.clj#L537-L545"
+      ]
+    },
+    {
+      "id": "admin-3",
+      "title": "Database caching form: server rejection of an over-large Minimum query duration shows only 'Failed', no message",
+      "findings": [
+        "run2-12"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "shot-3 shows the grey 'Failed' button and nothing else. Source: the Yup schema only checks positive + integer, no upper bound (complex.ts L13-16); the value is multiplied by 1000 and sent as min_duration_ms, which the API validates as an int (cache/api.clj L37) -> 400; StrategyForm renders only FormSubmitButton and has no form-level error message, so any server rejection is unexplained. Real feedback gap, but it needs an absurd 21-digit value and nothing is saved or lost, so cosmetic/wording level.",
+      "evidence": [
+        "run2-12/shot-3.png",
+        "run2-12/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/admin/performance/constants/complex.ts#L13-L16",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/admin/performance/components/StrategyForm.tsx#L428-L459",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/src/metabase/cache/api.clj#L37"
+      ]
+    },
+    {
+      "id": "admin-4",
+      "title": "Sample Database (H2) detail header omits the engine name that the list and other databases show",
+      "findings": [
+        "run2-13"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "shot-2: header reads only 'Added November 23, 2026'; shot-3: the Postgres database reads 'PostgreSQL  Added November 23, 2026'. Source: ExistingDatabaseHeader only looks up the driver name when isEngineKey(database.engine) is true (L17-20), and the engineKeys list does not contain 'h2' (settings.ts L36-55), while DatabaseList reads engines[engine]['driver-name'] directly (L98-99) and shows 'H2'. Unintended inconsistency from a type guard; cosmetic.",
+      "evidence": [
+        "run2-13/shot-2.png",
+        "run2-13/shot-3.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/admin/databases/components/ExistingDatabaseHeader/ExistingDatabaseHeader.tsx#L16-L37",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase-types/api/settings.ts#L36-L55",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/admin/databases/components/DatabaseList/DatabaseList.tsx#L97-L100"
+      ]
+    },
+    {
+      "id": "admin-5",
+      "title": "Long unbroken group name is not wrapped/truncated and pushes the Members column and row menu off the page",
+      "findings": [
+        "run2-14",
+        "run3-02"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "run2-14/shot-2 and run3-02/shot-2 both show the name running past the card edge, the Members header/counts gone and the page scrolling sideways. Source: the group name is rendered as a plain link in a table cell with no truncation or word-break (GroupsListing.tsx L263-279). Unrealistic input length, but a genuine layout defect; two runs hit it independently. Cosmetic.",
+      "evidence": [
+        "run2-14/shot-2.png",
+        "run3-02/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/admin/people/components/GroupsListing.tsx#L263-L281"
+      ]
+    },
+    {
+      "id": "admin-6",
+      "title": "Adding a group membership that already exists returns 500 and the People page swallows the error",
+      "findings": [
+        "run2-15"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "shot-5 shows the stale tab after the click: 'Administrators' still unticked, row still 'Default', no message (shot-3 is the first tab where the same click worked). The 500 itself is not visible in the screenshots, but source supports it: POST /api/permissions/membership inserts without an existence check (api.clj L305-325, permissions_group_membership.clj L120-142, L210-216) and the table has a unique (user_id, group_id) constraint (000_legacy_migrations.yaml L3075-3078), so a duplicate raises a DB error -> 500. In the UI, PeopleList.handleAdd just returns createMembership(...).unwrap() with no catch or error display (PeopleList.tsx L168-170), matching the reported uncaught page error. The agent created the stale state itself (two own tabs), so this is not another agent's interference; two admins working at once hit the same path. Silent failure.",
+      "evidence": [
+        "run2-15/shot-5.png",
+        "run2-15/shot-4.png",
+        "run2-15/shot-3.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/src/metabase/permissions_rest/api.clj#L305-L325",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/src/metabase/permissions/models/permissions_group_membership.clj#L120-L142",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/src/metabase/permissions/models/permissions_group_membership.clj#L210-L216",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/resources/migrations/000_legacy_migrations.yaml#L3075-L3078",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/admin/people/components/PeopleList.tsx#L168-L170"
+      ]
+    },
+    {
+      "id": "admin-7",
+      "title": "Retired segment's edit page (opened by typed address) has no 'retired' notice and its saved edits stay hidden",
+      "findings": [
+        "run2-16"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Works as designed and reached only by a hand-typed address. Retiring hides the segment from the list on purpose: GET /api/segment returns only archived=false (segments/api.clj L61-68) and the docs say a retired segment is no longer selectable but keeps existing questions working (segments.md L46). After retiring, no link in the app leads to /admin/datamodel/segment/1 (shot-4: list is empty); the agent typed the address. The edit itself succeeds (PUT 200) and nothing is lost; staying hidden after the edit is the expected state of a retired segment. A missing 'retired' badge on a page no link reaches is not a defect.",
+      "evidence": [
+        "run2-16/shot-4.png",
+        "run2-16/shot-5.png",
+        "run2-16/shot-6.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/src/metabase/segments/api.clj#L61-L68",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/docs/data-modeling/segments.md#L46"
+      ]
+    },
+    {
+      "id": "admin-8",
+      "title": "Table Metadata: Field preview panel overflows a 1280px window; 'Filtering' tab and close button are cut off",
+      "findings": [
+        "run2-17"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "shot-2/shot-3: the preview panel starts at x~944 and runs off the right edge; only 'Table' and 'Detail' tabs are fully visible, no close button, and the Field settings column is squeezed ('CHARACTE...'). Source: column minimum widths are nav 280 + table 320 + field 320 + preview 504 = 1424px (constants.ts L5-26) and the container is a plain Flex with no horizontal overflow handling (DataModelV1.tsx L99), so any window narrower than 1424px (including 1280 and 1366 laptops) clips the panel. Layout defect; panel can still be closed with Escape or the Preview button, so cosmetic.",
+      "evidence": [
+        "run2-17/shot-2.png",
+        "run2-17/shot-3.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/metadata/pages/DataModelV1/constants.ts#L3-L26",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/metadata/pages/DataModelV1/DataModelV1.tsx#L99-L108",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/metadata/pages/DataModelV1/DataModelV1.tsx#L208-L226"
+      ]
+    },
+    {
+      "id": "admin-9",
+      "title": "API key dialog: a name of only spaces is rejected by the server with 'Value must be a non-blank string.'",
+      "findings": [
+        "run2-20"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Validation works. shot-4 shows the field outlined red with a plain-English message directly under it and no key created. The form checks 'required' on the client (utils.ts L10-16) and the server enforces non-blank (schema.clj L109-117); the server's field error is surfaced inline next to the field, which is how Metabase forms are designed to show server validation. Whether the check runs on the client or the server is not a defect, and the wording is readable, not a raw error.",
+      "evidence": [
+        "run2-20/shot-4.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/admin/settings/components/ApiKeys/utils.ts#L10-L16",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/src/metabase/util/malli/schema.clj#L109-L117"
+      ]
+    },
+    {
+      "id": "admin-10",
+      "title": "'Add a new map' dialog is clipped on a 390px phone screen (labels, inputs and the Load button cut off)",
+      "findings": [
+        "run2-21"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "shot-2 (390x844): the dialog content runs past the right edge; the label '...display nam', the URL placeholder and both selects are cut, and the 'Load' button next to the URL field is not visible. Source: the form sits in a legacy <Modal wide> (L152) inside a flex row whose column is flexNoShrink with fixed-width admin inputs (L346-349), so it cannot shrink to a narrow screen. The admin area does switch to a mobile nav (hamburger in the shot), so phone widths are a supported case. Layout defect, cosmetic.",
+      "evidence": [
+        "run2-21/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/admin/settings/components/widgets/CustomGeoJSONWidget.tsx#L152",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/admin/settings/components/widgets/CustomGeoJSONWidget.tsx#L346-L361"
+      ]
+    },
+    {
+      "id": "admin-11",
+      "title": "Semantic type select keeps the typed search text ('Currency') after Escape although nothing is saved",
+      "findings": [
+        "run2-22"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "What the shots show is the user's own search text in a still-focused searchable combobox, not a stored value. In shot-4/shot-5 and frame-4 the input still has the blue focus border right after 'Pressing Escape'; the video only presses Escape and then reloads, it never moves focus away. SemanticTypePicker is a stock Mantine <Select searchable> (L40-59): Escape closes the dropdown but keeps focus and the typed text; the text is reset to the selected option's label on blur. No request is sent and the stored value is unchanged (shot-6), which is correct. Transient editing state of a standard control, no misreport once focus leaves the field.",
+      "evidence": [
+        "run2-22/shot-4.png",
+        "run2-22/frame-4.jpg",
+        "run2-22/shot-6.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/metadata/components/SemanticTypePicker/SemanticTypePicker.tsx#L39-L60"
+      ]
+    },
+    {
+      "id": "admin-12",
+      "title": "Unresolvable SSH tunnel host shows a raw Java exception string in the database form error",
+      "findings": [
+        "run2-24"
+      ],
+      "verdict": "accept",
+      "severity": 5,
+      "reason": "shot-5: the alert reads 'DefaultConnectFuture[agent11@ssh.example.com/<unresolved>:22]: Failed (UnresolvedAddressException) to execute: null', followed by unrelated tips (SSL, user permissions). Source: the SSH connect future is verified in ssh_tunnel.clj L68-69 and its exception message falls through humanize-connection-error-message, whose default just returns the first raw message (driver.clj L918-919; util.clj L143-158). Metabase defines a friendly ':ssh-tunnel-connection-fail' message ('We couldn't connect to the SSH tunnel host. Check the Host and Port.', util.clj L56-62) but no code path returns it, so the intended wording never appears. Passing unknown driver messages through is deliberate (DatabaseFormError.tsx L23-39), but an internal class toString ending in 'null' is technical error text shown to the user, which the rubric puts at 5; by impact alone (admin-only form, page not broken) it would be lower.",
+      "evidence": [
+        "run2-24/shot-5.png",
+        "run2-24/shot-3.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/src/metabase/driver/util.clj#L48-L62",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/src/metabase/driver/util.clj#L143-L158",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/src/metabase/driver.clj#L918-L919",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/src/metabase/driver/sql_jdbc/connection/ssh_tunnel.clj#L68-L69",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/databases/components/DatabaseFormError/DatabaseFormError.tsx#L23-L39"
+      ]
+    },
+    {
+      "id": "admin-13",
+      "title": "Help drawer on 'Edit connection details' is titled 'Add PostgreSQL'",
+      "findings": [
+        "run2-26"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "shot-2: page heading 'Edit connection details', drawer heading 'Add PostgreSQL'. Source: DatabaseHelpSidePanel hard-codes the title as t`Add ${driverName}` (L64) and DatabasePage shows the same panel for both the create and the edit route (L120-127). Wrong wording in the edit context; cosmetic.",
+      "evidence": [
+        "run2-26/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/admin/databases/components/DatabaseHelpSidePanel/DatabaseHelpSidePanel.tsx#L63-L65",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/admin/databases/containers/DatabasePage.tsx#L120-L127"
+      ]
+    },
+    {
+      "id": "admin-14",
+      "title": "Database caching form: Multiplier validation message is out of view at 1280x720, Save disabled with no visible reason",
+      "findings": [
+        "run3-05"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "shot-3: Multiplier 2.5 has a red border, 'Save changes' is disabled and no message is visible; the footer bar starts about 10px under the input. Source: the message exists ('Enter an integer.', complex.ts L13-16) and is rendered under the input (StrategyForm.tsx L273), but the form body is an inner scroll box (PerformanceApp.module.css L49-53, overflow: auto) whose height follows the window, so at 720px height the message lands below the fold of that box and is not scrolled into view. It is reachable by scrolling inside the form, so 'clipped behind the footer' overstates it, but at a common laptop height the user sees a disabled Save with no text. Layout/feedback defect, cosmetic.",
+      "evidence": [
+        "run3-05/shot-3.png",
+        "run3-05/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/admin/performance/components/PerformanceApp.module.css#L49-L53",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/admin/performance/components/StrategyForm.tsx#L262-L274",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/admin/performance/constants/complex.ts#L13-L16"
+      ]
+    }
+  ]
+}

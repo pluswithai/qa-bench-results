@@ -1,0 +1,83 @@
+{
+  "bugs": [
+    {
+      "name": "Filter \"Created by contains Tim Apple\" returns 0 companies although the column shows Tim Apple on every row",
+      "summary": "The Created by condition offers only the operator \"Contains\" and a plain text box; no people are suggested and whatever is typed is applied as-is. \"Tim Apple\" gives \"All Companies · 0\" and \"No Company found\", exactly as \"Jony\" and \"J\" do, although the Created by column of the unfiltered list reads \"Tim Apple\" or \"Jony Ive\" on every row. (on /objects/companies)",
+      "expected": "Filtering Created by by a person's name returns the companies created by that person (most of the 599 list reads \"Tim Apple\"), or the condition offers a picker of people like the Account Owner condition does.",
+      "actual": "The Created by condition offers only the operator \"Contains\" and a plain text box; no people are suggested and whatever is typed is applied as-is. \"Tim Apple\" gives \"All Companies · 0\" and \"No Company found\", exactly as \"Jony\" and \"J\" do, although the Created by column of the unfiltered list reads \"Tim Apple\" or \"Jony Ive\" on every row.",
+      "reproSteps": [
+        "Open https://5500-id2u1yqyeed69abiadw0w.e2b.app/objects/companies (All Companies, 599 records, Created by column reads Tim Apple / Jony Ive)",
+        "Click the Filter button above the table",
+        "Choose Created by in the field list",
+        "Type Tim Apple into the Created by value box (operator is Contains)",
+        "Notice there is no suggestion list, then press Enter to apply and read the result"
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Kanban columns come back in alphabetical order after changing the Group by field",
+      "summary": "The five columns are back but in alphabetical order: Customer, Meeting, New, Proposal, Screening. The stage pipeline order (New → Screening → Meeting → Proposal → Customer) that the view had before is not restored, and it does not come back by reselecting Stage; only the cards and the per-column totals (Customer 7.7m, Meeting 37.8m, New 16.4m, Proposal 31.1m, Screening 13.1m) are unchanged. (on /objects/opportunities (By Stage kanban view))",
+      "expected": "Regrouping the same field should keep the view's own column order (New, Screening, Meeting, Proposal, Customer), as it was before the group field was changed.",
+      "actual": "The five columns are back but in alphabetical order: Customer, Meeting, New, Proposal, Screening. The stage pipeline order (New → Screening → Meeting → Proposal → Customer) that the view had before is not restored, and it does not come back by reselecting Stage; only the cards and the per-column totals (Customer 7.7m, Meeting 37.8m, New 16.4m, Proposal 31.1m, Screening 13.1m) are unchanged.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev, open /objects/opportunities, select the kanban view \"By Stage\": the columns are New, Screening, Meeting, Proposal, Customer.",
+        "Click \"Options\" → \"Group\" → \"Group by Stage\" → choose \"Owner\".",
+        "Click \"Options\" → \"Group\" → \"Group by Owner\" → choose \"Stage\" again.",
+        "Look at the order of the columns on the board."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Hand-typed record address with an invented id shows an empty record page (and a raw UUID error for the all-zero id)",
+      "summary": "The page opens as a company record titled \"Companies / Untitled (0/0)\": the header shows two grey skeleton blocks (avatar and name) that never resolve, every field shows only its placeholder (\"Domain Name\", \"Account Owner\", \"Address\", \"Linkedin\", ...) and the timeline says \"No activity yet\". No not-found message is shown. With the all-zero UUID three red toasts \"Invalid value for UUID: \\\"00000000-0000-0000-0000-000000000000\\\"\" also appear and the console logs 'useFindManyRecords for \\\"companies\\\" error : CombinedGraphQLErrors: Invalid UUID value' — raw errors on screen. (on /object/company/8f1c2b65-1234-4a9b-9c3d-1a2b3c4d5e6f)",
+      "expected": "A record that does not exist should show an empty/not-found state (\"record not found\" or a 404 like the one /objects/nonexistentobject shows), not a half-loaded record page.",
+      "actual": "The page opens as a company record titled \"Companies / Untitled (0/0)\": the header shows two grey skeleton blocks (avatar and name) that never resolve, every field shows only its placeholder (\"Domain Name\", \"Account Owner\", \"Address\", \"Linkedin\", ...) and the timeline says \"No activity yet\". No not-found message is shown. With the all-zero UUID three red toasts \"Invalid value for UUID: \\\"00000000-0000-0000-0000-000000000000\\\"\" also appear and the console logs 'useFindManyRecords for \\\"companies\\\" error : CombinedGraphQLErrors: Invalid UUID value' — raw errors on screen.",
+      "reproSteps": [
+        "Signed in as tim@apple.dev, go to https://5500-i6ealdtlbctm7qodvu2we.e2b.app/object/company/8f1c2b65-1234-4a9b-9c3d-1a2b3c4d5e6f (a well-formed UUID that no company has)",
+        "Wait 4-8 seconds and watch the record panel on the left",
+        "Repeat once with https://5500-i6ealdtlbctm7qodvu2we.e2b.app/object/company/00000000-0000-0000-0000-000000000000"
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Advanced filter popup is a fixed 650 px wide: at 390 px the value input is off-screen",
+      "summary": "At 390px the rule row is wider than the popup: only \\\"Where\\\", the field (\\\"Name\\\") and the operator (\\\"Contains\\\") fit. The \\\"Enter value\\\" input sits entirely outside the visible popup (its box starts at x=375 in a 390px viewport) and can only be reached by scrolling the popup sideways, which nothing indicates. The Filter popup also overlaps the record list it is filtering. (on /objects/people)",
+      "expected": "The advanced filter rule wraps to the popup width at 390px so the field, the operator and the value input are all visible and usable.",
+      "actual": "At 390px the rule row is wider than the popup: only \\\"Where\\\", the field (\\\"Name\\\") and the operator (\\\"Contains\\\") fit. The \\\"Enter value\\\" input sits entirely outside the visible popup (its box starts at x=375 in a 390px viewport) and can only be reached by scrolling the popup sideways, which nothing indicates. The Filter popup also overlaps the record list it is filtering.",
+      "reproSteps": [
+        "Sign in and open https://5500-i6ealdtlbctm7qodvu2we.e2b.app/objects/people",
+        "Set the window to 390x844",
+        "Click \"Filter\" in the view bar, then choose \"Advanced filter\" at the bottom of the popup",
+        "Look at the filter rule row \"Where | Name | Contains\": there is no value input after \"Contains\"",
+        "Compare with the same step at 1280px wide, where the row shows \"Where | Name | Contains | Enter value\""
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Empty state button reads \"Add a Opportunity\" (wrong article)",
+      "summary": "The empty state shows the button \"Add a Opportunity\" and the heading \"No Opportunity found\". The article is wrong: it reads \"a Opportunity\" instead of \"an Opportunity\". (on /objects/opportunities)",
+      "expected": "The empty-state button should read \"Add an Opportunity\", like the other empty states use the correct article.",
+      "actual": "The empty state shows the button \"Add a Opportunity\" and the heading \"No Opportunity found\". The article is wrong: it reads \"a Opportunity\" instead of \"an Opportunity\".",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev and open /objects/opportunities (table view).",
+        "Click \"Filter\" in the toolbar above the table.",
+        "Click \"Close date\" in the field list — a filter \"Close date is <today>\" is applied and no record matches, so the empty state appears in the middle of the table.",
+        "Read the empty state: heading \"No Opportunity found\", sub-text \"No records matching the filter criteria were found.\", and a button \"Add a Opportunity\"."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Kanban column headers show \"-\" instead of the record count when the column aggregate is the default count",
+      "summary": "Every column header shows a dash where the record count belongs: \"To do -\", \"In progress -\", \"Done -\", \"No Value -\", even though the columns are full of cards and the view label says 1,802 records. The same dash appears on the seeded \"By Status\" board (before it was modified) and on a fresh Kanban view created from scratch; it survives a reload. (on /objects/tasks (Kanban layout))",
+      "expected": "Each Kanban column header shows how many records the column holds (e.g. \"To do 612\"), as the view label shows the total in the list.",
+      "actual": "Every column header shows a dash where the record count belongs: \"To do -\", \"In progress -\", \"Done -\", \"No Value -\", even though the columns are full of cards and the view label says 1,802 records. The same dash appears on the seeded \"By Status\" board (before it was modified) and on a fresh Kanban view created from scratch; it survives a reload.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev and open /objects/tasks.",
+        "Click the view dropdown at the top left ('All Tasks · 1,802'), click 'Add view', type the name agent4-counts, set View type to Kanban (Stages = Status) and click Create.",
+        "Look at the column headers of the new board (To do, In progress, Done, No Value).",
+        "Reload the page and look at the headers again."
+      ],
+      "severity": 3
+    }
+  ]
+}

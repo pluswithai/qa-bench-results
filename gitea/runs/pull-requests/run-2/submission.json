@@ -1,0 +1,182 @@
+{
+  "fixture": "gitea/areas/pull-requests",
+  "run": 2,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 388,
+      "name": "Files Changed tab of a pull request whose head branch is already contained in the base returns a blank page with raw text \"after commit not found in PR commits\" (HTTP 400)",
+      "summary": "The page is completely blank apart from the raw internal text 'after commit not found in PR commits' in the top-left corner. No header, no navigation, no error page. The HTTP response is 400 (the browser tab title is empty). Same on reload, and for other pull requests in the same state (e.g. #10). (on /eval/harbor-handbook/pulls/11/files)",
+      "expected": "The Files Changed tab shows the normal pull request page with a friendly empty state (e.g. 'No changes') and the usual navigation, or the tab is not offered when there is nothing to show.",
+      "actual": "The page is completely blank apart from the raw internal text 'after commit not found in PR commits' in the top-left corner. No header, no navigation, no error page. The HTTP response is 400 (the browser tab title is empty). Same on reload, and for other pull requests in the same state (e.g. #10).",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Open https://5503-iyhuwnqi1q5k6kqzc08au.e2b.app/eval/harbor-handbook/pulls/11 (a pull request from docs/release-owners into main whose commits are already in main, so the conversation shows '0 commits' and 'This branch is already included in the target branch. There is nothing to merge.').",
+        "Click the 'Files Changed' tab (or open .../pulls/11/files directly)."
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 467,
+      "name": "Organization Teams filter lists only \"All\" although the org has teams",
+      "summary": "The menu contains only 'All'. No team of the organization is ever offered, so the pull request list cannot be filtered by team at all. The same menu on /org/harbor14/dashboard and /org/harbor14/issues also lists only 'All', also after a full reload of the page. (on /org/harbor14/pulls)",
+      "expected": "The Teams menu should list the organization's teams (Owners and agent14-team, both with access to harbor14/a14-repo which has 2 open pull requests) so the pull requests can be filtered by team repositories, as its own label 'Filter by team repositories' promises.",
+      "actual": "The menu contains only 'All'. No team of the organization is ever offered, so the pull request list cannot be filtered by team at all. The same menu on /org/harbor14/dashboard and /org/harbor14/issues also lists only 'All', also after a full reload of the page.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Create an organization named harbor14 (New Organization) and, inside it, a repository harbor14/a14-repo with a pull request.",
+        "Create a second team in the organization: open /org/harbor14/teams/new, name it agent14-team, choose All repositories, click Create Team; then on /org/harbor14/teams/agent14-team click Join so eval is a member (the Owners team already has eval as a member).",
+        "Open https://5503-iyhuwnqi1q5k6kqzc08au.e2b.app/org/harbor14/pulls and click Teams in the organization header bar.",
+        "The opened menu is titled 'Filter by team repositories' but contains only the entry 'All'."
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 588,
+      "name": "After \"Update branch\" the PR page shows a diff total that is bigger than the branch's change (fixed only by reload)",
+      "summary": "Right after the update the header shows +6 (update by rebase) and +5 (update by merge) while Files Changed shows 1 and the file diff is +3; the number only becomes +3 after a manual reload of the page. The count includes main's own commits that were just merged/re-based into the branch. (on /eval/harbor-handbook/pulls/14)",
+      "expected": "The additions shown in the header should match the PR's own change: 1 file, 3 additions, the same number the Files Changed tab and the file diff show (+3). It should be the same before and after a reload.",
+      "actual": "Right after the update the header shows +6 (update by rebase) and +5 (update by merge) while Files Changed shows 1 and the file diff is +3; the number only becomes +3 after a manual reload of the page. The count includes main's own commits that were just merged/re-based into the branch.",
+      "reproSteps": [
+        "Sign in as eval (eval / momentic-eval-1) and open https://5503-iyhuwnqi1q5k6kqzc08au.e2b.app/eval/harbor-handbook/pulls/14 (PR \"agent10: add update note file on branch a\", branch agent10-update-a -> main, whose single file change is agent10-update-note.md with 3 added lines).",
+        "On main, add a new file through Code > New File (e.g. agent10-main-note2.md) so the PR shows \"This branch is out-of-date with the base branch\".",
+        "On the PR page click \"Update branch by merge\" (or \"Update branch by rebase\" from the split button's menu first) and wait for the page to reload after the update.",
+        "Read the green additions counter at the right of the Conversation / Commits / Files Changed tabs while Files Changed still says 1."
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 590,
+      "name": "Count labels never use the singular: \"1 Commits\" and \"1 changed files with 1 additions\"",
+      "summary": "Every one-count label keeps the plural form: \"1 Commits\", \"1 changed files with 1 additions and 0 deletions\", \"wants to merge 1 commits from agent1-spaces-title into main\". (on /eval/harbor-handbook/compare/main...agent1-spaces-title)",
+      "expected": "Counts of one are written in the singular: \"1 Commit\", \"1 changed file with 1 addition and 0 deletions\", \"wants to merge 1 commit from ...\".",
+      "actual": "Every one-count label keeps the plural form: \"1 Commits\", \"1 changed files with 1 additions and 0 deletions\", \"wants to merge 1 commits from agent1-spaces-title into main\".",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-iyhuwnqi1q5k6kqzc08au.e2b.app/eval/harbor-handbook/compare/main...agent1-spaces-title (a branch whose only commit adds one file).",
+        "Read the heading above the commit table: it says \"1 Commits\".",
+        "Read the diff summary line above the file diff: it says \"1 changed files with 1 additions and 0 deletions\".",
+        "The same wording appears on the created pull request https://5503-iyhuwnqi1q5k6kqzc08au.e2b.app/eval/harbor-handbook/pulls/22/files (\"1 changed files with 1 additions and 0 deletions\") and on its conversation header (\"wants to merge 1 commits from ...\")."
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 616,
+      "name": "Timeline says \\\"added 2 commits\\\" after Update branch by rebase and lists the replaced commit as added",
+      "summary": "The event headline reads \\\"eval added 2 commits\\\" and lists both 3e9a155157 (the pre-rebase commit) and 34c755fc9f (the rebased commit) with the same message, although only one commit was added and the PR's Commits tab shows 1 commit. The old commit is no longer part of the branch, so the event overstates the count and shows a commit that the branch does not contain; it persists after reload. (on /eval/harbor-handbook/pulls/14)",
+      "expected": "The timeline should report only the commit(s) actually added to the branch (1 commit, 34c755fc9f) and should not list the replaced pre-rebase commit as an added commit; the count should agree with the Commits tab.",
+      "actual": "The event headline reads \\\"eval added 2 commits\\\" and lists both 3e9a155157 (the pre-rebase commit) and 34c755fc9f (the rebased commit) with the same message, although only one commit was added and the PR's Commits tab shows 1 commit. The old commit is no longer part of the branch, so the event overstates the count and shows a commit that the branch does not contain; it persists after reload.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-iyhuwnqi1q5k6kqzc08au.e2b.app/eval/harbor-handbook/pulls/14 (PR from branch agent10-update-a, which contains one commit \"agent10: add update note file on branch a\", 3e9a155157) while the PR is up to date.",
+        "Add any new commit to main through Code > New File so the PR shows \"This branch is out-of-date with the base branch\".",
+        "On the PR page open the split button's menu and choose \"Update branch by rebase\", then click \"Update branch by rebase\".",
+        "Read the new timeline event and compare it with the Commits tab (1 commit)."
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 621,
+      "name": "Settings saves a disabled merge style as \"Default Merge Style\" and new PRs then ignore it",
+      "summary": "'Default Merge Style' always lists all five styles regardless of the ticked 'Merge Styles'. After saving with only 'Create squash commit' enabled and default 'Create merge commit', the settings page keeps and displays the disabled style as the default, and the PR merge box silently falls back to 'Create squash commit' — the stored default is never applied and the settings page misreports it. (on /eval/harbor-handbook/settings (Advanced Settings → Pull Requests))",
+      "expected": "The 'Default Merge Style' dropdown should offer only the merge styles enabled in 'Merge Styles' (or the save should refuse/repair a default that is disabled), so the saved default is a style that is actually allowed and the PR merge box uses it.",
+      "actual": "'Default Merge Style' always lists all five styles regardless of the ticked 'Merge Styles'. After saving with only 'Create squash commit' enabled and default 'Create merge commit', the settings page keeps and displays the disabled style as the default, and the PR merge box silently falls back to 'Create squash commit' — the stored default is never applied and the settings page misreports it.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-iyhuwnqi1q5k6kqzc08au.e2b.app/eval/harbor-handbook/settings",
+        "Scroll to the Advanced Settings panel, section 'Pull Requests' → 'Merge Styles'.",
+        "Tick only 'Create squash commit' (untick 'Create merge commit', 'Rebase then fast-forward', 'Rebase then create merge commit', 'Fast-forward only'; 'Manually merged' stays unticked), open 'Default Merge Style' and choose 'Create merge commit', then click 'Update Settings'.",
+        "Reload the page and read the same section: only 'Create squash commit' is ticked, but 'Default Merge Style' still shows 'Create merge commit'.",
+        "Open https://5503-iyhuwnqi1q5k6kqzc08au.e2b.app/eval/harbor-handbook/pulls/20 (PR 'agent12 settings merge style PR'): the merge button reads 'Create squash commit', not the configured default."
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 744,
+      "name": "Search box silently discards the Author filter on the global Pull Requests list",
+      "summary": "The search replaces the list with all matching pull requests regardless of author: #11 is opened by eval and still appears. The author filter is dropped from the address (search form only carries type/sort/state/q/search_mode) and no message is shown. The Author control reads just \\\"Author\\\" both before and after, so there is no sign on screen that an author filter is applied or that it was lost. (on /pulls)",
+      "expected": "The Author filter chosen in the toolbar keeps applying when I also search: with Author=alex and the term agent11, only alex's matching pull request (#25) should be listed, and the applied author filter must stay visible/applied (the Sort options and the Open/Closed tabs do keep poster in their addresses).",
+      "actual": "The search replaces the list with all matching pull requests regardless of author: #11 is opened by eval and still appears. The author filter is dropped from the address (search form only carries type/sort/state/q/search_mode) and no message is shown. The Author control reads just \\\"Author\\\" both before and after, so there is no sign on screen that an author filter is applied or that it was lost.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-iyhuwnqi1q5k6kqzc08au.e2b.app/pulls",
+        "Click \"Author\" in the toolbar, type alex in the \"Search users\" field and pick the suggestion alex (this navigates to /pulls?type=your_repositories&sort=recentupdate&state=open&poster=alex)",
+        "Observe the filtered list: 1 result, \"1 Open\" — eval/harbor-handbook#25 \"agent11: add reviewer flow note\", opened by alex",
+        "Type agent11 into the \"Search pulls...\" box and press Enter",
+        "Observe the results: 2 items — #25 opened by alex AND eval/harbor-handbook#11 \"agent11 release captain docs\" opened by eval — and the URL is now /pulls?type=your_repositories&sort=recentupdate&state=open&q=agent11&search_mode=exact, with poster=alex gone"
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 996,
+      "name": "Active Author filter is dropped by the Open/Closed tabs, whose counts are filtered: \"1 Open\" opens a list of 25",
+      "summary": "The tab link has no poster=alex in it: the page reloads at /pulls?type=your_repositories&sort=oldest&state=open, the author filter is silently gone, and the list shows all 25 open pull requests while the tab now reads '25 Open'. The count on the tab (1) does not match the list it opens (25), and nothing tells the person their filter was dropped. (on /pulls)",
+      "expected": "The Open tab keeps the author filter (the Sort options on the same page do keep poster=alex), so the tab labelled '1 Open' opens the same 1-item list it counts.",
+      "actual": "The tab link has no poster=alex in it: the page reloads at /pulls?type=your_repositories&sort=oldest&state=open, the author filter is silently gone, and the list shows all 25 open pull requests while the tab now reads '25 Open'. The count on the tab (1) does not match the list it opens (25), and nothing tells the person their filter was dropped.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-iyhuwnqi1q5k6kqzc08au.e2b.app/pulls",
+        "Click the 'Author' dropdown above the list",
+        "Type 'alex' in its 'Search users' box and click the 'alex' option that appears",
+        "The list now shows only 1 pull request ('agent11: add reviewer flow note' #25) and the tabs read '1 Open' / '0 Closed'; the address ends with &poster=alex",
+        "Click the '1 Open' tab"
+      ]
+    },
+    {
+      "index": 8,
+      "reported_at_seconds": 1129,
+      "name": "Fuzzy search finds nothing for a partial word or a typo although its tooltip promises close matches",
+      "summary": "Fuzzy returns no rows at all: \"No results\", \"0 Open / 0 Closed\", \"In your repositories 0\" for both \"revi\" and the typo \"reviwer\", although the open pull request \"agent11: add reviewer flow note\" (eval/harbor-handbook#25) and \"agent11 release captain docs (reviewer flow)\" (#11) are in the list. Searching the whole word \"reviewer\" with Fuzzy does return those two, and Fuzzy \"review\" returns exactly the same 4 rows as Exact \"review\", so Fuzzy never adds a partial or close match over Exact. (on /pulls)",
+      "expected": "Fuzzy, whose own dropdown entry is \"Include results that also match the search term closely\", finds the pull requests whose titles contain \"review\"/\"reviewer\" when the person types part of the word (\"revi\") or a close misspelling (\"reviwer\"), i.e. it returns at least the rows Exact returns plus close matches.",
+      "actual": "Fuzzy returns no rows at all: \"No results\", \"0 Open / 0 Closed\", \"In your repositories 0\" for both \"revi\" and the typo \"reviwer\", although the open pull request \"agent11: add reviewer flow note\" (eval/harbor-handbook#25) and \"agent11 release captain docs (reviewer flow)\" (#11) are in the list. Searching the whole word \"reviewer\" with Fuzzy does return those two, and Fuzzy \"review\" returns exactly the same 4 rows as Exact \"review\", so Fuzzy never adds a partial or close match over Exact.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-iyhuwnqi1q5k6kqzc08au.e2b.app/pulls (In your repositories: 26 Open).",
+        "In the search box type revi and choose Fuzzy in the search-type dropdown next to it (its tooltip reads \"Include results that also match the search term closely\"), then press Enter.",
+        "Read the result area: \"No results\" / \"0 Open / 0 Closed\".",
+        "Note that open pull requests with \"review\"/\"reviewer\" in the title exist in the same list, e.g. \"agent11: add reviewer flow note\" (eval/harbor-handbook#25) and \"agent11 release captain docs (reviewer flow)\" (#11).",
+        "Type the close misspelling reviwer with Fuzzy and press Enter: again \"No results\"; with the exact word reviewer and Fuzzy the same two PRs are returned, and \"review\" with Fuzzy returns the same 4 rows as \"review\" with Exact."
+      ]
+    },
+    {
+      "index": 9,
+      "reported_at_seconds": 1175,
+      "name": "Author filter applies but the control shows no selected user, and its prefilled search box offers no matching user",
+      "summary": "The Author control still reads just 'Author' with no user shown, so nothing on the page tells the person the list is filtered by alex (only 'opened by alex' in the row hints at it). Reopening the dropdown shows the search box prefilled with 'alex' but no alex row to see or unselect — only 'All users' — so the active filter cannot be seen or cleared by name. Seen twice: right after choosing alex, and after a reload. (on /pulls)",
+      "expected": "The Author filter shows the selected user in the dropdown (like the Sort control shows the active order) and, when reopened, lists that user as the current selection so it can be seen and cleared.",
+      "actual": "The Author control still reads just 'Author' with no user shown, so nothing on the page tells the person the list is filtered by alex (only 'opened by alex' in the row hints at it). Reopening the dropdown shows the search box prefilled with 'alex' but no alex row to see or unselect — only 'All users' — so the active filter cannot be seen or cleared by name. Seen twice: right after choosing alex, and after a reload.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-iyhuwnqi1q5k6kqzc08au.e2b.app/pulls",
+        "Click the 'Author' dropdown above the list",
+        "Type 'alex' in its 'Search users' box and click the 'alex' option",
+        "The list is now filtered to alex's pull request (#25) and the address ends with &poster=alex",
+        "Look at the Author control: it still reads 'Author'; click it again — the search box holds 'alex' but no alex row is offered, only 'All users'"
+      ]
+    },
+    {
+      "index": 10,
+      "reported_at_seconds": 1391,
+      "name": "Org pull request dashboard: sidebar counter still says 5 while the Author filter leaves the list empty",
+      "summary": "The list shows 'No results' and the tab says '0 Open / 0 Closed', but the sidebar still says 'In your repositories 5' and 'Created by you 5'. The same sidebar does follow the search box (a search that matches nothing shows 'In your repositories 0'), so the counter contradicts the list it sits next to. (on /org/harbor14/pulls)",
+      "expected": "The sidebar counter should match the filtered list (0), as the Open/Closed tab already does, since the page presents the counter as the number of pull requests in the current result set.",
+      "actual": "The list shows 'No results' and the tab says '0 Open / 0 Closed', but the sidebar still says 'In your repositories 5' and 'Created by you 5'. The same sidebar does follow the search box (a search that matches nothing shows 'In your repositories 0'), so the counter contradicts the list it sits next to.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-iyhuwnqi1q5k6kqzc08au.e2b.app/org/harbor14/pulls (the org has 5 open PRs, all opened by eval).",
+        "Click 'Author', type 'alex' in 'Search users' and pick the user alex.",
+        "Read the page: the result area says 'No results / Try adjusting your search filters.' and the tab reads '0 Open 0 Closed', but the left column still reads 'In your repositories 5' and 'Created by you 5'.",
+        "Reload the page (address .../org/harbor14/pulls?type=your_repositories&sort=oldest&state=open&poster=alex): the contradiction stays.",
+        "For comparison, type a text that matches no PR (e.g. 'zzqq-nothing-matches') in the 'Search pulls...' box and press Enter: the sidebar correctly drops to 'In your repositories 0'."
+      ]
+    },
+    {
+      "index": 11,
+      "reported_at_seconds": 1429,
+      "name": "Source-branch link on a merged pull request's row leads to a 404 page after \"Delete Branch\"",
+      "summary": "The row still renders the deleted branch name as a link, struck through: clicking \"agent5-merge-branch\" goes to /eval/harbor-handbook/src/branch/agent5-merge-branch, which answers the 404 page (\"404 Not Found. The page you are trying to reach either does not exist or you are not authorized to view it.\") with a failed GET in the console. (on /eval/harbor-handbook/pulls)",
+      "expected": "The source branch of a merged and deleted pull request should be shown without a link (as the pull request's own page does), or the link should lead somewhere valid, not to an error page.",
+      "actual": "The row still renders the deleted branch name as a link, struck through: clicking \"agent5-merge-branch\" goes to /eval/harbor-handbook/src/branch/agent5-merge-branch, which answers the 404 page (\"404 Not Found. The page you are trying to reach either does not exist or you are not authorized to view it.\") with a failed GET in the console.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and create a pull request from a branch of your own (I used branch agent5-merge-branch, file agent5-merge-note.md, PR #33 \"agent5 merge after-state probe\").",
+        "On the pull request page click \"Create merge commit\", tick \"Delete Branch \\\"agent5-merge-branch\\\"\" and confirm with \"Create merge commit\"; the page shows \"Branch \\\"eval/harbor-handbook:agent5-merge-branch\\\" has been deleted.\"",
+        "Open https://5503-iyhuwnqi1q5k6kqzc08au.e2b.app/eval/harbor-handbook/pulls?q=agent5+merge&state=closed",
+        "In the row \"agent5 merge after-state probe #33 by eval was merged\" the source branch is still shown as a struck-through link: \"main « agent5-merge-branch\".",
+        "Click the \"agent5-merge-branch\" link in that row."
+      ]
+    }
+  ]
+}

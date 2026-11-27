@@ -1,0 +1,250 @@
+{
+  "area": "querying",
+  "bugs": [
+    {
+      "id": "querying-1",
+      "title": "Ctrl+Enter in an empty SQL editor runs an empty query and shows 'Only SELECT statements are allowed'",
+      "findings": [
+        "run1-03"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "Screenshots show the editor with only its placeholder, the Run button greyed out, and the error panel 'Only SELECT statements are allowed in a native query.' with 'Showing 0 rows'. Source confirms the gap: the Run button is disabled via isRunnable (NativeQueryEditorRunButton.tsx L51), but the CodeMirror Mod-Enter keymap calls onRunQuery unconditionally (extensions.tsx L77-84) and runOrCancelQuestionOrSelectedQuery / runQuestionQuery never check canRun (querying.ts L116-170, L277-300). The H2 driver then rejects the empty text with a message that misdescribes what happened (h2.clj L316-327). An action the UI marks as unavailable runs anyway and yields a misleading error. Low impact, but a functional misbehaviour rather than a cosmetic one.",
+      "evidence": [
+        "run1-03/shot-3.png",
+        "run1-03/shot-4.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/query_builder/components/NativeQueryEditor/CodeMirrorEditor/extensions.tsx#L77-L84",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/query_builder/actions/querying.ts#L277-L300",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/query_builder/components/NativeQueryEditor/NativeQueryEditorRunButton/NativeQueryEditorRunButton.tsx#L51",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/src/metabase/driver/h2.clj#L316-L327"
+      ]
+    },
+    {
+      "id": "querying-2",
+      "title": "Browser Back after running a new SQL query auto-runs the empty previous state: error view, editor collapsed",
+      "findings": [
+        "run3-11"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "shot-5 shows the typed query with its result (agent2-tag / 18,760); after Back, shot-6 shows 'An error occurred in your query - Only SELECT statements are allowed in a native query.', the editor collapsed to 'This question is written in SQL / OPEN EDITOR', and shot-4 shows the reopened editor empty. Source explains it: popState treats a history card as 'empty' only when it has no database (navigation.ts L49-55); the New > SQL query entry has a database and an empty native query, so it goes to setCardAndRun (L57-61), which runs the empty query and then resetUIControls collapses the editor. Going back to the empty state is normal history behaviour (Forward restores the query), so 'query lost' is overstated, but landing on an error for a query the user never ran, with the editor closed, is a real defect. Same error text as querying-1 but a different trigger and code path, so kept separate.",
+      "evidence": [
+        "run3-11/shot-5.png",
+        "run3-11/shot-6.png",
+        "run3-11/shot-4.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/query_builder/actions/navigation.ts#L46-L63",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/query_builder/actions/core/core.ts#L109-L136"
+      ]
+    },
+    {
+      "id": "querying-3",
+      "title": "Collection picker in the Save dialog overflows a 390px phone screen",
+      "findings": [
+        "run1-04"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "At 390x844 the Browse tab shows the collection list pushed off the left edge (only 'gent8-sub' visible), the search field runs past the modal edge and the footer buttons are cut ('New collectio'); Recents rows are clipped mid-word. Source shows fixed desktop widths with no small-screen handling: each pane is 365px wide (NestedItemPicker.styled.tsx L9-10), the search input has miw 400, and the modal is capped at 80vw (EntityPickerModal.tsx L419-421, L443). Content stays reachable by horizontal scrolling, so this is a layout defect, not loss of function.",
+      "evidence": [
+        "run1-04/shot-2.png",
+        "run1-04/shot-1.png",
+        "run1-04/shot-4.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/common/components/EntityPicker/components/NestedItemPicker/NestedItemPicker.styled.tsx#L9-L10",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/common/components/EntityPicker/components/EntityPickerModal/EntityPickerModal.tsx#L419-L443"
+      ]
+    },
+    {
+      "id": "querying-4",
+      "title": "Two SQL statements separated by ';' return only the first result set, with no warning",
+      "findings": [
+        "run1-05",
+        "run2-02"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "the editor runs the query and silently drops every statement after the first, with no message. Only the documentation says multi-statement queries are unsupported; a user reading the result has no way to know part of the query was ignored. A silent partial result is a functional defect.",
+      "evidence": [
+        "run1-05/shot-3.png",
+        "run2-02/shot-4.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/docs/questions/native-editor/writing-sql.md#L93-L104",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/src/metabase/driver/h2.clj#L308-L327",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/test/metabase/driver/h2_test.clj#L286-L296",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/src/metabase/driver/sql_jdbc/execute.clj#L592-L596"
+      ]
+    },
+    {
+      "id": "querying-5",
+      "title": "SQL error box shows the database error including the '-- Metabase:: userID ... queryHash' remark",
+      "findings": [
+        "run1-06"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Works as designed. '{{my min}}' is not a valid variable name, so the text goes to H2 unchanged and H2 returns a syntax error that quotes the statement it received. Metabase documents that errors shown in the SQL editor are the database's own (writing-sql.md L93-95). The leading comment is the query remark Metabase adds on purpose for DBAs (query_processor/util.clj L31-47, injected in sql_jdbc/execute.clj L749-751 and controlled by the include-user-id-and-hash database option, L767). It only reveals the running user's own id and the hash of their own query to themselves.",
+      "evidence": [
+        "run1-06/shot-3.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/src/metabase/query_processor/util.clj#L31-L47",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/src/metabase/driver/sql_jdbc/execute.clj#L749-L768",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/docs/questions/native-editor/writing-sql.md#L93-L95"
+      ]
+    },
+    {
+      "id": "querying-6",
+      "title": "A custom column can be named like an existing table column ('Total'), giving two columns with the same label",
+      "findings": [
+        "run1-08"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Deliberate product decision visible in source: the name-conflict check in lib/expression.cljc is commented out with the note that it was removed as part of fixing #39059 and might return for collisions between expressions, 'probably not with tables or earlier stages' (L276-279, L317-322). The screenshots show both columns present with correct values (Orders.Total 39.72 and the custom Total = Quantity*2 = 4), so nothing is computed wrongly; the claim that picking one 'can silently use the other' is not demonstrated.",
+      "evidence": [
+        "run1-08/shot-2.png",
+        "run1-08/shot-4.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/src/metabase/lib/expression.cljc#L276-L279",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/src/metabase/lib/expression.cljc#L317-L322"
+      ]
+    },
+    {
+      "id": "querying-7",
+      "title": "Phone width: the Visualization button in the results footer is an empty box",
+      "findings": [
+        "run1-09"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "shot-3 (390px) shows a blank light-blue box left of the gear icon where desktop shows 'Visualization'. Source confirms: the button is rendered with labelBreakpoint=\"sm\" and no icon (LeftViewFooterButtonGroup.tsx L55-64), and Button hides the label below the sm breakpoint (Button.tsx L148), leaving nothing visible. The button still works, so this is cosmetic.",
+      "evidence": [
+        "run1-09/shot-3.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/query_builder/components/view/ViewFooter/LeftViewFooterButtonGroup.tsx#L55-L64",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/common/components/Button/Button.tsx#L148"
+      ]
+    },
+    {
+      "id": "querying-8",
+      "title": "Data picker search treats '%' as a SQL LIKE wildcard and returns everything",
+      "findings": [
+        "run2-03",
+        "run3-08"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "Both runs show the same thing: typing a single '%' in 'Search for tables and more...' lists every table, question and metric, while a non-matching word gives 'No search results'. The picker passes the text straight to the search API (MiniPickerItemList.tsx L326-331) and the backend wraps the term in '%...%' without escaping LIKE metacharacters, both in the H2 index search (appdb/specialization/h2.clj L33-48) and in the legacy in-place search (in_place/util.clj L8-11, legacy.clj L264-272). So '%' (and '_') act as wildcards and the search returns wrong results for the typed text.",
+      "evidence": [
+        "run3-08/shot-4.png",
+        "run2-03/shot-3.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/src/metabase/search/appdb/specialization/h2.clj#L33-L48",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/src/metabase/search/in_place/util.clj#L8-L11",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/src/metabase/search/in_place/legacy.clj#L264-L272",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/common/components/Pickers/MiniPicker/components/MiniPickerItemList.tsx#L326-L331"
+      ]
+    },
+    {
+      "id": "querying-9",
+      "title": "Switching the database keeps the previous result rows on screen and hides the row count",
+      "findings": [
+        "run3-04"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "This is the designed 'result is out of date' state, the same one shown after any edit to the query. shot-2 shows the Run button turned into the blue play button ('Get Answer') after the switch, which is how the app marks results as not matching the current query (RunButton.tsx L60-80; getIsResultDirty in selectors.js L482-514). The row count is hidden on purpose for a dirty native result (QuestionRowCount.tsx L85-87). Re-running then gives the correct Postgres error (shot-3). Nothing is run against the wrong database and nothing is saved wrongly.",
+      "evidence": [
+        "run3-04/shot-2.png",
+        "run3-04/shot-3.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/query_builder/components/view/QuestionRowCount/QuestionRowCount.tsx#L84-L91",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/query_builder/components/RunButton.tsx#L60-L80",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/query_builder/selectors.js#L482-L514"
+      ]
+    },
+    {
+      "id": "querying-10",
+      "title": "Save dialog enables Save for a whitespace-only name, then fails with the server text 'Value must be a non-blank string.'",
+      "findings": [
+        "run3-05"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "shot-4 shows the Name field in error with 'Value must be a non-blank string.' and the Save button reading 'Failed'. Source: the form schema uses Yup.string().required() with no trim, so spaces pass client validation (schema.ts L8-16), and the submit code then trims the name to '' before POSTing (util.ts L53), which the API rejects. Inconsistent with the empty-name case, where Save stays disabled. Nothing is saved and the message appears under the right field, so this is a validation/wording gap only.",
+      "evidence": [
+        "run3-05/shot-4.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/common/components/SaveQuestionForm/schema.ts#L8-L16",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/common/components/SaveQuestionForm/util.ts#L53"
+      ]
+    },
+    {
+      "id": "querying-11",
+      "title": "Row limit accepts a 20-digit number; the question then fails with 'Invalid query: {:stages [{:limit ...}]}'",
+      "findings": [
+        "run3-07"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "shot-3 shows the Row limit field holding 99999999999999999999; shot-4 shows 'There was a problem with your question' with 'Showing 0 rows'; the video (around 2:18) shows 'Show error details' revealing 'Invalid query: {:stages [{:limit [\"integer greater than or equal to zero\"]}]}'. Source: isLimitValid only checks integer and > 0 (LimitStep/util.ts L1-7), so 1e20 is accepted and written into the query, and the backend schema requires an :int (lib/schema/common.cljc L101-105). Real validation gap, but it needs a value above 2^63, the app fails closed with its designed error state and the raw text sits behind an explicit 'Show error details' link, so lowest severity.",
+      "evidence": [
+        "run3-07/shot-3.png",
+        "run3-07/shot-4.png",
+        "run3-07/video.webm"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/querying/notebook/components/LimitStep/util.ts#L1-L7",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/querying/notebook/components/LimitStep/LimitStep.tsx#L26-L43",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/src/metabase/lib/schema/common.cljc#L101-L105"
+      ]
+    },
+    {
+      "id": "querying-12",
+      "title": "Field picker for a Field Filter variable collapses when the search matches no field",
+      "findings": [
+        "run3-09"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "The video shows the Orders field list staying open while 'qua' matches Quantity, then vanishing as soon as the typed text matches nothing; shot-3/shot-4 show only a thin empty line under 'Field to map to - Select...', with no search box and no message. Source explains it: when no item matches, sortAndFilterSections drops the whole section (AccordionList/utils.ts L252-255), so AccordionList builds no header, no search row and no items, and the 'no-results' row is only added in globalSearch mode (AccordionList.tsx L373-391), which the field picker does not use (DataSelectorFieldPicker.tsx L83-98). The search input disappears together with the typed text, so the user cannot correct it and has to reopen the picker.",
+      "evidence": [
+        "run3-09/shot-3.png",
+        "run3-09/shot-4.png",
+        "run3-09/video.webm"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/common/components/AccordionList/utils.ts#L234-L255",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/common/components/AccordionList/AccordionList.tsx#L373-L391",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/query_builder/components/DataSelector/DataSelectorFieldPicker/DataSelectorFieldPicker.tsx#L83-L98"
+      ]
+    },
+    {
+      "id": "querying-13",
+      "title": "On the empty 'Pick your starting data' page, Tab focuses an invisible Save button with the tooltip 'You don't have permission to save this question.'",
+      "findings": [
+        "run3-12"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "shot-2 shows the tooltip 'You don't have permission to save this question.' pointing at an empty spot in the header where no Save button is visible, for an admin account that can save. Source: getSaveTooltip returns that permission text whenever the query is not editable (ViewTitleHeaderRightSide.tsx L271-279), which is also true for a query with no data source yet, and the Save button is rendered and focusable with only aria-disabled (L246-266). Wrong wording on a control that is not visible: cosmetic/accessibility.",
+      "evidence": [
+        "run3-12/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/query_builder/components/view/ViewHeader/components/ViewTitleHeaderRightSide/ViewTitleHeaderRightSide.tsx#L246-L279"
+      ]
+    }
+  ]
+}

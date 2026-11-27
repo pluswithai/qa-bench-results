@@ -1,0 +1,193 @@
+{
+  "area": "labels",
+  "bugs": [
+    {
+      "id": "labels-1",
+      "title": "Saving the Edit Label dialog for a label deleted meanwhile lands on a bare plain-text \"Not Found\" page",
+      "findings": [
+        "run1-10",
+        "run2-05",
+        "run3-11"
+      ],
+      "verdict": "accept",
+      "severity": 5,
+      "reason": "A normal in-app Save (full-page form POST to /labels/edit) ends on a white page holding only the text \"Not Found\": no Gitea layout, no message, typed edit lost. UpdateLabel answers a missing label with ctx.HTTPError(404), which writes plain text via http.Error instead of a flash message + redirect to /labels (as DeleteLabel does) or the styled 404 page (ctx.NotFound).",
+      "evidence": [
+        "run1-10/shot-4.png",
+        "run2-05/shot-4.png",
+        "run3-11/shot-4.png",
+        "run1-10/frame-6.jpg"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/repo/issue_label.go (UpdateLabel: IsErrRepoLabelNotExist -> ctx.HTTPError(http.StatusNotFound))",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/services/context/base.go (HTTPError -> http.Error plain text)",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/web_src/js/features/comp/LabelEdit.ts (form.submit() full-page POST)"
+      ]
+    },
+    {
+      "id": "labels-2",
+      "title": "Ticking a label in the sidebar Labels picker is only saved when the picker closes",
+      "findings": [
+        "run2-03"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Deliberate design: Gitea documents that the multi-select sidebar combo \"defers the update until the dropdown is hidden\", and the code only calls doUpdate() in onHide for selection-mode=multiple. Reloading with the picker still open discards an uncommitted selection, which is the documented behaviour, not a lost save.",
+      "evidence": [
+        "run2-03/shot-2.png",
+        "run2-03/shot-4.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/web_src/js/features/repo-issue-sidebar.md (\"multiple: ... defers the update until the dropdown is hidden\")",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/web_src/js/features/repo-issue-sidebar-combolist.ts (onHide -> doUpdate)"
+      ]
+    },
+    {
+      "id": "labels-3",
+      "title": "\"Exclusive\" checkbox cannot be ticked in the New/Edit Label dialog",
+      "findings": [
+        "run2-04"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Deliberate: the checkbox is disabled (and force-unchecked) unless the label name has a scope, i.e. contains \"/\"; the names used (agent1-dblclick, repro-exclusive-j15) have none. The dialog says so right under the checkbox (\"Name the label scope/item to make it mutually exclusive...\") and the screenshot shows the control greyed out.",
+      "evidence": [
+        "run2-04/shot-3.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/web_src/js/features/comp/LabelEdit.ts (syncModalUi: classList.toggle('disabled', !hasScope); if (!hasScope) elExclusiveInput.checked = false)",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/options/locale/locale_en-US.ini (issues.label_exclusive_desc)"
+      ]
+    },
+    {
+      "id": "labels-4",
+      "title": "Colour picker hue bar writes nothing to the empty Color field of a new label",
+      "findings": [
+        "run2-08"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "New Label opens with an empty required Color field; moving the hue slider visibly changes the picker (square turns cyan) but the field stays empty and Save then refuses with \"Please fill out this field\". Cause: LabelEdit.ts wipes the template's default colour to '', the picker silently falls back to #000 without writing it to the field, and a hue change on black yields the same hex so no color-changed event fires. Counter-argument a human should weigh: in HSV a hue change at zero brightness is still black, so the field would at best read #000000, not cyan.",
+      "evidence": [
+        "run2-08/shot-3.png",
+        "run2-08/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/web_src/js/features/comp/LabelEdit.ts (elColorInput.value = btn.getAttribute('data-label-color') || '')",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/repo/issue/labels/label_edit_modal.tmpl (input name=color value=\"#70c24a\" required)",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/web_src/js/features/colorpicker.ts (input only updated on 'color-changed')",
+        "https://unpkg.com/vanilla-colorful@0.7.2/lib/components/color-picker.js (handleEvent fires only when the new hex differs; defaultColor '#000')"
+      ]
+    },
+    {
+      "id": "labels-5",
+      "title": "Long label name is clipped mid-text inside the issue sidebar Labels picker (390 px)",
+      "findings": [
+        "run2-10"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "A 50-character label name (the maximum the form allows) is cut off at the right edge of the picker dropdown with no wrap or ellipsis, so the entry cannot be fully read. Label chips are styled white-space: nowrap with no max-width/ellipsis rule; same root as labels-6 but a different screen.",
+      "evidence": [
+        "run2-10/shot-2.png",
+        "run2-10/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/web_src/css/modules/label.css (.ui.label { white-space: nowrap })",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/services/forms/repo_form.go (CreateLabelForm Title MaxSize(50))"
+      ]
+    },
+    {
+      "id": "labels-6",
+      "title": "Long label chip on an issue-list row runs off the right edge of the screen (390 px)",
+      "findings": [
+        "run2-11"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "On the Issues list at 390 px the chip of a 50-character label (allowed length) overflows the row and the viewport and is cut at the screen edge, with no wrap or ellipsis. Layout defect from the nowrap label chip having no width limit in the list row.",
+      "evidence": [
+        "run2-11/shot-1.png",
+        "run2-11/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/web_src/css/modules/label.css (.ui.label { white-space: nowrap })",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/services/forms/repo_form.go (CreateLabelForm Title MaxSize(50))"
+      ]
+    },
+    {
+      "id": "labels-7",
+      "title": "Assigning a label that was deleted meanwhile answers 500 and fails silently",
+      "findings": [
+        "run3-07"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "Picking a label deleted in another tab makes POST /issues/labels return 500 and the page just reloads without the label and without any message. Source shows a wrong error check: UpdateIssueLabel tests IsErrRepoLabelNotExist to answer 404, but GetLabelByID returns ErrLabelNotExist, so a missing label always falls through to ctx.ServerError (500); the front end ignores the response status and reloads.",
+      "evidence": [
+        "run3-07/shot-3.png",
+        "run3-07/shot-4.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/repo/issue_label.go (UpdateIssueLabel: GetLabelByID + IsErrRepoLabelNotExist else ServerError)",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/models/issues/label.go (GetLabelByID returns ErrLabelNotExist{labelID})",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/web_src/js/features/repo-issue-sidebar-combolist.ts (updateToBackend: await POST then reload, no status check)"
+      ]
+    },
+    {
+      "id": "labels-8",
+      "title": "Opening /labels/new directly shows a blank page (405)",
+      "findings": [
+        "run3-08"
+      ],
+      "verdict": "accept",
+      "severity": 5,
+      "reason": "GET on /labels/new answers 405 with an empty body: a blank page from Gitea itself (checked: Gitea cookies and headers on the response). Counted under the rule for addresses the app does not generate.",
+      "evidence": [
+        "run3-08/shot-1.png",
+        "run3-08/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/web.go (m.Group(\"/labels\", ... m.Post(\"/new\", ...), m.Post(\"/edit\", ...)))",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/web_src/js/features/comp/LabelEdit.ts (the New Label dialog only ever POSTs to /labels/new)"
+      ]
+    },
+    {
+      "id": "labels-9",
+      "title": "\"Least issues\" label sort orders by total issues while the row shows only open issues",
+      "findings": [
+        "run3-09"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "The sort is coded to order by the label's total issue count (num_issues, open + closed), which matches its menu text \"Least issues\"; the number in each row is a different, explicitly named metric (\"N open issues/pull requests\" = NumIssues - NumClosedIssues). The list is correctly ordered by what the option names, so no promise of the app is broken, even though the total is not shown on the page.",
+      "evidence": [
+        "run3-09/shot-3.png",
+        "run3-09/frame-6.jpg",
+        "run3-09/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/models/issues/label.go (GetLabelsByRepoID: case \"leastissues\": sess.Asc(\"num_issues\"); CalOpenIssues: NumOpenIssues = NumIssues - NumClosedIssues)",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/repo/issue/labels/label_list.tmpl (sort item text repo.milestones.filter_sort.least_issues; row text repo.issues.label_open_issues .NumOpenIssues)"
+      ]
+    },
+    {
+      "id": "labels-10",
+      "title": "Colour preview square stays empty for a 3-digit hex the form accepts (#f00)",
+      "findings": [
+        "run3-12"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "With #f00 typed, the preview square shows the transparent checkerboard while the picker under it shows red and Save stores a red label. The Color input's own pattern accepts 3-digit hex, but updateSquare only paints when the value matches /#[0-9a-f]{6}/, so the preview contradicts the app's accepted input.",
+      "evidence": [
+        "run3-12/shot-4.png",
+        "run3-12/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/web_src/js/features/colorpicker.ts (updateSquare: /#[0-9a-f]{6}/i.test(newValue) ? newValue : 'transparent')",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/repo/issue/labels/label_edit_modal.tmpl (pattern=\"^#?([\\dA-Fa-f]{3}|[\\dA-Fa-f]{6})$\")"
+      ]
+    }
+  ]
+}

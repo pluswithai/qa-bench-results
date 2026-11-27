@@ -1,0 +1,280 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "findings": 25,
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 27,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Matches the New Release tag-validation message exposing form.TagName instead of the readable field label."
+      },
+      {
+        "groundTruthIndex": 1,
+        "reproStepsIndex": 0,
+        "findingIndex": 1,
+        "reason": "Matches the Releases RSS channel advertising the singular /release destination, which returns 404."
+      },
+      {
+        "groundTruthIndex": 24,
+        "reproStepsIndex": 0,
+        "findingIndex": 2,
+        "reason": "Matches the tag-message checkbox overlapping its label at 390px. The finding also describes the separately tracked Pre-Release checkbox overlap."
+      },
+      {
+        "groundTruthIndex": 42,
+        "reproStepsIndex": 0,
+        "findingIndex": 3,
+        "reason": "Matches a long release title squeezing and clipping the Draft badge on the Releases list; the narrower viewport changes only the clipping degree."
+      },
+      {
+        "groundTruthIndex": 0,
+        "reproStepsIndex": 0,
+        "findingIndex": 4,
+        "reason": "Matches the heading displaying '1 Tags' while the nearby tab correctly displays '1 Tag'."
+      },
+      {
+        "groundTruthIndex": 55,
+        "reproStepsIndex": 0,
+        "findingIndex": 5,
+        "reason": "Matches tag search interpreting percent signs and underscores as wildcards rather than literal characters."
+      },
+      {
+        "groundTruthIndex": 19,
+        "reproStepsIndex": 0,
+        "findingIndex": 10,
+        "reason": "Matches deleting an unpublished draft successfully while its content and leftover record remain reachable. This is distinct from retaining a published release's text on a surviving tag."
+      },
+      {
+        "groundTruthIndex": 48,
+        "reproStepsIndex": null,
+        "findingIndex": 12,
+        "reason": "Matches an out-of-range Releases page returning empty results rather than a valid page. This variant retains a misleading pager and is reached by entering the URL directly."
+      },
+      {
+        "groundTruthIndex": 17,
+        "reproStepsIndex": 0,
+        "findingIndex": 13,
+        "reason": "Matches empty-title validation restoring saved release fields and discarding the newly entered notes."
+      },
+      {
+        "groundTruthIndex": 28,
+        "reproStepsIndex": 0,
+        "findingIndex": 14,
+        "reason": "Matches the release-edit title validation banner displaying 'form.Title cannot be empty.'."
+      },
+      {
+        "groundTruthIndex": 33,
+        "reproStepsIndex": 0,
+        "findingIndex": 15,
+        "reason": "Matches fixing a draft's title error through the replacement Update Release button unintentionally publishing the draft and creating its tag."
+      },
+      {
+        "groundTruthIndex": 48,
+        "reproStepsIndex": null,
+        "findingIndex": 16,
+        "reason": "Matches the out-of-range list-pagination failure on Tags. This variant is reached through a manually entered page number and retains a pager showing the wrong current page."
+      },
+      {
+        "groundTruthIndex": 22,
+        "reproStepsIndex": 0,
+        "findingIndex": 20,
+        "reason": "Matches the detail-page header's Tags tab and RSS Feed control overlapping at 390px for a user with release-creation access."
+      },
+      {
+        "groundTruthIndex": 20,
+        "reproStepsIndex": 0,
+        "findingIndex": 21,
+        "reason": "Matches Create Tag Only with the tag-message option selected failing to display the entered title and notes on the tag page. The misleading release byline is an additional claim."
+      },
+      {
+        "groundTruthIndex": 21,
+        "reproStepsIndex": 0,
+        "findingIndex": 9,
+        "reason": "The reproduction saves a draft on an existing tag and observes that tag disappearing from the Tags feed. The broader claim about every release is not established."
+      },
+      {
+        "groundTruthIndex": 43,
+        "reproStepsIndex": null,
+        "findingIndex": 17,
+        "reason": "Matches a draft's Compare control falling back to main instead of its existing tag's target. The finding exercises Compare rather than inspecting the reopened draft target."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 6,
+        "reproStepsIndex": 0,
+        "findingIndex": 23,
+        "reason": "Matches leading-slash release-note paths being resolved relative to the repository. The reviewed rejection identifies this rewriting as intended behavior."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 6,
+        "reason": "No reviewed entry describes Escape retaining an arrow-key selection in the target-branch dropdown."
+      },
+      {
+        "findingIndex": 7,
+        "reason": "No reviewed entry describes editing a release changing its release timestamp and list ordering."
+      },
+      {
+        "findingIndex": 8,
+        "reason": "This concerns incorrectly offering Create Tag Only for an existing tag, not the rejected duplicate-error wording or the missing button for a new tag."
+      },
+      {
+        "findingIndex": 11,
+        "reason": "No reviewed entry describes clipping the tag name itself on the mobile Tags list; the long-tag entries concern other pages and displaced content."
+      },
+      {
+        "findingIndex": 18,
+        "reason": "No reviewed entry describes silent failure when deleting an already-deleted tag from a stale Tags page."
+      },
+      {
+        "findingIndex": 19,
+        "reason": "No reviewed entry covers nonexistent-tag archive requests displaying a bare internal reference error."
+      },
+      {
+        "findingIndex": 22,
+        "reason": "No reviewed entry matches a new draft exposing a code link for its not-yet-created tag. The draft tag-message entry concerns losing the option upon later publication."
+      },
+      {
+        "findingIndex": 24,
+        "reason": "No reviewed entry covers New Release prefilling an existing, undeleted draft while showing the new-Git-tag helper. The rejected prefill claim specifically follows release deletion."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 5,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 3,
+        "reason": "Cancelling the dropdown changes the selected target branch and submitted value."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 3,
+        "reason": "Saving an edit reportedly changes release metadata and chronological ordering."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 1,
+        "reason": "The redundant action causes avoidable validation feedback, but the duplicate tag is correctly rejected."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 1,
+        "reason": "The tag name is visually clipped without a demonstrated failed action."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 15,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 16,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 17,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 18,
+        "severity": 3,
+        "reason": "A failed deletion leaves stale results visible without reporting the failure."
+      },
+      {
+        "findingIndex": 19,
+        "severity": 5,
+        "reason": "The browser displays an unlabeled raw internal error instead of a normal page."
+      },
+      {
+        "findingIndex": 20,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 21,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 22,
+        "severity": 5,
+        "reason": "Following the displayed tag link opens a full-page 404."
+      },
+      {
+        "findingIndex": 23,
+        "severity": 5,
+        "reason": "The described link opens a full-page 404, although the path-resolution behavior is intended."
+      },
+      {
+        "findingIndex": 24,
+        "severity": 1,
+        "reason": "The finding describes confusing form presentation but does not demonstrate duplicate creation, overwrite, or data loss."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

@@ -1,0 +1,136 @@
+{
+  "bugs": [
+    {
+      "name": "Escape on the editor's table-size popup raises a JavaScript error banner and does not close the popup",
+      "summary": "The popup stays open and an uncaught script error fires (pageerror \"Cannot read properties of null (reading 'classList')\" from easymde.609fd356.js, HTMLDocument.documentOnKeyDown). Gitea shows a red banner at the top of the page: 'JavaScript error: Cannot read properties of null (reading 'classList') (…/assets/js/easymde.609fd356.js @ 32:48623). Open browser console to see more details.' The only way to dismiss the popup is with its 'Add' button or a mouse click elsewhere. (on /eval/harbor-handbook/wiki?action=_new)",
+      "expected": "Escape closes the table-size popup without errors.",
+      "actual": "The popup stays open and an uncaught script error fires (pageerror \"Cannot read properties of null (reading 'classList')\" from easymde.609fd356.js, HTMLDocument.documentOnKeyDown). Gitea shows a red banner at the top of the page: 'JavaScript error: Cannot read properties of null (reading 'classList') (…/assets/js/easymde.609fd356.js @ 32:48623). Open browser console to see more details.' The only way to dismiss the popup is with its 'Add' button or a mouse click elsewhere.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-is4xaezuej9qas021gzrh.e2b.app/eval/harbor-handbook/wiki?action=_new",
+        "Click the table icon (last button of the editor toolbar, tooltip 'Add a table') so the small '3 x 3 / Add' popup opens",
+        "Press the Escape key"
+      ],
+      "reason": "One screenshot shows a real red \"JavaScript error: Cannot read properties of null (reading 'classList')\" banner from easymde.js, but the reproduction video follows the written steps on a fresh page, presses Escape repeatedly and never shows the banner (the popup just stays open). The easymde chunk only loads after switching to the legacy editor, so the steps miss a precondition: a human should open New Page, switch to the legacy editor (try its fullscreen button), switch back, then open the table popup and press Escape to see whether the banner appears."
+    },
+    {
+      "name": "Home page's \"Glossary\" link opens the Pages list because no Glossary page exists",
+      "summary": "The bullet is rendered as a link but clicking it lands on the wiki 'Pages' index (/eval/harbor-handbook/wiki/?action=_pages) with no message about the missing page; no page named Glossary exists in the Pages list or in the 'Page:' page dropdown, so the link can never show the glossary it promises. (on /eval/harbor-handbook/wiki/Home)",
+      "expected": "A Glossary wiki page opens (the other two bullets, 'Onboarding' and 'Release Checklist', open their pages), or the app tells the reader the page does not exist / offers to create it.",
+      "actual": "The bullet is rendered as a link but clicking it lands on the wiki 'Pages' index (/eval/harbor-handbook/wiki/?action=_pages) with no message about the missing page; no page named Glossary exists in the Pages list or in the 'Page:' page dropdown, so the link can never show the glossary it promises.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-ipj8k3in3f2cenwjnb2vr.e2b.app/eval/harbor-handbook/wiki/Home",
+        "In the page body under the heading 'Sections' click the third bullet link 'Glossary'",
+        "Observe the page you land on and its address",
+        "Also open https://5503-ipj8k3in3f2cenwjnb2vr.e2b.app/eval/harbor-handbook/wiki/Glossary directly"
+      ],
+      "reason": "The dead link is page content written by an author, not app behaviour, and Gitea deliberately redirects any missing wiki page to the Pages list (if noEntry, ctx.Redirect to /wiki/?action=_pages)."
+    },
+    {
+      "name": "\"View original Git file\" (.md) link on the Pages list opens the rendered page, not raw Markdown",
+      "summary": "Both addresses return the normal rendered wiki page: full site chrome, \"Page: agent3diffdemo\" selector, Edit / New Page / Delete Page buttons, rendered heading \"Revision four — Ünïcode\" and the Table of Contents. No raw Markdown is ever shown; for a special page such as /eval/harbor-handbook/wiki/_Footer.md the same construction lands on the Pages list instead. (on /eval/harbor-handbook/wiki/agent3diffdemo.md)",
+      "expected": "The address meant to show the original Git file returns the file's Markdown source as plain text (the content the editor and the .diff view show), as the link's label promises.",
+      "actual": "Both addresses return the normal rendered wiki page: full site chrome, \"Page: agent3diffdemo\" selector, Edit / New Page / Delete Page buttons, rendered heading \"Revision four — Ünïcode\" and the Table of Contents. No raw Markdown is ever shown; for a special page such as /eval/harbor-handbook/wiki/_Footer.md the same construction lands on the Pages list instead.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /eval/harbor-handbook/wiki",
+        "Open the page \"agent3diffdemo\" (4 revisions, rendered content \"Revision four — Ünïcode\") and note the rendered page",
+        "Open /eval/harbor-handbook/wiki/agent3diffdemo.md in the address bar — this is the address of the small \">\" link every row of /eval/harbor-handbook/wiki/?action=_pages offers, labelled \"View original Git file instead of using friendly link.\"",
+        "Also open /eval/harbor-handbook/wiki/agent3diffdemo?action=_raw"
+      ],
+      "reason": "The link is deliberate: it opens the same page addressed by its real Git file name instead of the friendly name (href is GitEntryName, and a *.md web path is used \"directly as GitPath\"), and the page handler renders it. The tooltip's wording is loose, but it contrasts with \"friendly link\", so it is about the address, not a raw view."
+    },
+    {
+      "name": "The \"Aa\" monospace toggle in the wiki editor changes nothing visible",
+      "summary": "The button's state flips (tooltip becomes \\\"Disable monospace font\\\", a tw-font-mono class is added) but the editor's text stays in the same monospace font at the same size in both states, so a sighted user sees nothing happen. The button also has no accessible name (only a data-tooltip-content attribute, aria-label empty), so screen readers announce just \\\"button\\\". (on /eval/harbor-handbook/wiki?action=_new)",
+      "expected": "The typography toggle visibly switches the editor between monospace and proportional text (the tooltip promises \\\"Enable monospace font\\\" / \\\"Disable monospace font\\\")",
+      "actual": "The button's state flips (tooltip becomes \\\"Disable monospace font\\\", a tw-font-mono class is added) but the editor's text stays in the same monospace font at the same size in both states, so a sighted user sees nothing happen. The button also has no accessible name (only a data-tooltip-content attribute, aria-label empty), so screen readers announce just \\\"button\\\".",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-ipj8k3in3f2cenwjnb2vr.e2b.app/eval/harbor-handbook/wiki?action=_new",
+        "Type Markdown in the page content box (e.g. \"line one\" and \"- line [two](url)\")",
+        "Click the \"Aa\" typography icon at the right end of the Markdown toolbar (tooltip \"Enable monospace font\")",
+        "Compare the editor text before and after; click it again to return"
+      ],
+      "reason": "The evidence shows the opposite: the same text is monospace before the click and proportional after it (shot-1 vs shot-2, frame-3 vs frame-5). The missing accessible name is not shown either, since Gitea copies the tooltip text into aria-label."
+    },
+    {
+      "name": "Relative links and image paths on a page with a slash in its title resolve against the wiki root",
+      "summary": "Both are rewritten to the wrong place. The saved page's HTML is <img src=\"/eval/harbor-handbook/wiki/raw/pic.png\" alt=\"sibling\"> — the page's own directory agent3imgdir/ is dropped, so the browser asks for the wiki root file pic.png instead of agent3imgdir/pic.png. The parent reference becomes <img src=\"/eval/harbor-handbook/wiki/up.png\" alt=\"parent\"> — not a raw path at all (a wiki page address), so no file can ever load. Both images render as broken-image icons (alt text shown). On a page at the wiki root the same syntax works: ![x](Home.md) becomes /eval/harbor-handbook/wiki/raw/Home.md, which serves the file. (on /eval/harbor-handbook/wiki/agent3imgdir/sub)",
+      "expected": "Relative image paths resolve against the page's own location in the wiki repository: ![sibling](pic.png) on the page agent3imgdir/sub must request /eval/harbor-handbook/wiki/raw/agent3imgdir/pic.png, and ![parent](../up.png) must request /eval/harbor-handbook/wiki/raw/up.png, so an image stored next to the page loads.",
+      "actual": "Both are rewritten to the wrong place. The saved page's HTML is <img src=\"/eval/harbor-handbook/wiki/raw/pic.png\" alt=\"sibling\"> — the page's own directory agent3imgdir/ is dropped, so the browser asks for the wiki root file pic.png instead of agent3imgdir/pic.png. The parent reference becomes <img src=\"/eval/harbor-handbook/wiki/up.png\" alt=\"parent\"> — not a raw path at all (a wiki page address), so no file can ever load. Both images render as broken-image icons (alt text shown). On a page at the wiki root the same syntax works: ![x](Home.md) becomes /eval/harbor-handbook/wiki/raw/Home.md, which serves the file.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /eval/harbor-handbook/wiki?action=_new",
+        "Enter the page title agent3imgdir/sub (a page in a wiki subdirectory) and the content: \"Sibling image: ![sibling](pic.png)\" newline \"Parent image: ![parent](../up.png)\"",
+        "Click Save Page → the page opens at /eval/harbor-handbook/wiki/agent3imgdir%2Fsub with both images shown as broken images",
+        "Compare with a page at the wiki root: create agent3imgtest with \"![plain](Home.md)\" — its img src is /eval/harbor-handbook/wiki/raw/Home.md, which serves the file, while the subdirectory page's src values are /eval/harbor-handbook/wiki/raw/pic.png and /eval/harbor-handbook/wiki/up.png"
+      ],
+      "reason": "Gitea 1.24 wikis have no sub-directories: a slash in a title is stored as %2F in one root-level file, and the link resolver states the path options are unused \"because Wiki doesn't support sub-path\". Resolving every relative link from the wiki root is therefore the designed behaviour."
+    },
+    {
+      "name": "Commit diff and downloaded .diff show an accented wiki file name percent-encoded",
+      "summary": "The diff file header shows the file name percent-encoded: \\\"Caf%C3%A913-Notes.md\\\" (the tree exposes the same text as the file link). The commit title above it correctly reads \\\"Add Café13 Notes\\\", and the page itself shows \\\"Café13 Notes\\\", so the same name is shown two ways. (on /eval/harbor-handbook/wiki/commit/06075453a715044579b049d4d491bb21e5b33602)",
+      "expected": "The diff file header shows the readable file name \\\"Café13-Notes.md\\\", as the page view and the commit title show \\\"Café13 Notes\\\".",
+      "actual": "The diff file header shows the file name percent-encoded: \\\"Caf%C3%A913-Notes.md\\\" (the tree exposes the same text as the file link). The commit title above it correctly reads \\\"Add Café13 Notes\\\", and the page itself shows \\\"Café13 Notes\\\", so the same name is shown two ways.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1",
+        "Create a wiki page whose title has an accent: open https://5503-ipj8k3in3f2cenwjnb2vr.e2b.app/eval/harbor-handbook/wiki?action=_new, type the title \"Café13 Notes\", type any text in the content, click \"Save Page\"",
+        "The page opens at /eval/harbor-handbook/wiki/Caf%C3%A913-Notes and the page heading reads \"Café13 Notes\"",
+        "Open the page's revision list (/eval/harbor-handbook/wiki/Caf%C3%A913-Notes?action=_revision) and click the SHA1 \"06075453a7\" of the commit \"Add Café13 Notes\"",
+        "On the commit diff page /eval/harbor-handbook/wiki/commit/06075453a715044579b049d4d491bb21e5b33602 look at the file header inside the diff box"
+      ],
+      "reason": "The percent-encoded text is the file's real name in the wiki Git repository: Gitea deliberately stores wiki files URL-escaped (only spaces are kept), so the diff shows the true path. The second claim of run2-07, that accents are stripped from the content, is contradicted by its own screenshot, where the .diff reads \"Ünïcode rev one — héllo wörld.\"."
+    },
+    {
+      "name": "Hand-typed .md address of an accented wiki page shows the Pages list",
+      "summary": "The URL /eval/harbor-handbook/wiki/Caf%C3%A913-Notes.md shows the Pages list (title \\\"Pages - harbor-handbook\\\") with no message that the page is missing, even though the page exists and /wiki/Caf%C3%A913-Notes loads it. The same happens for another accented page: /wiki/Ren%C3%A9-%C3%9Cn%C3%AFcode.md shows the Pages list, while an ASCII page's .md address (/wiki/Addr13-Test.md) loads its page normally. The accented page is unreachable in its .md form. (on /eval/harbor-handbook/wiki/Caf%C3%A913-Notes.md)",
+      "expected": "The .md address of an existing page resolves to that page, exactly as /wiki/Addr13-Test.md resolves to the \\\"Addr13 Test\\\" page; the accented page \\\"/wiki/Caf%C3%A913-Notes.md\\\" should show \\\"Café13 Notes\\\", not the Pages list.",
+      "actual": "The URL /eval/harbor-handbook/wiki/Caf%C3%A913-Notes.md shows the Pages list (title \\\"Pages - harbor-handbook\\\") with no message that the page is missing, even though the page exists and /wiki/Caf%C3%A913-Notes loads it. The same happens for another accented page: /wiki/Ren%C3%A9-%C3%9Cn%C3%AFcode.md shows the Pages list, while an ASCII page's .md address (/wiki/Addr13-Test.md) loads its page normally. The accented page is unreachable in its .md form.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1",
+        "Create a wiki page with an accented title: open https://5503-ipj8k3in3f2cenwjnb2vr.e2b.app/eval/harbor-handbook/wiki?action=_new, type \"Café13 Notes\" as the Page title, type any text in the content, click \"Save Page\" (the page then lives at /wiki/Caf%C3%A913-Notes and displays correctly)",
+        "Open https://5503-ipj8k3in3f2cenwjnb2vr.e2b.app/eval/harbor-handbook/wiki/Caf%C3%A913-Notes.md",
+        "For comparison open https://5503-ipj8k3in3f2cenwjnb2vr.e2b.app/eval/harbor-handbook/wiki/Addr13-Test.md (an ASCII-named page)"
+      ],
+      "reason": "A *.md address is unescaped and used directly as the Git file name, and the stored file is literally \"Caf%C3%A913-Notes.md\", so the typed address /wiki/Caf%C3%A913-Notes.md asks for a file \"Café13-Notes.md\" that does not exist. The app's own link for that file is double-escaped (GitEntryName | PathEscape) and missing pages redirect to the Pages list by design; the agent typed the address instead of using the link."
+    },
+    {
+      "name": "Wide Markdown tables in wiki content and in _Sidebar are cut off with no scroll area of their own",
+      "summary": "The table overflows the wiki content card: at rest the fifth column is clipped at the viewport edge ('Colur five'), and sideways scrolling moves the WHOLE document (the card's left border and the first column's text 'umn one' are cut off on the left, the header and footer shift with it). The table has no inner scroll container, so it cannot be scrolled on its own (unlike the code block on the same page, which does scroll inside itself). (on /eval/harbor-handbook/wiki/agent15-mobile-rich)",
+      "expected": "The markdown table scrolls inside its own container, or fits the card: the page itself never scrolls horizontally, and all column text stays readable within the 390px viewport.",
+      "actual": "The table overflows the wiki content card: at rest the fifth column is clipped at the viewport edge ('Colur five'), and sideways scrolling moves the WHOLE document (the card's left border and the first column's text 'umn one' are cut off on the left, the header and footer shift with it). The table has no inner scroll container, so it cannot be scrolled on its own (unlike the code block on the same page, which does scroll inside itself).",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and set the browser viewport to 390x844.",
+        "Open https://5503-ixlrdcr4kwxgn019fmdah.e2b.app/eval/harbor-handbook/wiki?action=_new",
+        "Title: agent15-mobile-rich. Content: a markdown table with 5 columns (headers 'Column one with a very long heading' … 'Column five'), two data rows.",
+        "Click Save Page, then open the page /eval/harbor-handbook/wiki/agent15-mobile-rich and scroll to the table.",
+        "Look at the right edge: the last column is cut off mid-word ('Colur five', cells cut) at the viewport edge.",
+        "Scroll the page to the right (trackpad/touch sideways scroll over the table)."
+      ],
+      "reason": "Gitea makes every rendered table its own horizontal scroll area (.markup table: display block, max-width 100%, overflow auto), and run2-01's own screenshots show the table scrolled inside the card while the page header stays put. In all three findings the cut sits at the box's inner padding edge, which is that scroll area's clip; no evidence shows a failed attempt to scroll the table itself, and hidden scrollbars are normal in the headless browser."
+    },
+    {
+      "name": "A wiki address containing %00 returns a blank 400 page",
+      "summary": "The server answers HTTP 400 with an empty body: the browser shows a completely blank white page — no site header, no error message, no link back to the wiki or anywhere else. Navigating away with the browser's Back button is the only way out. (on /eval/harbor-handbook/wiki/agent5-alpha%00.-)",
+      "expected": "A clean error state: an error page saying the page address is not valid (404/400 state) with the usual Gitea header and a way back to the wiki, like other wrong wiki addresses.",
+      "actual": "The server answers HTTP 400 with an empty body: the browser shows a completely blank white page — no site header, no error message, no link back to the wiki or anywhere else. Navigating away with the browser's Back button is the only way out.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1",
+        "Open the address https://5503-ixlrdcr4kwxgn019fmdah.e2b.app/eval/harbor-handbook/wiki/agent5-alpha%00.- (a wiki page address with an encoded NUL character %00 in the page name)",
+        "The response is HTTP 400 and the tab is a blank white page"
+      ],
+      "reason": "An encoded NUL byte is malformed input that no link in the app produces, and 400 Bad Request is the correct answer to it. The evidence does not show whether Gitea or the sandbox proxy sent the empty body, and no handler in the wiki router returns a 400."
+    },
+    {
+      "name": "A wiki page re-created under a deleted page's name shows the old page's revisions",
+      "summary": "The new page's header badge and the revision history page say \"5\" / \"5 Commits\", listing the whole life of the deleted page: \"Add recyc-14\" (the original), \"Update recyc-14\", \"Update recyc-14\", \"Delete page \\\"recyc-14.-\\\"\" and the new \"Add recyc-14\". The re-created page contains only the new content, yet it inherits the deleted page's revisions — including the deletion commit — and the count is 5 for a page that was just created, directly contradicting the delete dialog's \"cannot be undone\". (on /eval/harbor-handbook/wiki/recyc-14.-?action=_revision)",
+      "expected": "A page created again under a name whose earlier page was deleted should start with a fresh history: 1 revision (\"Add recyc-14\") and one commit, matching the \"Deleting the wiki page … cannot be undone\" promise — or, if old history is kept deliberately, the deleted page's revisions should not be presented as the new page's own revisions/count.",
+      "actual": "The new page's header badge and the revision history page say \"5\" / \"5 Commits\", listing the whole life of the deleted page: \"Add recyc-14\" (the original), \"Update recyc-14\", \"Update recyc-14\", \"Delete page \\\"recyc-14.-\\\"\" and the new \"Add recyc-14\". The re-created page contains only the new content, yet it inherits the deleted page's revisions — including the deletion commit — and the count is 5 for a page that was just created, directly contradicting the delete dialog's \"cannot be undone\".",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1, open /eval/harbor-handbook/wiki?action=_new, enter the page title \"recyc-14\", put \"Content A for recycle test\" in the body and click \"Save Page\".",
+        "Edit the page twice, changing the body to \"Content B for recycle test\" and then \"Content C for recycle test\", saving each time (the page now shows the revision badge \"3\").",
+        "On the page click the red \"Delete Page\" button, then \"Yes\" in the \"Deleting the wiki page \"recyc-14\" cannot be undone. Continue?\" dialog (the app returns to the wiki Home page).",
+        "Open /eval/harbor-handbook/wiki?action=_new again, use exactly the same title \"recyc-14\", put \"Content D for recycle test\" in the body and click \"Save Page\".",
+        "Look at the revision badge next to the page name and click it to open the revision history."
+      ],
+      "reason": "Wiki revisions are by design the Git log of the page's file path (FileCommitsCount and CommitsByFileAndRange on pageFilename), so a file re-created at the same path carries the earlier commits, delete commit included. \"Cannot be undone\" refers to the delete action in the UI, not to erasing Git history."
+    }
+  ]
+}

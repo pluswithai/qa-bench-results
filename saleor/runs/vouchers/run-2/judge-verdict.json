@@ -1,0 +1,304 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "saleor/areas/vouchers",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "c0d32be641a441633bb2a7be0b74e88b0c64f6a50a69fd2f9b16d5f797db9d05",
+    "known_invalid_sha256": "622c79d85ad1bc40d9f31cbc6e0a0778e7058a39068611d2fe47b5c57d1a2243",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "82",
+    "bugs": "23",
+    "flags": "0",
+    "known_hits": "16",
+    "extra_known_hits": "0",
+    "unverified": "3",
+    "outside_area_known_hits": "0",
+    "outside_area_known_invalid": "0",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "",
+    "outside_area_ground_truth_sha256": "e081a2269963248f11544c2446bf53ca302ea09fb9e703ef6df92a246ca324fa",
+    "outside_area_known_invalid_sha256": "c7467d59de35548dd68bda0da0053a849e91385612a1f08366ced9214d2bc54b",
+    "duplicates": "0",
+    "duplicate_known_hits": "0",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "4",
+    "known_misses": "4",
+    "precision": "0.8",
+    "recall": "0.1951219512195122",
+    "findings_per_minute": "0.766668796302212",
+    "correct_findings_per_minute": "0.5333348148189301",
+    "severity_1": "5",
+    "severity_3": "11",
+    "severity_5": "0",
+    "severity_sum": "38",
+    "score": "34",
+    "duration_seconds": "1799.995",
+    "partial": "true",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 1,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Matches the setup checklist double-counting manually added codes while the code table contains the correct number."
+      },
+      {
+        "groundTruthIndex": 11,
+        "reproStepsIndex": null,
+        "findingIndex": 2,
+        "reason": "Matches the incorrect Products title in the voucher channel chooser, but opens it through the setup checklist rather than Availability > Manage."
+      },
+      {
+        "groundTruthIndex": 3,
+        "reproStepsIndex": 0,
+        "findingIndex": 3,
+        "reason": "Matches Name sorting updating its indicator and URL without ordering rows by their displayed voucher names."
+      },
+      {
+        "groundTruthIndex": 35,
+        "reproStepsIndex": null,
+        "findingIndex": 5,
+        "reason": "Matches fractional usage limits being silently truncated on Save, not the separate fractional-cap persistence bug. This finding edits an existing voucher rather than creating one."
+      },
+      {
+        "groundTruthIndex": 39,
+        "reproStepsIndex": 0,
+        "findingIndex": 6,
+        "reason": "Matches the green Voucher updated notification appearing while a rejected zero minimum quantity and its validation error remain."
+      },
+      {
+        "groundTruthIndex": 56,
+        "reproStepsIndex": 0,
+        "findingIndex": 8,
+        "reason": "Matches the mobile voucher table leaving non-Name columns clipped and unreadable. The tablet observations extend the same reported layout failure."
+      },
+      {
+        "groundTruthIndex": 27,
+        "reproStepsIndex": 0,
+        "findingIndex": 9,
+        "reason": "Matches the 390px detail header clipping Active to Ac. The missing voucher name is an additional observation."
+      },
+      {
+        "groundTruthIndex": 7,
+        "reproStepsIndex": 0,
+        "findingIndex": 10,
+        "reason": "Matches the search control extending beyond the 390px viewport. It documents the initial overflow, but not the reference's additional typing-induced pane shift."
+      },
+      {
+        "groundTruthIndex": 5,
+        "reproStepsIndex": 0,
+        "findingIndex": 11,
+        "reason": "Matches rejected percentage creation still persisting an incomplete voucher and reserving its code, causing a duplicate-code error on retry."
+      },
+      {
+        "groundTruthIndex": 43,
+        "reproStepsIndex": 0,
+        "findingIndex": 12,
+        "reason": "Matches saving an empty enabled usage limit producing Voucher updated despite a rejected update and unchanged stored limit."
+      },
+      {
+        "groundTruthIndex": 51,
+        "reproStepsIndex": 0,
+        "findingIndex": 13,
+        "reason": "Matches setup guidance incorrectly claiming one shared percentage despite independently configurable per-channel percentages."
+      },
+      {
+        "groundTruthIndex": 29,
+        "reproStepsIndex": 0,
+        "findingIndex": 15,
+        "reason": "Matches a visibly accepted fractional minimum item quantity being silently truncated on successful Save."
+      },
+      {
+        "groundTruthIndex": 9,
+        "reproStepsIndex": 0,
+        "findingIndex": 16,
+        "reason": "Matches the country assignment dialog labeling its select-all checkbox as selecting channels."
+      },
+      {
+        "groundTruthIndex": 66,
+        "reproStepsIndex": 0,
+        "findingIndex": 20,
+        "reason": "Matches the tablet Countries navigation variant: the selected section changes without scrolling it into view."
+      },
+      {
+        "groundTruthIndex": 26,
+        "reproStepsIndex": 0,
+        "findingIndex": 1,
+        "reason": "Matches accepting an empty manual code and adding a blank Draft row. The finding does not check the later generation of a code on Save."
+      },
+      {
+        "groundTruthIndex": 13,
+        "reproStepsIndex": 0,
+        "findingIndex": 21,
+        "reason": "Matches the mobile Set value shortcut failing to reach Discount. The broader claim that the discount cannot be configured is not established by the shortcut failure alone."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 19,
+        "reproStepsIndex": 0,
+        "findingIndex": 4,
+        "reason": "Matches the rejected stale-tab overwrite claim. Human review accepts last-write-wins rather than requiring field merging or conflict detection."
+      },
+      {
+        "knownInvalidIndex": 15,
+        "reproStepsIndex": 0,
+        "findingIndex": 7,
+        "reason": "Matches the rejected missing-percentage complaint. The header chip intentionally identifies scope and discount type, not the amount."
+      },
+      {
+        "knownInvalidIndex": 10,
+        "reproStepsIndex": null,
+        "findingIndex": 17,
+        "reason": "A completely blank Start Date invoking the current date/time default matches the accepted behavior. This finding reaches it by clearing a saved date and explicitly entering an hour."
+      },
+      {
+        "knownInvalidIndex": 33,
+        "reproStepsIndex": 0,
+        "findingIndex": 19,
+        "reason": "Matches the rejected whitespace-only name claim. The optional internal name may be unnamed, with the list falling back to the code count."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 14,
+        "reason": "No reference describes Enter leaving raw search text in the filter field picker. The report does not establish whether an option was actually highlighted."
+      },
+      {
+        "findingIndex": 18,
+        "reason": "No reference identifies Ended versus Inactive terminology as a bug. The stale schedule-status reference concerns failure to update over time, not equivalent labels."
+      },
+      {
+        "findingIndex": 22,
+        "reason": "No reference covers the selection counter using the plural items for one selected voucher code."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 3,
+        "reason": "The described impact is overwriting a previously saved name, although that behavior is accepted."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 1,
+        "reason": "The claimed defect concerns header presentation only."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 3,
+        "reason": "The described keyboard interaction leaves the filter condition unusable until mouse intervention."
+      },
+      {
+        "findingIndex": 15,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 16,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 17,
+        "severity": 3,
+        "reason": "The described impact is a saved start time differing from the entered hour, although blank-date defaulting is accepted."
+      },
+      {
+        "findingIndex": 18,
+        "severity": 1,
+        "reason": "The claim concerns inconsistent wording for the same ended state."
+      },
+      {
+        "findingIndex": 19,
+        "severity": 1,
+        "reason": "The claimed impact is missing identifying text in the header and list."
+      },
+      {
+        "findingIndex": 20,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 21,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 22,
+        "severity": 1,
+        "reason": "This is a singular/plural copy defect."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

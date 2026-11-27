@@ -1,0 +1,125 @@
+{
+  "bugs": [
+    {
+      "name": "\"Update Avatar\" with no file chosen answers \"Your avatar has been updated.\"",
+      "summary": "The page redirects back to /user/settings with the green success band \"Your avatar has been updated.\" although no file was chosen. The avatar is unchanged on /eval (still the default identicon) — a success message with nothing behind it. (on /user/settings)",
+      "expected": "The page should refuse the empty submission with an error next to the avatar field (e.g. that no image file was chosen), and no success message should appear.",
+      "actual": "The page redirects back to /user/settings with the green success band \"Your avatar has been updated.\" although no file was chosen. The avatar is unchanged on /eval (still the default identicon) — a success message with nothing behind it.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-ibar5w2u23qskgb6cuz7t.e2b.app/user/settings",
+        "Scroll down to the Avatar section (\"Choose new avatar\" file input shows \"No file chosen\")",
+        "Click the \"Update Avatar\" button without choosing any file",
+        "Read the green confirmation band at the top and then open /eval to see the avatar"
+      ],
+      "reason": "The avatar form is a settings form whose file is optional: the handler explicitly supports a submit with no upload (it saves the avatar-source radio and has a commented branch for \"No avatar is uploaded but setting has been changed\"), so the success flash is the normal answer to a save with nothing new, like \"Update Profile\" with no edits. No data is lost or altered wrongly; asking for a \"no file chosen\" error is a preference."
+    },
+    {
+      "name": "/<user>?tab=packages shows the repository list with no tab highlighted",
+      "summary": "The page renders the full Repositories list (the four repositories with the 'Search repos…' box and Filter/Sort) and the address bar still says /eval?tab=packages, but no tab in the tab bar is marked active — nothing tells the user they are seeing the Repositories tab rather than Packages. /alex?tab=packages behaves the same. The real Packages page is /eval/-/packages and it does show an active 'Packages' tab with 'There are no packages yet.' (on /eval?tab=packages)",
+      "expected": "Either the Packages view (/eval/-/packages) is shown, or the page falls back to the Repositories tab with that tab visibly selected, so the user can tell which tab the address refers to.",
+      "actual": "The page renders the full Repositories list (the four repositories with the 'Search repos…' box and Filter/Sort) and the address bar still says /eval?tab=packages, but no tab in the tab bar is marked active — nothing tells the user they are seeing the Repositories tab rather than Packages. /alex?tab=packages behaves the same. The real Packages page is /eval/-/packages and it does show an active 'Packages' tab with 'There are no packages yet.'",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1",
+        "Open the address /eval?tab=packages directly",
+        "Compare with /eval?tab=stars (Starred Repositories tab is highlighted) and with /alex?tab=packages"
+      ],
+      "reason": "?tab=packages is not an address the app produces (the Packages tab links to /<user>/-/packages); it only appears when typed by hand. The handler deliberately falls back to the repository list for any unknown tab value, and the missing highlight for an unsupported value is a nit, not a failure a user meets through the UI."
+    },
+    {
+      "name": "Blocking an already blocked user answers \"Failed to block user: cannot block the user\"",
+      "summary": "A red banner appears: \\\"Fehler beim Sperren des Benutzers: cannot block the user\\\" — a raw English technical error inside the German UI, and the same user is still sitting in the \\\"Gesperrte Benutzer\\\" list right below the form. The search box also suggests users who are already blocked, which is how the mistake happens. (on /user/settings/blocked_users)",
+      "expected": "The page either does not offer users that are already blocked in the \\\"Benutzer durchsuchen ...\\\" suggestions, or it tells the person in plain German that this user is already blocked; it must not show a raw technical error string.",
+      "actual": "A red banner appears: \\\"Fehler beim Sperren des Benutzers: cannot block the user\\\" — a raw English technical error inside the German UI, and the same user is still sitting in the \\\"Gesperrte Benutzer\\\" list right below the form. The search box also suggests users who are already blocked, which is how the mistake happens.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-ibar5w2u23qskgb6cuz7t.e2b.app/user/settings/blocked_users.",
+        "Block a user first so that it appears under \"Gesperrte Benutzer\" (e.g. type \"maya\" in \"Benutzer durchsuchen ...\", press ArrowDown and Enter, then click \"Sperren\").",
+        "Type the same user name again in \"Benutzer durchsuchen ...\", choose the suggestion with ArrowDown and Enter, and click \"Sperren\".",
+        "The autocomplete still offers the already blocked user (maya, also alex earlier) and the submit answers \"Fehler beim Sperren des Benutzers: cannot block the user\".",
+        "Repeated a second time with maya after the first error: same raw error."
+      ],
+      "reason": "This is the handled, deliberate refusal: the service returns ErrCanNotBlock for an already blocked user and the page shows it in the designed error banner with the translated prefix; nothing is saved wrongly. A more specific sentence (\"already blocked\"), a translated error tail and filtering the autocomplete are improvements, not broken behaviour."
+    },
+    {
+      "name": "\"Unblock\" on a blocked user's profile opens the blocked-users settings page instead of unblocking",
+      "summary": "The browser only navigates to /user/settings/blocked_users (a plain GET, no unblock request) and maya is still in the 'Blocked users' list with 'You have blocked this user.' on her profile — the user stays blocked. (on /maya (profile of a blocked user))",
+      "expected": "The 'Unblock' control unblocks the user: the blocked user disappears from /user/settings/blocked_users and the profile shows a normal profile with a Follow button.",
+      "actual": "The browser only navigates to /user/settings/blocked_users (a plain GET, no unblock request) and maya is still in the 'Blocked users' list with 'You have blocked this user.' on her profile — the user stays blocked.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1, open /user/settings/blocked_users, type maya in 'Search users...', pick the maya suggestion, then click 'Block'",
+        "Open /maya — the profile shows 'You have blocked this user.' and an 'Unblock' link at the bottom of the left column",
+        "Click 'Unblock'",
+        "Look at the page you land on (/user/settings/blocked_users): maya is still listed under 'Blocked users'",
+        "Open /maya again: it still says 'You have blocked this user.' and still offers 'Unblock'"
+      ],
+      "reason": "Deliberate: on a blocked profile the template renders \"Unblock\" as a plain link to /user/settings/blocked_users, where the real Unblock button (a POST form) sits next to the user. The link works as built and the unblock is one click away on the page it opens."
+    },
+    {
+      "name": "Profile RSS feed claimed to be served as text/html and shown as escaped markup",
+      "summary": "The response is delivered with Content-Type text/html, so the browser prints the whole feed as escaped plain text: '&lt;?xml version=\"1.0\" ... &lt;title&gt;Feed of &#34;Agent1 Full Name&#34;&lt;/title&gt; ...'. A person clicking the profile's RSS link sees raw, escaped XML with no readable feed. (on /eval.rss)",
+      "expected": "The RSS feed opens as a feed/XML document (e.g. a browser XML tree or a feed view), as the 'RSS Feed' link promises.",
+      "actual": "The response is delivered with Content-Type text/html, so the browser prints the whole feed as escaped plain text: '&lt;?xml version=\"1.0\" ... &lt;title&gt;Feed of &#34;Agent1 Full Name&#34;&lt;/title&gt; ...'. A person clicking the profile's RSS link sees raw, escaped XML with no readable feed.",
+      "reproSteps": [
+        "Sign in as eval (username eval, password momentic-eval-1).",
+        "Open the profile /eval.",
+        "In the left profile card click the small RSS icon next to '0 Followers · 0 Following' (link /eval.rss).",
+        "Look at what the browser renders."
+      ],
+      "reason": "Not shown by the evidence: the screenshot displays the XML tags themselves (<channel>, <title>, <item>), which a text/html response would not show, and no response header was captured. Gitea sets Content-Type application/rss+xml for this route; Chromium has no feed viewer and prints RSS as plain text, and the &lt; / &#34; entities are normal XML escaping inside the feed. One check would settle it: curl -I /eval.rss."
+    },
+    {
+      "name": "\"admin\" label overlaps the avatar in the top navigation",
+      "summary": "The blue \"admin\" label (span.navbar-profile-admin, box 1222,6 30×17) is drawn on top of the user's avatar image (24×24 at 1217,13), hiding its middle; only two dots of the generated avatar pattern show below the label. The accessibility tree flags the avatar as \"partly covered by span.navbar-profile-admin\". The same overlap occurs at 768 px (avatar at 705,13 24×24 under the label at 710,6). (on /eval)",
+      "expected": "The \"admin\" label and the user avatar sit next to each other in the account menu so that the whole avatar is visible.",
+      "actual": "The blue \"admin\" label (span.navbar-profile-admin, box 1222,6 30×17) is drawn on top of the user's avatar image (24×24 at 1217,13), hiding its middle; only two dots of the generated avatar pattern show below the label. The accessibility tree flags the avatar as \"partly covered by span.navbar-profile-admin\". The same overlap occurs at 768 px (avatar at 705,13 24×24 under the label at 710,6).",
+      "reproSteps": [
+        "Sign in as eval (an administrator account) and open https://5503-io7gkkxhkz5bckp0f49nq.e2b.app/eval at 1280 px width",
+        "Look at the account menu in the top-right corner of the navigation bar",
+        "Compare the avatar image and the blue 'admin' label",
+        "Repeat at a 768 px wide viewport"
+      ],
+      "reason": "Deliberate design: the admin label is a corner badge placed with position:absolute (top:-1px; left:18px) over the 24px account avatar in Gitea's stock stylesheet, the same way on every page and width."
+    },
+    {
+      "name": "Private profile's RSS feed (/eval.rss) readable by a user who gets 404 on the profile page",
+      "summary": "/eval.rss returns HTTP 200 with the full feed of the private profile: the channel title shows the real full name ('agent6 Zoë O'Brien'), the description contains the profile's biography (markdown/HTML) and website, and every activity item (commits, branches, tags) is listed. The page and the feed disagree about the same profile's visibility. (on /eval.rss)",
+      "expected": "The profile of a user whose visibility is 'Private' ('Visible only to members of organizations you have joined') is not readable by a user who shares no organization with them, in any view — the page returns 404, and the RSS feed should be refused the same way.",
+      "actual": "/eval.rss returns HTTP 200 with the full feed of the private profile: the channel title shows the real full name ('agent6 Zoë O'Brien'), the description contains the profile's biography (markdown/HTML) and website, and every activity item (commits, branches, tags) is listed. The page and the feed disagree about the same profile's visibility.",
+      "reproSteps": [
+        "Sign in as eval (momentic-eval-1), open /user/settings.",
+        "In the Privacy block set 'User visibility' to 'Private' (tooltip/label: 'Visible only to members of organizations you have joined') and click 'Update Profile'.",
+        "Sign out, sign in as alex (momentic-contributor-1).",
+        "Open /eval — the profile page correctly returns '404 Not Found'.",
+        "Open /eval.rss in the same session."
+      ],
+      "reason": "The evidence proves only half: the video and shot-1 show alex getting 404 on /eval, but the feed screenshots carry no sign of who was signed in or of the profile's visibility at that moment, and other agents were editing the same eval profile in parallel (a stale profile form resets visibility to Public). In the 1.24.7 source the .rss route runs the same IsUserVisibleToViewer check as the profile page, so both should give 404. A human should check on a clean instance: set eval to Private, sign in as alex (not admin, no shared organization, eval not following alex), open /eval (404) and then /eval.rss in the same session; if the feed returns 200 this is a real privacy leak (accept, severity 3), if 404 reject."
+    },
+    {
+      "name": "Biography longer than 255 characters ends up cut to 255 with a success message",
+      "summary": "The save reports success, but only 255 characters are stored: the textarea now ends mid-word (\\\"\"...0123456\\\"\" in the first run, \\\"...-abcd\\\"\" in the second) and the end marker typed (END-AGENT7 / SECOND-END) is gone. Nothing on the page warns that the biography was shortened. Measured: 302 characters typed -> 255 stored; 320 typed -> 255 stored. The /maya profile card shows the same cut text. (on /user/settings)",
+      "expected": "Either the whole biography as typed is stored and shown back everywhere, or the form refuses the too-long text with a message saying what the limit is, so the person knows the end of their text was not kept.",
+      "actual": "The save reports success, but only 255 characters are stored: the textarea now ends mid-word (\\\"\"...0123456\\\"\" in the first run, \\\"...-abcd\\\"\" in the second) and the end marker typed (END-AGENT7 / SECOND-END) is gone. Nothing on the page warns that the biography was shortened. Measured: 302 characters typed -> 255 stored; 320 typed -> 255 stored. The /maya profile card shows the same cut text.",
+      "reproSteps": [
+        "Sign in as maya (password momentic-eval-1) and open /user/settings (the Profile tab).",
+        "Click into the Biography textarea (it has no character counter and no maxlength) and paste about 300 characters, e.g. \"agent7-second-start abcdefghij-...-SECOND-END\" (the first run used \"agent7-bio-start 0123456789 ... END-AGENT7\").",
+        "Click Update Profile.",
+        "Read the green message \"Your profile has been updated.\", then read the Biography textarea again."
+      ],
+      "reason": "The 255-character limit is deliberate and enforced in the field itself: the Biography textarea carries maxlength=\"255\" (the finding's \"no maxlength\" contradicts the 1.24.7 template), so the browser stops the text at 255 before it is sent, and the server form has the same MaxSize(255) rule. What reached the server was saved in full; a visible counter or warning is a preference."
+    },
+    {
+      "name": "Browser Back after signing out shows the previous settings page again",
+      "summary": "The account's Appearance settings page is shown again after sign-out: the whole settings form with the account's saved values (Theme \\\"gitea-dark\\\", Language \\\"English\\\") and the signed-in navbar (Notifications bell, Create \\\"+\\\", account avatar) is rendered, although the person is signed out and the top-right shows no user. Seen 2 times out of 2 tries (once on /user/settings/appearance). Reloading the restored page does send the visitor to /user/login, so the server still protects the address; the page itself is displayed from the browser's copy. (on /user/settings/appearance)",
+      "expected": "After signing out, the Back button must not show the signed-in account's settings page: it should lead to the sign-in page (or a page that does not show the account's settings and the signed-in navigation).",
+      "actual": "The account's Appearance settings page is shown again after sign-out: the whole settings form with the account's saved values (Theme \\\"gitea-dark\\\", Language \\\"English\\\") and the signed-in navbar (Notifications bell, Create \\\"+\\\", account avatar) is rendered, although the person is signed out and the top-right shows no user. Seen 2 times out of 2 tries (once on /user/settings/appearance). Reloading the restored page does send the visitor to /user/login, so the server still protects the address; the page itself is displayed from the browser's copy.",
+      "reproSteps": [
+        "Sign in at /user/login as eval (eval / momentic-eval-1).",
+        "Open /user/settings/appearance: the Appearance page with Theme \"gitea-dark\" and Language \"English\" is shown and the navbar has the signed-in controls.",
+        "Open the account menu at the top right (the avatar, \"Profile and Settings…\") and click \"Sign Out\".",
+        "You land on the home page with a \"Sign In\" button — you are signed out.",
+        "Press the browser's Back button.",
+        "The /user/settings/appearance page is displayed again with the account's settings form and the signed-in navbar."
+      ],
+      "reason": "The page shown is the browser's own stored copy of a page this browser already displayed; the server session is ended (a reload goes to /user/login, as the finding notes). Gitea chooses this cache policy on purpose: its code comment says \"max-age=0 + must-revalidate\" is preferred instead of \"no-store\" so browsers can restore pages on navigate-back."
+    }
+  ]
+}

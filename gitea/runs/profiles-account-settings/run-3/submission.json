@@ -1,0 +1,249 @@
+{
+  "fixture": "gitea/areas/profiles-account-settings",
+  "run": 3,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 204,
+      "name": "Repositories settings page says \"You do not own any repositories\" on an out-of-range page although the account owns one",
+      "summary": "The list area reads \\\"You do not own any repositories.\\\" — the same page on the default address lists \\\"eval/harbor-handbook 25 KiB\\\", and the profile shows Repositories 1, so the empty-state text contradicts the account's own data. Same message with ?page=999. (on /user/settings/repos?page=2)",
+      "expected": "The page should either show the first/last valid page of the list (the one owned repository) or say that there is no page 2, e.g. a proper \"no more results\" state; it must not claim the user owns no repositories when the same page lists one on page 1.",
+      "actual": "The list area reads \\\"You do not own any repositories.\\\" — the same page on the default address lists \\\"eval/harbor-handbook 25 KiB\\\", and the profile shows Repositories 1, so the empty-state text contradicts the account's own data. Same message with ?page=999.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1",
+        "Open https://5503-i7o8fz8bj9kf9tmt09ztp.e2b.app/user/settings/repos — the list shows one repository, \"eval/harbor-handbook 25 KiB\"",
+        "Change the address to https://5503-i7o8fz8bj9kf9tmt09ztp.e2b.app/user/settings/repos?page=2 (also reproduces with ?page=999)"
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 262,
+      "name": "Blocking a username that does not exist returns a raw 500 Internal Server Error page",
+      "summary": "The whole page is replaced by a bare \"500 Internal Server Error / Gitea Version: 1.24.7 / If you believe that this is a Gitea bug, please search for issues on GitHub...\" page (POST /user/settings/blocked_users → 500, one console error \"Failed to load resource: ... 500\"). The settings page and its sidebar are gone; the typed name is lost. (on /user/settings/blocked_users)",
+      "expected": "The page should refuse with a readable message next to the field, e.g. \"user agent4-no-such-user does not exist\" (like the inline \"Failed to block user: ...\" banner it already uses for other failures), and keep the rest of the Blocked users page usable.",
+      "actual": "The whole page is replaced by a bare \"500 Internal Server Error / Gitea Version: 1.24.7 / If you believe that this is a Gitea bug, please search for issues on GitHub...\" page (POST /user/settings/blocked_users → 500, one console error \"Failed to load resource: ... 500\"). The settings page and its sidebar are gone; the typed name is lost.",
+      "reproSteps": [
+        "Sign in as eval (username eval, password momentic-eval-1).",
+        "Open /user/settings/blocked_users (Settings → Blocked users).",
+        "In the 'Search users...' field of the 'Block a user' section type agent4-no-such-user.",
+        "Click the red 'Block' button."
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 341,
+      "name": "\"Update Avatar\" reports success with no file chosen and changes nothing",
+      "summary": "Clicking \\\"Update Avatar\\\" with no file selected shows the green banner \\\"Your avatar has been updated.\\\", saves the account as using a custom avatar (the \\\"Use Custom Avatar\\\" radio stays ticked after reload) while no avatar was uploaded, and the avatar on /eval and in the top-right account menu remains the same generated identicon. Seen 3 times out of 3 tries (also with the radio unticked). (on /user/settings)",
+      "expected": "With no file selected the form should refuse the update with an error next to \\\"Choose new avatar\\\" (e.g. no file chosen), or at least not report \\\"Your avatar has been updated.\\\" — and the avatar shown on /eval should change if the message says it was updated.",
+      "actual": "Clicking \\\"Update Avatar\\\" with no file selected shows the green banner \\\"Your avatar has been updated.\\\", saves the account as using a custom avatar (the \\\"Use Custom Avatar\\\" radio stays ticked after reload) while no avatar was uploaded, and the avatar on /eval and in the top-right account menu remains the same generated identicon. Seen 3 times out of 3 tries (also with the radio unticked).",
+      "reproSteps": [
+        "Sign in as eval (username eval / password momentic-eval-1) and open /eval: the avatar is the generated light-purple identicon.",
+        "Open /user/settings and scroll to the \"Avatar\" section.",
+        "Tick the \"Use Custom Avatar\" radio and choose no file in \"Choose new avatar\" (\"No file chosen\").",
+        "Click \"Update Avatar\".",
+        "The page reloads with the green banner \"Your avatar has been updated.\" and the \"Use Custom Avatar\" radio is still ticked after a reload of /user/settings.",
+        "Go back to /eval and reload: the avatar is still the same generated identicon, no image was uploaded."
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 386,
+      "name": "Following/Followers list card collapses to ~110px on a 390px screen and the name wraps letter by letter",
+      "summary": "The user card is squeezed to about 110px wide: the avatar sits top-left and the full name wraps to about one or two characters per line (\\\"Ma / ya / Che / n\\\"), with the \\\"Joined on\\\" text broken into two lines below it and the card floating at the left of a mostly empty content area. The same card renders at full width on the account settings \\\"Blocked users\\\" page. (on /eval?tab=following (also the Followers list))",
+      "expected": "The entry should use the available width of the content column, keeping the name on one line and the card readable, as it does at desktop width.",
+      "actual": "The user card is squeezed to about 110px wide: the avatar sits top-left and the full name wraps to about one or two characters per line (\\\"Ma / ya / Che / n\\\"), with the \\\"Joined on\\\" text broken into two lines below it and the card floating at the left of a mostly empty content area. The same card renders at full width on the account settings \\\"Blocked users\\\" page.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and make sure eval follows at least one user, so that /eval?tab=following lists an entry (when I saw it, the list contained \"Maya Chen\")",
+        "Set the browser window to a phone size, 390 x 844",
+        "Open https://5503-i7o8fz8bj9kf9tmt09ztp.e2b.app/eval?tab=following and scroll to the list entry under the tab bar",
+        "Compare with the same card at desktop width (1280px), where it is ~280px wide"
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 418,
+      "name": "Broken sentence on the Profile settings page: \"Control how your profile is show to other users.\"",
+      "summary": "The sentence under the \"Public Profile\" heading reads \"Control how your profile is show to other users.\" — \"is show\" is not grammatical. (on /user/settings)",
+      "expected": "The help text reads \"Control how your profile is shown to other users.\" (or \"is displayed\").",
+      "actual": "The sentence under the \"Public Profile\" heading reads \"Control how your profile is show to other users.\" — \"is show\" is not grammatical.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-i7o8fz8bj9kf9tmt09ztp.e2b.app/user/settings",
+        "Read the help text directly under the 'Public Profile' heading at the top of the form"
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 438,
+      "name": "Private profile's RSS feed (/eval.rss) still exposes the whole profile and activity to other users",
+      "summary": "/eval.rss returns HTTP 200 with the full feed of the private profile: the channel title shows the real full name ('agent6 Zoë O'Brien'), the description contains the profile's biography (markdown/HTML) and website, and every activity item (commits, branches, tags) is listed. The page and the feed disagree about the same profile's visibility. (on /eval.rss)",
+      "expected": "The profile of a user whose visibility is 'Private' ('Visible only to members of organizations you have joined') is not readable by a user who shares no organization with them, in any view — the page returns 404, and the RSS feed should be refused the same way.",
+      "actual": "/eval.rss returns HTTP 200 with the full feed of the private profile: the channel title shows the real full name ('agent6 Zoë O'Brien'), the description contains the profile's biography (markdown/HTML) and website, and every activity item (commits, branches, tags) is listed. The page and the feed disagree about the same profile's visibility.",
+      "reproSteps": [
+        "Sign in as eval (momentic-eval-1), open /user/settings.",
+        "In the Privacy block set 'User visibility' to 'Private' (tooltip/label: 'Visible only to members of organizations you have joined') and click 'Update Profile'.",
+        "Sign out, sign in as alex (momentic-contributor-1).",
+        "Open /eval — the profile page correctly returns '404 Not Found'.",
+        "Open /eval.rss in the same session."
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 442,
+      "name": "Follow on a profile with a block relationship fails with a raw \"Error 400 when calling …?action=follow\" toast",
+      "summary": "A red toast appears at the top of the page reading \"Error 400 when calling /alex?action=follow\"; the follow does not happen (counts stay 0 Followers · 0 Following), the button stays \"Follow\", and nothing on the profile explains why. The browser console logs \"Response Status Error Code 400 from /alex?action=follow\" and the XHR POST /alex?action=follow returns 400. The page looked identical to a normal profile, so the person has no way to know the account cannot be followed. (on /alex)",
+      "expected": "Either the Follow action succeeds and the button becomes \"Unfollow\" with the follower counts updating, or the app explains in words why the person cannot follow this account (e.g. a block notice) and does not offer an action that cannot work. No raw technical error should be shown.",
+      "actual": "A red toast appears at the top of the page reading \"Error 400 when calling /alex?action=follow\"; the follow does not happen (counts stay 0 Followers · 0 Following), the button stays \"Follow\", and nothing on the profile explains why. The browser console logs \"Response Status Error Code 400 from /alex?action=follow\" and the XHR POST /alex?action=follow returns 400. The page looked identical to a normal profile, so the person has no way to know the account cannot be followed.",
+      "reproSteps": [
+        "Sign in as maya (username maya, password momentic-eval-1) — the seeded contributor account.",
+        "Open https://5503-i7o8fz8bj9kf9tmt09ztp.e2b.app/alex.",
+        "The profile shows a normal, enabled blue/outlined \"Follow\" button (0 Followers · 0 Following).",
+        "Click \"Follow\".",
+        "Same failure was seen earlier signed in as eval on /maya (https://…/maya): page showed an enabled \"Follow\" button, clicking it gave the same raw 400 toast and the follow did not happen."
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 484,
+      "name": "Choosing فارسی (Persian) renders the UI left-to-right with no RTL direction",
+      "summary": "The document keeps lang=\\\"fa-IR\\\" but no dir attribute, so everything is laid out left-to-right: the settings sidebar and logo stay on the left, Persian headings/labels are left-aligned and the checkboxes sit to the left of their Persian labels, both at 1280px and at 390px. (on /user/settings/appearance)",
+      "expected": "With a right-to-left language selected the document should be laid out right-to-left (dir=rtl): the sidebar on the right, headings and labels right-aligned, checkboxes to the right of their labels, the navigation mirrored.",
+      "actual": "The document keeps lang=\\\"fa-IR\\\" but no dir attribute, so everything is laid out left-to-right: the settings sidebar and logo stay on the left, Persian headings/labels are left-aligned and the checkboxes sit to the left of their Persian labels, both at 1280px and at 390px.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-i7o8fz8bj9kf9tmt09ztp.e2b.app/user/settings/appearance",
+        "In the Language dropdown choose \"فارسی\" and click \"Update Language\"",
+        "Read the page: the interface text is Persian but the whole layout stays left-to-right (logo and navigation order, settings sidebar still on the left, Persian headings and checkbox labels left-aligned with the checkboxes on the left)",
+        "Reload the page (the language is kept) and check again; also set the window to 390x844 and check again"
+      ]
+    },
+    {
+      "index": 8,
+      "reported_at_seconds": 574,
+      "name": "Biography is silently cut to 255 characters but the page says \"Your profile has been updated.\"",
+      "summary": "The save reports success, but only 255 characters are stored: the textarea now ends mid-word (\\\"\"...0123456\\\"\" in the first run, \\\"...-abcd\\\"\" in the second) and the end marker typed (END-AGENT7 / SECOND-END) is gone. Nothing on the page warns that the biography was shortened. Measured: 302 characters typed -> 255 stored; 320 typed -> 255 stored. The /maya profile card shows the same cut text. (on /user/settings)",
+      "expected": "Either the whole biography as typed is stored and shown back everywhere, or the form refuses the too-long text with a message saying what the limit is, so the person knows the end of their text was not kept.",
+      "actual": "The save reports success, but only 255 characters are stored: the textarea now ends mid-word (\\\"\"...0123456\\\"\" in the first run, \\\"...-abcd\\\"\" in the second) and the end marker typed (END-AGENT7 / SECOND-END) is gone. Nothing on the page warns that the biography was shortened. Measured: 302 characters typed -> 255 stored; 320 typed -> 255 stored. The /maya profile card shows the same cut text.",
+      "reproSteps": [
+        "Sign in as maya (password momentic-eval-1) and open /user/settings (the Profile tab).",
+        "Click into the Biography textarea (it has no character counter and no maxlength) and paste about 300 characters, e.g. \"agent7-second-start abcdefghij-...-SECOND-END\" (the first run used \"agent7-bio-start 0123456789 ... END-AGENT7\").",
+        "Click Update Profile.",
+        "Read the green message \"Your profile has been updated.\", then read the Biography textarea again."
+      ]
+    },
+    {
+      "index": 9,
+      "reported_at_seconds": 607,
+      "name": "Unfollowing from the Followers tab leaves the unfollowed person in the list while the count drops to 0",
+      "summary": "The counts in the profile sidebar switch to \"0 Followers\" but the followers list still shows the unfollowed person's card (avatar, name, website link) until the page is reloaded. The same profile then contradicts itself: the header says 0 followers while one follower is listed. Reloading the tab shows the empty list, so it is a stale render, not a failed unfollow. Seen as eval -> maya (Persian UI) and as eval -> alex (English UI). (on /maya?tab=followers)",
+      "expected": "After clicking Unfollow, the follower's card disappears from the followers list at the same time as the \"Followers\" count in the sidebar drops to the new value; the count and the list agree.",
+      "actual": "The counts in the profile sidebar switch to \"0 Followers\" but the followers list still shows the unfollowed person's card (avatar, name, website link) until the page is reloaded. The same profile then contradicts itself: the header says 0 followers while one follower is listed. Reloading the tab shows the empty list, so it is a stale render, not a failed unfollow. Seen as eval -> maya (Persian UI) and as eval -> alex (English UI).",
+      "reproSteps": [
+        "Sign in as eval (username eval, password momentic-eval-1).",
+        "Open the profile of another user, e.g. https://5503-i7o8fz8bj9kf9tmt09ztp.e2b.app/maya, and click \"Follow\" (the count goes to 1 Followers).",
+        "Open the Followers tab: https://5503-i7o8fz8bj9kf9tmt09ztp.e2b.app/maya?tab=followers — the follower card of eval is listed and the sidebar shows \"1 Followers\".",
+        "Click the \"Unfollow\" button in the sidebar (same happened on /alex?tab=followers).",
+        "Look at the sidebar count and the followers list without reloading."
+      ]
+    },
+    {
+      "index": 10,
+      "reported_at_seconds": 644,
+      "name": "Back after signing out brings back the account's settings page",
+      "summary": "The account's Appearance settings page is shown again after sign-out: the whole settings form with the account's saved values (Theme \\\"gitea-dark\\\", Language \\\"English\\\") and the signed-in navbar (Notifications bell, Create \\\"+\\\", account avatar) is rendered, although the person is signed out and the top-right shows no user. Seen 2 times out of 2 tries (once on /user/settings/appearance). Reloading the restored page does send the visitor to /user/login, so the server still protects the address; the page itself is displayed from the browser's copy. (on /user/settings/appearance)",
+      "expected": "After signing out, the Back button must not show the signed-in account's settings page: it should lead to the sign-in page (or a page that does not show the account's settings and the signed-in navigation).",
+      "actual": "The account's Appearance settings page is shown again after sign-out: the whole settings form with the account's saved values (Theme \\\"gitea-dark\\\", Language \\\"English\\\") and the signed-in navbar (Notifications bell, Create \\\"+\\\", account avatar) is rendered, although the person is signed out and the top-right shows no user. Seen 2 times out of 2 tries (once on /user/settings/appearance). Reloading the restored page does send the visitor to /user/login, so the server still protects the address; the page itself is displayed from the browser's copy.",
+      "reproSteps": [
+        "Sign in at /user/login as eval (eval / momentic-eval-1).",
+        "Open /user/settings/appearance: the Appearance page with Theme \"gitea-dark\" and Language \"English\" is shown and the navbar has the signed-in controls.",
+        "Open the account menu at the top right (the avatar, \"Profile and Settings…\") and click \"Sign Out\".",
+        "You land on the home page with a \"Sign In\" button — you are signed out.",
+        "Press the browser's Back button.",
+        "The /user/settings/appearance page is displayed again with the account's settings form and the signed-in navbar."
+      ]
+    },
+    {
+      "index": 11,
+      "reported_at_seconds": 718,
+      "name": "Submitting the profile settings form from a stale signed-in tab after sign-out answers a bare \\\"Invalid CSRF token.\\\" page",
+      "summary": "A bare white page containing only the text \\\"Invalid CSRF token.\\\" is shown (HTTP 400 on POST /user/settings). There is no site header, no message explaining that the session ended and no sign-in form or link — the visitor is stranded with no way on. (on /user/settings)",
+      "expected": "The stale form submit should end with the visitor being sent to the sign-in page (as every other protected page does when signed out) with a readable message, and no profile change made.",
+      "actual": "A bare white page containing only the text \\\"Invalid CSRF token.\\\" is shown (HTTP 400 on POST /user/settings). There is no site header, no message explaining that the session ended and no sign-in form or link — the visitor is stranded with no way on.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Open https://5503-i7o8fz8bj9kf9tmt09ztp.e2b.app/user/settings in a second tab (tab B) and leave it there.",
+        "In the first tab, open the account menu at the top right and click \"Sign Out\" (the visitor is signed out).",
+        "Back in tab B (still showing the old, signed-in profile settings form), type a value into the \"Location\" field, e.g. agent11-stale-signout, and click the \"Update Profile\" button."
+      ]
+    },
+    {
+      "index": 12,
+      "reported_at_seconds": 759,
+      "name": "Refusing an invalid Website shows the raw key 'form.Website\"Url\" is not a valid URL.'",
+      "summary": "A pink error banner appears with the raw form key: `form.Website\"Url\" is not a valid URL.` The typed value is also discarded — the Website field is re-rendered with the previously stored URL instead of the value the person typed. (on /user/settings)",
+      "expected": "A readable message naming the field, e.g. \"Website: Url is not a valid URL.\", and the field keeps the value the person typed so it can be corrected.",
+      "actual": "A pink error banner appears with the raw form key: `form.Website\"Url\" is not a valid URL.` The typed value is also discarded — the Website field is re-rendered with the previously stored URL instead of the value the person typed.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-i7o8fz8bj9kf9tmt09ztp.e2b.app/user/settings",
+        "Replace the value of the 'Website' field with javascript:alert(1)",
+        "Click 'Update Profile'"
+      ]
+    },
+    {
+      "index": 13,
+      "reported_at_seconds": 923,
+      "name": "Persian (and German) UI leaves many interface strings untranslated: menu entries, the Hidden comment types panel and most of its checkbox labels stay English",
+      "summary": "Large parts of the settings interface stay in English: the side-menu heading \"User Settings\" and the entries \"Blocked users\", \"Packages\" and \"Webhooks\" (all other entries are Persian), the whole \"Hidden comment types\" panel - its heading, its description \"Comment types checked here will not be shown inside issue pages...\" and 13 of the 14 checkbox labels (Reference, Label, Milestone, Assignee, Branch, Time Tracking, Deadline, Dependency, Lock Status, Review request, Added commits, Project, Issue reference; only \"عنوان\" is translated) - and the link text \"Colorblindness Theme Support\". In the same class of failure, the German interface keeps the settings entry \"Account\" in English while every other entry is German (Profil, Erscheinung, Sicherheit ...). (on /user/settings/appearance)",
+      "expected": "A UI the app itself reports as Persian (footer language selector \"فارسی\", <html lang> and the Persian strings elsewhere) shows its menus and labels in Persian, like the rest of the page.",
+      "actual": "Large parts of the settings interface stay in English: the side-menu heading \"User Settings\" and the entries \"Blocked users\", \"Packages\" and \"Webhooks\" (all other entries are Persian), the whole \"Hidden comment types\" panel - its heading, its description \"Comment types checked here will not be shown inside issue pages...\" and 13 of the 14 checkbox labels (Reference, Label, Milestone, Assignee, Branch, Time Tracking, Deadline, Dependency, Lock Status, Review request, Added commits, Project, Issue reference; only \"عنوان\" is translated) - and the link text \"Colorblindness Theme Support\". In the same class of failure, the German interface keeps the settings entry \"Account\" in English while every other entry is German (Profil, Erscheinung, Sicherheit ...).",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /user/settings/appearance.",
+        "In the Language dropdown choose فارسی (Persian): the page reloads in Persian.",
+        "Read the settings side menu on the left and the \"Hidden comment types\" panel with its checkboxes."
+      ]
+    },
+    {
+      "index": 14,
+      "reported_at_seconds": 956,
+      "name": "A refused username throws away every other value typed in the profile form",
+      "summary": "The page shows the red error ('form.Name can only contain alphanumeric chars…', 'ev al' likewise refused) and reloads the Profile form from the database: Username is reset to 'eval', and Location and Website come back EMPTY although they held 'agent12-loc' and 'https://example.com/agent12' a moment before. Only values already stored in the database survive; everything typed in this submit is thrown away and has to be retyped. (on /user/settings)",
+      "expected": "A refused username is answered with a message next to the Username field and the form keeps the other values the person had already typed (Location, Website, Full Name, Biography), so they can fix the username and submit again.",
+      "actual": "The page shows the red error ('form.Name can only contain alphanumeric chars…', 'ev al' likewise refused) and reloads the Profile form from the database: Username is reset to 'eval', and Location and Website come back EMPTY although they held 'agent12-loc' and 'https://example.com/agent12' a moment before. Only values already stored in the database survive; everything typed in this submit is thrown away and has to be retyped.",
+      "reproSteps": [
+        "Sign in as eval (momentic-eval-1) and open /user/settings.",
+        "Type 'agent12-loc' into Location and 'https://example.com/agent12' into Website.",
+        "Replace the Username 'eval' with '@@@' (the same happens with 'ev al').",
+        "Click 'Update Profile'.",
+        "Read the form after the error: Location and Website are empty again."
+      ]
+    },
+    {
+      "index": 15,
+      "reported_at_seconds": 1046,
+      "name": "Repository search treats \"%\" and \"_\" as wildcards and returns every repository",
+      "summary": "Searching for % and for _ lists harbor-handbook (every repository on the profile) instead of nothing, while a normal term such as zzz correctly shows \\\"No matching results found.\\\" — the wildcard characters of the underlying search are passed through, so the box does not filter as it says. (on /eval?tab=repositories)",
+      "expected": "The search box should find only repositories whose name or description contains the typed text, like the zzz search does; a search for % or _ should show \\\"No matching results found.\\\" because no repository contains those characters.",
+      "actual": "Searching for % and for _ lists harbor-handbook (every repository on the profile) instead of nothing, while a normal term such as zzz correctly shows \\\"No matching results found.\\\" — the wildcard characters of the underlying search are passed through, so the box does not filter as it says.",
+      "reproSteps": [
+        "Sign in as alex (alex / momentic-contributor-1) and open https://5503-i7o8fz8bj9kf9tmt09ztp.e2b.app/eval?tab=repositories (profile of eval, whose only repository is harbor-handbook).",
+        "Click the \"Search repos...\" box, type a percent sign % and press Enter.",
+        "Observe the list: harbor-handbook is shown although neither its name nor its description contains a % sign.",
+        "Repeat with a single underscore _ in the same box and press Enter: harbor-handbook is shown again.",
+        "Repeat with zzz for comparison: the page says \"No matching results found.\""
+      ]
+    },
+    {
+      "index": 16,
+      "reported_at_seconds": 1157,
+      "name": "A whitespace-only block note is saved and shows a dangling \\\"Anmerkung:\\\" label with no text",
+      "summary": "The note with only spaces is accepted and stored: after saving a note made of three spaces the row shows the label \\\"Anmerkung:\\\" with nothing after it, and it stays like that after a full reload of /user/settings/blocked_users. The note is neither trimmed away nor treated as empty (a cleared note does remove the label). (on /user/settings/blocked_users)",
+      "expected": "A note that is only whitespace should be trimmed and treated as an empty note: either the edit is refused with a message, or the note is cleared and the row shows no \\\"Anmerkung:\\\" label at all.",
+      "actual": "The note with only spaces is accepted and stored: after saving a note made of three spaces the row shows the label \\\"Anmerkung:\\\" with nothing after it, and it stays like that after a full reload of /user/settings/blocked_users. The note is neither trimmed away nor treated as empty (a cleared note does remove the label).",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-i7o8fz8bj9kf9tmt09ztp.e2b.app/user/settings/blocked_users.",
+        "Block a user (search \"alex\", click \"Sperren\") with the note \"first note\" so the row appears with \"Anmerkung: first note\".",
+        "Click \"Anmerkung bearbeiten\", clear the field and type three spaces only, then click \"Speichern\".",
+        "Look at the blocked-user row and reload the page."
+      ]
+    }
+  ]
+}

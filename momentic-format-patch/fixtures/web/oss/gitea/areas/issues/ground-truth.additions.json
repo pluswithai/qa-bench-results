@@ -1,0 +1,100 @@
+{
+  "bugs": [
+    {
+      "name": "Escape no longer closes a sidebar picker (Assignees/Labels) once an entry has been clicked with the mouse",
+      "summary": "The Labels menu stayed open after two Escape presses, and the Assignees menu stayed open after two Escape presses; only a mouse click outside closes them. While open they cover the Milestone, Projects and Assignees rows, so a keyboard-only user cannot get out of the menu. (on /eval/harbor-handbook/issues/new)",
+      "expected": "Pressing Escape closes the open dropdown menu, as it does for the Milestone menu on the same page (Escape closed that one immediately).",
+      "actual": "The Labels menu stayed open after two Escape presses, and the Assignees menu stayed open after two Escape presses; only a mouse click outside closes them. While open they cover the Milestone, Projects and Assignees rows, so a keyboard-only user cannot get out of the menu.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-itj9npss7825cqyyppxe0.e2b.app/eval/harbor-handbook/issues/new",
+        "In the right sidebar click 'Labels' – the label list opens with a 'Filter Label' box",
+        "Press the Escape key twice",
+        "Observed: the label menu is still open, covering Milestone, Projects and Assignees",
+        "Click empty space on the left to close it, then click 'Assignees' and pick 'alex'",
+        "Press Escape twice – the assignee menu is still open as well"
+      ],
+      "severity": 3
+    },
+    {
+      "name": "\"Add dependency\" commits the first suggestion when the list is closed without a pick (Escape or clicking \"+\"), linking an issue the user never chose",
+      "summary": "A dependency on the unrelated issue #19 was created: the timeline says \\\"eval added a new dependency #19 agent10-special <b>x</b> & \\\\\\\"quotes\\\\\\\" 'single'🤖 José 100% _under_ end\\\" and \\\"Depends on\\\" lists #19. The same happened with the number 3 typed (dependency on #19 added instead of issue #3/its match); only with a title word (\\\"Review\\\") did the first entry match and the right issue (#4) get added. (on /eval/harbor-handbook/issues/12)",
+      "expected": "Clicking \"+\" after typing the issue number 2 should link issue #2 (the issue whose number was typed), or the app should refuse and ask which suggestion is meant. It must not silently link a different issue.",
+      "actual": "A dependency on the unrelated issue #19 was created: the timeline says \\\"eval added a new dependency #19 agent10-special <b>x</b> & \\\\\\\"quotes\\\\\\\" 'single'🤖 José 100% _under_ end\\\" and \\\"Depends on\\\" lists #19. The same happened with the number 3 typed (dependency on #19 added instead of issue #3/its match); only with a title word (\\\"Review\\\") did the first entry match and the right issue (#4) get added.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open the issue https://5503-itj9npss7825cqyyppxe0.e2b.app/eval/harbor-handbook/issues/12 (agent6-dep-a).",
+        "Scroll the right sidebar to the \"Dependencies\" section and click the \"Add dependency…\" search field.",
+        "Type the number 2 (issue #2 \"Clarify release ownership\" exists and is open).",
+        "The suggestion list shows \"#19 agent10-special <b>x</b> & \\\"quotes\\\" 'single'🤖 José 100% _under_ end\" first and \"#2 Clarify release ownership\" second.",
+        "Click the \"+\" button next to the field without picking an entry.",
+        "Read the timeline and the \"Depends on\" list in the sidebar."
+      ],
+      "severity": 3
+    },
+    {
+      "name": "\"Add dependency\" search: typing \"#1\" does not find issue #1",
+      "summary": "With the query \\\"#1\\\" the list shows a single, unrelated entry \\\"#11 agent9-bulk-1\\\" (its title happens to contain a 1); issue #1 is not offered. Typing \\\"1\\\" lists 10 results including \\\"#1 Expand the onboarding checklist\\\", and typing \\\"onboarding\\\" finds it too, so the issue exists and is searchable — only the \\\"#\\\" form, the one the list itself uses to label issues, fails and returns a misleading result. (on /eval/harbor-handbook/issues/4)",
+      "expected": "Typing the issue reference as the dropdown itself displays it (#1) should find issue #1 \\\"Expand the onboarding checklist\\\" in eval/harbor-handbook, as typing 1 or onboarding does.",
+      "actual": "With the query \\\"#1\\\" the list shows a single, unrelated entry \\\"#11 agent9-bulk-1\\\" (its title happens to contain a 1); issue #1 is not offered. Typing \\\"1\\\" lists 10 results including \\\"#1 Expand the onboarding checklist\\\", and typing \\\"onboarding\\\" finds it too, so the issue exists and is searchable — only the \\\"#\\\" form, the one the list itself uses to label issues, fails and returns a misleading result.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-izxouzvjflo86mc67ty9v.e2b.app/eval/harbor-handbook/issues/4",
+        "Scroll down to the right-hand sidebar section \"Dependencies\" (shows \"No dependencies set.\")",
+        "Click the \"Add dependency…\" dropdown and type #1 into its search field",
+        "Read the result list",
+        "For comparison, clear the field and type 1, then type onboarding"
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Issue number is drawn inside the title (\"8#\" before the last word) when the title ends with right-to-left text",
+      "summary": "The heading shows \\\"agent3-title-only 8# مرحبا\\\": the number jumps into the middle of the title and its own \\\"#\\\" is flipped to the right of the digits, so the title reads as two pieces with the issue number between them. Same with a title ending in an emoji + Arabic word (issue #18: \\\"agent3-special <b>x</b> & 'q' \\\"dq\\\" 100% _u_ José 18# 🚀 مرحبا\\\"). Latin-only titles are fine. (on /eval/harbor-handbook/issues/8)",
+      "expected": "The issue number is shown after the title as is does for every other issue (e.g. \\\"agent3-long-body #25\\\"), i.e. \\\"agent3-title-only مرحبا #8\\\".",
+      "actual": "The heading shows \\\"agent3-title-only 8# مرحبا\\\": the number jumps into the middle of the title and its own \\\"#\\\" is flipped to the right of the digits, so the title reads as two pieces with the issue number between them. Same with a title ending in an emoji + Arabic word (issue #18: \\\"agent3-special <b>x</b> & 'q' \\\"dq\\\" 100% _u_ José 18# 🚀 مرحبا\\\"). Latin-only titles are fine.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-izxouzvjflo86mc67ty9v.e2b.app/eval/harbor-handbook/issues/8 (my own issue, created for this test).",
+        "Click Edit next to the title, replace the title with: agent3-title-only مرحبا and click Save.",
+        "Look at the heading above the issue box, and at the same issue's row in the repository issue list."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Tabbing across the issue-list filters leaves each opened menu open, stacking Label, Milestone and Author menus on top of each other",
+      "summary": "Every filter dropdown opens as soon as Tab lands on it, and the previously opened one is not closed: after three Tabs the Label, Milestone and Author menus are all open at once, stacked and overlapping over each other and over the issue rows. The screenshots show the Milestone menu open on top of the still-open Label menu, and then the Author menu on top of both. (on /eval/harbor-handbook/issues)",
+      "expected": "Tab moves focus through the filter buttons with only a focus ring; a menu opens only when the user activates it (Enter/Space/click), and opening one menu closes any other open menu.",
+      "actual": "Every filter dropdown opens as soon as Tab lands on it, and the previously opened one is not closed: after three Tabs the Label, Milestone and Author menus are all open at once, stacked and overlapping over each other and over the issue rows. The screenshots show the Milestone menu open on top of the still-open Label menu, and then the Author menu on top of both.",
+      "reproSteps": [
+        "Open https://5503-izxouzvjflo86mc67ty9v.e2b.app/eval/harbor-handbook/issues",
+        "Click in the \"Search...\" box, then press Tab to reach the \"24 Open\" / \"8 Closed\" tabs and press Tab once more so focus lands on the \"Label\" filter button",
+        "Press Tab again (focus moves to \"Milestone\") and note that the Label menu stays open while the Milestone menu opens on top of it",
+        "Press Tab again (focus moves to \"Author\") — the Author menu opens on top of the still-open Milestone and Label menus"
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Assignee entry in the issue sidebar is a dead link (href=\"#\")",
+      "summary": "The assigned user's entry is an anchor with href=\"#\" (\\\"Alex Rivera alex\\\" -> /url: \\\"#\\\"). Clicking it does not open /alex: the address becomes .../issues/1# and the page stays on the issue, so the assignee name in the sidebar is a dead link. The Participants avatars and the timeline's \\\"alex\\\" links on the same page correctly go to /alex, and the sidebar milestone entry correctly goes to /eval/harbor-handbook/milestone/1. (on /eval/harbor-handbook/issues/1)",
+      "expected": "Clicking the assigned user in the issue sidebar should open that user's profile (/alex), like the avatar of the same user in the Participants block and in the assignment timeline entry.",
+      "actual": "The assigned user's entry is an anchor with href=\"#\" (\\\"Alex Rivera alex\\\" -> /url: \\\"#\\\"). Clicking it does not open /alex: the address becomes .../issues/1# and the page stays on the issue, so the assignee name in the sidebar is a dead link. The Participants avatars and the timeline's \\\"alex\\\" links on the same page correctly go to /alex, and the sidebar milestone entry correctly goes to /eval/harbor-handbook/milestone/1.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-izxouzvjflo86mc67ty9v.e2b.app/eval/harbor-handbook/issues/1 (an issue with an assignee).",
+        "In the right sidebar, find the Assignees block showing the user \"alex\" with their avatar.",
+        "Click the avatar or the name \"alex\".",
+        "Nothing opens: the address only gains a trailing \"#\" (.../issues/1#) and the page stays on the issue.",
+        "The same happens on issue #4 (assignee alex): clicking the sidebar assignee gives .../issues/4# and no profile page."
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Timeline of the blocking issue says \"added a new dependency #15\" while its sidebar says \"Blocks #15\"",
+      "summary": "The same page says both things: the timeline at the top reads \"eval added a new dependency\" followed by \"+ #15 agent7-dep-alpha\", while the sidebar panel \"Blocks\" on the right lists \"#15 agent7-dep-alpha\". The timeline entry copies the wording of the dependent side, so on the blocking issue it states the opposite direction of the relation shown in the sidebar of the same page. Seen the same way on #1 after #4 was made to depend on it (timeline \"added a new dependency + #4 Review the release ownership proposal\", sidebar \"Blocks #4\"). (on /eval/harbor-handbook/issues/17)",
+      "expected": "The timeline entry on the blocking issue should state the relation in its real direction (that the other issue was made to depend on this one), the same direction as the \"Blocks\" section of the sidebar; it should not read as if this issue had just been given a new dependency.",
+      "actual": "The same page says both things: the timeline at the top reads \"eval added a new dependency\" followed by \"+ #15 agent7-dep-alpha\", while the sidebar panel \"Blocks\" on the right lists \"#15 agent7-dep-alpha\". The timeline entry copies the wording of the dependent side, so on the blocking issue it states the opposite direction of the relation shown in the sidebar of the same page. Seen the same way on #1 after #4 was made to depend on it (timeline \"added a new dependency + #4 Review the release ownership proposal\", sidebar \"Blocks #4\").",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-ioyiuw0ebjuremypnxaoz.e2b.app/eval/harbor-handbook/issues/15 (agent7-dep-alpha)",
+        "In the sidebar panel \"Dependencies\" click the \"Add dependency…\" box, type agent7-dep-beta, pick \"#17 agent7-dep-beta\" and click \"+\"",
+        "Open https://5503-ioyiuw0ebjuremypnxaoz.e2b.app/eval/harbor-handbook/issues/17 (agent7-dep-beta)",
+        "Read the timeline near the top and then the \"Blocks\" panel in the right sidebar of the same page"
+      ],
+      "severity": 1
+    }
+  ]
+}

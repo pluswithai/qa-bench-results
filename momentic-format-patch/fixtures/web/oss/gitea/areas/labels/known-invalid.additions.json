@@ -1,0 +1,49 @@
+{
+  "bugs": [
+    {
+      "name": "Ticking a label in the sidebar Labels picker is only saved when the picker closes",
+      "summary": "The row shows a ✓ but no request is sent at that moment; after a reload the sidebar lists only \\\"documentation\\\" and \\\"enhancement\\\" — agent8-normal was never assigned and no timeline entry exists. A request to /eval/harbor-handbook/issues/labels is only sent when the tester clicks somewhere else on the page afterwards (clicking the page background then saved it), so ticking a label and leaving/reloading the page silently loses the assignment. Seen 5 times of 5 (documentation twice, enhancement once, agent8-normal twice). (on /eval/harbor-handbook/pulls/5)",
+      "expected": "Clicking a label in the picker assigns it: the label chip appears in the Labels sidebar box, a timeline entry \\\"eval added the agent8-normal label\\\" is written, and it is still there after a reload.",
+      "actual": "The row shows a ✓ but no request is sent at that moment; after a reload the sidebar lists only \\\"documentation\\\" and \\\"enhancement\\\" — agent8-normal was never assigned and no timeline entry exists. A request to /eval/harbor-handbook/issues/labels is only sent when the tester clicks somewhere else on the page afterwards (clicking the page background then saved it), so ticking a label and leaving/reloading the page silently loses the assignment. Seen 5 times of 5 (documentation twice, enhancement once, agent8-normal twice).",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-iat14q7nt2yjqq6nojtsc.e2b.app/eval/harbor-handbook/pulls/5 (my own PR \"agent7 labels test: release captain docs\"; the same happens on any issue/PR sidebar).",
+        "In the right sidebar click the \"Labels\" dropdown to open the label picker.",
+        "Type agent8-normal into the \"Filter Label\" box so only that label is listed.",
+        "Click the agent8-normal row once: a ✓ appears next to it and the row is ticked.",
+        "Reload the page (F5).",
+        "Look at the Labels box in the right sidebar and at the Timeline."
+      ],
+      "reason": "Deliberate design: Gitea documents that the multi-select sidebar combo \"defers the update until the dropdown is hidden\", and the code only calls doUpdate() in onHide for selection-mode=multiple. Reloading with the picker still open discards an uncommitted selection, which is the documented behaviour, not a lost save."
+    },
+    {
+      "name": "\"Exclusive\" checkbox cannot be ticked in the New/Edit Label dialog",
+      "summary": "The Exclusive checkbox never ticks: clicking exactly on its square, clicking its \"Exclusive\" text, and focusing it and pressing Space all leave it an empty square, and after Save + reopening Edit it is still unticked. In the same Edit Label dialog, a click of the same kind on the \"Archive Label\" checkbox right below it ticks immediately (blue checkmark), so the two checkboxes behave differently. Browser hit-testing on the Exclusive control reports the surrounding form intercepts the click, while the Archive one resolves to its input. (on /eval/harbor-handbook/labels)",
+      "expected": "Clicking the Exclusive checkbox (or its label) ticks it, and Save stores the exclusive state so it is still ticked when the label is opened again — as happens with the \"Archive Label\" checkbox in the same dialog.",
+      "actual": "The Exclusive checkbox never ticks: clicking exactly on its square, clicking its \"Exclusive\" text, and focusing it and pressing Space all leave it an empty square, and after Save + reopening Edit it is still unticked. In the same Edit Label dialog, a click of the same kind on the \"Archive Label\" checkbox right below it ticks immediately (blue checkmark), so the two checkboxes behave differently. Browser hit-testing on the Exclusive control reports the surrounding form intercepts the click, while the Archive one resolves to its input.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-iat14q7nt2yjqq6nojtsc.e2b.app/eval/harbor-handbook/labels",
+        "Click \"New Label\", type a name into Name and a colour such as #cc00aa into Color",
+        "Click the small square checkbox left of the word \"Exclusive\": nothing changes (two attempts, including a click on the \"Exclusive\" text)",
+        "Click \"Save\": the label is created with Exclusive off",
+        "Click \"Edit\" on that label (agent1-dblclick) and click the Exclusive checkbox again, then click \"Save\" and click \"Edit\" again: Exclusive is still unticked",
+        "In the same Edit dialog click the \"Archive Label\" checkbox just below: it ticks at once (blue checkmark)"
+      ],
+      "reason": "Deliberate: the checkbox is disabled (and force-unchecked) unless the label name has a scope, i.e. contains \"/\"; the names used (agent1-dblclick, repro-exclusive-j15) have none. The dialog says so right under the checkbox (\"Name the label scope/item to make it mutually exclusive...\") and the screenshot shows the control greyed out."
+    },
+    {
+      "name": "\"Least issues\" label sort orders by total issues while the row shows only open issues",
+      "summary": "The list is not in ascending order of the numbers shown: the tail reads agent14-tablet-label \"1 open issues/pull requests\", documentation \"2 open issues/pull requests\", then agent7-count \"1 open issues/pull requests\", then enhancement. The label with 1 open item is listed after the label with 2. After removing the label from closed issue #3 (leaving agent7-count with only its 1 open issue), the same sort put agent7-count correctly before documentation, so the order follows a count that includes closed issues, while the number on the page counts only open ones. (on /eval/harbor-handbook/labels?sort=leastissues&state=)",
+      "expected": "Under \"Least issues\" the labels are ordered by the number shown next to them, smallest first, so a label with \"1 open issues/pull requests\" always comes before a label with \"2 open issues/pull requests\".",
+      "actual": "The list is not in ascending order of the numbers shown: the tail reads agent14-tablet-label \"1 open issues/pull requests\", documentation \"2 open issues/pull requests\", then agent7-count \"1 open issues/pull requests\", then enhancement. The label with 1 open item is listed after the label with 2. After removing the label from closed issue #3 (leaving agent7-count with only its 1 open issue), the same sort put agent7-count correctly before documentation, so the order follows a count that includes closed issues, while the number on the page counts only open ones.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-ihto2i2dj1c31tlfb1unv.e2b.app/eval/harbor-handbook/labels",
+        "Create a label named \"agent7-count\" (a color must be typed in the Color field first, e.g. #00aabb)",
+        "Open open issue #2 (https://5503-ihto2i2dj1c31tlfb1unv.e2b.app/eval/harbor-handbook/issues/2), click \"Labels\" in the right sidebar, pick \"agent7-count\", then click anywhere outside the picker so it saves",
+        "Open closed issue #3 (https://5503-ihto2i2dj1c31tlfb1unv.e2b.app/eval/harbor-handbook/issues/3) and give it the same \"agent7-count\" label the same way",
+        "Go back to the labels page, open the \"Sort\" menu and choose \"Least issues\" (or open .../labels?sort=leastissues&state=)",
+        "Scroll to the end of the label list and compare the order of the last labels with their counts"
+      ],
+      "reason": "The sort is coded to order by the label's total issue count (num_issues, open + closed), which matches its menu text \"Least issues\"; the number in each row is a different, explicitly named metric (\"N open issues/pull requests\" = NumIssues - NumClosedIssues). The list is correctly ordered by what the option names, so no promise of the app is broken, even though the total is not shown on the page."
+    }
+  ]
+}

@@ -1,0 +1,85 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "metabase/areas/querying",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "b0bba52944c876018da80109a6e1289563723ba2bd75f22353c6dea0f14371fd",
+    "known_invalid_sha256": "55d68abd02f312dcda01a1ada8e1f4954936eb0986a754fa64802e47bcad7e97",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "131",
+    "bugs": "3",
+    "flags": "0",
+    "known_hits": "1",
+    "extra_known_hits": "0",
+    "unverified": "2",
+    "outside_area_known_hits": "0",
+    "outside_area_known_invalid": "0",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "",
+    "outside_area_ground_truth_sha256": "18765609374b28bc9ff8c4d574f183a1cec470472e42a7e8bae343da32e17da8",
+    "outside_area_known_invalid_sha256": "bda5fa1dae2abd3dbc884c784d0bd82ccd854fe93bc63cc4126be5e14c0b4c18",
+    "duplicates": "0",
+    "duplicate_known_hits": "0",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "0",
+    "known_misses": "0",
+    "precision": "1",
+    "recall": "0.007633587786259542",
+    "findings_per_minute": "0.1073616064159296",
+    "correct_findings_per_minute": "0.0357872021386432",
+    "severity_1": "1",
+    "severity_3": "0",
+    "severity_5": "0",
+    "severity_sum": "1",
+    "score": "1",
+    "duration_seconds": "1676.577",
+    "partial": "false",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 25,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Matches the whitespace-only inline rename: the title becomes blank without validation feedback, and reloading restores the saved name."
+      }
+    ],
+    "invalidMatches": [],
+    "unverified": [
+      {
+        "findingIndex": 1,
+        "reason": "No entry covers multi-statement SQL showing only the first result. Ground truth 22 concerns an export mismatch after running a selected statement."
+      },
+      {
+        "findingIndex": 2,
+        "reason": "No entry covers wildcard matching in starting-data search. The listed wildcard bugs concern query filters, not source-name searches."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 3,
+        "reason": "The claim describes incomplete query execution without warning, a functional failure rather than a cosmetic issue."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "The search returns unrelated sources instead of filtering names by the entered text."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

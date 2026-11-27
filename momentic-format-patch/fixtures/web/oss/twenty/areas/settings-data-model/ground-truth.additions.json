@@ -1,0 +1,133 @@
+{
+  "bugs": [
+    {
+      "name": "Skills table: the Type column is empty on every row",
+      "summary": "For every one of the 15 rows the Type cell is blank: only the header word \"Type\" is drawn, at the same height as the Name header, with an empty area of about 120 px under it in every row, including the custom skill 'agent15-cancelled-name' I created. No row ever shows a Type value, at desktop (1280), tablet (768) and phone (390) widths. (on /settings/ai#skills)",
+      "expected": "Each skill row shows a Type value under the Type column header (for example whether the skill is built-in or custom, or the type of its deactivated state).",
+      "actual": "For every one of the 15 rows the Type cell is blank: only the header word \"Type\" is drawn, at the same height as the Name header, with an empty area of about 120 px under it in every row, including the custom skill 'agent15-cancelled-name' I created. No row ever shows a Type value, at desktop (1280), tablet (768) and phone (390) widths.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open Settings > AI, then the Skills tab (/settings/ai#skills).",
+        "Look at the 'Type' column: the header is drawn on the right of 'Name' (around x=590 at 768 px width, x=965 at 1280 px).",
+        "Read the rows below the header, including a skill created in this session ('agent15-cancelled-name')."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "New Webhook: the Description section repeats the Endpoint URL helper text",
+      "summary": "The Description field's helper text reads \\\"We will send a POST request to this endpoint for each new event in application/json format.\\\" — the same sentence as the Endpoint URL helper, which describes the URL and not a description. It tells the user nothing about what the Description field is for. (on /settings/mcp-apis/webhooks/new)",
+      "expected": "The Description field has its own helper text describing a description (e.g. \\\"Optional note to recognise this webhook\\\"), not a copy of the Endpoint URL helper.",
+      "actual": "The Description field's helper text reads \\\"We will send a POST request to this endpoint for each new event in application/json format.\\\" — the same sentence as the Endpoint URL helper, which describes the URL and not a description. It tells the user nothing about what the Description field is for.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev and open Settings > MCP & APIs.",
+        "Click the \"Webhooks\" tab, then \"Create webhook\" (URL /settings/mcp-apis/webhooks/new).",
+        "Read the helper text under the \"Endpoint URL\" heading and under the \"Description\" heading."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Hand-typed settings addresses with no matching page (/settings, /settings/does-not-exist) render an empty pane",
+      "summary": "The settings UI is never rendered: the page shows the normal workspace sidebar (Companies, People, Tasks, ...) next to an empty main area, with no settings navigation, no default settings page, no not-found message and no way on. Reloading keeps the same blank state. (on /settings)",
+      "expected": "Opening /settings with no subpage opens Settings on a sensible default page (e.g. Settings > Profile) with the settings navigation, or answers a clear not-found page with a link back.",
+      "actual": "The settings UI is never rendered: the page shows the normal workspace sidebar (Companies, People, Tasks, ...) next to an empty main area, with no settings navigation, no default settings page, no not-found message and no way on. Reloading keeps the same blank state.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev.",
+        "Enter the address https://5500-ihwe0ejky0mc6llacv6bz.e2b.app/settings (Settings with no subpage) and press Enter.",
+        "Look at the main content area of the page."
+      ],
+      "severity": 3
+    },
+    {
+      "name": "API key created with \"30 days\" expiration reads \"Expires in 29 days\" right after saving",
+      "summary": "Immediately after saving, the key's page shows \\\"Expires in 29 days\\\" for the \\\"30 days\\\" choice and \\\"Expires in 89 days\\\" for the \\\"90 days\\\" choice (and the API tab list shows the same \\\"In 29 days\\\"), always one day short of what was chosen. (on /settings/mcp-apis/apis/new (result on /settings/mcp-apis/apis/<key id> and the API tab list))",
+      "expected": "A key created with the \\\"30 days\\\" expiration reports 30 days of validity (\\\"Expires in 30 days\\\"), and the list column agrees with the chosen option.",
+      "actual": "Immediately after saving, the key's page shows \\\"Expires in 29 days\\\" for the \\\"30 days\\\" choice and \\\"Expires in 89 days\\\" for the \\\"90 days\\\" choice (and the API tab list shows the same \\\"In 29 days\\\"), always one day short of what was chosen.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open Settings > MCP & APIs > API tab > \"Create API key\".",
+        "Type a name (e.g. agent9-exp30) in \"Name\".",
+        "Open the \"Expiration Date\" field (showing \"Never\") and choose \"30 days\".",
+        "Click \"Save\" and read the \"Expiration\" field of the key that was created: it says \"Expires in 29 days\" (the API tab list shows \"In 29 days\" for the same key).",
+        "Repeat with a new key and the \"90 days\" option: the saved key says \"Expires in 89 days\"."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Clearing the \"Erasure of soft-deleted records\" field turns it into 0 and saves 0 days",
+      "summary": "The field silently becomes 0 and the value 0 is saved to the workspace: after a page reload the field shows 0. \\\"Permanent deletion. Enter the number of days.\\\" — 0 days means soft-deleted records are erased immediately, and nothing warned or blocked the empty value (typing -5 also ends up as 0). (on /settings/general#security)",
+      "expected": "An empty or invalid value is refused (or the previous value 14 is kept) with a message next to the field; a destructive retention value like 0 is never saved silently.",
+      "actual": "The field silently becomes 0 and the value 0 is saved to the workspace: after a page reload the field shows 0. \\\"Permanent deletion. Enter the number of days.\\\" — 0 days means soft-deleted records are erased immediately, and nothing warned or blocked the empty value (typing -5 also ends up as 0).",
+      "reproSteps": [
+        "Sign in with tim@apple.dev / tim@apple.dev",
+        "Open https://5500-i2yxv3mesmjzdnyssnas5.e2b.app/settings/general#security and scroll to the \"Other\" section",
+        "In \"Erasure of soft-deleted records\" (shows 14) clear the number field so it is empty and click elsewhere on the page (e.g. the \"Audit Logs\" heading)",
+        "The field shows 0 — reload the page (browser reload) and scroll back to the section"
+      ],
+      "severity": 3
+    },
+    {
+      "name": "New Approved Access Domain: empty Domain shows a length/special-character message instead of \"required\"",
+      "summary": "The Domain field shows \"Domains have to be smaller than 256 characters, cannot contain spaces and cannot contain any special characters.\" while the field is empty, so the message describes problems that do not exist and never says the field is required (the Email field next to it does show the correct \"Email cannot be empty\"). (on /settings/security/approved-access-domain/new)",
+      "expected": "Saving with an empty Domain should say the Domain is required (e.g. \"Domain cannot be empty\"), as the Email verification field correctly does.",
+      "actual": "The Domain field shows \"Domains have to be smaller than 256 characters, cannot contain spaces and cannot contain any special characters.\" while the field is empty, so the message describes problems that do not exist and never says the field is required (the Email field next to it does show the correct \"Email cannot be empty\").",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open Settings > Members.",
+        "On the Members page open the Invite tab (/settings/members#invite).",
+        "In the Approved Domains section click \"Add Approved Access Domain\" (opens /settings/security/approved-access-domain/new).",
+        "Leave the Domain field empty and click Save."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "A very long workspace name runs off both edges of the sign-in screen and adds a horizontal scrollbar",
+      "summary": "The greeting is rendered on one unbroken line: the name runs off both edges of the window, the document becomes 2958 px wide on a 1280 px viewport, and the page gets a horizontal scrollbar with the name cut off. The Name field on Settings > General has no maximum length (no maxlength, no validation), so this value was saved and is what every visitor sees on the sign-in screen. (on /welcome)",
+      "expected": "The sign-in greeting stays inside the window: the workspace name wraps or is truncated with an ellipsis, no horizontal scrolling, nothing cut off.",
+      "actual": "The greeting is rendered on one unbroken line: the name runs off both edges of the window, the document becomes 2958 px wide on a 1280 px viewport, and the page gets a horizontal scrollbar with the name cut off. The Name field on Settings > General has no maximum length (no maxlength, no validation), so this value was saved and is what every visitor sees on the sign-in screen.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev and open https://5500-i2yxv3mesmjzdnyssnas5.e2b.app/settings/general",
+        "In the Name field under \"Name of your workspace\", paste a very long workspace name of 260 characters (agent10- followed by 255 'A' characters); the field accepts it without any length limit",
+        "Press Tab to save and reload the page: the long name is stored",
+        "Open https://5500-i2yxv3mesmjzdnyssnas5.e2b.app/welcome (the sign-in screen)"
+      ],
+      "severity": 1
+    },
+    {
+      "name": "REST API playground: link reads \"Find out more about **Twenty**\" with literal asterisks",
+      "summary": "The button/label reads \\\"Find out more about **Twenty**\\\" — the Markdown asterisks are rendered as literal characters instead of bold text, so a raw formatting artefact is shown to the user. (on /settings/playground/rest/core)",
+      "expected": "The label reads \\\"Find out more about Twenty\\\" (bold) with no asterisks, like the other buttons next to it (\\\"AGPL-3.0\\\", \\\"Terms of Service\\\").",
+      "actual": "The button/label reads \\\"Find out more about **Twenty**\\\" — the Markdown asterisks are rendered as literal characters instead of bold text, so a raw formatting artefact is shown to the user.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev",
+        "Go to Settings > MCP & APIs",
+        "On the API tab click \"Launch\" next to Schema \"Core\" / API \"REST\"",
+        "In the \"Twenty Api\" introduction that loads, read the row of buttons under the title"
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Layout customization: a folder with an empty name makes Save fail with only \"Failed to save layout customization\"",
+      "summary": "'Save' is enabled and the empty-named row stays in the sidebar. Clicking Save shows only a generic toast at the bottom right: 'Failed to save layout customization'. Nothing marks the folder name as required or invalid, the field gets no error, and the console logs 'CombinedGraphQLErrors: Multiple validation errors occurred while creating navigation menu items'. Every other pending layout edit in the same session is left unsaved. (on /settings/layout (Layout customization))",
+      "expected": "Either the name cannot be emptied / Save is blocked, or the page says next to the field that a folder name is required and which item blocks the save.",
+      "actual": "'Save' is enabled and the empty-named row stays in the sidebar. Clicking Save shows only a generic toast at the bottom right: 'Failed to save layout customization'. Nothing marks the folder name as required or invalid, the field gets no error, and the console logs 'CombinedGraphQLErrors: Multiple validation errors occurred while creating navigation menu items'. Every other pending layout edit in the same session is left unsaved.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open /settings/layout",
+        "Click 'Customize' in the 'Customize layout' card",
+        "Click 'Add menu item' at the bottom of the sidebar, then 'Folder'",
+        "Clear the 'Folder name' field so it is empty (the sidebar row shows only a folder icon, no label)",
+        "Click 'Save' in the top bar"
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Deactivated field page: Danger zone still says \"Deactivate this field\" above an \"Activate\" button",
+      "summary": "The page shows no \"Deactivated\" indicator anywhere (the Name field, the Values panel and the page title look exactly like an active field), and the Danger zone subtitle still reads \"Deactivate this field\" while its only state action is the \"Activate\" button. The deactivated state is only visible in the object's field list. (on /settings/objects/agent4Things/agent4Renamed)",
+      "expected": "A deactivated field's detail page should say that the field is deactivated (and the Danger zone should describe the action it actually offers, \"Activate this field\"), so an admin can tell the field's state without going back to the object's field list.",
+      "actual": "The page shows no \"Deactivated\" indicator anywhere (the Name field, the Values panel and the page title look exactly like an active field), and the Danger zone subtitle still reads \"Deactivate this field\" while its only state action is the \"Activate\" button. The deactivated state is only visible in the object's field list.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev and go to /settings/objects.",
+        "Open the object I created earlier, Agent4Things, then open its field \"agent4Renamed\" (/settings/objects/agent4Things/agent4Renamed).",
+        "Scroll to the Danger zone and click \"Deactivate\" (the field is then marked \"Deactivated\" in the object's field list).",
+        "Open the same field page /settings/objects/agent4Things/agent4Renamed again and read the top of the page and the Danger zone."
+      ],
+      "severity": 1
+    }
+  ]
+}

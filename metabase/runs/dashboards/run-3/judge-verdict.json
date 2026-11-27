@@ -1,0 +1,272 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "metabase/areas/dashboards",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "a29eb196c93da55c3af4643e298d77fef4d81535a124dba0c35439c999c41a90",
+    "known_invalid_sha256": "a1fbd65686f5b66009e6e0a14915dfd1b66fa897f44669a1ec7e4f29fee4465e",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "95",
+    "bugs": "21",
+    "flags": "0",
+    "known_hits": "6",
+    "extra_known_hits": "0",
+    "unverified": "8",
+    "outside_area_known_hits": "0",
+    "outside_area_known_invalid": "0",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "",
+    "outside_area_ground_truth_sha256": "18765609374b28bc9ff8c4d574f183a1cec470472e42a7e8bae343da32e17da8",
+    "outside_area_known_invalid_sha256": "bda5fa1dae2abd3dbc884c784d0bd82ccd854fe93bc63cc4126be5e14c0b4c18",
+    "duplicates": "0",
+    "duplicate_known_hits": "0",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "7",
+    "known_misses": "7",
+    "precision": "0.46153846153846156",
+    "recall": "0.06315789473684211",
+    "findings_per_minute": "0.6999879446520644",
+    "correct_findings_per_minute": "0.19999655561487553",
+    "severity_1": "3",
+    "severity_3": "3",
+    "severity_5": "0",
+    "severity_sum": "12",
+    "score": "5",
+    "duration_seconds": "1800.031",
+    "partial": "true",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 24,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "The sample dashboard's History shows the same “undefined modified this” author text. The finding also reports a blank creator section."
+      },
+      {
+        "groundTruthIndex": 0,
+        "reproStepsIndex": 0,
+        "findingIndex": 5,
+        "reason": "More info is invisible in fullscreen and appears immediately after exiting fullscreen, exactly matching the reference."
+      },
+      {
+        "groundTruthIndex": 22,
+        "reproStepsIndex": 0,
+        "findingIndex": 8,
+        "reason": "The inline whitespace rename leaves a blank title after a rejected save, with no feedback, and reload restores the old name."
+      },
+      {
+        "groundTruthIndex": 1,
+        "reproStepsIndex": 0,
+        "findingIndex": 11,
+        "reason": "Product breakdown retains every category and unchanged percentages while a single Product Category is selected."
+      },
+      {
+        "groundTruthIndex": 52,
+        "reproStepsIndex": 0,
+        "findingIndex": 19,
+        "reason": "Canceling the Back-navigation confirmation retains the dashboard editor but leaves the collection address in the URL."
+      },
+      {
+        "groundTruthIndex": 7,
+        "reproStepsIndex": 0,
+        "findingIndex": 20,
+        "reason": "Reverting away the active tab leaves no surviving tab selected and falsely shows an empty dashboard until a remaining tab is clicked."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 7,
+        "reproStepsIndex": null,
+        "findingIndex": 6,
+        "reason": "The rendered Markdown link has an empty href and navigates Home, matching the rejected empty-destination behavior. Here the empty href results from a malformed scheme."
+      },
+      {
+        "knownInvalidIndex": 48,
+        "reproStepsIndex": 0,
+        "findingIndex": 7,
+        "reason": "This is the same current-period category-revenue empty state. The card's saved previous-four-month restriction excludes today's data."
+      },
+      {
+        "knownInvalidIndex": 8,
+        "reproStepsIndex": 0,
+        "findingIndex": 10,
+        "reason": "This matches the rejected claim that link cards should validate or normalize text rather than accept it as a relative URL leading to not-found."
+      },
+      {
+        "knownInvalidIndex": 42,
+        "reproStepsIndex": 0,
+        "findingIndex": 12,
+        "reason": "This is the same description soft-line-break collapse rejected because descriptions render as Markdown."
+      },
+      {
+        "knownInvalidIndex": 22,
+        "reproStepsIndex": 0,
+        "findingIndex": 15,
+        "reason": "This is the same stale-dashboard snapshot overwriting another session's saved work without conflict detection, rejected as last-write-wins behavior."
+      },
+      {
+        "knownInvalidIndex": 27,
+        "reproStepsIndex": 0,
+        "findingIndex": 18,
+        "reason": "This matches the rejected long-heading overflow claim: wrapped lines are clipped by the default single-row card height."
+      },
+      {
+        "knownInvalidIndex": 2,
+        "reproStepsIndex": 0,
+        "findingIndex": 14,
+        "reason": "This matches the rejected impossible-calendar-date rollover claim in the fixed date picker. The finding does not establish that the impossible text remains after blur."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 1,
+        "reason": "No reference describes extra tooltip metrics or a failing tooltip-column configuration."
+      },
+      {
+        "findingIndex": 2,
+        "reason": "No reference covers nonnumeric dashboard IDs remaining on a loading spinner."
+      },
+      {
+        "findingIndex": 3,
+        "reason": "No reference covers mobile text-card body clipping. The heading-overflow and vertical-alignment entries describe different failures."
+      },
+      {
+        "findingIndex": 4,
+        "reason": "The reference text-overflow bug hides beginning content after Bottom or Middle alignment; this finding loses trailing content without that configuration."
+      },
+      {
+        "findingIndex": 9,
+        "reason": "No reference describes a progress bar displaying full completion for a zero value."
+      },
+      {
+        "findingIndex": 13,
+        "reason": "No reference covers whitespace validation in the creation dialog. The title-edit references instead describe failed saves without explanatory validation."
+      },
+      {
+        "findingIndex": 16,
+        "reason": "No reference describes a link-card autocomplete opening automatically on entering edit mode and resisting Escape dismissal."
+      },
+      {
+        "findingIndex": 17,
+        "reason": "No reference covers Best selling products retaining other-category products. The Product breakdown and orders-per-age claims concern separate card configurations."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 1,
+        "reason": "Extra tooltip rows and raw aggregation labels affect presentation; no incorrect metric values are described."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 5,
+        "reason": "The requested page remains unusable, with neither content nor an error state."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 1,
+        "reason": "Responsive layout clips displayed text without a described functional failure."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 1,
+        "reason": "Text clipping and a missing overflow affordance are presentation and usability defects."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 3,
+        "reason": "Clicking the link unexpectedly navigates away from the dashboard."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 3,
+        "reason": "The finding describes missing chart results despite populated comparison cards, a claimed functional inconsistency."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 3,
+        "reason": "The visualization communicates 100% completion for a value of zero, an incorrect result."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 3,
+        "reason": "The saved link navigates to an unintended local destination instead of the expected external site."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 1,
+        "reason": "The reported issue concerns text layout only; the stored description retains its line breaks."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 3,
+        "reason": "The described submission leaves the Create button in a persistent failed state; the inline field message is not a raw error dump."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 3,
+        "reason": "The finding describes applying a different date from the one entered, changing the filter's result."
+      },
+      {
+        "findingIndex": 15,
+        "severity": 3,
+        "reason": "The stale save overwrites previously saved dashboard content and titles."
+      },
+      {
+        "findingIndex": 16,
+        "severity": 1,
+        "reason": "The unsolicited, click-dismissible popup obscures content and adds minor interaction friction."
+      },
+      {
+        "findingIndex": 17,
+        "severity": 3,
+        "reason": "The card presents products and counts inconsistent with the selected category."
+      },
+      {
+        "findingIndex": 18,
+        "severity": 1,
+        "reason": "The heading's wrapped text is visually clipped, a presentation defect."
+      },
+      {
+        "findingIndex": 19,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 20,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

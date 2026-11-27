@@ -1,0 +1,90 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "findings": 7,
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 5,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Matches the Read-tab row action dropping q=read and redirecting to Unread after Mark as unread."
+      },
+      {
+        "groundTruthIndex": 0,
+        "reproStepsIndex": 0,
+        "findingIndex": 4,
+        "reason": "Matches the claimed read-state change when pinning an already-read notification. Evidence is weaker because it shows list placement, not the action and unread-count changes."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 6,
+        "reproStepsIndex": 0,
+        "findingIndex": 2,
+        "reason": "Matches the rejected missing-Unpin claim. Mark as read is the intended way to remove a pin."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 1,
+        "reason": "No supplied entry describes Watching search interpreting percent signs or underscores as wildcards."
+      },
+      {
+        "findingIndex": 3,
+        "reason": "No supplied entry covers browser Back restoring notification content after logout; this differs from retaining private-repository notifications after access revocation."
+      },
+      {
+        "findingIndex": 5,
+        "reason": "No supplied entry describes incorrect chronological ordering of Read notifications."
+      },
+      {
+        "findingIndex": 6,
+        "reason": "No supplied entry describes browser Back retaining and subsequently reapplying a stale Watching privacy filter."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 3,
+        "reason": "The search returns repositories that do not match the requested literal text."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "The described impact is an inability to undo pinning independently of changing notification status."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 3,
+        "reason": "The restored page displays stale authenticated state and notification content after logout."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 3,
+        "reason": "The list presents notifications in an incorrect chronological order."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 3,
+        "reason": "A stale filter is submitted unexpectedly and hides repositories that should match."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

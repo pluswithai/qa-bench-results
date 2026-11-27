@@ -1,0 +1,12 @@
+App,Area,Effort,Agent,Runs,Findings,Correct,Incorrect,Unmatched,Dup.,Precision,Recall,Score,Avg cost/run,Avg cost/correct finding
+Gitea,Issues,30 min,Pluswithai,3,16.67,10.67,5.00,0.00,0.67,0.681,0.133,17.67,$12.40,$1.16
+Gitea,Labels,30 min,Pluswithai,3,13.00,10.33,1.67,0.00,0.00,0.861,0.272,20.67,$12.23,$1.18
+Gitea,Milestones,30 min,Pluswithai,3,13.67,11.00,2.33,0.00,0.00,0.825,0.324,21.33,$9.59,$0.87
+Gitea,Notifications,30 min,Pluswithai,3,7.67,5.67,1.67,0.00,0.00,0.773,0.283,14.67,$10.13,$1.79
+Gitea,Profiles & account settings,30 min,Pluswithai,3,14.67,10.67,4.00,0.00,0.00,0.727,0.323,17.33,$9.50,$0.89
+Gitea,Pull requests,30 min,Pluswithai,3,12.00,7.67,3.00,0.00,0.33,0.719,0.104,15.67,$11.02,$1.44
+Gitea,Releases,30 min,Pluswithai,3,26.33,19.67,5.67,0.00,0.00,0.776,0.298,34.00,$10.10,$0.51
+Gitea,Repository code,30 min,Pluswithai,3,27.00,21.00,2.33,0.00,0.33,0.900,0.253,43.00,$13.42,$0.64
+Gitea,Repository settings,30 min,Pluswithai,3,14.67,11.33,2.00,0.00,0.00,0.850,0.189,26.67,$10.38,$0.92
+Gitea,Site administration,30 min,Pluswithai,3,18.00,12.00,5.33,0.00,0.33,0.692,0.293,17.67,$10.28,$0.86
+Gitea,Wiki,30 min,Pluswithai,3,20.33,12.67,5.33,0.00,0.67,0.704,0.333,22.00,$12.28,$0.97

@@ -1,0 +1,157 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "gitea/areas/notifications",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "7c2564e8e895f8ee6014bbf4afbc7a12307dd23d3088098598bbe12e6bd16cc4",
+    "known_invalid_sha256": "995af98e3ec66dc6ca50c42ed5d5c7c33d90931c9854bf7444b7d8b2a214c230",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "16",
+    "bugs": "8",
+    "flags": "0",
+    "known_hits": "2",
+    "extra_known_hits": "0",
+    "unverified": "3",
+    "outside_area_known_hits": "0",
+    "outside_area_known_invalid": "1",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "0",
+    "outside_area_ground_truth_sha256": "47db07b83af13b7c7dd75acd1b523ed86e8107b60e6f33878e8fb5b68a2acbe2",
+    "outside_area_known_invalid_sha256": "72e79c4023c85c9101fbf2b7613d3daf78b07fded510d117ab5b26f6ac3103f9",
+    "duplicates": "0",
+    "duplicate_known_hits": "0",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "2",
+    "known_misses": "2",
+    "precision": "0.5",
+    "recall": "0.125",
+    "findings_per_minute": "0.34625264468491374",
+    "correct_findings_per_minute": "0.08656316117122843",
+    "severity_1": "0",
+    "severity_3": "2",
+    "severity_5": "0",
+    "severity_sum": "6",
+    "score": "4",
+    "duration_seconds": "1386.271",
+    "partial": "false",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 5,
+        "reproStepsIndex": 0,
+        "findingIndex": 4,
+        "reason": "Matches Mark as unread dropping q=read and switching to Unread, using the same Read-tab row action."
+      },
+      {
+        "groundTruthIndex": 7,
+        "reproStepsIndex": null,
+        "findingIndex": 5,
+        "reason": "Matches the live bell count failing until reload with the same JSON parsing error. The reproduction changes an existing notification to unread in another tab rather than receiving another user's new activity."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 6,
+        "reproStepsIndex": 0,
+        "findingIndex": 1,
+        "reason": "Matches the missing Unpin control claim and pin-then-inspect reproduction. The reference establishes that Mark as read intentionally removes the pin."
+      },
+      {
+        "knownInvalidIndex": 7,
+        "reproStepsIndex": 0,
+        "findingIndex": 2,
+        "reason": "Matches the claim that pinned notifications should not appear in Read. Their presence in both tabs is intentional because pinned is a separate status, not an unread notification."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 0,
+        "reason": "No reference entry describes wildcard characters returning unrelated repositories in Watching search."
+      },
+      {
+        "findingIndex": 3,
+        "reason": "No reference entry describes a stale Archived selection after browser Back. The Watching sort-highlight bug concerns a different control and trigger."
+      },
+      {
+        "findingIndex": 6,
+        "reason": "No reference entry describes browser Back restoring the full Watching list while retaining the previous search text."
+      },
+      {
+        "findingIndex": 7,
+        "reason": "No reference entry describes incorrect notification ordering or pinned rows being split across the list. Concrete timestamps support the claim, though reproduction relies on pre-existing notification data."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 3,
+        "reason": "The search returns incorrect results for the entered text."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 3,
+        "reason": "The claimed impact is an inability to undo pinning without changing notification status."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "The report describes incorrect filter membership and an inconsistent unread count."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 3,
+        "reason": "The selected filter incorrectly represents the applied filtering state."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 3,
+        "reason": "The search field shows a query that does not match the displayed results."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 3,
+        "reason": "The report describes incorrect chronological ordering of notification results."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [],
+    "knownInvalid": [
+      {
+        "findingIndex": 6,
+        "reference": {
+          "name": "Browser Back retains the newer profile repository search draft while restoring earlier results",
+          "summary": "After searching for repository A then B and going Back, the URL and results restore A while the search box retains the last typed B draft.",
+          "expected": "The report expects the visible search text to restore A together with its results.",
+          "actual": "The browser restores the last typed field value B, while the response input value attribute, URL and repository results correctly restore A. Normal submissions, Forward and navigation without editing the field are consistent.",
+          "reproSteps": [
+            [
+              "On a user profile Repositories tab, search for a uniquely named repository A and confirm its matching result.",
+              "Search for a different uniquely named repository B and confirm its matching result.",
+              "Press browser Back and compare the URL, visible query field and results.",
+              "Observe A in the URL and results while B remains in the search field."
+            ]
+          ],
+          "reason": "User rejected the reported draft-only display mismatch, consistent with gitea-pass2-007. Both reviewers reproduced the mismatch but disagreed on classification: Claude rejected it as browser-restored draft state, while Codex recommended acceptance at severity 1. This rejection is the explicit human judgment; it does not claim the observation failed to reproduce. A later Sort action applying the visible draft was observed separately and is excluded from this rejection, as are hidden filters or incorrect server search results."
+        },
+        "reason": "Same browser-restored repository-search draft mismatch: Back restores the earlier URL and results while retaining later typed search text. Watching is a different page, but the reported behavior is the same."
+      }
+    ],
+    "duplicates": []
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "bugs": [
+    {
+      "name": "Saving the Edit Label dialog for a label deleted meanwhile lands on a bare plain-text \"Not Found\" page",
+      "summary": "The Save posts to /eval/harbor-handbook/labels/edit, which answers 404, and the browser is left on a bare white page containing only the text \\\"Not Found\\\" — no site header, no message about the deleted label, no way back except the browser's Back button. The typed changes are lost. Reproduced twice (once with the label qa-s-dbl, once with qa-s-dbl2). (on /eval/harbor-handbook/labels (Edit Label dialog, deleted from a second tab))",
+      "expected": "The label no longer exists, so the app should say so (for example a red \\\"This label has been deleted\\\" message on the labels list) and return the person to the list, instead of rendering a raw \\\"Not Found\\\" page.",
+      "actual": "The Save posts to /eval/harbor-handbook/labels/edit, which answers 404, and the browser is left on a bare white page containing only the text \\\"Not Found\\\" — no site header, no message about the deleted label, no way back except the browser's Back button. The typed changes are lost. Reproduced twice (once with the label qa-s-dbl, once with qa-s-dbl2).",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-ig6idqpc9wl8ew3cs6uan.e2b.app/eval/harbor-handbook/labels in tab A",
+        "In tab A click \"New Label\", type the name \"qa-s-dbl2\", type a colour such as \"#abcdef\" and click \"Save\"",
+        "Open the same labels page in a second tab (tab B) and in tab B click \"Edit\" on the \"qa-s-dbl2\" row so the Edit Label dialog stays open",
+        "Back in tab A reload the page, click \"Delete\" on the \"qa-s-dbl2\" row and click \"Confirm\" (the list now says \"The label has been deleted.\")",
+        "Return to tab B, where the Edit Label dialog for qa-s-dbl2 is still open, and click \"Save\""
+      ],
+      "severity": 5
+    },
+    {
+      "name": "Colour picker hue bar writes nothing to the empty Color field of a new label",
+      "summary": "The picker reacts (the square turns cyan, the hue thumb moves) but the Color field stays empty and still shows the grey placeholder \\\"#c320f6\\\"; no value is written. Only clicking inside the saturation/brightness square sets the value. A person who picks a colour on the hue bar gets no colour, and the form then refuses to save on the empty required Color field. (on /eval/harbor-handbook/labels)",
+      "expected": "The Color field takes the colour picked on the hue bar (as it does when the field already holds a value), and the label can be saved with the picked colour.",
+      "actual": "The picker reacts (the square turns cyan, the hue thumb moves) but the Color field stays empty and still shows the grey placeholder \\\"#c320f6\\\"; no value is written. Only clicking inside the saturation/brightness square sets the value. A person who picks a colour on the hue bar gets no colour, and the form then refuses to save on the empty required Color field.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-iat14q7nt2yjqq6nojtsc.e2b.app/eval/harbor-handbook/labels",
+        "Click the \"New Label\" button (do not type anything into the Color field: it must stay as the grey placeholder \"#c320f6\")",
+        "Click into the empty Color field to open the colour picker popup",
+        "Click on the hue bar at the bottom of the popup, on the cyan/blue part (about x=391, y=601 in a 1280x720 window)",
+        "Read the Color field"
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Long label name is clipped mid-text inside the issue sidebar Labels picker (390 px)",
+      "summary": "At 390 px wide, inside the open Labels dropdown the row for \"agent1-long-01234567890123456789012345678901234567\" runs to the right edge of the dropdown and is cut off mid-name (the chip and its text are clipped, no wrap, no ellipsis); other long names in the list are clipped the same way. The name cannot be read or told apart from another long name in the picker. (on /eval/harbor-handbook/issues/1)",
+      "expected": "Long label names should wrap inside the dropdown row or be shortened with an ellipsis so the whole entry stays inside the panel at phone width.",
+      "actual": "At 390 px wide, inside the open Labels dropdown the row for \"agent1-long-01234567890123456789012345678901234567\" runs to the right edge of the dropdown and is cut off mid-name (the chip and its text are clipped, no wrap, no ellipsis); other long names in the list are clipped the same way. The name cannot be read or told apart from another long name in the picker.",
+      "reproSteps": [
+        "Set the browser window to 390 x 844 CSS pixels and sign in as eval.",
+        "Open https://5503-iat14q7nt2yjqq6nojtsc.e2b.app/eval/harbor-handbook/issues/1 and scroll down to the sidebar block (it stacks below the comment box at this width).",
+        "Click the \"Labels\" heading to open the label picker.",
+        "Scroll inside the label list down to the entry \"agent1-long-01234567890123456789012345678901234567\"."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Long label chip on an issue-list row runs off the right edge of the screen (390 px)",
+      "summary": "At 390 px the row for issue #4 \"Review the release ownership proposal\" shows the label chip \"agent4-long-0123456789012345678901234567890123456…\" running past the right edge of the row and off the screen: the chip text is cut off at the viewport edge with no wrap or ellipsis, and it spills into the space where the comment-count icon sits on other rows. The whole label name cannot be read. (on /eval/harbor-handbook/issues)",
+      "expected": "Long label chips on issue-list rows should wrap or be truncated with an ellipsis inside the row, staying within the 390 px viewport.",
+      "actual": "At 390 px the row for issue #4 \"Review the release ownership proposal\" shows the label chip \"agent4-long-0123456789012345678901234567890123456…\" running past the right edge of the row and off the screen: the chip text is cut off at the viewport edge with no wrap or ellipsis, and it spills into the space where the comment-count icon sits on other rows. The whole label name cannot be read.",
+      "reproSteps": [
+        "Set the browser window to 390 x 844 CSS pixels and sign in as eval.",
+        "Open https://5503-iat14q7nt2yjqq6nojtsc.e2b.app/eval/harbor-handbook/issues (Issues list of eval/harbor-handbook).",
+        "Look at the fourth row, issue #4 \"Review the release ownership proposal\", and at its label chip under the title."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Assigning a label that was deleted meanwhile answers 500 and fails silently",
+      "summary": "The label gets a check mark as if assigned, and nothing tells the user anything is wrong. When the picker is closed the request POST /eval/harbor-handbook/issues/labels fails with 500 Internal Server Error, the check mark is gone, the sidebar still shows only \"documentation\" and no error message is displayed anywhere. The stale deleted label also remains in the picker's list until the page is reloaded. (on /eval/harbor-handbook/issues/7 (sidebar label picker))",
+      "expected": "The app tells the user the label could not be applied (it no longer exists) instead of failing silently with a 500 server error, and the deleted label does not stay listed as assignable.",
+      "actual": "The label gets a check mark as if assigned, and nothing tells the user anything is wrong. When the picker is closed the request POST /eval/harbor-handbook/issues/labels fails with 500 Internal Server Error, the check mark is gone, the sidebar still shows only \"documentation\" and no error message is displayed anywhere. The stale deleted label also remains in the picker's list until the page is reloaded.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "On /eval/harbor-handbook/labels create a label named 'agent11-vanish' (description 'Agent11 delete while picker open test', colour #ff8800) and Save.",
+        "Open /eval/harbor-handbook/issues/7 (issue 'agent11-dialog-fixture') and open the label picker from the 'Labels' row of the right sidebar — 'agent11-vanish' is listed.",
+        "In a second browser tab open /eval/harbor-handbook/labels and delete the label 'agent11-vanish' (Delete → Confirm, page says 'The label has been deleted.').",
+        "Back in the first tab, click 'agent11-vanish' in the still-open picker — a check mark appears next to it as if the label had been assigned.",
+        "Click somewhere else on the issue page to close the picker."
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Opening /labels/new directly shows a blank page (405)",
+      "summary": "The page is completely blank — white, no title, no navigation, no message. The console shows \"Failed to load resource: the server responded with a status of 405 (Method Not Allowed)\" for that address; the page state was 43% error with an empty body. Same result on reload. (on /eval/harbor-handbook/labels/new)",
+      "expected": "A proper page with a clear message — e.g. the labels page, the same New Label dialog, or Gitea's \"404 Not Found / not authorized\" page as other unknown addresses show — never a blank white page.",
+      "actual": "The page is completely blank — white, no title, no navigation, no message. The console shows \"Failed to load resource: the server responded with a status of 405 (Method Not Allowed)\" for that address; the page state was 43% error with an empty body. Same result on reload.",
+      "reproSteps": [
+        "Sign in to https://5503-ihto2i2dj1c31tlfb1unv.e2b.app/ (here as alex, the Contributor account)",
+        "Open the address https://5503-ihto2i2dj1c31tlfb1unv.e2b.app/eval/harbor-handbook/labels/new directly",
+        "Look at the page (and read the browser console)"
+      ],
+      "severity": 5
+    },
+    {
+      "name": "Colour preview square stays empty for a 3-digit hex the form accepts (#f00)",
+      "summary": "The small preview swatch next to the field shows the empty/transparent checkerboard (as if no colour were set), although the value is accepted: clicking Save stores #ff0000 and the label chip in the list is solid red. The colour picker popup that opens under the field shows red at the same moment, so the field's own preview contradicts both the picker and the saved result. (on /eval/harbor-handbook/labels)",
+      "expected": "The preview swatch shows the colour that will be saved (red), exactly like the picker beside it and the resulting label chip.",
+      "actual": "The small preview swatch next to the field shows the empty/transparent checkerboard (as if no colour were set), although the value is accepted: clicking Save stores #ff0000 and the label chip in the list is solid red. The colour picker popup that opens under the field shows red at the same moment, so the field's own preview contradicts both the picker and the saved result.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /eval/harbor-handbook/labels",
+        "Click 'Edit' on a label (the label 'agent2-combo' was used)",
+        "Select the value in the 'Color' field and type the 3-digit hex #f00",
+        "Look at the small colour preview square at the left inside the Color field, then click Save and look at the label chip in the list"
+      ],
+      "severity": 1
+    }
+  ]
+}

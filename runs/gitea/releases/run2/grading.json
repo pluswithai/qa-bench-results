@@ -1,0 +1,318 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "findings": 26,
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 0,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Same singular-count grammar defect: the heading says “1 Tags” while the tab says “1 Tag.”"
+      },
+      {
+        "groundTruthIndex": 27,
+        "reproStepsIndex": 0,
+        "findingIndex": 1,
+        "reason": "Same invalid-tag validation exposing form.TagName; Save Draft triggers the same New Release validation flow."
+      },
+      {
+        "groundTruthIndex": 12,
+        "reproStepsIndex": 0,
+        "findingIndex": 2,
+        "reason": "Same mobile tag-row clipping, including an offscreen Delete Tag action that horizontal scrolling cannot reveal."
+      },
+      {
+        "groundTruthIndex": 55,
+        "reproStepsIndex": 0,
+        "findingIndex": 3,
+        "reason": "Same literal percent and underscore searches behaving as wildcards and returning nonmatching tags."
+      },
+      {
+        "groundTruthIndex": 19,
+        "reproStepsIndex": 0,
+        "findingIndex": 4,
+        "reason": "Same deleted-draft persistence: deletion reports success and removes the listing, but the draft remains readable and editable."
+      },
+      {
+        "groundTruthIndex": 45,
+        "reproStepsIndex": null,
+        "findingIndex": 5,
+        "reason": "Same Back-navigation mismatch between the search box and restored results, but in the reverse direction: an unfiltered list retains the query."
+      },
+      {
+        "groundTruthIndex": 1,
+        "reproStepsIndex": 0,
+        "findingIndex": 6,
+        "reason": "Same Releases RSS channel link using singular /release and opening a 404 instead of /releases."
+      },
+      {
+        "groundTruthIndex": 23,
+        "reproStepsIndex": 0,
+        "findingIndex": 8,
+        "reason": "Same mobile Releases-header overlap between the Tags tab and RSS Feed control; the finding establishes the visual overlap but not misnavigation."
+      },
+      {
+        "groundTruthIndex": 15,
+        "reproStepsIndex": 0,
+        "findingIndex": 11,
+        "reason": "Same New Release tag-field overflow at phone width, widening the page and requiring horizontal scrolling."
+      },
+      {
+        "groundTruthIndex": 42,
+        "reproStepsIndex": 0,
+        "findingIndex": 12,
+        "reason": "Same Draft badge clipping beside a long wrapping title on the Releases list; the narrower viewport is a test-parameter difference."
+      },
+      {
+        "groundTruthIndex": 36,
+        "reproStepsIndex": null,
+        "findingIndex": 13,
+        "reason": "Same whitespace-only title acceptance and invisible heading, reached by editing a draft rather than creating and publishing a release."
+      },
+      {
+        "groundTruthIndex": 5,
+        "reproStepsIndex": null,
+        "findingIndex": 15,
+        "reason": "Same mobile Pre-Release checkbox overlapping its label, but on Edit Release rather than the recorded New Release flow."
+      },
+      {
+        "groundTruthIndex": 3,
+        "reproStepsIndex": 0,
+        "findingIndex": 16,
+        "reason": "Same Create Tag Only submission replacing the form with a filename-too-long Git error and HTTP 500; the attempted tag length differs."
+      },
+      {
+        "groundTruthIndex": 40,
+        "reproStepsIndex": 0,
+        "findingIndex": 18,
+        "reason": "Same stale-editor overwrite across two tabs; swapping which tab changes the title versus notes does not change the failure."
+      },
+      {
+        "groundTruthIndex": 6,
+        "reproStepsIndex": 0,
+        "findingIndex": 20,
+        "reason": "Same tag-only detail page claiming “eval released this” despite the Tags row offering New Release."
+      },
+      {
+        "groundTruthIndex": 29,
+        "reproStepsIndex": 0,
+        "findingIndex": 21,
+        "reason": "Same tag-message checkbox reset after invalid-tag validation on New Release; Save Draft invokes the same validation flow."
+      },
+      {
+        "groundTruthIndex": 25,
+        "reproStepsIndex": null,
+        "findingIndex": 23,
+        "reason": "Same mobile Preview task checkboxes stretching into full-width bars instead of matching published notes, reached through Edit Release."
+      },
+      {
+        "groundTruthIndex": 32,
+        "reproStepsIndex": 0,
+        "findingIndex": 25,
+        "reason": "Same accepted Unicode release title being silently shortened with an ellipsis in storage, confirmed by reopening the editor."
+      },
+      {
+        "groundTruthIndex": 21,
+        "reproStepsIndex": null,
+        "findingIndex": 7,
+        "reason": "Same observable omission of an existing tag from Tags RSS while the Tags page lists it; the draft-save trigger is not reproduced."
+      },
+      {
+        "groundTruthIndex": 33,
+        "reproStepsIndex": 0,
+        "findingIndex": 19,
+        "reason": "Same draft title-validation error replacing draft actions with Update Release, followed by unintended publication."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 0,
+        "reproStepsIndex": 0,
+        "findingIndex": 17,
+        "reason": "Exact rejected claim: retrying Create Tag Only correctly rejects an existing standalone tag but uses release-exists wording."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 9,
+        "reason": "No entry covers draft-release tag chips pointing to # or draft tags being absent from the Tags list."
+      },
+      {
+        "findingIndex": 10,
+        "reason": "No entry covers malformed RSS GUID values or missing isPermaLink=false attributes."
+      },
+      {
+        "findingIndex": 14,
+        "reason": "The report concerns prefilling from a still-existing release; knownInvalid 5 concerns retained content after deleting a release while keeping its tag."
+      },
+      {
+        "findingIndex": 22,
+        "reason": "No entry covers escaped HTML anchor markup in repository activity RSS titles; this is distinct from incorrect feed links."
+      },
+      {
+        "findingIndex": 24,
+        "reason": "No entry covers pluralization on Compare; the “1 Tags” heading defect concerns a different label and page."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 5,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 3,
+        "reason": "The reported links do not navigate to their claimed destinations."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 3,
+        "reason": "The feed declares non-URL identifiers to be functional permalinks."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 3,
+        "reason": "The claimed defect is unexpected form population followed by rejection, not merely wording."
+      },
+      {
+        "findingIndex": 15,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 16,
+        "severity": 5,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 17,
+        "severity": 1,
+        "reason": "The complaint is wording-only; duplicate creation is correctly prevented."
+      },
+      {
+        "findingIndex": 18,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 19,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 20,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 21,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 22,
+        "severity": 1,
+        "reason": "The described impact is unwanted markup in displayed title text."
+      },
+      {
+        "findingIndex": 23,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 24,
+        "severity": 1,
+        "reason": "Singular/plural copy defects only."
+      },
+      {
+        "findingIndex": 25,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [
+      {
+        "findingIndex": 24,
+        "reference": {
+          "name": "Commit detail summary uses incorrect singular/plural grammar for one changed file",
+          "summary": "Commit detail and branch comparison diff summaries use plural “files” when exactly one file changed.",
+          "expected": "Diff summaries should use singular “file” when exactly one file changed.",
+          "actual": "A commit changing one file displays “1 changed files with 1 additions and 0 deletions”. Comparing docs/release-owners against main also displays “1 changed files with 5 additions and 0 deletions”.",
+          "reproSteps": [
+            [
+              "Open an authenticated repository's commit history.",
+              "Open a commit that changes exactly one file.",
+              "Read the changed-files summary above the diff and observe that it says `1 changed files with 1 additions and 0 deletions`.",
+              "Reported comparison-page variant: open eval/harbor-handbook → Branches and choose New Pull Request beside docs/release-owners, with main as the base.",
+              "Read the comparison summary and observe “1 changed files with 5 additions and 0 deletions”."
+            ]
+          ],
+          "severity": 1
+        },
+        "reason": "Matches the reviewed comparison-page pluralization defect: a single changed file is described as '1 changed files'. The same repro case includes this comparison-page variant."
+      }
+    ],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

@@ -1,0 +1,231 @@
+{
+  "bugs": [
+    {
+      "name": "\"Orders according to sources per quarter\" shows revenue amounts, not order counts",
+      "summary": "The pivot's values are money amounts with cents, identical to the revenue figures elsewhere on the same dashboard: Row totals for Q4 2026 is 67,863.4, exactly the number on the \\\"Revenue per quarter\\\" card, and Q3 2026 is 56,686.65, exactly the Revenue value shown in the \\\"Revenue and orders over time\\\" tooltip. Grand totals 247,412.89 is the sum of those revenue figures. The card's own info tooltip says \\\"Orders placed per quarter broken down by source\\\", so a reader takes 67,863.4 for a count of orders in Q4 2026. (on /dashboard/1)",
+      "expected": "A card titled and described as counting orders per source should show order counts per source per quarter, on the same scale as the Orders numbers elsewhere (hundreds), not currency amounts matching the Revenue cards.",
+      "actual": "The pivot's values are money amounts with cents, identical to the revenue figures elsewhere on the same dashboard: Row totals for Q4 2026 is 67,863.4, exactly the number on the \\\"Revenue per quarter\\\" card, and Q3 2026 is 56,686.65, exactly the Revenue value shown in the \\\"Revenue and orders over time\\\" tooltip. Grand totals 247,412.89 is the sum of those revenue figures. The card's own info tooltip says \\\"Orders placed per quarter broken down by source\\\", so a reader takes 67,863.4 for a count of orders in Q4 2026.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open https://5501-iu5qaxtlo2oqrkbh4xt5i.e2b.app/dashboard/1 (Overview tab).",
+        "Scroll down to the card titled \"Orders according to sources per quarter\" and read its rows: Date / Affiliate / Facebook / Google / Organic / Twitter / Row totals.",
+        "Compare its Row totals column with the \"Revenue per quarter\" scalar card at the top right (67,863.4) and with the tooltip of the \"Revenue and orders over time\" chart (Revenue Q3 2026 = 56,686.65).",
+        "Hover the info icon next to the card title and read the card description."
+      ],
+      "reason": "Observation is correct, but it is the content of Metabase's shipped sample dashboard, not app behaviour: the saved question aggregates [metric 9] = 'Revenue' broken out by source and quarter. The app renders the saved query faithfully; only the card's title/description are loosely worded demo content."
+    },
+    {
+      "name": "\"Revenue and orders over time\" plots a quantity sum as the \"Orders\" series",
+      "summary": "The \\\"Orders\\\" series is a sum of a numeric column, not an order count: the tooltip shows Orders 3,215 for Q4 2026 while its own Count row says 904, and the per-quarter \\\"Orders\\\" values (260, 1.1k, 1.2k, 843, 2.6k, 4.4k, 3.2k, about 13,500 in total) contradict the 3,372 total orders shown by the \\\"Total orders by product category\\\" card on the same tab. The card's description (question payload) reads \\\"Cumulative revenue overlaid with number of orders placed each month\\\" while the plotted line is non-cumulative and bucketed by quarter. (on /dashboard/1)",
+      "expected": "The series labelled \\\"Orders\\\" should be the number of orders for the quarter, agreeing with the Count row of its own tooltip (904) and with the order counts the other cards on the dashboard report (3,372 orders in total).",
+      "actual": "The \\\"Orders\\\" series is a sum of a numeric column, not an order count: the tooltip shows Orders 3,215 for Q4 2026 while its own Count row says 904, and the per-quarter \\\"Orders\\\" values (260, 1.1k, 1.2k, 843, 2.6k, 4.4k, 3.2k, about 13,500 in total) contradict the 3,372 total orders shown by the \\\"Total orders by product category\\\" card on the same tab. The card's description (question payload) reads \\\"Cumulative revenue overlaid with number of orders placed each month\\\" while the plotted line is non-cumulative and bucketed by quarter.",
+      "reproSteps": [
+        "Sign in with eval@momentic.ai / momentic-eval-1 and open /dashboard/1 (tab \"Overview\").",
+        "In the card \"Revenue and orders over time\" (top left), hover the rightmost purple bar (x-axis \"Q4 2026\", bar labelled 3.2k).",
+        "Read the tooltip: \"Q4 2026 / Revenue 53,898.26 +22.92% / Orders 3,215 -27.03% / Sum of Discount $497.73 / Count 904\".",
+        "Compare the \"Orders\" number with the \"Count\" row of the same tooltip, then scroll to the card \"Total orders by product category\" and compare with its centre total (3,372)."
+      ],
+      "reason": "Sample-content definition, not an app defect: the card's query has four aggregations (Revenue metric, sum of Quantity, sum of Discount, count) and its settings title the sum-of-quantity series 'Orders'. The chart shows exactly what the saved question defines; the naming is demo content."
+    },
+    {
+      "name": "Tooltip of \"Revenue and orders over time\" lists extra rows (Sum of Discount, Count)",
+      "summary": "The tooltip lists two extra rows below the series: \\\"Sum of Discount\\\" ($521.01 for Q3 2026, $738.56 for Q4 2026) and \\\"Count\\\" (1,004 / 1,166) — values that are not part of the chart and whose names are raw aggregation labels. The browser console also logs, on every dashboard load, \\\"Error getting setting graph.tooltip_columns TypeError: Cannot read properties of undefined (reading 'column')\\\", so the card's tooltip column configuration fails and the tooltip falls back to all query columns. (on /dashboard/1)",
+      "expected": "The tooltip shows the two series drawn in the chart (Revenue and Orders) with their values for the hovered quarter, as the legend and the card's own configuration state.",
+      "actual": "The tooltip lists two extra rows below the series: \\\"Sum of Discount\\\" ($521.01 for Q3 2026, $738.56 for Q4 2026) and \\\"Count\\\" (1,004 / 1,166) — values that are not part of the chart and whose names are raw aggregation labels. The browser console also logs, on every dashboard load, \\\"Error getting setting graph.tooltip_columns TypeError: Cannot read properties of undefined (reading 'column')\\\", so the card's tooltip column configuration fails and the tooltip falls back to all query columns.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open /dashboard/1 (E-commerce Insights, Overview tab).",
+        "Hover the mouse over the bar above the \"Q3 2026\" label in the \"Revenue and orders over time\" card.",
+        "Read the tooltip that appears.",
+        "Hover the bar above \"Q4 2026\" and read the tooltip again."
+      ],
+      "reason": "Works as configured: the card's visualization settings set graph.tooltip_columns to the count and sum_3 (discount) columns - Metabase's 'additional tooltip columns' feature - so the two extra rows are intended. The console message about that setting is not user-visible and the tooltip shows precisely the configured columns."
+    },
+    {
+      "name": "Website Analysis funnel cards ignore the Date Range filter",
+      "summary": "With Date Range = Previous 30 days applied (chip \"Date Range: Previous 30 days\" visible), the \"User flow diagram\" and \"Checkout funnel\" cards show exactly the same numbers as without any date filter — Create Item 1,071 / Invite 1,063 / Subscribe 1,051 / Signup 1,024 / Checkout 975, funnel percentages 99.25 % / 98.13 % / 95.61 % / 91.04 % — while other cards on the same tab do react to the same filter (\"Number of subscriptions\" and \"Subscription seats over time\" switch from numbers to \"No results!\"). The same numbers came back after a reload with the filter still set, so the date filter is silently ignored by these two cards while the page shows it as applied. (on /dashboard/1 (Website Analysis tab))",
+      "expected": "With \"Date Range: Previous 30 days\" applied the funnel cards show the numbers for that 30-day window (different from the unfiltered totals), as the other cards on the tab do — or the page says the filter does not apply to them.",
+      "actual": "With Date Range = Previous 30 days applied (chip \"Date Range: Previous 30 days\" visible), the \"User flow diagram\" and \"Checkout funnel\" cards show exactly the same numbers as without any date filter — Create Item 1,071 / Invite 1,063 / Subscribe 1,051 / Signup 1,024 / Checkout 975, funnel percentages 99.25 % / 98.13 % / 95.61 % / 91.04 % — while other cards on the same tab do react to the same filter (\"Number of subscriptions\" and \"Subscription seats over time\" switch from numbers to \"No results!\"). The same numbers came back after a reload with the filter still set, so the date filter is silently ignored by these two cards while the page shows it as applied.",
+      "reproSteps": [
+        "Sign in and open /dashboard/1 (E-commerce Insights).",
+        "Click the 'Website Analysis' tab and note the 'User flow diagram' and 'Checkout funnel' numbers with no filter: 1,071 / 1,063 / 1,051 / 1,024 / 975 (screenshot s17).",
+        "Go to the 'Overview' tab, open the 'Date Range' filter, choose 'Previous 30 days'.",
+        "Go back to the 'Website Analysis' tab (the filter bar shows 'Date Range: Previous 30 days').",
+        "Compare the two funnel cards and the subscription cards (screenshot s19)."
+      ],
+      "reason": "Dashboard filters only affect cards they are wired to. In the shipped sample dashboard the 'Checkout funnel' (card 6) and 'User flow diagram' (card 11) dashcards have parameter_mappings \"[]\", while the subscription cards are mapped to Date Range. Unconnected cards staying unchanged is designed behaviour and a dashboard-authoring choice."
+    },
+    {
+      "name": "\"Best selling products\" card does not react to the Product Category filter",
+      "summary": "The card keeps listing the same nine products with the same counts (Aerodynamic Copper Knife 120, Heavy-Duty Silk Chair 119, Enormous Wool Car 118, Mediocre Wool Toucan 117, Small Cotton Chair 117, … Lightweight Wool Plate 110) whatever the Product Category filter is, and the bar tooltip of 'Lightweight Wool Plate' still reads 'Product → Category: Gadget' while the pill says 'Product Category: Widget'. Only the bar colour changes. The card therefore shows data that contradicts the applied dashboard filter. (on /dashboard/1 (Portfolio Performance tab))",
+      "expected": "With only 'Widget' selected the 'Best selling products' card lists Widget products only, as the 'Total order amount vs. discount given' card next to it shows only the Widget series.",
+      "actual": "The card keeps listing the same nine products with the same counts (Aerodynamic Copper Knife 120, Heavy-Duty Silk Chair 119, Enormous Wool Car 118, Mediocre Wool Toucan 117, Small Cotton Chair 117, … Lightweight Wool Plate 110) whatever the Product Category filter is, and the bar tooltip of 'Lightweight Wool Plate' still reads 'Product → Category: Gadget' while the pill says 'Product Category: Widget'. Only the bar colour changes. The card therefore shows data that contradicts the applied dashboard filter.",
+      "reproSteps": [
+        "Open https://5501-i6mbgjuu6h6owsro2smz3.e2b.app/dashboard/1 and sign in as eval@momentic.ai if needed.",
+        "On the Overview tab set the 'Product Category' filter to a single value 'Gadget' (untick Select all, tick Gadget, click 'Update filter').",
+        "Click the 'Portfolio Performance' tab and scroll to the 'Best selling products' card; note the nine products and their counts, and hover a bar to read its tooltip ('Product → Category: Gadget').",
+        "Back on the same tab, set 'Product Category' to 'Widget' only and click 'Update filter'.",
+        "Compare the 'Best selling products' card with what it showed for Gadget: same products, same counts, and the tooltip still says the product's category is Gadget although the filter pill reads 'Product Category: Widget'."
+      ],
+      "reason": "Same cause as the funnel cards: the 'Best selling products' dashcard (card 21) ships with parameter_mappings \"[]\", so the Product Category filter is not connected to it and the list legitimately stays the same. Dashboard configuration, not a filtering bug."
+    },
+    {
+      "name": "Website Analysis subscription cards disagree on dates (2022 vs 2023-2026; 'No results' next to 64 recent subscriptions)",
+      "summary": "\\\"Number of subscriptions\\\" and \\\"Subscription seats over time\\\" both show the empty state \\\"No results!\\\", while the \\\"Most recent subscription\\\" card right next to them lists subscription ID 1487, Plan Basic, Created At October 31, 2026, 10:41 PM and says \\\"Item 1 of 64\\\" - i.e. 64 subscriptions exist inside the same three-month window the other two cards report as empty. (on /dashboard/1?tab=3-website-analysis)",
+      "expected": "All cards on the tab should show the same window: if the window (Previous 3 months, i.e. Aug-Nov 2026) contains 64 subscriptions, \\\"Number of subscriptions\\\" and \\\"Subscription seats over time\\\" should show them instead of \\\"No results!\\\", or the subscription card should be empty too.",
+      "actual": "\\\"Number of subscriptions\\\" and \\\"Subscription seats over time\\\" both show the empty state \\\"No results!\\\", while the \\\"Most recent subscription\\\" card right next to them lists subscription ID 1487, Plan Basic, Created At October 31, 2026, 10:41 PM and says \\\"Item 1 of 64\\\" - i.e. 64 subscriptions exist inside the same three-month window the other two cards report as empty.",
+      "reproSteps": [
+        "Open /dashboard/1 (E-commerce Insights) and click the \"Website Analysis\" tab.",
+        "Click the \"Date Range\" filter at the top left and choose \"Previous 3 months\".",
+        "Scroll down so the cards \"Number of subscriptions\", \"Subscription seats over time\" and \"Most recent subscription\" are in view.",
+        "Compare the empty state of the two subscription cards with the subscription record and the \"Item 1 of 64\" counter of the \"Most recent subscription\" card.",
+        "Scroll inside the \"Most recent subscription\" card to see the Created At value."
+      ],
+      "reason": "Sample data and sample wiring, not app behaviour. 'Number of subscriptions' counts Analytic Events rows (button = Subscribe) whose timestamps are in 2022, while 'Subscription seats over time' and 'Most recent subscription' read the Accounts table (dates up to 2026) - different tables with different date ranges. 'Subscription seats over time' goes empty under 'Previous 3 months' because its Date Range mapping targets the year-bucketed column of stage 1 (2026-01-01 is outside the window), whereas 'Most recent subscription' is filtered on the raw date. Each card returns what its saved query and mapping define."
+    },
+    {
+      "name": "A dashboard's only tab cannot be renamed",
+      "summary": "With only one tab, the tab's chevron menu holds just \\\"Duplicate\\\" — no \\\"Rename\\\" (and no Delete) — and clicking/double-clicking the tab name does not open an editor either, so the tab keeps the name \\\"Tab 1\\\" for good. As soon as a second tab exists the same menu shows Rename / Duplicate / Delete, so renaming is only available when there are two or more tabs. (on /dashboard/17-agent13-responsive-dashboard#edit)",
+      "expected": "The tab menu offers \\\"Rename\\\" for the dashboard's only tab too (as it does for every tab when there are two or more), so a dashboard with a single tab can be given a meaningful tab name.",
+      "actual": "With only one tab, the tab's chevron menu holds just \\\"Duplicate\\\" — no \\\"Rename\\\" (and no Delete) — and clicking/double-clicking the tab name does not open an editor either, so the tab keeps the name \\\"Tab 1\\\" for good. As soon as a second tab exists the same menu shows Rename / Duplicate / Delete, so renaming is only available when there are two or more tabs.",
+      "reproSteps": [
+        "Sign in with eval@momentic.ai / momentic-eval-1 and open /dashboard/17-agent13-responsive-dashboard.",
+        "Click the pencil \"Edit dashboard\" button, then delete every tab but the first one (each remaining tab's chevron > Delete) so the tab bar shows only \"Tab 1\".",
+        "Click the small chevron-down right of \"Tab 1\" and read the menu: it contains only \"Duplicate\".",
+        "Click the text \"Tab 1\" itself (once and double-click): nothing becomes editable.",
+        "Now click the \"+\" at the end of the tab bar to add a second tab and open that new tab's chevron: the menu now contains Rename, Duplicate and Delete."
+      ],
+      "reason": "Deliberate: canRename={isEditing && hasMultipleTabs} and Delete is only added when there are several tabs. With a single tab the tab strip is not shown to viewers at all (showTabs = hasMultipleTabs || isEditing), so the lone tab's name is never displayed and renaming it has no purpose."
+    },
+    {
+      "name": "Clicking a chart legend item on a dashboard card opens the question instead of hiding the series",
+      "summary": "The dashboard is left entirely: the browser goes to /question#<base64> and the question builder opens with the breadcrumb \\\"Started from Revenue and orders over time\\\". The series is never hidden. Happens with both legend labels (\\\"Revenue\\\" and \\\"Orders\\\"), 2 of 2 tries. (on /dashboard/1)",
+      "expected": "Clicking a legend item toggles that series on the chart (hide/show) and keeps the person on the dashboard, as the neighbouring small \\\"Hide series\\\" dot does.",
+      "actual": "The dashboard is left entirely: the browser goes to /question#<base64> and the question builder opens with the breadcrumb \\\"Started from Revenue and orders over time\\\". The series is never hidden. Happens with both legend labels (\\\"Revenue\\\" and \\\"Orders\\\"), 2 of 2 tries.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open https://5501-iu5qaxtlo2oqrkbh4xt5i.e2b.app/dashboard/1 (E-commerce Insights, Overview tab).",
+        "In the card \"Revenue and orders over time\" move the mouse to the legend row under the title; the legend items \"Revenue\" and \"Orders\" react on hover (the other series dims), so they are interactive series controls.",
+        "Click the legend label \"Revenue\" (or \"Orders\")."
+      ],
+      "reason": "Designed behaviour: on dashboards the legend label click handler opens the underlying question (onOpenQuestion) when there is no clickable breakout; hiding a series is the job of the separate legend dot, which the report itself notes works."
+    },
+    {
+      "name": "Table card \"Customer survey responses\" is wider than its card and the Body column is cut off",
+      "summary": "The \\\"Body\\\" column is 780px wide, which makes the table wider than its card (card 1048px wide, table columns about 1465px). Nothing scrolls: the row text runs past the card's right edge and is cut by the page edge, e.g. row 353 shows \\\"Light amber. The nose offers up walnut bread, spelt flour, and a green, malty note. Ove\\\" and stops there. No ellipsis and no way to read the rest of the answer. rows 352, 351, 350, 349 ... all cut the same way. (on /dashboard/1 (Portfolio Performance tab))",
+      "expected": "The table fits its card (or scrolls inside it), and a long answer is shortened with an ellipsis / shown in full on hover, so nothing is cut off at the card or page edge.",
+      "actual": "The \\\"Body\\\" column is 780px wide, which makes the table wider than its card (card 1048px wide, table columns about 1465px). Nothing scrolls: the row text runs past the card's right edge and is cut by the page edge, e.g. row 353 shows \\\"Light amber. The nose offers up walnut bread, spelt flour, and a green, malty note. Ove\\\" and stops there. No ellipsis and no way to read the rest of the answer. rows 352, 351, 350, 349 ... all cut the same way.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open https://5501-iu5qaxtlo2oqrkbh4xt5i.e2b.app/dashboard/1",
+        "Click the tab \"Portfolio Performance\" and scroll down to the \"Customer survey responses\" table card.",
+        "Read the rightmost column \"Body\": the answers run past the card's right edge and are cut off at the page edge."
+      ],
+      "reason": "The table body is a horizontally scrollable grid (overflow:auto); a wide column continuing past the card edge is the normal state of any Metabase table, and the text is clipped at the card edge, not at the page edge as claimed. The recording only shows vertical page scrolling - no horizontal scroll inside the table was attempted - so 'nothing scrolls' is not supported by the evidence."
+    },
+    {
+      "name": "Phone width in edit mode: \"Add a chart\" panel squeezes the dashboard into a sliver",
+      "summary": "The \\\"Add a chart\\\" panel spans the full width and the dashboard underneath is squeezed into a ~12px sliver on the left edge, where fragments of the empty-state text (single letters like \\\"e\\\", \\\"n\\\", \\\"o\\\", \\\"y\\\") are drawn clipped behind the panel. The dashboard tab bar (Tab 1 / the long tab / Tab 3) is not rendered at all in this state, and Escape does not close the panel. (on /dashboard/17-agent13-responsive-dashboard#edit)",
+      "expected": "On a phone-sized window the \\\"Add a chart\\\" sidebar should overlay the dashboard (or replace it) at full width, with the dashboard content hidden or laid out at a usable width, and the dashboard tab bar should stay visible/usable.",
+      "actual": "The \\\"Add a chart\\\" panel spans the full width and the dashboard underneath is squeezed into a ~12px sliver on the left edge, where fragments of the empty-state text (single letters like \\\"e\\\", \\\"n\\\", \\\"o\\\", \\\"y\\\") are drawn clipped behind the panel. The dashboard tab bar (Tab 1 / the long tab / Tab 3) is not rendered at all in this state, and Escape does not close the panel.",
+      "reproSteps": [
+        "Sign in with eval@momentic.ai / momentic-eval-1.",
+        "Open /dashboard/17-agent13-responsive-dashboard (a dashboard I created, any dashboard works).",
+        "Click the pencil \"Edit dashboard\" button to enter edit mode and open the \"Add a chart\" side panel.",
+        "Resize the window to 390x844 (phone).",
+        "Look at the left edge of the page and at the row under the title where the dashboard tabs should be."
+      ],
+      "reason": "Dashboard editing is deliberately not offered below the small breakpoint: the Edit button is rendered with visibleOnSmallScreen={false} (display none under 40em). The state was produced by entering edit mode on desktop and then shrinking the window to 390 px, which a phone user cannot reach."
+    },
+    {
+      "name": "\"+ New\" button is missing at phone width",
+      "summary": "The app bar shows only the menu (hamburger), logo, search and settings; the \\\"New\\\" button is gone. The hamburger's sidebar does not contain it either (Home, Getting started, Collections, Data, Trash only), so nothing on the page creates a question, dashboard or document. Only \\\"Create a new collection\\\" and \\\"Upload data\\\" remain in the collection header. (on /collection/root at 390×844)",
+      "expected": "The \\\"+ New\\\" button stays reachable at phone width (in the app bar or inside the menu), so a phone user can create a question, dashboard or document as they can on a desktop.",
+      "actual": "The app bar shows only the menu (hamburger), logo, search and settings; the \\\"New\\\" button is gone. The hamburger's sidebar does not contain it either (Home, Getting started, Collections, Data, Trash only), so nothing on the page creates a question, dashboard or document. Only \\\"Create a new collection\\\" and \\\"Upload data\\\" remain in the collection header.",
+      "reproSteps": [
+        "Sign in with eval@momentic.ai / momentic-eval-1.",
+        "Open /collection/root at the desktop size and note the \"+ New\" button at the top right of the bar.",
+        "Set the window to a phone size, 390 × 844, and open /collection/root again.",
+        "Look at the app bar and open the hamburger menu to look for a way to create something."
+      ],
+      "reason": "Deliberate product decision: the small-screen app bar (AppBarSmall) contains only the nav toggle, logo, search and profile link, and the unit test asserts the New button is not rendered on small screens."
+    },
+    {
+      "name": "Text card hides content that exceeds the card height at desktop width (link / later lines 'missing' in view mode)",
+      "summary": "In view mode the card shows only the bold line and the two bullets; the last block (the link \"agent10 link\") is not visible at all, although about 35 px of empty space remains below \"second item\" inside the card. Going into edit mode again, the same card shows \"agent10 link\" at its bottom edge (partly cut), and the page's markup does contain the link with href https://www.metabase.com/learn. After a reload the link is still missing in view mode, so what the editor shows is not what a viewer of the dashboard gets. (on /dashboard/4-agent10-trash-test?tab=7-tab-1)",
+      "expected": "The saved text card renders its markdown exactly as entered and as the editing view shows it: the bold line, the two bullets and the link \"agent10 link\" pointing at https://www.metabase.com/learn.",
+      "actual": "In view mode the card shows only the bold line and the two bullets; the last block (the link \"agent10 link\") is not visible at all, although about 35 px of empty space remains below \"second item\" inside the card. Going into edit mode again, the same card shows \"agent10 link\" at its bottom edge (partly cut), and the page's markup does contain the link with href https://www.metabase.com/learn. After a reload the link is still missing in view mode, so what the editor shows is not what a viewer of the dashboard gets.",
+      "reproSteps": [
+        "Open https://5501-ieaktt3pj66aduas4qpqc.e2b.app/dashboard/4-agent10-trash-test?tab=7-tab-1 (dashboard \"agent10-trash-test\" in Harbor Admin's Personal Collection, tab \"Tab 1\").",
+        "Click \"Edit dashboard\".",
+        "Click the \"Add a heading or text box\" (T) button in the dashboard toolbar and choose \"Text\".",
+        "In the new card's editor type: **agent10 bold** and a list: / - first item / - second item / (blank line) / [agent10 link](https://www.metabase.com/learn)",
+        "Click an empty spot of the dashboard grid, then click \"Save\".",
+        "Look at the saved text card, then reload the page and look again."
+      ],
+      "reason": "Text cards have the fixed grid size the author gives them; content taller than the card scrolls inside it (.text-card-markdown has overflow-y:auto). Both reports put ~6-12 lines into a default-height card and never resized it; the 'missing' link/lines are below the fold, not dropped (the report itself finds the link in the markup), and the claim that the rest is unreachable contradicts the in-card scrolling observed in run1-17. The ~35 px of 'free space' is list and card padding. Author-controlled sizing, not data loss."
+    },
+    {
+      "name": "Browser Back after a filter change returns to the previous tab while keeping the new filter value",
+      "summary": "The browser Back goes to the URL of the earlier tab state but with the new filter selection: the page comes back on the \\\"Overview\\\" tab (a tab the person left two steps before) with the Product Category filter still showing \\\"3 selections\\\" and the numbers already recalculated for 3 categories. The previous view (Portfolio Performance with all 4 categories) is never restored, and the resulting tab+filter combination is one the person never chose. Seen 2 times out of 2 tries. (on /dashboard/1)",
+      "expected": "Pressing Back once after changing a filter should restore the view that was on screen just before the change: the same tab (Portfolio Performance) with the previous filter selection (4 selections, all categories).",
+      "actual": "The browser Back goes to the URL of the earlier tab state but with the new filter selection: the page comes back on the \\\"Overview\\\" tab (a tab the person left two steps before) with the Product Category filter still showing \\\"3 selections\\\" and the numbers already recalculated for 3 categories. The previous view (Portfolio Performance with all 4 categories) is never restored, and the resulting tab+filter combination is one the person never chose. Seen 2 times out of 2 tries.",
+      "reproSteps": [
+        "Open https://5501-ieaktt3pj66aduas4qpqc.e2b.app/dashboard/1 (Overview tab, Product Category: 4 selections).",
+        "Click the \"Portfolio Performance\" tab.",
+        "Click the \"Product Category\" filter pill, untick \"Gizmo\" and click \"Update filter\" (now 3 selections, URL has product_category=Doohickey&product_category=Gadget&product_category=Widget&tab=2-portfolio-performance).",
+        "Press the browser Back button once.",
+        "Observe the resulting page: the \"Overview\" tab is now active while the Product Category pill still shows \"3 selections\"."
+      ],
+      "reason": "By design only tab changes create history entries (push); filter changes rewrite the current entry (replace). Back therefore steps to the previous tab, and filter values - which are dashboard-wide state, not per tab - stay as they are and the URL is re-synced. The outcome follows directly from that explicit choice."
+    },
+    {
+      "name": "Card menu loses \"Edit question\" after the card is given a custom visualization (\"Visualize another way\")",
+      "summary": "The chart card's \"…\" menu contains only \"Download results\"; \"Edit question\" is missing, while the identical table card right next to it shows both \"Edit question\" and \"Download results\". After a reload the chart card's menu still has only \"Download results\", so there is no way from that card to reach its question. The custom visualization itself saved correctly (bar chart with data labels persists across reloads). (on /dashboard/9-agent8-info-dash)",
+      "expected": "Both cards of the same question offer the same card menu: \"Edit question\" and \"Download results\" — changing the card's visualization should not remove the way to edit its question.",
+      "actual": "The chart card's \"…\" menu contains only \"Download results\"; \"Edit question\" is missing, while the identical table card right next to it shows both \"Edit question\" and \"Download results\". After a reload the chart card's menu still has only \"Download results\", so there is no way from that card to reach its question. The custom visualization itself saved correctly (bar chart with data labels persists across reloads).",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1 and open https://5501-ieaktt3pj66aduas4qpqc.e2b.app/dashboard/9-agent8-info-dash (a dashboard of mine with two \"Release requests\" cards on tab 1)",
+        "Click the pencil \"Edit dashboard\" button",
+        "Hover the LEFT \"Release requests\" card, click the third icon in its toolbar (\"Visualize another way\")",
+        "In the visualization dialog click \"Settings\", turn ON \"Show values on data points\", click \"Save\" in the dialog, then \"Save\" the dashboard",
+        "Reload the page and click the \"…\" menu at the top right of that now bar-chart card: it lists only \"Download results\"",
+        "Click the \"…\" menu at the top right of the RIGHT (unchanged table) card: it lists \"Edit question\" and \"Download results\""
+      ],
+      "reason": "Explicit in source: once a dashcard is a visualizer card, the view-mode menu is rendered with canEdit={!isVisualizerDashboardCard(dashcard)}, so the question-edit entry is intentionally dropped (such a card is its own visualization and may combine several questions). The underlying question(s) stay reachable through the card title menu, so 'no way to reach its question' does not hold."
+    },
+    {
+      "name": "Small empty card shows only the sailboat and no \"No results!\" line",
+      "summary": "Every card shows the sailboat drawing plus the line \\\"No results!\\\" except the \\\"Revenue per quarter\\\" card, which shows only the sailboat and then empty white space – no \\\"No results!\\\", no number, no message. Seen 3 times out of 3 loads of the same address (screenshots s60, s61, s62). (on /dashboard/1)",
+      "expected": "Every card that has no rows says so in words, exactly as \\\"Revenue and orders over time\\\", \\\"Total orders by product category\\\", \\\"Revenue by product category\\\" and \\\"Orders according to sources per quarter\\\" do on the same dashboard.",
+      "actual": "Every card shows the sailboat drawing plus the line \\\"No results!\\\" except the \\\"Revenue per quarter\\\" card, which shows only the sailboat and then empty white space – no \\\"No results!\\\", no number, no message. Seen 3 times out of 3 loads of the same address (screenshots s60, s61, s62).",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open https://5501-ieaktt3pj66aduas4qpqc.e2b.app/dashboard/1?date_grouping=&date_range=past3months&product_category=NoSuchCategoryXYZ&tab=1-overview&vendor= (Overview tab with a Product Category value that matches no rows)",
+        "Compare the \"Revenue per quarter\" card at the top right with the \"Revenue and orders over time\" card to its left"
+      ],
+      "reason": "Designed: NoResultsView omits the text when the card is small ({!isSmall && <ShortMessage>}) and exposes 'No results!' as a tooltip on the illustration instead. 'Revenue per quarter' is the only small card among those compared."
+    },
+    {
+      "name": "\"Revenue goal for this quarter\" progress bar looks 100% full at value 0",
+      "summary": "The gauge bar under the title \"Revenue goal for this quarter\" is drawn completely filled (solid green all the way to \"Goal 250,000\") while the value marker sits at 0 and the value label reads \"0\". With real data (no filter) the same bar is only filled about 27% for 67,863 of 250,000, so a 0 value is shown as 100% of the goal. The neighbouring \"Revenue per quarter\" card is also blank apart from a sailboat icon while the chart card correctly says \"No results!\". (on /dashboard/1)",
+      "expected": "The gauge should show an empty (0%) bar for a value of 0 out of a goal of 250,000, consistent with the number shown and with how it renders when the value is 67,863.",
+      "actual": "The gauge bar under the title \"Revenue goal for this quarter\" is drawn completely filled (solid green all the way to \"Goal 250,000\") while the value marker sits at 0 and the value label reads \"0\". With real data (no filter) the same bar is only filled about 27% for 67,863 of 250,000, so a 0 value is shown as 100% of the goal. The neighbouring \"Revenue per quarter\" card is also blank apart from a sailboat icon while the chart card correctly says \"No results!\".",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1",
+        "Open https://5501-i6mbgjuu6h6owsro2smz3.e2b.app/dashboard/1?product_category=Nonexistent&tab=1-overview (a direct dashboard address whose Product Category filter value matches no data)",
+        "Look at the two cards on the right of the \"Overall Business Health\" section",
+        "Reload the page and look again"
+      ],
+      "reason": "The evidence contradicts the claim: the bar is entirely the light track colour (background = main colour lightened 25%), i.e. 0% filled, with the pointer at 0. With data, the filled part is the darker green and the remainder is this same light green (compare run2-02/shot-3.png). The side remark about 'Revenue per quarter' is the designed small-card empty state (see the previous bug)."
+    },
+    {
+      "name": "Multi-select filter shows \"Set to default\" instead of \"Update filter\" when every value is ticked",
+      "summary": "As soon as all four values are ticked, 'Update filter' disappears and the only control left in the popup is 'Set to default' (which saves the selection as the dashboard's default rather than applying it as a view filter). The same happens with nothing ticked. So a user who wants to go from 'Widget' back to all categories has no apply action in the popup; they must use the small reset icon on the pill, which returns to the saved default, not to a chosen selection. (on /dashboard/1 (Overview tab, Product Category filter))",
+      "expected": "The pending selection can be applied, so the filter can be widened from one value to all values: the 'Update filter' button stays available for any non-empty selection, and the dashboard then shows every product category.",
+      "actual": "As soon as all four values are ticked, 'Update filter' disappears and the only control left in the popup is 'Set to default' (which saves the selection as the dashboard's default rather than applying it as a view filter). The same happens with nothing ticked. So a user who wants to go from 'Widget' back to all categories has no apply action in the popup; they must use the small reset icon on the pill, which returns to the saved default, not to a chosen selection.",
+      "reproSteps": [
+        "Open /dashboard/1 and click the 'Product Category' filter pill.",
+        "Tick 'Widget' and 'Doohickey' and 'Gadget' but leave 'Gizmo' unticked: the footer shows the blue 'Update filter' button.",
+        "Tick 'Gizmo' as well (or tick 'Select all') so that all four values are ticked.",
+        "Look at the popup footer."
+      ],
+      "reason": "Product Category is a required filter whose default is all four values. getUpdateButtonProps deliberately labels the submit button 'Set to default' whenever the pending selection equals the default (or is empty on a required filter); it is still the apply button and sets the view filter to that selection - it does not save a new dashboard default, as the report assumed."
+    }
+  ]
+}

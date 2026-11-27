@@ -1,0 +1,98 @@
+{
+  "bugs": [
+    {
+      "name": "Record page for a workflow id that does not exist renders an empty \"Untitled (0/0)\" shell with no not-found state",
+      "summary": "The editor renders as if an empty workflow named \"Untitled\" with 0 nodes existed: blank canvas, no message, no error, toolbar actions missing. With a malformed id the only feedback is a raw duplicated toast \"Invalid value for UUID: \\\"not-a-workflow-id\\\"\" and the same blank editor stays on screen. (on /object/workflow/{id})",
+      "expected": "A workflow id that does not exist should show a proper not-found state (\\\"This workflow does not exist\\\" / \\\"Record not found\\\") with a way back to the workflow list, and a malformed id should not surface a raw GraphQL validation message.",
+      "actual": "The editor renders as if an empty workflow named \"Untitled\" with 0 nodes existed: blank canvas, no message, no error, toolbar actions missing. With a malformed id the only feedback is a raw duplicated toast \"Invalid value for UUID: \\\"not-a-workflow-id\\\"\" and the same blank editor stays on screen.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev.",
+        "Type the address https://5500-ia9vrv4csx3pgsgypfjej.e2b.app/object/workflow/00000000-0000-4000-8000-000000000000 in the browser and press Enter.",
+        "Observe the workflow editor: breadcrumb reads \"Workflows / Untitled (0/0)\", the canvas is completely blank and every toolbar button (Add a Node, See Runs, Deactivate, Add to Favorites) is missing.",
+        "Repeat with a malformed id: https://5500-ia9vrv4csx3pgsgypfjej.e2b.app/object/workflow/not-a-workflow-id — a raw red toast \"Invalid value for UUID: \"not-a-workflow-id\"\" is shown twice and the same blank \"Untitled (0/0)\" editor remains."
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Overflow tooltip has no height limit: a very long name opens a tooltip that covers the page and runs off the bottom of the window",
+      "summary": "The tooltip renders the whole 10,000-character name unclamped: a dark box about 500 px wide and 690 px tall covering most of the page, hiding the canvas, the header buttons and the fields panel until the mouse moves away. Same on the version record page and in the workflow editor breadcrumb. (on /object/workflow/a3c16a4e-1ed7-4f84-ad4d-d2d237a9b62b (also /object/workflowVersion/48354bea-f230-4d74-96c6-e091753e96c3))",
+      "expected": "A tooltip for a long name should stay small — clamped width and a few lines (or a scrollable/truncated tooltip) — and never cover the record's fields or the editor canvas and toolbar.",
+      "actual": "The tooltip renders the whole 10,000-character name unclamped: a dark box about 500 px wide and 690 px tall covering most of the page, hiding the canvas, the header buttons and the fields panel until the mouse moves away. Same on the version record page and in the workflow editor breadcrumb.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev, open /objects/workflowVersions.",
+        "Open the version record whose Workflow is \"agent1-long5000 XXXXX…\" (row v1, /object/workflowVersion/48354bea-f230-4d74-96c6-e091753e96c3).",
+        "Hover the truncated \"Workflow\" field value in the Fields panel: a dark tooltip appears showing the full name as a huge block (screenshot 1).",
+        "Click \"See Workflow\" and hover the workflow name in the editor breadcrumb (top left): the same dark block covers the canvas from the top bar to the bottom of the window (screenshot 2).",
+        "Move the mouse away and it disappears."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Quick Lead default workflow drops the form's \"Job title\": the created Person has an empty Job Title",
+      "summary": "The Person is created with the right first/last name, email and company link, but its Job Title field is empty (\"Job Title\" placeholder) — the value typed in the form is silently dropped. Reproduced on both test runs (agent5job → Person \"agent5first agent5last\"; agent5b-jobtitle → Person \"agent5b-first agent5b-last\"). (on /object/workflow/c95c78b4-48d2-56f6-8e15-36ff8572f1d8 (Quick Lead Test form) → /objects/people)",
+      "expected": "The Person record created by the workflow carries the Job title value typed in the Quick Lead Form, as it does the first name, last name, email and company.",
+      "actual": "The Person is created with the right first/last name, email and company link, but its Job Title field is empty (\"Job Title\" placeholder) — the value typed in the form is silently dropped. Reproduced on both test runs (agent5job → Person \"agent5first agent5last\"; agent5b-jobtitle → Person \"agent5b-first agent5b-last\").",
+      "reproSteps": [
+        "Open /object/workflow/c95c78b4-48d2-56f6-8e15-36ff8572f1d8 (Quick Lead) and click Test in the toolbar.",
+        "Fill the form: First name \"agent5b-first\", Last Name \"agent5b-last\", Email \"agent5b@example.com\", Job title \"agent5b-jobtitle\", Company name \"agent5b-co\", Company domain \"agent5b-domain.example\".",
+        "Click Submit and wait for the run to show Completed.",
+        "Open People (/objects/people) and open the Person row \"agent5b-first agent5b-last\".",
+        "Read the Work section of the record: Company is \"agent5b-co\" but Job Title is empty."
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Row context menu opens past the bottom of the window for low rows: most entries are cut off",
+      "summary": "The context menu opens downward from the clicked row without flipping up, so its lower part falls outside the window: only the first two entries (\\\"Delete Workflow\\\", \\\"Remove from Favorites\\\") are visible, clipped at the bottom edge. The remaining entries — Export Workflow, Deactivate Workflow, Test Workflow, See Runs, See Versions History, Duplicate Workflow, More actions — stay below the window (measured at y≈943 with a 720px-high window) and cannot be reached: pressing End / scrolling does not bring them into view. Duplicating a workflow from the row context menu is therefore impossible for rows in the lower part of the list. (on /objects/workflows)",
+      "expected": "The context menu should stay inside the window (flipping upward when there is no room below) so every entry, including \\\"Duplicate Workflow\\\", can be read and clicked.",
+      "actual": "The context menu opens downward from the clicked row without flipping up, so its lower part falls outside the window: only the first two entries (\\\"Delete Workflow\\\", \\\"Remove from Favorites\\\") are visible, clipped at the bottom edge. The remaining entries — Export Workflow, Deactivate Workflow, Test Workflow, See Runs, See Versions History, Duplicate Workflow, More actions — stay below the window (measured at y≈943 with a 720px-high window) and cannot be reached: pressing End / scrolling does not bring them into view. Duplicating a workflow from the row context menu is therefore impossible for rows in the lower part of the list.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open /objects/workflows (the list holds enough rows to fill the window — 17-18 workflows).",
+        "Scroll so that the last visible row, \"Quick Lead\", sits near the bottom of the window (in my run: \"Quick Lead\" at y≈640).",
+        "Right-click that \"Quick Lead\" row.",
+        "Look at the menu that opens: only \"Delete Workflow\" and \"Remove from Favorites\" are shown, cut off at the bottom of the window.",
+        "Try to reach the rest of the menu (press End to scroll, scroll the page) — the lower entries, \"Duplicate Workflow\" among them, never become visible."
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Clicking \"Test\" twice starts two test runs",
+      "summary": "Both clicks go through: two runs are created for the same workflow (\"#2 - agent12-run-test\" and \"#3 - agent12-run-test\", both Completed) and the workflow's Create Record action runs twice, leaving two extra duplicate notes \"agent12-note\" with the body \"agent12 body text\". Nothing disables the Test button or asks to confirm. (on /object/workflow/d000a9ab-3535-4d6f-bdf1-0ac58a816a4f (workflow \"agent12-run-test\"), effect in /objects/workflowRuns and /objects/notes)",
+      "expected": "One test run: the Test button is disabled or ignored while the first test is starting, so a quick double-click does not run the workflow twice and does not create duplicate records.",
+      "actual": "Both clicks go through: two runs are created for the same workflow (\"#2 - agent12-run-test\" and \"#3 - agent12-run-test\", both Completed) and the workflow's Create Record action runs twice, leaving two extra duplicate notes \"agent12-note\" with the body \"agent12 body text\". Nothing disables the Test button or asks to confirm.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open the workflow \"agent12-run-test\" (/object/workflow/d000a9ab-3535-4d6f-bdf1-0ac58a816a4f); it has the trigger \"Launch manually\" and one \"Create Record\" action that creates a Note titled \"agent12-note\" with body \"agent12 body text\"",
+        "Double-click the \"Test\" button in the workflow toolbar quickly",
+        "Open /objects/workflowRuns and look at the runs of workflow \"agent12-run-test\"",
+        "Open /objects/notes and look at the notes titled \"agent12-note\""
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Schedule trigger accepts a malformed cron expression (\"* * *\"): the panel says it is invalid and still lists upcoming runs, three identical",
+      "summary": "The page shows 'Failed to describe cron expression: Invalid cron expression. Expected 4-6 fields, got 3' and at the same time an 'Upcoming execution time (UTC)' block listing 'Nov 25, 2026 12:00 AM' three times — identical timestamps for an expression the app says is invalid. Seen twice in two tries. (on /object/workflow/d7367ac5-9535-4d90-85e6-251df920675d (workflow editor, Trigger side panel))",
+      "expected": "The page refuses the invalid expression and shows only the validation message; no execution schedule is shown for an expression it just declared invalid.",
+      "actual": "The page shows 'Failed to describe cron expression: Invalid cron expression. Expected 4-6 fields, got 3' and at the same time an 'Upcoming execution time (UTC)' block listing 'Nov 25, 2026 12:00 AM' three times — identical timestamps for an expression the app says is invalid. Seen twice in two tries.",
+      "reproSteps": [
+        "Open /objects/workflows and click '+ New Workflow' (workflow agent6-Create Test Flow).",
+        "Click the 'Add a Trigger' node on the canvas, then choose 'On a schedule'.",
+        "In the trigger panel set 'Trigger interval' to 'Cron (Custom)'.",
+        "Clear the Expression field and type '* * *', then click on the 'Expression' label to blur the field."
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Flow view opens with the trigger node partly outside the canvas (phone width)",
+      "summary": "The canvas opens at desktop pan/zoom: the trigger node sits half outside the left edge so only \"ed or updated\" of \"Record is created or updated\" is visible, its \"Trigger\" label and icon are gone, and the connector to the next step starts off-screen. No zoom-to-fit control is visible; the graph has to be dragged by hand to read the first step. (on /object/workflowVersion/6766a511-cf95-5255-866c-e23c1a8cc5f9)",
+      "expected": "The whole flow, starting with the trigger node, fits the canvas at phone width (or the canvas opens scrolled so that the first node is fully visible).",
+      "actual": "The canvas opens at desktop pan/zoom: the trigger node sits half outside the left edge so only \"ed or updated\" of \"Record is created or updated\" is visible, its \"Trigger\" label and icon are gone, and the connector to the next step starts off-screen. No zoom-to-fit control is visible; the graph has to be dragged by hand to read the first step.",
+      "reproSteps": [
+        "Sign in, set the browser to 390 x 844 CSS pixels",
+        "Open https://5500-i6ld7xztybx9b54kyq3mz.e2b.app/objects/workflowVersions and open the v1 row of \"Create company when adding a new person\"",
+        "On the version record, open the \"Flow\" tab",
+        "Look at the first (trigger) node on the left of the canvas"
+      ],
+      "severity": 1
+    }
+  ]
+}

@@ -1,0 +1,331 @@
+{
+  "fixture": "twenty/areas/record-pages-activities",
+  "run": 2,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 608,
+      "name": "Annual Revenue: typing a decimal amount silently multiplies it (2500.75 is saved as 250,075)",
+      "summary": "The decimal point is swallowed while typing: 2500.75 becomes 250,075 and is saved and displayed as $250.1k — 100× the amount entered. The same happened with 1500.50 (saved as 150,050) and 1234.567 (saved as 1,234,567); the amount survives a page reload as the wrong value and the Timeline shows the wrong amount too. (on /object/company/315b7bfe-a771-4907-b67d-e68db4f146e7 (company record, Fields panel → Annual Revenue))",
+      "expected": "A decimal amount 2500.75 is kept as 2,500.75 (or the field refuses decimals with a clear message). The saved value must be the number the person typed.",
+      "actual": "The decimal point is swallowed while typing: 2500.75 becomes 250,075 and is saved and displayed as $250.1k — 100× the amount entered. The same happened with 1500.50 (saved as 150,050) and 1234.567 (saved as 1,234,567); the amount survives a page reload as the wrong value and the Timeline shows the wrong amount too.",
+      "reproSteps": [
+        "Sign in at /welcome with tim@apple.dev / tim@apple.dev.",
+        "Open the company record agent1-testco by its address /object/company/315b7bfe-a771-4907-b67d-e68db4f146e7 (or open any company from /objects/companies).",
+        "In the left Fields panel, under Business, click the value cell of the Annual Revenue row — the currency editor opens with a currency select (USD) and an amount input.",
+        "Type 2500.75 into the amount input (characters typed one by one).",
+        "Watch the input: it shows 250,075 — the decimal point disappears and the digits are read as one whole number.",
+        "Press Enter to save; the field shows $250.1k and the Timeline entry reads 'Annual Revenue → $250.1k'."
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 630,
+      "name": "Body field editor on a task record opens as a blank white panel — existing and typed text are invisible",
+      "summary": "The popover renders as a large empty white rectangle. The editable area is positioned above the viewport (its element sits at y=-20, outside the popover), so the existing body text and anything typed are invisible while editing. The text is saved (it appears in the Body row after Escape) but cannot be seen or edited while the editor is open. (on /object/task/2226cb47-d514-4d17-936c-241f8da11c8a (task record page))",
+      "expected": "The Body editor popover should show the field's current text and the caret where I type, so the person can read and edit the body.",
+      "actual": "The popover renders as a large empty white rectangle. The editable area is positioned above the viewport (its element sits at y=-20, outside the popover), so the existing body text and anything typed are invisible while editing. The text is saved (it appears in the Body row after Escape) but cannot be seen or edited while the editor is open.",
+      "reproSteps": [
+        "Go to /objects/tasks and click '+ New Task' to open the record side panel, type the title 'agent11-task-alpha'.",
+        "Click 'Open Ctrl+⏎' at the bottom right of the panel to open the task record page.",
+        "In the left 'Fields' panel click the 'Body' row (once to focus, a second time to open the editor).",
+        "A large white popover appears over the page with no placeholder, no caret and no text.",
+        "Type 'agent11 body text line one.' — nothing appears in the white area.",
+        "Press Escape: the Body row now shows 'agent11 body text line one.', proving the text was entered.",
+        "Click the Body value again twice: the same blank white popover opens and the existing body text is still not shown."
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 722,
+      "name": "Task rows in the record Tasks tab clip the due date and drop the relation chip when the side panel is open",
+      "summary": "The due date text runs into the card's right border and is cut mid-value, and the relation chip that is shown on the same row at full width is gone. Text is clipped without an ellipsis. (on /object/company/20202020-a305-41e7-8c72-ba44072a4c58#77c258a2-14d5-45eb-8cb2-464adcd4684f)",
+      "expected": "Task row content adapts to the narrower column: the title truncates with an ellipsis as it does, and the due date and relation chip either stay readable or are hidden deliberately as whole elements, never cut in half.",
+      "actual": "The due date text runs into the card's right border and is cut mid-value, and the relation chip that is shown on the same row at full width is gone. Text is clipped without an ellipsis.",
+      "reproSteps": [
+        "Sign in with tim@apple.dev / tim@apple.dev and open https://5500-i2bvhtm4sxq8s677s7h83.e2b.app/object/company/20202020-a305-41e7-8c72-ba44072a4c58 at a 1280x720 window",
+        "Open the Tasks tab",
+        "Note a task row that shows a due date plus the Google relation chip (e.g. 'Dec 4, 2026 Google')",
+        "Click that row (or any row) so the record side panel opens on the right and the tabs column becomes ~240px wide",
+        "Look at the task rows: the due date is cut off in the middle of the value ('Nov 30, 2026' loses its last digit at the card border, 'Nov 28, 2026' likewise) and the Google relation chip that was on the same row disappears"
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 727,
+      "name": "Note side panel: the Body field value overflows the panel and is cut off mid-word",
+      "summary": "The Body row prints the whole body text on a single line that runs past the panel's right edge (and the window edge) and stops mid-word with no ellipsis, e.g. 'agent3 body check: <b>x</b> & \"quotes' — the rest of the body cannot be read there. (on /object/company/20202020-a305-41e7-8c72-ba44072a4c58#d2577f0c-79eb-4a2f-8988-b975694a6cae)",
+      "expected": "The Body preview truncates with an ellipsis (or wraps) inside the panel, like the other field rows, so the panel stays readable.",
+      "actual": "The Body row prints the whole body text on a single line that runs past the panel's right edge (and the window edge) and stops mid-word with no ellipsis, e.g. 'agent3 body check: <b>x</b> & \"quotes' — the rest of the body cannot be read there.",
+      "reproSteps": [
+        "Sign in with tim@apple.dev / tim@apple.dev and open the company record https://5500-i2bvhtm4sxq8s677s7h83.e2b.app/object/company/20202020-a305-41e7-8c72-ba44072a4c58 at a 1280x720 window",
+        "Open the Notes tab and click the note titled 'agent3 note title' (body text: 'agent3 body check: <b>x</b> & \"quotes\" José 100% _x_ 1234567890...')",
+        "Look at the Fields section of the note side panel on the right: the Body row shows the body text on one line running out of the panel"
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 795,
+      "name": "Notes tab count does not decrease after deleting a note (header says 4, list shows 3)",
+      "summary": "The deleted note disappears from the list (3 cards remain: 'agent4 note one', 'agent3 note title', 'Partnership Opportunity') but the header still says 'Notes 4'. The count only corrects itself to 'Notes 3' after reloading the page. Seen twice: once after deleting the note 'agent14 note alpha renamed' and once after deleting a freshly created empty note. (on /object/company/20202020-a305-41e7-8c72-ba44072a4c58#d2577f0c-79eb-4a2f-8988-b975694a6cae)",
+      "expected": "After the note is deleted the count in the Notes tab header drops to 3 and matches the three cards that remain (same as after a page reload).",
+      "actual": "The deleted note disappears from the list (3 cards remain: 'agent4 note one', 'agent3 note title', 'Partnership Opportunity') but the header still says 'Notes 4'. The count only corrects itself to 'Notes 3' after reloading the page. Seen twice: once after deleting the note 'agent14 note alpha renamed' and once after deleting a freshly created empty note.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open the Google company record /object/company/20202020-a305-41e7-8c72-ba44072a4c58",
+        "Open the Notes tab (it shows a count, e.g. 'Notes 3', with 3 note cards)",
+        "Click the '+' (New note) button at the top right of the Notes tab: the count becomes 'Notes 4' and an empty note card appears, and the note's side panel opens",
+        "Click 'Options ... Ctrl O' at the bottom right of the side panel, then 'Delete Note'",
+        "Read the Notes tab header and the list of cards"
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 809,
+      "name": "Notes created from a company's Notes tab never appear in the All Notes list",
+      "summary": "Notes created from a company record's Notes tab exist (counted in \\\"All Notes · 1,811\\\", shown in the company's Notes tab and Timeline, and returned by the global search) but they never appear in the All Notes list, even after a reload or a fresh navigation — while a note created with \\\"+ New Note\\\" on /objects/notes does appear. A user looking for the note in the Notes area will not find it. (on /objects/notes and /object/company/819ddd59-a50b-4219-bec0-c4cbf38d4945)",
+      "expected": "A note created from the company record's Notes tab is a Note record like any other and must be listed in /objects/notes at the top of the default Creation-date-descending list, in the same way as the note created with \\\"+ New Note\\\" on /objects/notes (\\\"agent10-ZZ Test Note QA\\\", visible there).",
+      "actual": "Notes created from a company record's Notes tab exist (counted in \\\"All Notes · 1,811\\\", shown in the company's Notes tab and Timeline, and returned by the global search) but they never appear in the All Notes list, even after a reload or a fresh navigation — while a note created with \\\"+ New Note\\\" on /objects/notes does appear. A user looking for the note in the Notes area will not find it.",
+      "reproSteps": [
+        "Open /object/company/819ddd59-a50b-4219-bec0-c4cbf38d4945 (the company \"agent10-testco\") and click its Notes tab.",
+        "Click the \"+\" (New note) button at the right of the Notes tab header: a new note is created and its panel opens. Type the title \"agent10-Company Note 2\" in the panel title and press Tab.",
+        "The note card appears in the company's Notes tab (Notes count becomes 2) and in the company Timeline (\"You created a related note …\").",
+        "Select Notes in the left navigation to open /objects/notes and read the top of the list, which is sorted by Creation date, newest first.",
+        "The list count rises (1,809 -> 1,811), but neither \"agent10-Company Note 2\" (created seconds before) nor \"agent10-Company Note 1 EDITED\" (created 5 minutes before from the same tab) is in the list; the newest rows shown are \"Untitled\" (less than a minute ago) and \"agent7-LongTitle…\" (6 minutes ago). Both company notes are found by the global search and open normally.",
+        "Done twice with two different company notes, with a reload and a fresh navigation of /objects/notes in between: still absent."
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 833,
+      "name": "Calendar event shows raw internal key FIELD_RESTRICTED_ADDITIONAL_PERMISSIONS_REQUIRED instead of a value (Description field and Title column)",
+      "summary": "The Description field on the record page literally reads 'FIELD_RESTRICTED_ADDITIONAL_PERMISSIONS_REQUIRED', and the same internal key is printed in the Title column of the list for that row, while the record's own page header shows the name 'Code Review Session'. The raw internal constant is shown to the user instead of a value or a translated message, and the same record is titled differently in the list and on its page. (on /object/calendarEvent/20202020-0011-4e7c-8001-123456789cde)",
+      "expected": "The Description field shows a readable value or a human message if the value is restricted; the Title column of the list shows the same record name the record page shows ('Code Review Session').",
+      "actual": "The Description field on the record page literally reads 'FIELD_RESTRICTED_ADDITIONAL_PERMISSIONS_REQUIRED', and the same internal key is printed in the Title column of the list for that row, while the record's own page header shows the name 'Code Review Session'. The raw internal constant is shown to the user instead of a value or a translated message, and the same record is titled differently in the list and on its page.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open /objects/calendarEvents",
+        "Scroll to the row whose Meet Link is https://teams.com/j/2123723423 (its Title column reads 'FIELD_RESTRICTED_AD...'); a second row with the same text follows it",
+        "Click that row, then click 'Open' in the side panel to open the record /object/calendarEvent/20202020-0011-4e7c-8001-123456789cde",
+        "Read the Fields > General section of the record, and compare the Title column in the list with the record name shown in the page header"
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 871,
+      "name": "Non-existent record address opens as an editable empty record that appears to save a field value, then says the record does not exist",
+      "summary": "The page shows a normal-looking empty record (?Companies / Untitled (0/0)?, avatar and name stuck as grey loading skeletons, all Fields editable). Clicking the Domain Name field, typing \"agent3-ghost.example\" and pressing Enter shows the value as a saved chip in the field, and only then a toast appears: \"This record does not exist or has been deleted.\" The typed value is nowhere saved and vanishes on reload. No \"record not found\" state is shown before the person can type. (on /object/company/9f1c2d3e-4a5b-4c6d-8e9f-0a1b2c3d4e5f)",
+      "expected": "A record id that does not exist shows a clear \"record not found / does not exist\" message instead of an editable record, and no field accepts a value that cannot be saved (or the value is refused with an error next to the field).",
+      "actual": "The page shows a normal-looking empty record (?Companies / Untitled (0/0)?, avatar and name stuck as grey loading skeletons, all Fields editable). Clicking the Domain Name field, typing \"agent3-ghost.example\" and pressing Enter shows the value as a saved chip in the field, and only then a toast appears: \"This record does not exist or has been deleted.\" The typed value is nowhere saved and vanishes on reload. No \"record not found\" state is shown before the person can type.",
+      "reproSteps": [
+        "Sign in with tim@apple.dev / tim@apple.dev",
+        "Navigate to https://5500-i2bvhtm4sxq8s677s7h83.e2b.app/object/company/9f1c2d3e-4a5b-4c6d-8e9f-0a1b2c3d4e5f (well-formed UUID that does not exist in the workspace)",
+        "Page renders a company record titled 'Untitled' with (0/0), a grey loading skeleton where the name should be, and editable Fields",
+        "Click the 'Domain Name' placeholder value in the Fields section, type agent3-ghost.example and press Enter",
+        "The value is shown as saved in the Domain Name field (with an edit pencil) and only then a toast appears: 'This record does not exist or has been deleted.'",
+        "Reload the page: the typed value is gone and the record is again an empty 'Untitled' shell"
+      ]
+    },
+    {
+      "index": 8,
+      "reported_at_seconds": 880,
+      "name": "Opening a record with the all-zero id shows three stacked raw toasts \"Invalid value for UUID\"",
+      "summary": "Three identical raw error toasts stack in the bottom-right: 'Invalid value for UUID: \"00000000-0000-0000-0000-000000000000\"', while the page itself shows an empty 'Untitled' record with 'No activity yet'. The message is a raw server/technical error including the id, and it is repeated once per failing query. (on /object/company/00000000-0000-0000-0000-000000000000)",
+      "expected": "One plain message such as \"This record does not exist or has been deleted\", or a not-found page; no raw technical error text and no duplicated toasts.",
+      "actual": "Three identical raw error toasts stack in the bottom-right: 'Invalid value for UUID: \"00000000-0000-0000-0000-000000000000\"', while the page itself shows an empty 'Untitled' record with 'No activity yet'. The message is a raw server/technical error including the id, and it is repeated once per failing query.",
+      "reproSteps": [
+        "Sign in with tim@apple.dev / tim@apple.dev",
+        "Navigate to https://5500-i2bvhtm4sxq8s677s7h83.e2b.app/object/company/00000000-0000-0000-0000-000000000000",
+        "Look at the bottom-right of the page: three stacked error toasts reading 'Invalid value for UUID: \"00000000-0000-0000-0000-000000000000\"' while the page shows an empty company record"
+      ]
+    },
+    {
+      "index": 9,
+      "reported_at_seconds": 956,
+      "name": "Timeline field-update chip cuts the value mid-word at tablet and phone widths",
+      "summary": "In the Timeline activity card the chip under \\\"Domain Name\\\" stops mid-word: it reads \\\"agent15-domain-one.te\\\" (last character cut, no ellipsis), and at 390px it reads \\\"agent15-domain-one.te:\\\" — the value is clipped by the card edge instead of wrapping or being truncated with \\\"…\\\". (on /object/company/b381b6a6-27e2-4480-8276-c1afbc2f76c5 (record page, Timeline tab))",
+      "expected": "The chip shows the whole saved value (\\\"agent15-domain-one.test\\\") or is truncated with an ellipsis, and stays inside the activity card at tablet and phone widths.",
+      "actual": "In the Timeline activity card the chip under \\\"Domain Name\\\" stops mid-word: it reads \\\"agent15-domain-one.te\\\" (last character cut, no ellipsis), and at 390px it reads \\\"agent15-domain-one.te:\\\" — the value is clipped by the card edge instead of wrapping or being truncated with \\\"…\\\".",
+      "reproSteps": [
+        "Sign in with tim@apple.dev / tim@apple.dev and open https://5500-i2bvhtm4sxq8s677s7h83.e2b.app/object/company/b381b6a6-27e2-4480-8276-c1afbc2f76c5 (company \"agent15-testco\").",
+        "On the record, double-click the \"Domain Name\" value cell in the Fields panel, type \"agent15-domain-one.test\" and press Enter.",
+        "Open the record's \"Timeline\" tab.",
+        "Look at the activity card \"You updated 2 fields on agent15-testco\" and read the value next to \"Domain Name\".",
+        "Set the window to 768x1024 and then 390x844 and look at the same chip."
+      ]
+    },
+    {
+      "index": 10,
+      "reported_at_seconds": 972,
+      "name": "\"New task\" in a company's Tasks tab saves an untitled empty task before anything is entered; it stays after closing the panel",
+      "summary": "Clicking \"+\\\" immediately sends a create request (CreateOneTask + CreateOneTaskTarget relating it to Google). After closing the panel without typing anything the count is \\\"Tasks 6\\\" and a new row sits at the top of TODO showing only the grey placeholder text \\\"Task title\\\" — an untitled task now belongs to the company record and was never wanted. (on /object/company/20202020-a305-41e7-8c72-ba44072a4c58 (Tasks tab))",
+      "expected": "Opening the new-task panel should not create a record until the user saves something (a title); closing the panel without typing anything should leave the record's task list unchanged (\"Tasks 5\" and no empty row).",
+      "actual": "Clicking \"+\\\" immediately sends a create request (CreateOneTask + CreateOneTaskTarget relating it to Google). After closing the panel without typing anything the count is \\\"Tasks 6\\\" and a new row sits at the top of TODO showing only the grey placeholder text \\\"Task title\\\" — an untitled task now belongs to the company record and was never wanted.",
+      "reproSteps": [
+        "Open the Google company record: /object/company/20202020-a305-41e7-8c72-ba44072a4c58, signed in as tim@apple.dev, and click the Tasks tab in the record's tab bar.",
+        "Note the tab header count: \"Tasks 5\".",
+        "Click the \"+\" (New task) button at the top right of the Tasks tab.",
+        "Do not type anything anywhere; close the side panel that opened with the \"X\" (Close side panel) button at its top right.",
+        "Look at the Tasks tab again."
+      ]
+    },
+    {
+      "index": 11,
+      "reported_at_seconds": 1057,
+      "name": "Record title and its editable heading disappear at tablet and phone widths",
+      "summary": "At 768 and 390 px the record title heading, the record avatar and the 'Added …' line are not rendered at all, and there is no Title input in the page, so the title of the record cannot be read in full or edited on a tablet or phone. Only the truncated breadcrumb shows part of the title. (on /object/note/6930efc4-a6e1-4f85-a717-cccc109c2bcd)",
+      "expected": "The record page shows the record's title (and lets you rename it) at every width, as it does on desktop.",
+      "actual": "At 768 and 390 px the record title heading, the record avatar and the 'Added …' line are not rendered at all, and there is no Title input in the page, so the title of the record cannot be read in full or edited on a tablet or phone. Only the truncated breadcrumb shows part of the title.",
+      "reproSteps": [
+        "Sign in with tim@apple.dev / tim@apple.dev and open https://5500-i2bvhtm4sxq8s677s7h83.e2b.app/object/note/6930efc4-a6e1-4f85-a717-cccc109c2bcd at a 1280 px wide window: the record title \"agent9-Ünïcode & <b>x</b> 🎉 note\" is shown as a large heading with the record avatar and \"Added 12 minutes ago\" under it, and clicking it turns it into an editable Title field.",
+        "Narrow the window to 768 x 1024 (tablet): the heading, avatar and 'Added …' line are gone; the page starts at the Note/Timeline/Files tabs, then Fields.",
+        "Narrow the window to 390 x 844 (phone): still no title heading and no Title field anywhere on the page; the title only appears cut off in the breadcrumb (\"Notes / agent9-Ünïcode & <b>x</b> ... (5/1,814)\")."
+      ]
+    },
+    {
+      "index": 12,
+      "reported_at_seconds": 1090,
+      "name": "A 200-character record name pushes the record header buttons (star, previous/next, ⋮) off screen and clips the record counter",
+      "summary": "The breadcrumb grows to the full window width, its title is cut with no ellipsis, the position counter is clipped to \"(1,807/1,815\" at the window edge, and the record header actions that were visible before (Add to Favorites star, previous/next record arrows, Command Menu ⋮) are pushed off screen and are no longer in the page's accessibility tree either. Renaming the record back to a short title brings all of them back. (on /object/note/ae62af53-946b-414b-9b2d-3871d32e8486)",
+      "expected": "A long record name is truncated with an ellipsis inside the breadcrumb (or wraps), and the header action buttons plus the record counter stay visible and clickable, as they are with a short name.",
+      "actual": "The breadcrumb grows to the full window width, its title is cut with no ellipsis, the position counter is clipped to \"(1,807/1,815\" at the window edge, and the record header actions that were visible before (Add to Favorites star, previous/next record arrows, Command Menu ⋮) are pushed off screen and are no longer in the page's accessibility tree either. Renaming the record back to a short title brings all of them back.",
+      "reproSteps": [
+        "Sign in with tim@apple.dev / tim@apple.dev and open the note record https://5500-i2bvhtm4sxq8s677s7h83.e2b.app/object/note/ae62af53-946b-414b-9b2d-3871d32e8486 at a 1280x720 window ('agent3 note title')",
+        "Note the header right side shows the favourite star, the previous/next record arrows and the ⋮ Command Menu button",
+        "Click the note title heading, select all and type a 200-character unbroken title: agent3 followed by 200 'x' characters, then press Enter",
+        "The breadcrumb becomes 'Notes / agent3xxxx…' and runs to the window edge: the counter is clipped to '(1,807/1,815' and the star, previous/next arrows and ⋮ button are gone",
+        "Click the title, replace it with 'agent3 note title' and press Enter: the counter and all the header buttons come back"
+      ]
+    },
+    {
+      "index": 13,
+      "reported_at_seconds": 1131,
+      "name": "Escape in the Address field editor saves the edit instead of cancelling it",
+      "summary": "Pressing Escape sends UpdateOneCompany and saves the edit: the City value agent1-EscCity typed into the popover is written to the record (the address value/tooltip now reads \"...Suite 100,agent1-EscCity,CA,95014,United States\" and the Timeline entry updates). There is no way to cancel an address edit once a sub-field has been touched; the same happened earlier when I pressed Escape after filling Address 1/2, City, State, Post Code and Country — all parts were saved. (on /object/company/315b7bfe-a771-4907-b67d-e68db4f146e7 (company record, Fields panel → Address))",
+      "expected": "Escape closes the address editor and discards the change typed in it (a cancel), so the record keeps its previous City value; only a deliberate save (Enter/click outside) writes it.",
+      "actual": "Pressing Escape sends UpdateOneCompany and saves the edit: the City value agent1-EscCity typed into the popover is written to the record (the address value/tooltip now reads \"...Suite 100,agent1-EscCity,CA,95014,United States\" and the Timeline entry updates). There is no way to cancel an address edit once a sub-field has been touched; the same happened earlier when I pressed Escape after filling Address 1/2, City, State, Post Code and Country — all parts were saved.",
+      "reproSteps": [
+        "Sign in at /welcome with tim@apple.dev / tim@apple.dev and open /object/company/315b7bfe-a771-4907-b67d-e68db4f146e7 (company agent1-testco).",
+        "In the left Fields panel under Contact, click the Address value — the address editor popover opens (Address 1, Address 2, City, State, Post Code, Country).",
+        "Replace the City value with agent1-EscCity.",
+        "Press Escape to cancel the edit.",
+        "Reopen the Address editor (or hover the Address value): City still reads agent1-EscCity, i.e. the cancelled change was saved."
+      ]
+    },
+    {
+      "index": 14,
+      "reported_at_seconds": 1139,
+      "name": "The Tasks count in a record's Tasks tab does not decrease after a task is deleted (says 6 while 5 are listed)",
+      "summary": "The deleted row disappears from the list immediately but the tab header keeps the old total: it still reads \\\"Tasks 6\\\" while the groups below list only 5 tasks (TODO 1, IN_PROGRESS 1, DONE 3 = 5). After reloading the page the header correctly reads \\\"Tasks 5\\\", so the number is only refreshed on a page load, not when a task is deleted. (on /object/company/20202020-a305-41e7-8c72-ba44072a4c58 (Tasks tab))",
+      "expected": "The Tasks count in the record's Tasks tab should drop to the number of tasks actually listed as soon as the task is deleted (5 after deleting one of 6), without needing a page reload.",
+      "actual": "The deleted row disappears from the list immediately but the tab header keeps the old total: it still reads \\\"Tasks 6\\\" while the groups below list only 5 tasks (TODO 1, IN_PROGRESS 1, DONE 3 = 5). After reloading the page the header correctly reads \\\"Tasks 5\\\", so the number is only refreshed on a page load, not when a task is deleted.",
+      "reproSteps": [
+        "Open the Google company record /object/company/20202020-a305-41e7-8c72-ba44072a4c58 (signed in as tim@apple.dev) and click the Tasks tab; note the header count, e.g. \"Tasks 6\".",
+        "Click the \"+\" (New task) button at the top right of the Tasks tab, type a title (e.g. \"agent5 long title Lorem ipsum ...\") in the panel's Title field, press Enter, then close the side panel with the \"X\" button.",
+        "Confirm the header now reads \"Tasks 6\" and 6 rows are listed (TODO 2, IN_PROGRESS 1, DONE 3).",
+        "Click that task's row to open the side panel, click \"Options\" at the bottom right of the panel, then \"Delete Task\".",
+        "Look at the Tasks tab header and the rows still listed, without reloading the page."
+      ]
+    },
+    {
+      "index": 15,
+      "reported_at_seconds": 1201,
+      "name": "Note cards in a record's Notes tab break words mid-word (\"more text her / e.\", \"Complement / ary\")",
+      "summary": "The card preview splits ordinary words at the line end (\\\"her e.\\\", \\\"Complement ary\\\", \\\"rea ch\\\", \\\"%underscap e\\\"), so the text is hard to read at every width tested (1280 and 768). (on /object/company/20202020-a305-41e7-8c72-ba44072a4c58 (Notes tab))",
+      "expected": "The note body preview wraps at word boundaries, as the rest of the app does; long words that do not fit are hyphenated or overflow, not split in the middle of ordinary words.",
+      "actual": "The card preview splits ordinary words at the line end (\\\"her e.\\\", \\\"Complement ary\\\", \\\"rea ch\\\", \\\"%underscap e\\\"), so the text is hard to read at every width tested (1280 and 768).",
+      "reproSteps": [
+        "Open https://5500-i2bvhtm4sxq8s677s7h83.e2b.app/object/company/20202020-a305-41e7-8c72-ba44072a4c58 (Google) and open the Notes tab.",
+        "Read the body preview of the note cards, e.g. the card titled \"agent4 note one\" and the card \"Partnership Opportunity\".",
+        "Notice that lines end in the middle of words: \"and more text her / e.\", \"%underscap / e_\", \"Complement / ary strengths in market rea / ch\", \"<b>x / </b>\".",
+        "Resize the window to tablet width (768) and read the same cards: \"Stro / ng financial position\", \"ve / ndor status\"."
+      ]
+    },
+    {
+      "index": 16,
+      "reported_at_seconds": 1305,
+      "name": "Slash command menu leaves the typed \\\"/\\\" in the note text, saved after reload",
+      "summary": "After picking \\\"Heading 1\\\" (or \\\"Quote\\\") from the slash menu, the \\\"/\\\" that opened the menu stays in the block as text: the heading line reads \\\"/agent10 heading line\\\" and the quote reads \\\"/agent10 quote line\\\", and the stray \\\"/\\\" is saved — it is still there after reloading the record page. (on /object/note/94f3a810-fc26-4636-9e87-4d2b0c278976)",
+      "expected": "Choosing an item from the slash command menu converts the current line to that block type and consumes the \\\"/\\\" trigger, so the block holds only the text the person types and reads back the same after reloading.",
+      "actual": "After picking \\\"Heading 1\\\" (or \\\"Quote\\\") from the slash menu, the \\\"/\\\" that opened the menu stays in the block as text: the heading line reads \\\"/agent10 heading line\\\" and the quote reads \\\"/agent10 quote line\\\", and the stray \\\"/\\\" is saved — it is still there after reloading the record page.",
+      "reproSteps": [
+        "Open the note record /object/note/94f3a810-fc26-4636-9e87-4d2b0c278976 (note \"agent10-ZZ Test Note QA\") and click at the end of the text in the Note editor on the right.",
+        "Press Enter to start a new line and type \"/\" — the slash command menu opens (Heading 1, Heading 2, Heading 3, Quote, Toggle List).",
+        "Click \"Heading 1\" in the menu and type \"agent10 heading line\".",
+        "The block becomes a Heading 1 but reads \"/agent10 heading line\" — the slash is kept.",
+        "Reload the page: the heading still reads \"/agent10 heading line\", so the stray slash was saved.",
+        "Repeat with a second block: new line, type \"/\", choose \"Quote\", type \"agent10 quote line\" — the quote reads \"/agent10 quote line\"."
+      ]
+    },
+    {
+      "index": 17,
+      "reported_at_seconds": 1339,
+      "name": "Adding the same relation from two tabs creates a duplicate relation: the note appears twice on the person's Notes tab",
+      "summary": "A second relation row is created for the same record. The note's Relations field renders the same person and the same company twice (plus a \\\"+2\\\" overflow counter), and Terry Melendez's Notes tab shows the note card \\\"agent8-Note Beta\\\" twice with the tab counting \\\"Notes 3\\\" although only two different notes exist. (on /object/note/63412e96-fc0f-4497-ab1b-f61cd9f9b693)",
+      "expected": "A note can be related to a given record only once: checking a relation that already exists must not create a second link, and the person's Notes tab should list the note once (count 2 with the other related note).",
+      "actual": "A second relation row is created for the same record. The note's Relations field renders the same person and the same company twice (plus a \\\"+2\\\" overflow counter), and Terry Melendez's Notes tab shows the note card \\\"agent8-Note Beta\\\" twice with the tab counting \\\"Notes 3\\\" although only two different notes exist.",
+      "reproSteps": [
+        "Open https://5500-i2bvhtm4sxq8s677s7h83.e2b.app/object/note/63412e96-fc0f-4497-ab1b-f61cd9f9b693 (note \"agent8-Note Beta\") in two browser tabs.",
+        "Tab 1: click the pencil next to the Relations chips, type \"Terry\" in the Search box, tick the checkbox \"Terry Melendez\". The chip \"Terry Melendez\" is added.",
+        "Tab 2 (still open, not reloaded, so it shows only the old relation \"Automation Anywhere\"): click the pencil next to the Relations chips, tick \"Terry Melendez\" again.",
+        "Reload tab 2: the Relations field now shows the company \"Automation Anywhere\" and the person \"Terry Melendez\" twice each (the chips overflow into a \"+2\" counter).",
+        "Open the person record https://5500-i2bvhtm4sxq8s677s7h83.e2b.app/object/person/20202020-b003-415a-9051-133248495f7f (Terry Melendez) and click its Notes tab."
+      ]
+    },
+    {
+      "index": 18,
+      "reported_at_seconds": 1411,
+      "name": "The LinkedIn field is misspelled \"Linkedin\" on company records and in the Companies list",
+      "summary": "Both the field label and its empty placeholder read \"Linkedin\" (lowercase second i); the platform's name is \"LinkedIn\". The same spelling appears as the column header in the Companies list. (on /object/company/53a4a890-5548-4c50-97a3-3458d43384ce)",
+      "expected": "The field is labelled \"LinkedIn\", like the platform it links to.",
+      "actual": "Both the field label and its empty placeholder read \"Linkedin\" (lowercase second i); the platform's name is \"LinkedIn\". The same spelling appears as the column header in the Companies list.",
+      "reproSteps": [
+        "Sign in with tim@apple.dev / tim@apple.dev and open https://5500-i2bvhtm4sxq8s677s7h83.e2b.app/object/company/53a4a890-5548-4c50-97a3-3458d43384ce",
+        "Look at the Contact section of the Fields panel: the field label is 'Linkedin' and its empty value placeholder is also 'Linkedin'",
+        "Open /objects/companies: the same column header reads 'Linkedin'"
+      ]
+    },
+    {
+      "index": 19,
+      "reported_at_seconds": 1435,
+      "name": "Browser Back removes the tab from the record's address but the record keeps showing the old tab",
+      "summary": "The address bar drops the tab (it becomes /object/company/20202020-a225-4b3d-a89c-7f6c30df998a with no #tab), but the record stays on the tab I was on: with Tasks selected the Tasks tab and its rows are still shown, with Notes selected the Notes tab and its 4 notes are still shown. Reloading that same address then shows the Timeline tab instead, so the address does not describe what is on screen. (on /object/company/20202020-a225-4b3d-a89c-7f6c30df998a)",
+      "expected": "Back should return to the previous view with its URL and its tab in agreement — either the Timeline tab (the tab of the address shown) or the previous tab with its #tab hash still in the address, so that the address a person copies or reloads opens the tab they see.",
+      "actual": "The address bar drops the tab (it becomes /object/company/20202020-a225-4b3d-a89c-7f6c30df998a with no #tab), but the record stays on the tab I was on: with Tasks selected the Tasks tab and its rows are still shown, with Notes selected the Notes tab and its 4 notes are still shown. Reloading that same address then shows the Timeline tab instead, so the address does not describe what is on screen.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open the Microsoft company record /object/company/20202020-a225-4b3d-a89c-7f6c30df998a (Timeline is shown).",
+        "Click the \"Tasks\" tab in the record's tab bar; the address gains a #<tab-id> hash.",
+        "Press the browser Back button once.",
+        "Compare the selected tab and content on screen with the address in the address bar, then reload the page.",
+        "Repeat with the \"Notes\" tab instead of Tasks."
+      ]
+    },
+    {
+      "index": 20,
+      "reported_at_seconds": 1447,
+      "name": "'Export to PDF' and 'Export Note' on a note record do nothing - no request, no dialog, no message",
+      "summary": "Nothing happens. No dialog, no PDF preview, no toast, no download prompt and no error message appear; the command menu stays open. The browser network log shows zero requests for the click and the console shows no output, so neither command sends an export request or produces a file. Both 'Export to PDF' (tried 3 times) and 'Export Note' have the same effect: nothing. (on /object/note/20202020-0002-4e7c-8001-123456789abc)",
+      "expected": "The command exports the open note: a request is sent (and answers 200) or a PDF preview/dialog appears, and the user gets the exported note or at least a clear message - anything other than silence.",
+      "actual": "Nothing happens. No dialog, no PDF preview, no toast, no download prompt and no error message appear; the command menu stays open. The browser network log shows zero requests for the click and the console shows no output, so neither command sends an export request or produces a file. Both 'Export to PDF' (tried 3 times) and 'Export Note' have the same effect: nothing.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open the note record /object/note/20202020-0002-4e7c-8001-123456789abc (note 'Project Update Discussion', from /objects/notes)",
+        "Click the three-dot options button at the top right of the record header to open the command menu",
+        "Click 'Export to PDF' in the 'Other' group - watch the screen, the browser network log and the console",
+        "Reload the page, reopen the same menu and click 'Export Note' under 'Export to PDF' - watch the same things"
+      ]
+    },
+    {
+      "index": 21,
+      "reported_at_seconds": 1610,
+      "name": "Email sender names in a record's Emails tab are cut mid-word without an ellipsis",
+      "summary": "The sender column is cut mid-word with no ellipsis: rows read \"Workspace Men\", \"Workspace Mr\", \"Person 256, W\", \"Person 192, Er\", \"Emma Johnso\", \"Person 1194, A\", \"Maria Garcia, \\\" while the neighbouring subject and snippet columns in the same row end correctly with \\\"…\\\". At 1280 px wide the same names are also cut (e.g. \"Person 256, Works\", \"Person 192, Emily C\"). (on /object/company/20202020-a305-41e7-8c72-ba44072a4c58 (Emails tab))",
+      "expected": "A truncated sender/recipient name in the list should end with an ellipsis (like the subject and snippet columns next to it), or the column should be wide enough to read the name.",
+      "actual": "The sender column is cut mid-word with no ellipsis: rows read \"Workspace Men\", \"Workspace Mr\", \"Person 256, W\", \"Person 192, Er\", \"Emma Johnso\", \"Person 1194, A\", \"Maria Garcia, \\\" while the neighbouring subject and snippet columns in the same row end correctly with \\\"…\\\". At 1280 px wide the same names are also cut (e.g. \"Person 256, Works\", \"Person 192, Emily C\").",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev",
+        "Open /object/company/20202020-a305-41e7-8c72-ba44072a4c58 (Google company record)",
+        "Click the \"Emails\" tab (header shows \"Emails 284\")",
+        "Set the window to tablet width 768 x 1024 and look at the sender names at the start of each email row"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,263 @@
+{
+  "bugs": [
+    {
+      "name": "Home page's \"Glossary\" link leads nowhere — it opens the Pages list, no Glossary page exists",
+      "summary": "The bullet is rendered as a link but clicking it lands on the wiki 'Pages' index (/eval/harbor-handbook/wiki/?action=_pages) with no message about the missing page; no page named Glossary exists in the Pages list or in the 'Page:' page dropdown, so the link can never show the glossary it promises. (on /eval/harbor-handbook/wiki/Home)",
+      "expected": "A Glossary wiki page opens (the other two bullets, 'Onboarding' and 'Release Checklist', open their pages), or the app tells the reader the page does not exist / offers to create it.",
+      "actual": "The bullet is rendered as a link but clicking it lands on the wiki 'Pages' index (/eval/harbor-handbook/wiki/?action=_pages) with no message about the missing page; no page named Glossary exists in the Pages list or in the 'Page:' page dropdown, so the link can never show the glossary it promises.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-ipj8k3in3f2cenwjnb2vr.e2b.app/eval/harbor-handbook/wiki/Home",
+        "In the page body under the heading 'Sections' click the third bullet link 'Glossary'",
+        "Observe the page you land on and its address",
+        "Also open https://5503-ipj8k3in3f2cenwjnb2vr.e2b.app/eval/harbor-handbook/wiki/Glossary directly"
+      ]
+    },
+    {
+      "name": "Page filter box empties itself when ArrowDown is pressed, but the list stays filtered",
+      "summary": "The filter box empties and shows its 'Filter page...' placeholder again, but the list stays filtered to the two 'beta' matches, so ~20 pages are hidden with no visible filter. After Escape and reopening the dropdown the box is still empty while the list is still filtered; only typing a character and deleting it brings all pages back. (on /eval/harbor-handbook/wiki/Filt-alpha.-)",
+      "expected": "The typed query stays visible in the filter box while the list is filtered by it (or the box and the list always agree), so the user can see which filter is applied and clear it.",
+      "actual": "The filter box empties and shows its 'Filter page...' placeholder again, but the list stays filtered to the two 'beta' matches, so ~20 pages are hidden with no visible filter. After Escape and reopening the dropdown the box is still empty while the list is still filtered; only typing a character and deleting it brings all pages back.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /eval/harbor-handbook/wiki/Filt-alpha.-",
+        "Click the 'Page: Filt-alpha' dropdown button at the top left of the wiki page",
+        "Type 'beta' into the 'Filter page...' box: the list correctly narrows to 'Filt-beta' and 'RenBeta'",
+        "Press the Down arrow key once",
+        "Look at the filter box and at the list",
+        "Also press Escape, then click 'Page: ...' again to reopen the dropdown"
+      ]
+    },
+    {
+      "name": "Commit summary counts don't match the diff when \"Ignore changes in whitespace at EOL\" is applied",
+      "summary": "The summary still says \\\"1 changed files with 6 additions and 3 deletions\\\" while the diff below shows 5 added lines (# Version four, Delta line two., Epsilon line three., Zeta line four., Omega line six.) and 2 deleted lines (# Version three, Gamma line two.). The file header badge, by contrast, changes from 9 to 7 changed blocks for the same option, so the page contradicts itself. (on /eval/harbor-handbook/wiki/commit/39931523d080ed6d7e89c17bcdd10c580884e5a7)",
+      "expected": "The summary counts describe the diff that is displayed: with the whitespace-at-EOL change ignored, \\\"Common line here.\\\" is shown as unchanged context, so the summary should read 5 additions and 2 deletions.",
+      "actual": "The summary still says \\\"1 changed files with 6 additions and 3 deletions\\\" while the diff below shows 5 added lines (# Version four, Delta line two., Epsilon line three., Zeta line four., Omega line six.) and 2 deleted lines (# Version three, Gamma line two.). The file header badge, by contrast, changes from 9 to 7 changed blocks for the same option, so the page contradicts itself.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open the wiki page /eval/harbor-handbook/wiki/Agent2-Rev-1.-",
+        "Open its revision history and the newest commit \"agent2: <b>x</b> & \"quotes\" 🎯 ünïcode\" (SHA 39931523d0)",
+        "In the diff options menu (the \"...\" next to Split View) choose \"Ignore changes in whitespace at EOL\" — the address becomes ?style=unified&whitespace=ignore-eol",
+        "Read the summary line above the file and compare it with the + and - lines shown in Agent2-Rev-1.-.md"
+      ]
+    },
+    {
+      "name": "Page selector menu stretches to the width of the longest page name and runs off the screen",
+      "summary": "The menu grows to the width of the longest page name: it is about 2024 px wide against a 1440 px window, so it runs far past the right edge and the whole page is pushed sideways (the repository header and nav links are cut off at the left, \"ssues\", \"ul Requests\"). At 390 px the menu is also ~2024 px wide, so the \"Filter page...\" box, its magnifier icon and the right part of every entry are off-screen and the menu overlays the page content. (on /eval/harbor-handbook/wiki/Filt-gamma.-)",
+      "expected": "The page selector menu stays within the window (max width, long names wrapped or truncated with an ellipsis), the filter box and every entry fully visible, and the page does not scroll sideways.",
+      "actual": "The menu grows to the width of the longest page name: it is about 2024 px wide against a 1440 px window, so it runs far past the right edge and the whole page is pushed sideways (the repository header and nav links are cut off at the left, \"ssues\", \"ul Requests\"). At 390 px the menu is also ~2024 px wide, so the \"Filter page...\" box, its magnifier icon and the right part of every entry are off-screen and the menu overlays the page content.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /eval/harbor-handbook/wiki/Filt-gamma.- (the repository already contains a wiki page named 'agent4 long title aaaa...' with ~200 characters)",
+        "Click the 'Page: Filt-gamma' dropdown at the top left of the wiki page",
+        "Look at the opened menu and at the rest of the page (test at a 1440 px wide window)",
+        "Repeat at a 390 x 844 window"
+      ]
+    },
+    {
+      "name": "Renaming a wiki page wipes its earlier revision history (revision count resets to 1)",
+      "summary": "After the rename the revision badge drops from 2 to 1 and the 'Wiki Page Revisions' page lists a single commit 'Update RenEta' (4e8f9763a9). The revisions made before the rename can no longer be viewed or compared from the wiki. Reproduced on three pages: 'RenGamma' (2 revisions) renamed to 'RenDelta' then 'RenEta' went 2 → 1 → 1, and a page created as 'RenAlpha' and renamed to 'RenBeta' shows only one commit 'Update RenBeta'. (on /eval/harbor-handbook/wiki)",
+      "expected": "The renamed page keeps the revisions made before the rename: the revision badge and the revision list still show the earlier commits, so older versions can be viewed, compared and downloaded.",
+      "actual": "After the rename the revision badge drops from 2 to 1 and the 'Wiki Page Revisions' page lists a single commit 'Update RenEta' (4e8f9763a9). The revisions made before the rename can no longer be viewed or compared from the wiki. Reproduced on three pages: 'RenGamma' (2 revisions) renamed to 'RenDelta' then 'RenEta' went 2 → 1 → 1, and a page created as 'RenAlpha' and renamed to 'RenBeta' shows only one commit 'Update RenBeta'.",
+      "reproSteps": [
+        "Create a wiki page from /eval/harbor-handbook/wiki?action=_new titled 'RenDelta' with some content and save it, then edit it once more (e.g. change the content to 'Version three of the gamma page.') and save, so the page header shows the revision badge '2'.",
+        "Open /eval/harbor-handbook/wiki/RenDelta?action=_revision: the page says '2 Commits' and lists both revisions.",
+        "Open /eval/harbor-handbook/wiki/RenDelta?action=_edit and change ONLY the 'Page title' field to 'RenEta' (content untouched), then click Save Page.",
+        "On the new page /eval/harbor-handbook/wiki/RenEta open the revision badge: /eval/harbor-handbook/wiki/RenEta?action=_revision."
+      ]
+    },
+    {
+      "name": "Pages list: a page with a long unbroken title overflows the panel and creates page-wide horizontal scrolling",
+      "summary": "The name is rendered on one 1775 px wide line that runs past the list panel's right border and off the screen (it is cut at the viewport edge); the document becomes 1844 px wide at a 1280 px viewport, so the whole Pages page scrolls horizontally. (on /eval/harbor-handbook/wiki/_pages)",
+      "expected": "The page name wraps or is truncated inside the list panel, and the page never scrolls sideways.",
+      "actual": "The name is rendered on one 1775 px wide line that runs past the list panel's right border and off the screen (it is cut at the viewport edge); the document becomes 1844 px wide at a 1280 px viewport, so the whole Pages page scrolls horizontally.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-ipj8k3in3f2cenwjnb2vr.e2b.app/eval/harbor-handbook/wiki?action=_new",
+        "Type a long page title of one unbroken word, e.g. \"agent4 long title aaaa…\" (about 215 characters) and click \"Save Page\". The page is created at /wiki/agent4-long-title-aaaa…",
+        "Go to the Pages list: https://5503-ipj8k3in3f2cenwjnb2vr.e2b.app/eval/harbor-handbook/wiki/_pages and look at the row of that page (scroll down until it is visible)."
+      ]
+    },
+    {
+      "name": "Table of Contents shows raw HTML tags instead of the heading's text",
+      "summary": "The heading body renders \\\"bold heading\\\" in bold, but the Table of Contents entry shows the markup literally: <b>bold heading</b> (the tags are escaped and displayed to the reader). (on /eval/harbor-handbook/wiki/Md-agent6.-)",
+      "expected": "The Table of Contents entry shows the heading's readable text (\\\"bold heading\\\"), the same text the heading itself renders.",
+      "actual": "The heading body renders \\\"bold heading\\\" in bold, but the Table of Contents entry shows the markup literally: <b>bold heading</b> (the tags are escaped and displayed to the reader).",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-ipj8k3in3f2cenwjnb2vr.e2b.app/eval/harbor-handbook/wiki",
+        "Click \"New Page\", type the page title \"Md-agent6\", and switch the editor to the plain Markdown one with the \"Use the legacy editor instead\" button (or press the \"Revert to simple textarea\" button if the toolbar editor opens)",
+        "In the page content type a heading that contains inline HTML: ## <b>bold heading</b>",
+        "Click \"Save Page\" and look at the \"Table of Contents\" panel on the right of the rendered page"
+      ]
+    },
+    {
+      "name": "Markdown image with a site-absolute path is rewritten to a wiki/raw URL and shows a broken image",
+      "summary": "The image is requested from /eval/harbor-handbook/wiki/raw/assets/img/logo.svg, which answers 404, so the page shows a broken-image icon and the alt text \\\"logo\\\" instead of the picture. A raw HTML <img src=\\\"/assets/img/logo.svg\\\"> in the same page is rewritten the same way (/eval/harbor-handbook/wiki/raw/assets/img/logo.svg, 404) and shows alt text \\\"html img\\\". /assets/img/logo.svg itself answers 200 at the site root. (on /eval/harbor-handbook/wiki/Md-agent6.-)",
+      "expected": "An absolute (site-root) image path in a wiki page is loaded from that path, or at least from a URL that resolves to the image, so the picture is shown.",
+      "actual": "The image is requested from /eval/harbor-handbook/wiki/raw/assets/img/logo.svg, which answers 404, so the page shows a broken-image icon and the alt text \\\"logo\\\" instead of the picture. A raw HTML <img src=\\\"/assets/img/logo.svg\\\"> in the same page is rewritten the same way (/eval/harbor-handbook/wiki/raw/assets/img/logo.svg, 404) and shows alt text \\\"html img\\\". /assets/img/logo.svg itself answers 200 at the site root.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-ipj8k3in3f2cenwjnb2vr.e2b.app/eval/harbor-handbook/wiki",
+        "Click \"New Page\", type the page title \"Md-agent6\" and use the plain Markdown editor (\"Use the legacy editor instead\" / \"Revert to simple textarea\")",
+        "In the page content type an image with a site-absolute path: ![logo](/assets/img/logo.svg \"the logo\")",
+        "Click \"Save Page\" and look at the rendered page where the image should be",
+        "Also try the raw HTML form in the same content: <img src=\"/assets/img/logo.svg\" width=\"40\" alt=\"html img\">, save and look again"
+      ]
+    },
+    {
+      "name": "Saving a stale wiki edit form silently overwrites a newer revision made in another tab",
+      "summary": "The stale form saves without any warning: revision 5 is committed with the older content, the page shows \"First line from alex. … Second section written by eval.\" again, and the text saved from tab 2 (\"FRESH content saved from tab 2 by eval.\", revision \"agent12 FRESH tab2 save\") is silently overwritten. No conflict message, no indication the page had changed. (on /eval/harbor-handbook/wiki/agent12-Alpha)",
+      "expected": "The editor should notice that the page changed since the form was loaded and refuse or warn about the conflict (or show a diff/merge) instead of committing the stale text over the newer revision.",
+      "actual": "The stale form saves without any warning: revision 5 is committed with the older content, the page shows \"First line from alex. … Second section written by eval.\" again, and the text saved from tab 2 (\"FRESH content saved from tab 2 by eval.\", revision \"agent12 FRESH tab2 save\") is silently overwritten. No conflict message, no indication the page had changed.",
+      "reproSteps": [
+        "Sign in as eval and open /eval/harbor-handbook/wiki/agent12-Alpha",
+        "Click Edit; leave this tab (tab 1) with the editor open and its content untouched",
+        "In a second tab open the same edit URL /eval/harbor-handbook/wiki/agent12-Alpha?action=_edit, replace the content with 'FRESH content saved from tab 2 by eval.', write the note 'agent12 FRESH tab2 save' and click Save Page (this becomes revision 4)",
+        "Switch back to tab 1, which still holds the older content, and click Save Page",
+        "The save succeeds (revision 5) and the page now shows tab 1's older text; the content saved from tab 2 is gone"
+      ]
+    },
+    {
+      "name": "Renaming a page onto an existing page's title silently overwrites that page's content",
+      "summary": "No warning or confirmation: the save redirects to /eval/harbor-handbook/wiki/RenExisting and that page now shows the content of the renamed page (\"Version three of the gamma page.\", heading \"RenDelta\"). The previous content of 'RenExisting' (\"Content of the page that already exists (should be preserved).\") is gone from the page and survives only as the older commit 'Add RenExisting' in the revision list; 'RenEta' no longer exists in the Pages list. (on /eval/harbor-handbook/wiki)",
+      "expected": "Either the rename is refused with a message that a page named 'RenExisting' already exists, or the person is warned that the existing page will be overwritten and must confirm before anything is lost.",
+      "actual": "No warning or confirmation: the save redirects to /eval/harbor-handbook/wiki/RenExisting and that page now shows the content of the renamed page (\"Version three of the gamma page.\", heading \"RenDelta\"). The previous content of 'RenExisting' (\"Content of the page that already exists (should be preserved).\") is gone from the page and survives only as the older commit 'Add RenExisting' in the revision list; 'RenEta' no longer exists in the Pages list.",
+      "reproSteps": [
+        "Create a page at /eval/harbor-handbook/wiki?action=_new titled 'RenExisting' with content 'Content of the page that already exists (should be preserved).' and click Save Page.",
+        "Create a second page titled 'RenEta' (in this run it was created as 'RenGamma', content 'Version three of the gamma page.').",
+        "Open /eval/harbor-handbook/wiki/RenEta?action=_edit, change only the 'Page title' field to 'RenExisting' (the title of the page from step 1) and click Save Page.",
+        "Open /eval/harbor-handbook/wiki/RenExisting and compare its content with step 1; then open /eval/harbor-handbook/wiki/RenExisting?action=_revision."
+      ]
+    },
+    {
+      "name": "At 390px a long page title makes the page selector overlap the \\\"Code\\\" button, which then cannot be clicked",
+      "summary": "The \\\"Page: agent13verylongpagetitlenospacesatallhere\\\" selector grows to 266px and overlaps the 100px \\\"Code\\\" button, which is reduced to a ~38px blue sliver at the right edge with its label and caret cut off. Clicking the \\\"Code\\\" button does not open the menu: the click is intercepted by the page-selector element (\\\"div.ui.basic.small.button inside div.flex-text-block tw-flex-1 intercepts pointer events\\\"), so Code cannot be reached at this width. The page name row below is also truncated to \\\"agent13verylongpagetitlenospacesat…\\\". (on /eval/harbor-handbook/wiki/agent13verylongpagetitlenospacesatallhere)",
+      "expected": "The toolbar row keeps both controls usable at phone width: the page selector is truncated (or wraps) so the \\\"Code\\\" button keeps its full label and can be clicked, as it does on a page with a short title such as /wiki/Home.",
+      "actual": "The \\\"Page: agent13verylongpagetitlenospacesatallhere\\\" selector grows to 266px and overlaps the 100px \\\"Code\\\" button, which is reduced to a ~38px blue sliver at the right edge with its label and caret cut off. Clicking the \\\"Code\\\" button does not open the menu: the click is intercepted by the page-selector element (\\\"div.ui.basic.small.button inside div.flex-text-block tw-flex-1 intercepts pointer events\\\"), so Code cannot be reached at this width. The page name row below is also truncated to \\\"agent13verylongpagetitlenospacesat…\\\".",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1",
+        "Set the browser viewport to 390 x 844",
+        "Open https://5503-ipj8k3in3f2cenwjnb2vr.e2b.app/eval/harbor-handbook/wiki/agent13verylongpagetitlenospacesatallhere (a page whose title is one long word: \"agent13verylongpagetitlenospacesatallhere\")",
+        "Look at the wiki toolbar row at the top of the page: the \"Page: <title>\" selector and, to its right, the blue \"Code\" button",
+        "Try to click the \"Code\" button"
+      ]
+    },
+    {
+      "name": "At phone width the wiki revision list hides the SHA1 column, leaving no way to open a revision or its diff",
+      "summary": "At 390px the table shows only Author, Message and Date: there is no SHA1 column, no SHA link at all, and the table cannot be scrolled sideways (the page has no horizontal scroll and no scroll container). The only copy of a revision is the copy-to-clipboard icon, which cannot open the commit. At 768px and 1440px the SHA1 column and its links are present. (on /eval/harbor-handbook/wiki/agent12-Alpha?action=_revision)",
+      "expected": "The revision list stays usable on a phone: each revision keeps a way to open it (the SHA1 link), as it does at tablet and desktop width, so a commit/diff can be opened from the revision history.",
+      "actual": "At 390px the table shows only Author, Message and Date: there is no SHA1 column, no SHA link at all, and the table cannot be scrolled sideways (the page has no horizontal scroll and no scroll container). The only copy of a revision is the copy-to-clipboard icon, which cannot open the commit. At 768px and 1440px the SHA1 column and its links are present.",
+      "reproSteps": [
+        "Sign in and open /eval/harbor-handbook/wiki/agent12-Alpha?action=_revision (Wiki Page Revisions, 5 commits)",
+        "Set the browser width to 390 CSS pixels (phone)",
+        "Look at the revision table and try to open any revision / scroll the table sideways"
+      ]
+    },
+    {
+      "name": "Saving a stale edit form recreates a page that was just deleted (\"cannot be undone\" is not true)",
+      "summary": "The save succeeds (303) and the deleted page exists again, with the old content and the revision counter at 3; the person gets no warning that the page was deleted in the meantime. The deletion the dialog called irreversible is silently undone. (on /eval/harbor-handbook/wiki/Del5Foxtrot?action=_edit)",
+      "expected": "The editor should notice the page no longer exists (the delete said it \\\"cannot be undone\\\") and refuse the save with a message such as \\\"this page was deleted\\\", instead of recreating it.",
+      "actual": "The save succeeds (303) and the deleted page exists again, with the old content and the revision counter at 3; the person gets no warning that the page was deleted in the meantime. The deletion the dialog called irreversible is silently undone.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1, open https://5503-ipj8k3in3f2cenwjnb2vr.e2b.app/eval/harbor-handbook/wiki?action=_new and create a page named Del5Foxtrot (Save Page)",
+        "Open the page's editor in a second tab: https://5503-ipj8k3in3f2cenwjnb2vr.e2b.app/eval/harbor-handbook/wiki/Del5Foxtrot?action=_edit",
+        "In the first tab, on the page view, click \"Delete Page\" and confirm with \"Yes\" (the dialog says the deletion cannot be undone)",
+        "Switch to the second tab, where the edit form for Del5Foxtrot is still open, and click \"Save Page\"",
+        "Look at the resulting page and its revision badge (it also reappears in the Pages list)"
+      ]
+    },
+    {
+      "name": "Creating a wiki page whose name already exists throws away the Markdown body that was typed",
+      "summary": "The red error \"A wiki page with the same name already exists.\" appears, the title \"Life-Renamed\" is kept, but the editor body is reset to the default \"Welcome to the Wiki.\" - the text that was typed (\"agent9 second attempt body text\") is gone and has to be retyped. Happened both times. (on /eval/harbor-handbook/wiki?action=_new)",
+      "expected": "The error is shown and the form keeps everything the person typed (title and Markdown body), so they can pick another name and save without retyping the content.",
+      "actual": "The red error \"A wiki page with the same name already exists.\" appears, the title \"Life-Renamed\" is kept, but the editor body is reset to the default \"Welcome to the Wiki.\" - the text that was typed (\"agent9 second attempt body text\") is gone and has to be retyped. Happened both times.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /eval/harbor-handbook/wiki?action=_new",
+        "Type 'Life-Renamed' in the 'Page title' field (a wiki page with that name already exists in this repository)",
+        "Replace the body in the editor with 'agent9 second attempt body text'",
+        "Click 'Save Page'",
+        "Look at the error message and at the editor body"
+      ]
+    },
+    {
+      "name": "The \"original Git file\" (.md) address of a wiki page shows the rendered page instead of the raw Markdown",
+      "summary": "Both addresses return the normal rendered wiki page: full site chrome, \"Page: agent3diffdemo\" selector, Edit / New Page / Delete Page buttons, rendered heading \"Revision four — Ünïcode\" and the Table of Contents. No raw Markdown is ever shown; for a special page such as /eval/harbor-handbook/wiki/_Footer.md the same construction lands on the Pages list instead. (on /eval/harbor-handbook/wiki/agent3diffdemo.md)",
+      "expected": "The address meant to show the original Git file returns the file's Markdown source as plain text (the content the editor and the .diff view show), as the link's label promises.",
+      "actual": "Both addresses return the normal rendered wiki page: full site chrome, \"Page: agent3diffdemo\" selector, Edit / New Page / Delete Page buttons, rendered heading \"Revision four — Ünïcode\" and the Table of Contents. No raw Markdown is ever shown; for a special page such as /eval/harbor-handbook/wiki/_Footer.md the same construction lands on the Pages list instead.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /eval/harbor-handbook/wiki",
+        "Open the page \"agent3diffdemo\" (4 revisions, rendered content \"Revision four — Ünïcode\") and note the rendered page",
+        "Open /eval/harbor-handbook/wiki/agent3diffdemo.md in the address bar — this is the address of the small \">\" link every row of /eval/harbor-handbook/wiki/?action=_pages offers, labelled \"View original Git file instead of using friendly link.\"",
+        "Also open /eval/harbor-handbook/wiki/agent3diffdemo?action=_raw"
+      ]
+    },
+    {
+      "name": "Commit diff summary says \\\"1 changed files with 1 additions and 1 deletions\\\"",
+      "summary": "The summary line always reads \\\"1 changed files with 1 additions and 1 deletions\\\" for a single-file change — plural wording for every count of one (\\\"files\\\", \\\"additions\\\", \\\"deletions\\\"). (on /eval/harbor-handbook/wiki/commit/f05f652226720562328c2ae8730514ab7b68f47e)",
+      "expected": "Correct singular wording for a one-file change, e.g. \\\"1 changed file with 1 addition and 1 deletion\\\".",
+      "actual": "The summary line always reads \\\"1 changed files with 1 additions and 1 deletions\\\" for a single-file change — plural wording for every count of one (\\\"files\\\", \\\"additions\\\", \\\"deletions\\\").",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-ipj8k3in3f2cenwjnb2vr.e2b.app/eval/harbor-handbook/wiki?action=_new, create page WSTest5 with three lines, Save Page",
+        "Edit the page (Edit -> change one line -> Save Page) so a revision exists",
+        "Open https://5503-ipj8k3in3f2cenwjnb2vr.e2b.app/eval/harbor-handbook/wiki/WSTest5?action=_revision and click the newest SHA1 to open the commit diff",
+        "Read the summary line above the diff"
+      ]
+    },
+    {
+      "name": "The \\\"Aa\\\" monospace toggle in the wiki editor changes nothing visible",
+      "summary": "The button's state flips (tooltip becomes \\\"Disable monospace font\\\", a tw-font-mono class is added) but the editor's text stays in the same monospace font at the same size in both states, so a sighted user sees nothing happen. The button also has no accessible name (only a data-tooltip-content attribute, aria-label empty), so screen readers announce just \\\"button\\\". (on /eval/harbor-handbook/wiki?action=_new)",
+      "expected": "The typography toggle visibly switches the editor between monospace and proportional text (the tooltip promises \\\"Enable monospace font\\\" / \\\"Disable monospace font\\\")",
+      "actual": "The button's state flips (tooltip becomes \\\"Disable monospace font\\\", a tw-font-mono class is added) but the editor's text stays in the same monospace font at the same size in both states, so a sighted user sees nothing happen. The button also has no accessible name (only a data-tooltip-content attribute, aria-label empty), so screen readers announce just \\\"button\\\".",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-ipj8k3in3f2cenwjnb2vr.e2b.app/eval/harbor-handbook/wiki?action=_new",
+        "Type Markdown in the page content box (e.g. \"line one\" and \"- line [two](url)\")",
+        "Click the \"Aa\" typography icon at the right end of the Markdown toolbar (tooltip \"Enable monospace font\")",
+        "Compare the editor text before and after; click it again to return"
+      ]
+    },
+    {
+      "name": "Relative image paths on a wiki page in a subdirectory lose the page's directory, and \"../\" loses the raw path entirely",
+      "summary": "Both are rewritten to the wrong place. The saved page's HTML is <img src=\"/eval/harbor-handbook/wiki/raw/pic.png\" alt=\"sibling\"> — the page's own directory agent3imgdir/ is dropped, so the browser asks for the wiki root file pic.png instead of agent3imgdir/pic.png. The parent reference becomes <img src=\"/eval/harbor-handbook/wiki/up.png\" alt=\"parent\"> — not a raw path at all (a wiki page address), so no file can ever load. Both images render as broken-image icons (alt text shown). On a page at the wiki root the same syntax works: ![x](Home.md) becomes /eval/harbor-handbook/wiki/raw/Home.md, which serves the file. (on /eval/harbor-handbook/wiki/agent3imgdir/sub)",
+      "expected": "Relative image paths resolve against the page's own location in the wiki repository: ![sibling](pic.png) on the page agent3imgdir/sub must request /eval/harbor-handbook/wiki/raw/agent3imgdir/pic.png, and ![parent](../up.png) must request /eval/harbor-handbook/wiki/raw/up.png, so an image stored next to the page loads.",
+      "actual": "Both are rewritten to the wrong place. The saved page's HTML is <img src=\"/eval/harbor-handbook/wiki/raw/pic.png\" alt=\"sibling\"> — the page's own directory agent3imgdir/ is dropped, so the browser asks for the wiki root file pic.png instead of agent3imgdir/pic.png. The parent reference becomes <img src=\"/eval/harbor-handbook/wiki/up.png\" alt=\"parent\"> — not a raw path at all (a wiki page address), so no file can ever load. Both images render as broken-image icons (alt text shown). On a page at the wiki root the same syntax works: ![x](Home.md) becomes /eval/harbor-handbook/wiki/raw/Home.md, which serves the file.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /eval/harbor-handbook/wiki?action=_new",
+        "Enter the page title agent3imgdir/sub (a page in a wiki subdirectory) and the content: \"Sibling image: ![sibling](pic.png)\" newline \"Parent image: ![parent](../up.png)\"",
+        "Click Save Page → the page opens at /eval/harbor-handbook/wiki/agent3imgdir%2Fsub with both images shown as broken images",
+        "Compare with a page at the wiki root: create agent3imgtest with \"![plain](Home.md)\" — its img src is /eval/harbor-handbook/wiki/raw/Home.md, which serves the file, while the subdirectory page's src values are /eval/harbor-handbook/wiki/raw/pic.png and /eval/harbor-handbook/wiki/up.png"
+      ]
+    },
+    {
+      "name": "Commit diff shows the accented wiki file name percent-encoded as \\\"Caf%C3%A913-Notes.md\\\"",
+      "summary": "The diff file header shows the file name percent-encoded: \\\"Caf%C3%A913-Notes.md\\\" (the tree exposes the same text as the file link). The commit title above it correctly reads \\\"Add Café13 Notes\\\", and the page itself shows \\\"Café13 Notes\\\", so the same name is shown two ways. (on /eval/harbor-handbook/wiki/commit/06075453a715044579b049d4d491bb21e5b33602)",
+      "expected": "The diff file header shows the readable file name \\\"Café13-Notes.md\\\", as the page view and the commit title show \\\"Café13 Notes\\\".",
+      "actual": "The diff file header shows the file name percent-encoded: \\\"Caf%C3%A913-Notes.md\\\" (the tree exposes the same text as the file link). The commit title above it correctly reads \\\"Add Café13 Notes\\\", and the page itself shows \\\"Café13 Notes\\\", so the same name is shown two ways.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1",
+        "Create a wiki page whose title has an accent: open https://5503-ipj8k3in3f2cenwjnb2vr.e2b.app/eval/harbor-handbook/wiki?action=_new, type the title \"Café13 Notes\", type any text in the content, click \"Save Page\"",
+        "The page opens at /eval/harbor-handbook/wiki/Caf%C3%A913-Notes and the page heading reads \"Café13 Notes\"",
+        "Open the page's revision list (/eval/harbor-handbook/wiki/Caf%C3%A913-Notes?action=_revision) and click the SHA1 \"06075453a7\" of the commit \"Add Café13 Notes\"",
+        "On the commit diff page /eval/harbor-handbook/wiki/commit/06075453a715044579b049d4d491bb21e5b33602 look at the file header inside the diff box"
+      ]
+    },
+    {
+      "name": "The .md address of an accented wiki page shows the Pages list instead of the page",
+      "summary": "The URL /eval/harbor-handbook/wiki/Caf%C3%A913-Notes.md shows the Pages list (title \\\"Pages - harbor-handbook\\\") with no message that the page is missing, even though the page exists and /wiki/Caf%C3%A913-Notes loads it. The same happens for another accented page: /wiki/Ren%C3%A9-%C3%9Cn%C3%AFcode.md shows the Pages list, while an ASCII page's .md address (/wiki/Addr13-Test.md) loads its page normally. The accented page is unreachable in its .md form. (on /eval/harbor-handbook/wiki/Caf%C3%A913-Notes.md)",
+      "expected": "The .md address of an existing page resolves to that page, exactly as /wiki/Addr13-Test.md resolves to the \\\"Addr13 Test\\\" page; the accented page \\\"/wiki/Caf%C3%A913-Notes.md\\\" should show \\\"Café13 Notes\\\", not the Pages list.",
+      "actual": "The URL /eval/harbor-handbook/wiki/Caf%C3%A913-Notes.md shows the Pages list (title \\\"Pages - harbor-handbook\\\") with no message that the page is missing, even though the page exists and /wiki/Caf%C3%A913-Notes loads it. The same happens for another accented page: /wiki/Ren%C3%A9-%C3%9Cn%C3%AFcode.md shows the Pages list, while an ASCII page's .md address (/wiki/Addr13-Test.md) loads its page normally. The accented page is unreachable in its .md form.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1",
+        "Create a wiki page with an accented title: open https://5503-ipj8k3in3f2cenwjnb2vr.e2b.app/eval/harbor-handbook/wiki?action=_new, type \"Café13 Notes\" as the Page title, type any text in the content, click \"Save Page\" (the page then lives at /wiki/Caf%C3%A913-Notes and displays correctly)",
+        "Open https://5503-ipj8k3in3f2cenwjnb2vr.e2b.app/eval/harbor-handbook/wiki/Caf%C3%A913-Notes.md",
+        "For comparison open https://5503-ipj8k3in3f2cenwjnb2vr.e2b.app/eval/harbor-handbook/wiki/Addr13-Test.md (an ASCII-named page)"
+      ]
+    },
+    {
+      "name": "Relative Markdown links inside a sub-page (title with a slash) point at the wiki root and lead nowhere",
+      "summary": "Both links point at the wiki root: \\\"[Index rel](Index)\\\" becomes /eval/harbor-handbook/wiki/Index and \\\"[Sibling rel](Sibling)\\\" becomes /eval/harbor-handbook/wiki/Sibling. Those addresses hold no page, so clicking them lands on the Pages list instead of opening Guides5/Index, which exists and opens fine at /wiki/Guides5/Index. (on /eval/harbor-handbook/wiki/Guides5%2FIndex)",
+      "expected": "A relative link inside a sub-page should resolve against the sub-page's own folder (Index → /wiki/Guides5%2FIndex), the way relative links work on pages at the wiki root, so the existing sibling page opens.",
+      "actual": "Both links point at the wiki root: \\\"[Index rel](Index)\\\" becomes /eval/harbor-handbook/wiki/Index and \\\"[Sibling rel](Sibling)\\\" becomes /eval/harbor-handbook/wiki/Sibling. Those addresses hold no page, so clicking them lands on the Pages list instead of opening Guides5/Index, which exists and opens fine at /wiki/Guides5/Index.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1, open https://5503-ipj8k3in3f2cenwjnb2vr.e2b.app/eval/harbor-handbook/wiki?action=_new and create the sub-page \"Guides5/Index\" (Save Page)",
+        "Create a second sub-page \"Guides5/\" the same way, then open it and click Edit",
+        "Put a plain relative link in the content, e.g. \"[Index rel](Index)\", and Save Page",
+        "On the page view click the link \"Index rel\"",
+        "Repeat with the page \"Guides5/Index\" and the link \"[Sibling rel](Sibling)\""
+      ]
+    }
+  ]
+}

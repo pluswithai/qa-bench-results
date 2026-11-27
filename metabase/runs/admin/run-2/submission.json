@@ -1,0 +1,385 @@
+{
+  "fixture": "metabase/areas/admin",
+  "run": 2,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 192,
+      "name": "Enter with a blank group name submits anyway and shows a generic \"Something went wrong\"",
+      "summary": "Pressing Enter submits the empty name: POST /api/permissions/group returns 400, the console logs \\\"Error creating group\\\", and a modal appears that only says \\\"Something went wrong\\\" with an Ok button. The \\\"Add\\\" button is still greyed out, so this path is inconsistent with the form's own state. (on /admin/people/groups)",
+      "expected": "The blank/whitespace name is refused with a validation message next to the field (as the disabled \\\"Add\\\" button implies), and nothing is sent to the server.",
+      "actual": "Pressing Enter submits the empty name: POST /api/permissions/group returns 400, the console logs \\\"Error creating group\\\", and a modal appears that only says \\\"Something went wrong\\\" with an Ok button. The \\\"Add\\\" button is still greyed out, so this path is inconsistent with the form's own state.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1 and open /admin/people/groups",
+        "Click \"Create a group\"",
+        "Type three spaces into the new group name field (placeholder 'Something like \"Marketing\"')",
+        "Press Enter"
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 233,
+      "name": "Saving connection details of Sample Database always fails with \"H2 is not supported as a data warehouse\" and the display name change is lost",
+      "summary": "The PUT /api/database/1 request returns 400, the 'Save changes' button turns red and reads 'Failed', and an expanded 'Show advanced options' panel says 'Metabase tried, but couldn't connect — H2 is not supported as a data warehouse' with SSL/permissions troubleshooting tips. The change is not saved: /admin/databases still lists 'Sample Database'. The same edit page's own detail page says the database is 'Connected', so the two pages contradict each other. No database connection detail of this H2 database can be saved at all. (on /admin/databases/1/edit)",
+      "expected": "The display name is saved, the page leaves the edit form or confirms the save, and /admin/databases lists the database as 'agent8-Sample Database'.",
+      "actual": "The PUT /api/database/1 request returns 400, the 'Save changes' button turns red and reads 'Failed', and an expanded 'Show advanced options' panel says 'Metabase tried, but couldn't connect — H2 is not supported as a data warehouse' with SSL/permissions troubleshooting tips. The change is not saved: /admin/databases still lists 'Sample Database'. The same edit page's own detail page says the database is 'Connected', so the two pages contradict each other. No database connection detail of this H2 database can be saved at all.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1 and open /admin/databases.",
+        "Click the 'Sample Database' link to open its detail page (/admin/databases/1) — it shows 'Connected'.",
+        "Click 'Edit connection details' (/admin/databases/1/edit).",
+        "In 'Display name' replace 'Sample Database' with 'agent8-Sample Database' (the connection string is left untouched).",
+        "Click 'Save changes'.",
+        "Go back to /admin/databases and look at the list."
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 254,
+      "name": "Map tile server URL accepts any text (\"not a url\") and saves it without an error",
+      "summary": "The page shows the toast \"Changes saved\", sends PUT /api/setting/map-tile-server-url → 204, and after a reload the field still contains \"not a url\". No error is shown and the instance-wide map tile server is now a value that cannot render tiles. (on /admin/settings/maps)",
+      "expected": "The field is described as the URL of the map tile server, so a value that is not a URL should be refused with a validation message next to the field and the previous value kept (an empty value falls back to the OpenStreetMap default, so the field is validated at least for emptiness).",
+      "actual": "The page shows the toast \"Changes saved\", sends PUT /api/setting/map-tile-server-url → 204, and after a reload the field still contains \"not a url\". No error is shown and the instance-wide map tile server is now a value that cannot render tiles.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1 and open Admin > Settings > Maps (/admin/settings/maps).",
+        "Click the 'Map tile server URL' field, which holds https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png, clear it and type: not a url",
+        "Press Tab to leave the field (the setting saves on blur).",
+        "Reload the page."
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 348,
+      "name": "\"Redirect to HTTPS\" toggle shows the Site url help text (\"This URL is used for...\") instead of its own",
+      "summary": "Under the \"Redirect to HTTPS\" toggle the help text reads \"This URL is used for things like creating links in emails, auth redirects, and in some embedding scenarios, so changing it could break functionality or get you locked out of this instance.\" — the very same paragraph that describes the Site url field above it. It talks about a URL while the control is an on/off toggle, so it tells the admin nothing about what redirecting to HTTPS does. (on /admin/settings/general)",
+      "expected": "The help text under \"Redirect to HTTPS\" should describe that toggle (whether Metabase redirects all HTTP requests to HTTPS), not reuse the Site url description which names a URL.",
+      "actual": "Under the \"Redirect to HTTPS\" toggle the help text reads \"This URL is used for things like creating links in emails, auth redirects, and in some embedding scenarios, so changing it could break functionality or get you locked out of this instance.\" — the very same paragraph that describes the Site url field above it. It talks about a URL while the control is an on/off toggle, so it tells the admin nothing about what redirecting to HTTPS does.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1 and open /admin/settings/general.",
+        "In the 'App config' card, read the help text under 'Site url' and then the help text under the 'Redirect to HTTPS' toggle at the bottom of the card."
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 352,
+      "name": "Help text of environment-variable-controlled settings (Site url, Anonymous tracking) is printed twice",
+      "summary": "The description appears twice in a row: once directly under the label and again a few lines lower, right above the \"This has been set by the ... environment variable\" line. Seen for both settings on the page that are controlled by an environment variable. (on /admin/settings/general)",
+      "expected": "Each setting's description should appear once — under the label — and only the \"This has been set by the MB_SITE_URL / MB_ANON_TRACKING_ENABLED environment variable\" note should be added below.",
+      "actual": "The description appears twice in a row: once directly under the label and again a few lines lower, right above the \"This has been set by the ... environment variable\" line. Seen for both settings on the page that are controlled by an environment variable.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1 and open /admin/settings/general.",
+        "In 'App config', read the 'Site url' block: the paragraph starting 'This URL is used for things like creating links in emails...' is printed twice.",
+        "Scroll to the 'Email and tracking' card and read the 'Anonymous tracking' block: 'Enable the collection of anonymous usage data in order to help us improve.' is printed twice."
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 478,
+      "name": "\"Email address for help requests\" accepts \"not-an-email\" and saves it",
+      "summary": "The page shows \"Changes saved\", sends PUT /api/setting/admin-email → 204, and after a reload the field still contains \"not-an-email\". No error or hint is shown next to the field, so the instance's help address is now a string that is not an email address. (on /admin/settings/general)",
+      "expected": "A field described as \"The email address users should be referred to if they encounter a problem\" should refuse a value that is not an email address, with a message next to the field, and keep the previous address (eval@momentic.ai).",
+      "actual": "The page shows \"Changes saved\", sends PUT /api/setting/admin-email → 204, and after a reload the field still contains \"not-an-email\". No error or hint is shown next to the field, so the instance's help address is now a string that is not an email address.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1 and open /admin/settings/general.",
+        "Scroll to the 'Email and tracking' card and click the 'Email address for help requests' field (it holds eval@momentic.ai).",
+        "Replace it with: not-an-email",
+        "Press Tab to leave the field (the setting saves on blur).",
+        "Reload the page: the field still holds 'not-an-email'."
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 530,
+      "name": "A segment name made only of spaces enables \\\"Save changes\\\", and the rejected save shows no error at all",
+      "summary": "\\\"Save changes\\\" is enabled even though the name field contains only spaces, and clicking it sends POST /api/segment which is answered 400 Bad Request. The page does not show any error message, field highlight or toast; the form stays exactly as it was, so the user cannot tell why the segment was not created. The console logs \\\"Request entities,segments,create failed: {status: 400 ...}\\\". (on /admin/datamodel/segment/create)",
+      "expected": "The form should refuse a name that is only whitespace (Save disabled or a message next to the name field, e.g. \\\"Name is required\\\"), or, if the server rejects the save, the page should show the error next to the form so the user knows the segment was not created.",
+      "actual": "\\\"Save changes\\\" is enabled even though the name field contains only spaces, and clicking it sends POST /api/segment which is answered 400 Bad Request. The page does not show any error message, field highlight or toast; the form stays exactly as it was, so the user cannot tell why the segment was not created. The console logs \\\"Request entities,segments,create failed: {status: 400 ...}\\\".",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai, open /admin/datamodel/segments and click \"New segment\" (URL /admin/datamodel/segment/create)",
+        "Click \"Select a table\", choose Sample Database -> Orders",
+        "Click \"Add filters to narrow your answer\", pick the field \"agent10-Total Amount\" (the Orders Total field), leave the operator \"Between\", type Min 10 and Max 100, click \"Add filter\"",
+        "Click the \"Name Your Segment\" field and press the space bar three times so the field holds only spaces and looks empty",
+        "Type any text into \"Describe Your Segment\" (e.g. \"agent9 spaces name test\") — \"Save changes\" turns blue and enabled although no name is visible",
+        "Click \"Save changes\": the request POST /api/segment is answered 400, nothing on the page changes and no error message is shown anywhere"
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 587,
+      "name": "\"Clear\" on SMTP settings reports success but leaves the invalid host/port and their errors in the form",
+      "summary": "The toast says \\\"Email settings cleared\\\" and DELETE /api/email returns 204, but the dialog still shows SMTP Host \\\"not a host at all\\\", Port 587 and the red \\\"Wrong host or port\\\" errors under both fields; only after closing and reopening the dialog are the fields empty. The person is left looking at values the app says it has just deleted. (on /admin/settings/email)",
+      "expected": "After 'Clear', the SMTP Host/Port/Username/Password fields should be emptied and the validation errors removed, matching the \"Email settings cleared\" confirmation and the saved (empty) state.",
+      "actual": "The toast says \\\"Email settings cleared\\\" and DELETE /api/email returns 204, but the dialog still shows SMTP Host \\\"not a host at all\\\", Port 587 and the red \\\"Wrong host or port\\\" errors under both fields; only after closing and reopening the dialog are the fields empty. The person is left looking at values the app says it has just deleted.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1 and open /admin/settings/email.",
+        "Click 'Configure' to open the 'SMTP Configuration' dialog.",
+        "Fill SMTP Host with 'not a host at all' and SMTP Port with '587', click 'Save changes' and wait ~10 s until the red 'Wrong host or port' errors appear under both fields.",
+        "Click 'Clear'. The toast reads 'Email settings cleared'.",
+        "Look at the form fields, then close the dialog (Escape) and click 'Configure' again to see the real saved state."
+      ]
+    },
+    {
+      "index": 8,
+      "reported_at_seconds": 619,
+      "name": "Opening and closing a task's details silently drops the task filter from the address, so a reload loses the filter",
+      "summary": "Opening a row's details replaces the address with /admin/tools/tasks/37, and closing the details replaces it with bare /admin/tools/tasks — the task filter is gone from the address while the list still shows the filtered 3 rows and the filter box still says \"sync\". Reloading then drops the filter: the unfiltered list (1-50) comes back and the filter box is empty. (on /admin/tools/tasks)",
+      "expected": "Closing the Task details keeps the list's filter in the address (…/admin/tools/tasks?task=sync), so a reload or a shared link shows the same filtered list",
+      "actual": "Opening a row's details replaces the address with /admin/tools/tasks/37, and closing the details replaces it with bare /admin/tools/tasks — the task filter is gone from the address while the list still shows the filtered 3 rows and the filter box still says \"sync\". Reloading then drops the filter: the unfiltered list (1-50) comes back and the filter box is empty.",
+      "reproSteps": [
+        "Sign in with eval@momentic.ai / momentic-eval-1, open https://5501-ifu9zeza11kw2jt1zrm8o.e2b.app/admin/tools/tasks",
+        "In 'Filter by task' type sync and pick the option 'sync' from the dropdown — the list shrinks to the 3 sync runs and the address becomes …/admin/tools/tasks?task=sync",
+        "Click any row of the list — the 'Task details' dialog opens and the address becomes …/admin/tools/tasks/<id>",
+        "Press Escape to close the dialog — the address is now …/admin/tools/tasks (no task=sync) while the filter box still shows sync",
+        "Reload the page — the filter is lost and all tasks are listed again"
+      ]
+    },
+    {
+      "index": 9,
+      "reported_at_seconds": 625,
+      "name": "Task details dialog prints the raw value \"null\" for a run that has no details",
+      "summary": "The dialog body shows the bare word \"null\" (a raw JSON value) where the task details would be. Same for every run of a task that stores no details, e.g. the sync rows. (on /admin/tools/tasks)",
+      "expected": "The dialog should say in words that this run has no details (or show a proper empty state), not print the raw value null",
+      "actual": "The dialog body shows the bare word \"null\" (a raw JSON value) where the task details would be. Same for every run of a task that stores no details, e.g. the sync rows.",
+      "reproSteps": [
+        "Sign in with eval@momentic.ai / momentic-eval-1, open https://5501-ifu9zeza11kw2jt1zrm8o.e2b.app/admin/tools/tasks?task=sync (or open …/admin/tools/tasks/37 directly)",
+        "Click a row whose Task is 'sync' (for example the run of 2026-11-23T22:26:17)",
+        "Read the 'Task details' dialog: its code block contains only the word null"
+      ]
+    },
+    {
+      "index": 10,
+      "reported_at_seconds": 637,
+      "name": "Admin pages are unusable at phone width: sidebar keeps full width and the content column is clipped",
+      "summary": "The admin sidebar keeps its full ~256px width and the content column is pushed off-screen and clipped: on /admin/people the \"People\" heading is cut to \"People\" past the edge, the \"Invite someone\" button is cut mid-word, the table shows only the avatar column and \"3 people found\", and there is no horizontal scroll to reach the rest. On /admin/settings/general the \"General\" heading and \"App config\" card are cut at the right edge and the Site name description wraps one word per line in a ~40px column. The collapsed hamburger menu still opens the nav, but the page content itself is not usable. (on /admin/people and /admin/settings/general)",
+      "expected": "At a phone width the admin area should adapt: the admin sidebar should collapse or overlay, and the content should use the full width so headings, buttons, tables and settings fields are fully visible and reachable (or the page should scroll sideways to them).",
+      "actual": "The admin sidebar keeps its full ~256px width and the content column is pushed off-screen and clipped: on /admin/people the \"People\" heading is cut to \"People\" past the edge, the \"Invite someone\" button is cut mid-word, the table shows only the avatar column and \"3 people found\", and there is no horizontal scroll to reach the rest. On /admin/settings/general the \"General\" heading and \"App config\" card are cut at the right edge and the Site name description wraps one word per line in a ~40px column. The collapsed hamburger menu still opens the nav, but the page content itself is not usable.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1.",
+        "Set the browser window to 390 x 844 (phone).",
+        "Open /admin/people and look at the page.",
+        "Open /admin/settings/general and look at the page."
+      ]
+    },
+    {
+      "index": 11,
+      "reported_at_seconds": 645,
+      "name": "An over-large \\\"Minimum query duration\\\" is rejected with only the word \\\"Failed\\\" on the button and no explanation",
+      "summary": "The value is accepted into the field and \\\"Save changes\\\" stays enabled, but PUT /api/cache answers 400 and the only feedback is the button label changing to \\\"Failed\\\" (grey). Nothing says what is wrong, what the maximum allowed value is, or that the old value is still in force; the form stays dirty and the console logs {status: 400}. (on /admin/performance/databases)",
+      "expected": "The page should explain the rejection — for example a message next to \\\"Minimum query duration\\\" saying the value is too large, and the allowed maximum — or refuse the value while typing, so the person knows what to correct and that nothing was saved.",
+      "actual": "The value is accepted into the field and \\\"Save changes\\\" stays enabled, but PUT /api/cache answers 400 and the only feedback is the button label changing to \\\"Failed\\\" (grey). Nothing says what is wrong, what the maximum allowed value is, or that the old value is still in force; the form stays dirty and the console logs {status: 400}.",
+      "reproSteps": [
+        "Sign in and open /admin/performance/databases (Admin > Performance > Database caching).",
+        "Select the \"Adaptive\" cache invalidation policy.",
+        "Type 999999999999999999999 into \"Minimum query duration\".",
+        "Click \"Save changes\" and read the button and the page."
+      ]
+    },
+    {
+      "index": 12,
+      "reported_at_seconds": 649,
+      "name": "Sample Database detail page omits the engine name that its own list row shows",
+      "summary": "Under the heading it only reads \\\"Added November 23, 2026\\\" — the engine name is missing, although the Databases list shows \\\"H2\\\" for this same record and the other database's page shows \\\"PostgreSQL Added November 23, 2026\\\". (on /admin/databases/1)",
+      "expected": "The header shows the engine name and the added date, e.g. \\\"H2 Added November 23, 2026\\\" (or \\\"H2 · Added November 23, 2026\\\"), the same way the Release operations page shows \\\"PostgreSQL Added November 23, 2026\\\".",
+      "actual": "Under the heading it only reads \\\"Added November 23, 2026\\\" — the engine name is missing, although the Databases list shows \\\"H2\\\" for this same record and the other database's page shows \\\"PostgreSQL Added November 23, 2026\\\".",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1 and open /admin/databases.",
+        "Note the list row: Sample Database — Engine \"H2\".",
+        "Click the \"Sample Database\" link to open /admin/databases/1 and read the subtitle under the \"Sample Database\" heading.",
+        "Compare with /admin/databases/2 (Release operations), whose subtitle reads \"PostgreSQL Added November 23, 2026\"."
+      ]
+    },
+    {
+      "index": 13,
+      "reported_at_seconds": 651,
+      "name": "A long group name with no spaces pushes the Members count and the row menu off the page",
+      "summary": "The table row grows to ~2043px inside the 1280px viewport: the long name runs across (and past) the card edge, and the whole admin page gets a horizontal scrollbar (document scrollWidth 2087). The Members count column and the row's \\\"...\\\" action menu are pushed off the right edge, so the count cannot be read and Edit Name / Remove Group cannot be reached without horizontal scrolling. (on /admin/people/groups)",
+      "expected": "The name wraps or is truncated with an ellipsis inside the group name column, and the Members count and row action menu stay visible at the normal page width.",
+      "actual": "The table row grows to ~2043px inside the 1280px viewport: the long name runs across (and past) the card edge, and the whole admin page gets a horizontal scrollbar (document scrollWidth 2087). The Members count column and the row's \\\"...\\\" action menu are pushed off the right edge, so the count cannot be read and Edit Name / Remove Group cannot be reached without horizontal scrolling.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1 and open /admin/people/groups",
+        "Click \"Create a group\"",
+        "Paste a ~280-character name made of \"agent2-\" followed by many \"a\" characters with no spaces (the field accepts it, no length limit)",
+        "Click \"Add\"",
+        "Look at the new group's row in the list"
+      ]
+    },
+    {
+      "index": 14,
+      "reported_at_seconds": 711,
+      "name": "Adding a group in a stale second tab fails with a 500 that the page swallows silently",
+      "summary": "The click sends POST /api/permissions/membership, which answers 500; the console logs the failed request plus an uncaught page error, the tick never appears next to \"Administrators\", the row keeps reading \"Default\", and nothing on the page tells the person anything went wrong — the dropdown just stays as it was. (on /admin/people)",
+      "expected": "Adding a group the person already has either does nothing visible (the app notices the membership exists and shows it ticked, or refreshes the row) or fails with a clear message next to the action; in no case does the request crash with a 500 that is swallowed without a word.",
+      "actual": "The click sends POST /api/permissions/membership, which answers 500; the console logs the failed request plus an uncaught page error, the tick never appears next to \"Administrators\", the row keeps reading \"Default\", and nothing on the page tells the person anything went wrong — the dropdown just stays as it was.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai, open /admin/people, and open a second browser tab on /admin/people as well.",
+        "In the first tab, click the Groups cell of the \"Jordan Ellis / jordan@example.test\" row and click \"Administrators\" in the dropdown: the membership is saved (POST /api/permissions/membership → 200) and the row starts reading \"Admin\".",
+        "Now switch to the second tab, which was loaded before that change and still shows \"Default\" for Jordan Ellis.",
+        "In the second tab click the Groups cell of the Jordan Ellis row (the dropdown shows only \"All Users\" ticked, \"Administrators\" unticked, because the tab is stale) and click \"Administrators\".",
+        "Watch the page and the network: POST /api/permissions/membership → 500, no tick appears, the row still says \"Default\", no error is shown."
+      ]
+    },
+    {
+      "index": 15,
+      "reported_at_seconds": 763,
+      "name": "A retired segment's edit page shows no sign that it is retired, and saving changes there leaves the change invisible everywhere",
+      "summary": "The edit page looks like an ordinary live segment: \\\"EDIT YOUR SEGMENT — Make changes to your segment and leave an explanatory note\\\", the saved name/description/filter, \\\"18760 rows\\\", an enabled Save changes. Nothing says the segment is retired. Editing the name and clicking Save changes sends PUT /api/segment/1 which answers 200, the app returns to /admin/datamodel/segments and that page still shows the empty state \\\"Create segments to add them to the Filter dropdown in the query builder\\\" — the change is not visible anywhere in Admin and there is no control to un-retire or even to list retired segments. (on /admin/datamodel/segment/1)",
+      "expected": "The edit page of a retired segment should show that it is retired (a badge or notice) and either refuse the edit or make clear that saving will not bring it back, so that a person can see what happened to their saved change instead of finding the segment missing from the list.",
+      "actual": "The edit page looks like an ordinary live segment: \\\"EDIT YOUR SEGMENT — Make changes to your segment and leave an explanatory note\\\", the saved name/description/filter, \\\"18760 rows\\\", an enabled Save changes. Nothing says the segment is retired. Editing the name and clicking Save changes sends PUT /api/segment/1 which answers 200, the app returns to /admin/datamodel/segments and that page still shows the empty state \\\"Create segments to add them to the Filter dropdown in the query builder\\\" — the change is not visible anywhere in Admin and there is no control to un-retire or even to list retired segments.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open /admin/datamodel/segments",
+        "Create a segment: \"New segment\", table Sample Database -> Orders, add the filter Total <= 999999, name it, add a description, \"Save changes\" (in this hunt it is the segment at /admin/datamodel/segment/1 named \"agent9-orders-below-999999x2\")",
+        "In the segments list open the row's \"...\" menu and choose \"Retire Segment\", then \"Retire\": the list now shows the empty state \"Create segments to add them to the Filter dropdown in the query builder\"",
+        "Open the retired segment's edit page by its address: /admin/datamodel/segment/1",
+        "Change the name (e.g. append \"z\") and type a note in \"REASON FOR CHANGES\", then click \"Save changes\"",
+        "Land back on /admin/datamodel/segments: the list is still empty and shows no trace of the segment that was just saved"
+      ]
+    },
+    {
+      "index": 16,
+      "reported_at_seconds": 763,
+      "name": "Field preview panel overflows the window at 1280px: its \"Filtering\" tab and close (X) button are cut off",
+      "summary": "The 'Field preview' panel starts at x≈944 and is 456px wide, so it ends at x≈1400 on a 1280px-wide window: the third tab ('Filtering', at x=1238–1371) is cut off at the right edge and the panel's close (X) button (at x=1347) is completely outside the window and cannot be clicked. The page does not scroll sideways (scrollWidth = clientWidth = 1280), so that part is unreachable. In the same state the Field settings column is squeezed: 'Data type' shows 'CHARACTE…' truncated and 'Cast to a specific data type' wraps one word per line. Only Escape or pressing Preview again closes the panel. (on /admin/datamodel/database/1/schema/1:PUBLIC/table/5/field/26)",
+      "expected": "The 'Field preview' panel opens fully inside the window: all three of its tabs ('Table', 'Detail', 'Filtering') and its close (X) button are visible and clickable, and the Field settings column keeps readable labels.",
+      "actual": "The 'Field preview' panel starts at x≈944 and is 456px wide, so it ends at x≈1400 on a 1280px-wide window: the third tab ('Filtering', at x=1238–1371) is cut off at the right edge and the panel's close (X) button (at x=1347) is completely outside the window and cannot be clicked. The page does not scroll sideways (scrollWidth = clientWidth = 1280), so that part is unreachable. In the same state the Field settings column is squeezed: 'Data type' shows 'CHARACTE…' truncated and 'Cast to a specific data type' wraps one word per line. Only Escape or pressing Preview again closes the panel.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open /admin/datamodel",
+        "Click 'Sample Database' in the left tree, then the 'Feedback' table",
+        "Click the 'Email' field row to open its Field settings panel",
+        "Click the 'Preview' button in the 'Field settings' header (the eye icon)"
+      ]
+    },
+    {
+      "index": 17,
+      "reported_at_seconds": 806,
+      "name": "At phone width the Permissions data view is cut off: the 300px group list leaves a 90px permission panel no one can read or use",
+      "summary": "At a 390×844 viewport the left group sidebar is 300px wide, so the permission panel is only 90px wide and everything in it is cut off at the right screen edge: the header reads \"Permis… for the… All Users group\", the \"Search for a …\" box is clipped, the database rows show only \"Release o…\" and \"Sample D…\", and the permission dropdowns of the table are not visible or usable at all. (on /admin/permissions/data/group/1)",
+      "expected": "The group list and the permission panel are both usable on a phone-sized screen — a collapsible or stacked layout, so the group's data permissions (and their dropdowns) can be read and changed, or at least scrolled to without being cut.",
+      "actual": "At a 390×844 viewport the left group sidebar is 300px wide, so the permission panel is only 90px wide and everything in it is cut off at the right screen edge: the header reads \"Permis… for the… All Users group\", the \"Search for a …\" box is clipped, the database rows show only \"Release o…\" and \"Sample D…\", and the permission dropdowns of the table are not visible or usable at all.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1 and set the browser tab to 390 × 844 (phone).",
+        "Open /admin/permissions (Data tab) — the empty-state text 'Select a group to see its data permissions' is already squeezed into a ~90px strip at the right edge.",
+        "Click 'All Users' in the group list on the left.",
+        "Look at the permission panel on the right: its heading, search box, database entries and permission controls are cut off at the right edge of the screen."
+      ]
+    },
+    {
+      "index": 18,
+      "reported_at_seconds": 818,
+      "name": "Pressing Enter in the table name field shows the new name but never saves it, and it silently reverts on reload",
+      "summary": "Pressing Enter in the 'Give this table a name' field leaves the new name visible in the header, but nothing is saved: no 'Table name updated' toast appears, the table list on the left still shows the previous name, and after a reload the header reverts to the old name. Only pressing Tab (blur) or clicking elsewhere triggers the save. Seen 2 times out of 2. (on /admin/datamodel/database/1/schema/1:PUBLIC/table/2)",
+      "expected": "Enter in the table name field should commit the rename like it does on blur: a 'Table name updated' confirmation, the new name in the table list and the new name after a reload. If Enter is not the way to save, the field should show that the change is not saved.",
+      "actual": "Pressing Enter in the 'Give this table a name' field leaves the new name visible in the header, but nothing is saved: no 'Table name updated' toast appears, the table list on the left still shows the previous name, and after a reload the header reverts to the old name. Only pressing Tab (blur) or clicking elsewhere triggers the save. Seen 2 times out of 2.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1 and open /admin/datamodel/database/1/schema/1:PUBLIC/table/2 (Table Metadata > Sample Database > Orders).",
+        "Click into the table name field at the top (placeholder 'Give this table a name') and type a new name, e.g. 'agent5-enter-test'.",
+        "Press Enter.",
+        "Notice: header shows the new name, but the left table list still shows the old name and there is no 'Table name updated' toast.",
+        "Reload the page: the header is back to the old name, so the edit was lost.",
+        "(Restore the original name by typing it and pressing Tab, or clicking elsewhere, which does save.)"
+      ]
+    },
+    {
+      "index": 19,
+      "reported_at_seconds": 870,
+      "name": "A key name of only spaces enables \\\"Create\\\" in the API key dialog and the save fails with the raw text \\\"Value must be a non-blank string.\\\"",
+      "summary": "Typing only spaces into \\\"Key name *\\\" enables the \\\"Create\\\" button; clicking it sends the request, which the server refuses with 400. The field then shows the server's developer wording \\\"Value must be a non-blank string.\\\" and the button becomes \\\"Failed\\\". No key is created, but a name that only looks non-empty passes the form's own required-field check and the user gets a raw validation string instead of a plain message. (on /admin/settings/authentication/api-keys)",
+      "expected": "A key name of only whitespace is treated as empty: \\\"Create\\\" stays disabled (as it is for an empty name), or the page says next to the field that a key name is required, without a round-trip to the server",
+      "actual": "Typing only spaces into \\\"Key name *\\\" enables the \\\"Create\\\" button; clicking it sends the request, which the server refuses with 400. The field then shows the server's developer wording \\\"Value must be a non-blank string.\\\" and the button becomes \\\"Failed\\\". No key is created, but a name that only looks non-empty passes the form's own required-field check and the user gets a raw validation string instead of a plain message.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1 and open https://5501-ifu9zeza11kw2jt1zrm8o.e2b.app/admin/settings/authentication/api-keys (the list is empty: \"No API keys here yet\")",
+        "Click \"Create API key\" (top right) to open the \"Create a new API key\" dialog",
+        "Type two spaces into the \"Key name *\" field",
+        "Choose \"Administrators\" in the group dropdown \"Which group should this key belong to?\"",
+        "Note that \"Create\" is now enabled although the name is blank, and click it"
+      ]
+    },
+    {
+      "index": 20,
+      "reported_at_seconds": 934,
+      "name": "\"Add a new map\" dialog is wider than the phone screen, so its labels and fields are cut off",
+      "summary": "The dialog is wider than the 390px screen and is clipped on its right side: the labels read \"Which property specifies the region's identifier?\"/'… display nam', the URL field's hint is cut to \"Like https://my-mb-server.com/maps/my…\", and the fields extend past the right screen edge. There is no close (X) button in the dialog header; only the Cancel button at the bottom can dismiss it. (on /admin/settings/maps)",
+      "expected": "The dialog fits the phone width: every label, hint and input fully visible and usable, with a way to close the dialog.",
+      "actual": "The dialog is wider than the 390px screen and is clipped on its right side: the labels read \"Which property specifies the region's identifier?\"/'… display nam', the URL field's hint is cut to \"Like https://my-mb-server.com/maps/my…\", and the fields extend past the right screen edge. There is no close (X) button in the dialog header; only the Cancel button at the bottom can dismiss it.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1 and set the tab to 390 × 844 (phone).",
+        "Open /admin/settings/maps and scroll to the Custom maps section.",
+        "Click 'Add a map'.",
+        "Look at the 'Add a new map' dialog: its labels, the GeoJSON URL placeholder and the input fields are cut off at the right screen edge."
+      ]
+    },
+    {
+      "index": 21,
+      "reported_at_seconds": 1127,
+      "name": "Semantic type picker shows a typed, nonexistent choice (\"Currency\") as the field's value although nothing is saved",
+      "summary": "After typing a search text with no matches, the closed Semantic type control displays \\\"Currency\\\" as if it were the field's semantic type, although no save request is sent (no PUT /api/field/48) and after a reload the value is \\\"Entity Name\\\" again — the panel misreports the stored setting with no error. (on /admin/datamodel/database/1/schema/1:PUBLIC/table/1/field/48)",
+      "expected": "A select that could not apply the typed text should keep showing the real value (\\\"Entity Name\\\") and treat the typed text as search text only, or tell the user the choice is invalid; what it displays must be the value that is actually stored.",
+      "actual": "After typing a search text with no matches, the closed Semantic type control displays \\\"Currency\\\" as if it were the field's semantic type, although no save request is sent (no PUT /api/field/48) and after a reload the value is \\\"Entity Name\\\" again — the panel misreports the stored setting with no error.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1, open /admin/datamodel, expand Sample Database, click the table People, then click the field card \"Name\" (address /admin/datamodel/database/1/schema/1:PUBLIC/table/1/field/48).",
+        "In the right-hand Field settings panel note the Semantic type select reads \"Entity Name\".",
+        "Click the Semantic type select and type Currency into its search input.",
+        "The dropdown panel answers \"Didn't find any results\" while the select itself now displays \"Currency\".",
+        "Press Escape (or click elsewhere) to close the dropdown: the select still displays \"Currency\" as the field's semantic type.",
+        "Reload the page: the select is back to \"Entity Name\"; no request was made and nothing was saved."
+      ]
+    },
+    {
+      "index": 22,
+      "reported_at_seconds": 1159,
+      "name": "Database edit: a spaces-only Display name is rejected with no message, only the button turning into \"Failed\"",
+      "summary": "The save calls PUT /api/database/2 and gets 400 (console shows the raw error object). No message appears near the field or anywhere on the page: the Display name field is simply blank, and the submit button's label changes from \"Save changes\" to \"Failed\". The form stays open on the edit page, so the admin cannot tell why the save failed, and the database keeps its old name. (on /admin/databases/2/edit)",
+      "expected": "A display name made only of spaces should be refused inline (\"Display name is required\" next to the field, Save disabled) or the value trimmed and saved; a failed save should be explained in words, not by renaming the button to \"Failed\".",
+      "actual": "The save calls PUT /api/database/2 and gets 400 (console shows the raw error object). No message appears near the field or anywhere on the page: the Display name field is simply blank, and the submit button's label changes from \"Save changes\" to \"Failed\". The form stays open on the edit page, so the admin cannot tell why the save failed, and the database keeps its old name.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1 and open Admin > Databases (/admin/databases).",
+        "Click 'Release operations', then 'Edit connection details' (address /admin/databases/2/edit).",
+        "Clear the 'Display name' field and type three spaces.",
+        "Scroll down and click 'Save changes'.",
+        "The request PUT /api/database/2 returns 400; look at the Display name field (top) and at the button (bottom right)."
+      ]
+    },
+    {
+      "index": 23,
+      "reported_at_seconds": 1173,
+      "name": "Unresolvable SSH tunnel host shows a raw Netty exception (\"DefaultConnectFuture[agent11@ssh.example.com/<unresolved>:22]... execute: null\")",
+      "summary": "The red error panel under the form shows the raw internal exception instead of a readable reason: «Metabase tried, but couldn't connect / DefaultConnectFuture[agent11@ssh.example.com/<unresolved>:22]: Failed (UnresolvedAddressException) to execute: null». Below it only two irrelevant hints follow (\"Try using a secure connection (SSL)\", \"Check Metabase user permissions\"). Nothing tells the admin that the SSH tunnel host could not be resolved. With a resolvable SSH host (localhost) the same failure is worded properly (\"Hmm, we couldn't connect to the database / Make sure your Host and Port settings are correct\"), so only the unresolvable-host path leaks the exception. (on /admin/databases/create)",
+      "expected": "A readable message such as \"Could not resolve the SSH tunnel host ssh.example.com\", without a raw Java/Netty exception or a stray \"null\"",
+      "actual": "The red error panel under the form shows the raw internal exception instead of a readable reason: «Metabase tried, but couldn't connect / DefaultConnectFuture[agent11@ssh.example.com/<unresolved>:22]: Failed (UnresolvedAddressException) to execute: null». Below it only two irrelevant hints follow (\"Try using a secure connection (SSL)\", \"Check Metabase user permissions\"). Nothing tells the admin that the SSH tunnel host could not be resolved. With a resolvable SSH host (localhost) the same failure is worded properly (\"Hmm, we couldn't connect to the database / Make sure your Host and Port settings are correct\"), so only the unresolvable-host path leaks the exception.",
+      "reproSteps": [
+        "Sign in with eval@momentic.ai / momentic-eval-1 and open https://5501-ifu9zeza11kw2jt1zrm8o.e2b.app/admin/databases, then click 'Add database' (form opens with Database type = PostgreSQL)",
+        "In 'Connection string (optional)' type postgresql://agent11:secret@db.example.com:5432/agent11db and press Tab, so Display name, Host, Port, Database name, Username and Password are pre-filled",
+        "Switch 'Use an SSH-tunnel' on",
+        "Fill 'SSH tunnel host' with ssh.example.com, 'SSH tunnel username' with agent11 and 'SSH private key' with any text between '-----BEGIN PRIVATE KEY-----' and '-----END PRIVATE KEY-----'",
+        "Click 'Save' and read the error panel at the bottom of the form"
+      ]
+    },
+    {
+      "index": 24,
+      "reported_at_seconds": 1228,
+      "name": "On the Logs page, closing the \\\"Customize log levels\\\" dialog drops the log filter from the address, so a reload loses it",
+      "summary": "On the Logs page, clicking \\\"Customize log levels\\\" changes the address to /admin/tools/logs/levels and pressing Escape returns to /admin/tools/logs, but the ?query=api%2Fhealth part is gone from the address while the Filter logs box still shows \\\"api/health\\\". Reloading then loads /admin/tools/logs with an empty Filter logs box and the whole unfiltered log, so the filter is silently lost — a different page and dialog from the Tasks one. (on /admin/tools/logs)",
+      "expected": "Closing the \\\"Customize log levels\\\" dialog should leave the address as it was (/admin/tools/logs?query=api%2Fhealth), so the log filter survives a reload or a Back step, exactly as it does when the dialog is never opened.",
+      "actual": "On the Logs page, clicking \\\"Customize log levels\\\" changes the address to /admin/tools/logs/levels and pressing Escape returns to /admin/tools/logs, but the ?query=api%2Fhealth part is gone from the address while the Filter logs box still shows \\\"api/health\\\". Reloading then loads /admin/tools/logs with an empty Filter logs box and the whole unfiltered log, so the filter is silently lost — a different page and dialog from the Tasks one.",
+      "reproSteps": [
+        "Sign in and open /admin/tools/logs (Admin > Tools > Logs).",
+        "Type api/health into \"Filter logs\": the address becomes /admin/tools/logs?query=api%2Fhealth and only matching lines are listed.",
+        "Click \"Customize log levels\" (the address changes to /admin/tools/logs/levels).",
+        "Press Escape to close the dialog.",
+        "Reload the page with the browser's reload button: the Filter logs box is empty and the full unfiltered log is shown, although the box held api/health a moment before."
+      ]
+    },
+    {
+      "index": 25,
+      "reported_at_seconds": 1329,
+      "name": "Help drawer on the database edit page is titled \"Add PostgreSQL\"",
+      "summary": "The drawer's heading reads \\\"Add PostgreSQL\\\", i.e. it describes the add-a-database flow, while the page heading is \\\"Edit connection details\\\" for the existing database \\\"Release operations\\\"; the drawer's sections (\\\"Connection string\\\", \\\"Display name\\\", \\\"Host\\\", \\\"Password\\\"…) also describe setting up a new connection. (on /admin/databases/2/edit)",
+      "expected": "The help drawer opened from \\\"Edit connection details\\\" is titled for editing that connection (e.g. \\\"PostgreSQL\\\" or \\\"Edit PostgreSQL connection\\\"), not \\\"Add PostgreSQL\\\".",
+      "actual": "The drawer's heading reads \\\"Add PostgreSQL\\\", i.e. it describes the add-a-database flow, while the page heading is \\\"Edit connection details\\\" for the existing database \\\"Release operations\\\"; the drawer's sections (\\\"Connection string\\\", \\\"Display name\\\", \\\"Host\\\", \\\"Password\\\"…) also describe setting up a new connection.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1 and open /admin/databases.",
+        "Click the \"Release operations\" link, then the \"Edit connection details\" button (address /admin/databases/2/edit) — the page heading reads \"Edit connection details\".",
+        "Click the \"Help is here\" button at the top right of the page and read the heading of the side drawer that opens."
+      ]
+    }
+  ]
+}

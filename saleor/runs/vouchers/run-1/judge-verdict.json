@@ -1,0 +1,351 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "saleor/areas/vouchers",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "c0d32be641a441633bb2a7be0b74e88b0c64f6a50a69fd2f9b16d5f797db9d05",
+    "known_invalid_sha256": "622c79d85ad1bc40d9f31cbc6e0a0778e7058a39068611d2fe47b5c57d1a2243",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "82",
+    "bugs": "28",
+    "flags": "0",
+    "known_hits": "19",
+    "extra_known_hits": "0",
+    "unverified": "7",
+    "outside_area_known_hits": "0",
+    "outside_area_known_invalid": "0",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "",
+    "outside_area_ground_truth_sha256": "e081a2269963248f11544c2446bf53ca302ea09fb9e703ef6df92a246ca324fa",
+    "outside_area_known_invalid_sha256": "c7467d59de35548dd68bda0da0053a849e91385612a1f08366ced9214d2bc54b",
+    "duplicates": "0",
+    "duplicate_known_hits": "0",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "2",
+    "known_misses": "2",
+    "precision": "0.9047619047619048",
+    "recall": "0.23170731707317074",
+    "findings_per_minute": "0.943319947174083",
+    "correct_findings_per_minute": "0.640109964153842",
+    "severity_1": "7",
+    "severity_3": "11",
+    "severity_5": "1",
+    "severity_sum": "45",
+    "score": "43",
+    "duration_seconds": "1780.944",
+    "partial": "false",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 1,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Matches the checklist reporting two codes after one manual code is added, despite the table containing one row."
+      },
+      {
+        "groundTruthIndex": 36,
+        "reproStepsIndex": 0,
+        "findingIndex": 5,
+        "reason": "Matches the mobile Status filter value selector being clipped outside the panel, leaving Apply disabled."
+      },
+      {
+        "groundTruthIndex": 35,
+        "reproStepsIndex": 0,
+        "findingIndex": 6,
+        "reason": "Matches silent truncation of a displayed fractional usage limit. Its explicit create-flow variant follows the reference case."
+      },
+      {
+        "groundTruthIndex": 43,
+        "reproStepsIndex": 0,
+        "findingIndex": 7,
+        "reason": "Matches saving an empty enabled usage limit and receiving Voucher updated while the invalid change remains unsaved."
+      },
+      {
+        "groundTruthIndex": 12,
+        "reproStepsIndex": 0,
+        "findingIndex": 8,
+        "reason": "Matches the contradictory limited-countries heading and applies-to-all-countries empty state on a saved shipping voucher."
+      },
+      {
+        "groundTruthIndex": 3,
+        "reproStepsIndex": 0,
+        "findingIndex": 9,
+        "reason": "Matches the Name sort indicator producing an order inconsistent with displayed voucher names, including after switching to descending."
+      },
+      {
+        "groundTruthIndex": 11,
+        "reproStepsIndex": 0,
+        "findingIndex": 13,
+        "reason": "Matches the voucher channel chooser incorrectly titled Manage Products Channel Availability."
+      },
+      {
+        "groundTruthIndex": 10,
+        "reproStepsIndex": 0,
+        "findingIndex": 15,
+        "reason": "Matches the Percentage discount-type filter including vouchers whose offer is Free shipping."
+      },
+      {
+        "groundTruthIndex": 27,
+        "reproStepsIndex": 0,
+        "findingIndex": 16,
+        "reason": "Matches the Active status clipping to Ac at 390px. The hidden voucher name is an additional bundled observation."
+      },
+      {
+        "groundTruthIndex": 0,
+        "reproStepsIndex": 0,
+        "findingIndex": 18,
+        "reason": "Matches confirming eligible category assignments in a new Products voucher and replacing the editor with an unexpected-error page."
+      },
+      {
+        "groundTruthIndex": 51,
+        "reproStepsIndex": 0,
+        "findingIndex": 22,
+        "reason": "Matches setup guidance claiming one shared percentage while the editor supports different percentages per channel."
+      },
+      {
+        "groundTruthIndex": 22,
+        "reproStepsIndex": null,
+        "findingIndex": 23,
+        "reason": "Matches the terminal skeleton instead of a missing-voucher state, but reaches it through a malformed ID rather than a deleted voucher URL."
+      },
+      {
+        "groundTruthIndex": 9,
+        "reproStepsIndex": 0,
+        "findingIndex": 24,
+        "reason": "Matches the country dialog's select-all checkbox incorrectly referring to channels, including its filtered wording."
+      },
+      {
+        "groundTruthIndex": 63,
+        "reproStepsIndex": 0,
+        "findingIndex": 25,
+        "reason": "Matches narrow-layout eligibility descriptions overlapping assignment counts; this finding additionally demonstrates the overlap at phone width."
+      },
+      {
+        "groundTruthIndex": 26,
+        "reproStepsIndex": 0,
+        "findingIndex": 1,
+        "reason": "Matches accepting a blank manual code and displaying an empty Draft row. The finding does not demonstrate backend persistence."
+      },
+      {
+        "groundTruthIndex": 5,
+        "reproStepsIndex": 0,
+        "findingIndex": 2,
+        "reason": "Matches invalid-percentage creation leaving an incomplete voucher with a code but no channel discounts. The predicted second creation is not demonstrated."
+      },
+      {
+        "groundTruthIndex": 7,
+        "reproStepsIndex": 0,
+        "findingIndex": 4,
+        "reason": "Matches the overflowing mobile search field and sideways content shift. Calling the shifted container the whole document does not change the observed failure."
+      },
+      {
+        "groundTruthIndex": 33,
+        "reproStepsIndex": 0,
+        "findingIndex": 14,
+        "reason": "The reported second attempt matches the blank date and lingering Schedule dirty state after successful Save. Blank-date defaulting itself is intended."
+      },
+      {
+        "groundTruthIndex": 13,
+        "reproStepsIndex": 0,
+        "findingIndex": 27,
+        "reason": "Matches Set value failing to scroll to the discount field at mobile width. Add codes is an additional bundled shortcut failure."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 0,
+        "reproStepsIndex": 0,
+        "findingIndex": 3,
+        "reason": "Matches the rejected expectation that both minimum requirements can coexist; the dashboard intentionally makes these choices mutually exclusive."
+      },
+      {
+        "knownInvalidIndex": 15,
+        "reproStepsIndex": 0,
+        "findingIndex": 11,
+        "reason": "Matches the rejected missing-percentage complaint: the header pill intentionally identifies scope and discount type, not the amount."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 10,
+        "reason": "No reference covers re-enabled columns moving to the front or the table order differing from the column picker."
+      },
+      {
+        "findingIndex": 12,
+        "reason": "No reference covers Clear filters removing the separate search term; detail Back losing list state is a different failure."
+      },
+      {
+        "findingIndex": 17,
+        "reason": "No reference covers over-maximum quantity entry dropping its final digit; the rejected fractional-character filtering claim is different."
+      },
+      {
+        "findingIndex": 19,
+        "reason": "No reference covers Enter leaving a typed filter field without usable operator or value controls."
+      },
+      {
+        "findingIndex": 20,
+        "reason": "No reference covers incorrect singular/plural wording in the code-selection counter or deletion dialog."
+      },
+      {
+        "findingIndex": 21,
+        "reason": "No reference covers the generator accepting a prefix that produces an overlength, unsavable voucher code."
+      },
+      {
+        "findingIndex": 26,
+        "reason": "No reference covers a country restriction remaining stored but hidden after changing from Free shipping to Entire order."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 3,
+        "reason": "The claimed impact is one configured requirement being disabled when another is enabled."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 1,
+        "reason": "Only column presentation and arrangement are reported affected."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 1,
+        "reason": "The complaint concerns information displayed in a header label."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 3,
+        "reason": "The action unexpectedly clears search state and changes the displayed results."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 15,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 16,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 17,
+        "severity": 3,
+        "reason": "The finding claims quantity entry changes the requested count and generates fewer codes."
+      },
+      {
+        "findingIndex": 18,
+        "severity": 5,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 19,
+        "severity": 3,
+        "reason": "Keyboard selection leaves the condition unusable and prevents applying it."
+      },
+      {
+        "findingIndex": 20,
+        "severity": 1,
+        "reason": "The reported failure is grammatical copy only."
+      },
+      {
+        "findingIndex": 21,
+        "severity": 3,
+        "reason": "The generator creates a draft code that subsequently blocks saving."
+      },
+      {
+        "findingIndex": 22,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 23,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 24,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 25,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 26,
+        "severity": 3,
+        "reason": "The finding claims a retained restriction cannot be inspected or removed in the saved scope."
+      },
+      {
+        "findingIndex": 27,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

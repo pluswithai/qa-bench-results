@@ -1,0 +1,249 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "findings": 21,
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 13,
+        "reproStepsIndex": 0,
+        "findingIndex": 3,
+        "reason": "Matches the open Page picker expanding to a long title, overflowing the mobile viewport and shifting the surrounding page."
+      },
+      {
+        "groundTruthIndex": 0,
+        "reproStepsIndex": 0,
+        "findingIndex": 4,
+        "reason": "Matches earlier revisions disappearing from page history after a title-only rename."
+      },
+      {
+        "groundTruthIndex": 11,
+        "reproStepsIndex": 0,
+        "findingIndex": 8,
+        "reason": "Matches a stale editor saving successfully and silently replacing a newer revision from another tab."
+      },
+      {
+        "groundTruthIndex": 2,
+        "reproStepsIndex": 0,
+        "findingIndex": 9,
+        "reason": "Matches renaming onto an existing title without validation, overwriting the target and removing the source title."
+      },
+      {
+        "groundTruthIndex": 5,
+        "reproStepsIndex": 0,
+        "findingIndex": 10,
+        "reason": "Matches a long mobile page selector covering the Code control and intercepting its clicks."
+      },
+      {
+        "groundTruthIndex": 1,
+        "reproStepsIndex": 0,
+        "findingIndex": 11,
+        "reason": "Matches mobile history hiding revision links without providing another visible route to revision diffs."
+      },
+      {
+        "groundTruthIndex": 21,
+        "reproStepsIndex": 0,
+        "findingIndex": 12,
+        "reason": "Matches saving an editor opened before deletion and silently recreating the deleted page."
+      },
+      {
+        "groundTruthIndex": 4,
+        "reproStepsIndex": 0,
+        "findingIndex": 13,
+        "reason": "Matches duplicate-title validation replacing the submitted body with the default welcome text."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 4,
+        "reproStepsIndex": 0,
+        "findingIndex": 7,
+        "reason": "Matches the rejected expectation that leading-slash wiki image paths resolve from the site root; those paths intentionally resolve within wiki/raw."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 0,
+        "reason": "Reports a link to a nonexistent Glossary page, not a reviewed case of an existing page being misaddressed."
+      },
+      {
+        "findingIndex": 1,
+        "reason": "The filter query disappearing while its filtering remains active is not covered by a reviewed entry."
+      },
+      {
+        "findingIndex": 2,
+        "reason": "No reviewed entry describes diff summary counts failing to update after whitespace filtering."
+      },
+      {
+        "findingIndex": 5,
+        "reason": "Pages-list row overflow is distinct from the reviewed Page picker and closed-selector overflow bugs."
+      },
+      {
+        "findingIndex": 6,
+        "reason": "No reviewed entry covers inline HTML appearing literally in Table of Contents labels."
+      },
+      {
+        "findingIndex": 14,
+        "reason": "The claimed original-file link returning rendered content is not reviewed. It differs from bracket links targeting pages whose actual titles end in .md."
+      },
+      {
+        "findingIndex": 15,
+        "reason": "No reviewed entry covers incorrect singular/plural wording in commit summaries."
+      },
+      {
+        "findingIndex": 16,
+        "reason": "Neither the ineffective typography toggle nor its claimed missing accessible name matches a reviewed entry."
+      },
+      {
+        "findingIndex": 17,
+        "reason": "Subdirectory-relative image resolution is not reviewed and differs from the rejected site-root image-path expectation."
+      },
+      {
+        "findingIndex": 18,
+        "reason": "No reviewed entry describes percent-encoded accented filenames being displayed in diff headers."
+      },
+      {
+        "findingIndex": 19,
+        "reason": "Accented pages failing through their .md URL aliases is distinct from reviewed bracket-link failures for titles literally ending in .md."
+      },
+      {
+        "findingIndex": 20,
+        "reason": "Subdirectory-relative page links resolving at the wiki root are not reviewed; the rejected root-relative link claim concerns leading-slash paths."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 3,
+        "reason": "The navigation fails to deliver the promised content or explain the missing page."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 3,
+        "reason": "The displayed filter state is incorrect and pages remain unexpectedly hidden."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "Applying the diff option produces summary counts inconsistent with the displayed changes."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 1,
+        "reason": "The described impact is clipped text and horizontal scrolling."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 1,
+        "reason": "The failure affects label presentation; no broken navigation is described."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 3,
+        "reason": "The claimed impact is an image failing to load because its URL resolves elsewhere."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 3,
+        "reason": "The purported source-view navigation returns rendered content rather than the requested Markdown source."
+      },
+      {
+        "findingIndex": 15,
+        "severity": 1,
+        "reason": "This is a grammatical copy defect."
+      },
+      {
+        "findingIndex": 16,
+        "severity": 1,
+        "reason": "The described effects concern font presentation and accessible naming, not content editing or saving."
+      },
+      {
+        "findingIndex": 17,
+        "severity": 3,
+        "reason": "The reported path resolution requests the wrong resources and prevents images from loading."
+      },
+      {
+        "findingIndex": 18,
+        "severity": 1,
+        "reason": "Only the filename's displayed representation is affected."
+      },
+      {
+        "findingIndex": 19,
+        "severity": 3,
+        "reason": "An address expected to resolve to an existing page instead opens the Pages list."
+      },
+      {
+        "findingIndex": 20,
+        "severity": 3,
+        "reason": "The reported link resolution navigates to missing root-level pages instead of the intended existing subpage."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [
+      {
+        "findingIndex": 15,
+        "reference": {
+          "name": "Commit detail summary uses incorrect singular/plural grammar for one changed file",
+          "summary": "Commit detail and branch comparison diff summaries use plural “files” when exactly one file changed.",
+          "expected": "Diff summaries should use singular “file” when exactly one file changed.",
+          "actual": "A commit changing one file displays “1 changed files with 1 additions and 0 deletions”. Comparing docs/release-owners against main also displays “1 changed files with 5 additions and 0 deletions”.",
+          "reproSteps": [
+            [
+              "Open an authenticated repository's commit history.",
+              "Open a commit that changes exactly one file.",
+              "Read the changed-files summary above the diff and observe that it says `1 changed files with 1 additions and 0 deletions`.",
+              "Reported comparison-page variant: open eval/harbor-handbook → Branches and choose New Pull Request beside docs/release-owners, with main as the base.",
+              "Read the comparison summary and observe “1 changed files with 5 additions and 0 deletions”."
+            ]
+          ],
+          "severity": 1
+        },
+        "reason": "Matches the singular/plural defect in commit diff summaries. The finding reaches it through wiki revisions rather than the documented repository-code history flow."
+      }
+    ],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

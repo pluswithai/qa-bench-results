@@ -1,0 +1,139 @@
+{
+  "bugs": [
+    {
+      "name": "Ctrl+Enter in an empty SQL editor runs an empty query and shows 'Only SELECT statements are allowed'",
+      "summary": "The app sends an empty query and shows the error panel 'An error occurred in your query — Only SELECT statements are allowed in a native query.' with 'Showing 0 rows'. The URL hash of the question confirms the query it sent is empty ('\"native\":\"\"'), while the button next to the editor stays disabled. A person who has not typed anything is told there is a SQL problem in a query they never wrote. (on /question (New → SQL query))",
+      "expected": "Nothing runs, because the editor is empty: the Run button is disabled and Save is disabled, so the keyboard shortcut should be a no-op or say that a query is needed.",
+      "actual": "The app sends an empty query and shows the error panel 'An error occurred in your query — Only SELECT statements are allowed in a native query.' with 'Showing 0 rows'. The URL hash of the question confirms the query it sent is empty ('\"native\":\"\"'), while the button next to the editor stays disabled. A person who has not typed anything is told there is a SQL problem in a query they never wrote.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and click New → SQL query (Sample Database is preselected; the editor shows only the grey placeholder 'SELECT * FROM TABLE_NAME').",
+        "Type nothing at all.",
+        "Press Ctrl+Enter (the same shortcut the editor advertises as 'Run query (Ctrl+enter)')."
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Browser Back after running a new SQL query auto-runs the empty previous state: error view, editor collapsed",
+      "summary": "The page shows an error state: \"An error occurred in your query — Only SELECT statements are allowed in a native query.\" with \"Showing 0 rows\", and the SQL editor is gone (only an \"OPEN EDITOR\" link). Clicking OPEN EDITOR brings back an empty editor with the placeholder \"SELECT * FROM TABLE_NAME\" — the query that was typed and run is lost. The error also misdescribes the query: the query the person wrote was a SELECT. (on /question (native SQL editor))",
+      "expected": "Back should return to the previous state of the editor with the query text still in it (or to the previous page), not to an error view, and the typed SELECT must not be lost.",
+      "actual": "The page shows an error state: \"An error occurred in your query — Only SELECT statements are allowed in a native query.\" with \"Showing 0 rows\", and the SQL editor is gone (only an \"OPEN EDITOR\" link). Clicking OPEN EDITOR brings back an empty editor with the placeholder \"SELECT * FROM TABLE_NAME\" — the query that was typed and run is lost. The error also misdescribes the query: the query the person wrote was a SELECT.",
+      "reproSteps": [
+        "Open https://5501-ivcz977nhep8zpgfafcws.e2b.app/ (signed in as eval@momentic.ai).",
+        "Click 'New' in the top bar, then 'SQL query'. The database is already Sample Database.",
+        "Click into the SQL editor and type: SELECT 'agent2-tag' AS tag, COUNT(*) AS n FROM orders",
+        "Press Ctrl+Enter to run it: the result table shows agent2-tag / 18,760 and 'Showing 1 row'.",
+        "Press the browser Back button.",
+        "The page now shows the red error 'An error occurred in your query — Only SELECT statements are allowed in a native query.' and 'Showing 0 rows'.",
+        "Click 'OPEN EDITOR': the editor comes back empty, showing only the placeholder SELECT * FROM TABLE_NAME, so the query is lost."
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Collection picker in the Save dialog overflows a 390px phone screen",
+      "summary": "The picker keeps its desktop pane layout wider than the phone screen: the left collection list is clipped to its last characters, row text is cut mid-word, and the bottom buttons ('New collectio', 'Select this collection' off-screen) can only be reached by scrolling the dialog horizontally, so a collection cannot be chosen with a normal phone use. (on /question/notebook (Save new question → \"Where do you want to save this?\"))",
+      "expected": "On a 390px screen the picker should fit the modal: the collections list readable, the panes stacked or collapsed, and the Cancel / Select this collection buttons fully visible without horizontal scrolling.",
+      "actual": "The picker keeps its desktop pane layout wider than the phone screen: the left collection list is clipped to its last characters, row text is cut mid-word, and the bottom buttons ('New collectio', 'Select this collection' off-screen) can only be reached by scrolling the dialog horizontally, so a collection cannot be chosen with a normal phone use.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai, set the browser to a phone size 390×844.",
+        "Open /question/notebook, open Sample Database, choose the Orders table, then click Save (top right) to open the 'Save new question' dialog.",
+        "Click the location button 'Harbor Admin's Personal Collection' to open the 'Select a collection or dashboard' picker.",
+        "Look at the Recents tab: the rows are clipped ('Harbor Admin's P...' with 'in O...' cut at the right edge).",
+        "Switch to the Browse tab: the collection list is pushed off the left edge so only the tail 'gent8-sub' is visible, and the bottom buttons 'New dashboard' / 'New collection' are cut off; 'Select this collection' and the three panes are not reachable without scrolling the dialog sideways."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Two SQL statements separated by ';' return only the first result set, with no warning",
+      "summary": "The result shows only the value of the first statement (a scalar \"1\", status 'Showing 1 row') and nothing indicates that the second statement was not run. No error, no warning, no note: a person who pastes a two-statement script is given the first result as if it were the whole answer. (on /question (native SQL editor))",
+      "expected": "Either the second statement is executed (two result sets) or the app tells the person that only the first statement was run / that multiple statements are not supported.",
+      "actual": "The result shows only the value of the first statement (a scalar \"1\", status 'Showing 1 row') and nothing indicates that the second statement was not run. No error, no warning, no note: a person who pastes a two-statement script is given the first result as if it were the whole answer.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai, click New → SQL query (Sample Database is preselected).",
+        "In the SQL editor type exactly: SELECT 1; SELECT 2;",
+        "Press Ctrl+Enter (or click the round Run button)."
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Phone width: the Visualization button in the results footer is an empty box",
+      "summary": "At phone width the bottom-left control next to the gear icon is a blank light-grey rounded box: neither the \"Visualization\" label nor a visualization icon is visible, while at desktop width the same control reads \"Visualization\". The only visualization switch available is the small chart icon in the middle of the footer bar. (on /question (native SQL editor results footer))",
+      "expected": "The visualization-type button in the results footer keeps a visible label or icon at phone width, so a person can tell what it is.",
+      "actual": "At phone width the bottom-left control next to the gear icon is a blank light-grey rounded box: neither the \"Visualization\" label nor a visualization icon is visible, while at desktop width the same control reads \"Visualization\". The only visualization switch available is the small chart icon in the middle of the footer bar.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1",
+        "From the home page choose New → SQL query, keep Sample Database",
+        "Type SELECT * FROM ORDERS LIMIT 50 in the editor and press Ctrl + Enter so the results table appears",
+        "Set the browser to a phone size, 390 × 844",
+        "Close the data-reference sidebar with its X and look at the bottom-left corner of the results footer, left of the gear icon"
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Data picker search treats '%' as a SQL LIKE wildcard and returns everything",
+      "summary": "Typing a single \"%\" into the box replaces the list with every table, saved question and model in the app (agent6-renamed-1, agent6-copy-1, agent4-count-by-size, Release requests by region and category, People, Orders, Products, agent2-sql-lifecycle, Release requests, Number of Orders, Revenue …), the same as an empty search. The typed text is not matched literally. (on /question/notebook)",
+      "expected": "The picker should filter on the literal text, or say \"No search results\" for a character that appears in no name, as it does for \"zzzznothing\".",
+      "actual": "Typing a single \"%\" into the box replaces the list with every table, saved question and model in the app (agent6-renamed-1, agent6-copy-1, agent4-count-by-size, Release requests by region and category, People, Orders, Products, agent2-sql-lifecycle, Release requests, Number of Orders, Revenue …), the same as an empty search. The typed text is not matched literally.",
+      "reproSteps": [
+        "Go to /question/notebook (signed in as eval@momentic.ai).",
+        "In the 'Pick your starting data' panel, click the search box 'Search for tables and more...'.",
+        "Type a single percent sign '%' and wait for the list to update.",
+        "Compare with typing 'zzzznothing' in the same box, which correctly shows 'No search results'."
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Save dialog enables Save for a whitespace-only name, then fails with the server text 'Value must be a non-blank string.'",
+      "summary": "The Save button is enabled for a whitespace-only name, POST /api/card returns 400, and the dialog shows the raw server wording 'Value must be a non-blank string.' under the field while the Save button's label changes to 'Failed'. (on /question (new question → Save dialog))",
+      "expected": "A name with only whitespace should be treated like an empty name: the Save button stays disabled or the dialog shows a clear validation message in the user's language before any request is sent.",
+      "actual": "The Save button is enabled for a whitespace-only name, POST /api/card returns 400, and the dialog shows the raw server wording 'Value must be a non-blank string.' under the field while the Save button's label changes to 'Failed'.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1.",
+        "Open /question/notebook, click 'Sample Database' then 'Orders', then click 'Visualize'.",
+        "Click 'Save' in the top right to open the 'Save new question' dialog.",
+        "Leave the Name field empty and note that the dialog's 'Save' button stays disabled.",
+        "Type 5 spaces into the Name field: the 'Save' button becomes enabled (blue).",
+        "Click the dialog's 'Save' button."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Row limit accepts a 20-digit number; the question then fails with 'Invalid query: {:stages [{:limit ...}]}'",
+      "summary": "The notebook accepts the value and runs the query, which fails: the results pane shows \\\"There was a problem with your question … Double check your inputs and retry your query\\\", the row count says \\\"Showing 0 rows\\\", and \\\"Show error details\\\" reveals the raw internal message \\\"Invalid query: {:stages [{:limit [\\\"integer greater than or equal to zero\\\"]}]}\\\". No validation message appears next to the Row limit field. (on /question/notebook)",
+      "expected": "The Row limit field should refuse or clamp a value that cannot be used (or say what the maximum is), instead of accepting it and failing the whole question with a raw internal error.",
+      "actual": "The notebook accepts the value and runs the query, which fails: the results pane shows \\\"There was a problem with your question … Double check your inputs and retry your query\\\", the row count says \\\"Showing 0 rows\\\", and \\\"Show error details\\\" reveals the raw internal message \\\"Invalid query: {:stages [{:limit [\\\"integer greater than or equal to zero\\\"]}]}\\\". No validation message appears next to the Row limit field.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open /question/notebook, choose Sample Database > Orders.",
+        "Add a sort step: sort by Quantity, then add a second sort by Total.",
+        "Click the Row limit step icon and type 99999999999999999999 (twenty 9s) in \"Enter a limit\", press Tab (the field keeps the value).",
+        "Click Visualize."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Field picker for a Field Filter variable collapses when the search matches no field",
+      "summary": "The whole 'Select...' popover disappears after the second keystroke, the field to map to reverts to 'Select...' with nothing selected, and no message is shown. The only way on is to click the dropdown again. Happened 3 times out of 3 (2x typing the full word, 1x typing 'q' first which matched and kept the popover open — so the close is tied to a search with no match). (on /question (native SQL editor, Variables and parameters panel))",
+      "expected": "The popover stays open and says no field matches, so the person can clear the search or go back to another table.",
+      "actual": "The whole 'Select...' popover disappears after the second keystroke, the field to map to reverts to 'Select...' with nothing selected, and no message is shown. The only way on is to click the dropdown again. Happened 3 times out of 3 (2x typing the full word, 1x typing 'q' first which matched and kept the popover open — so the close is tied to a search with no match).",
+      "reproSteps": [
+        "Open /question, choose New > SQL query, pick Sample Database.",
+        "Type in the editor: SELECT count(*) FROM ORDERS WHERE {{filter}}",
+        "In the right side panel 'Variables and parameters', open the Variable type dropdown and choose 'Field Filter'.",
+        "In 'Field to map to (required)' click 'Select...' and pick the table Orders in the popover.",
+        "Click the 'Find...' search box at the top of that popover and type 'category' (Orders has no Category column)."
+      ],
+      "severity": 3
+    },
+    {
+      "name": "On the empty 'Pick your starting data' page, Tab focuses an invisible Save button with the tooltip 'You don't have permission to save this question.'",
+      "summary": "Tabbing lands on an invisible control (no focus ring anywhere on screen) and a tooltip appears reading \"You don't have permission to save this question.\" - which is untrue, this account can and does save questions (Save is simply unavailable because no table has been picked yet). The same happens on every pass (2 of 2). (on /question/notebook)",
+      "expected": "Tabbing past Settings should skip the Save control while it is not visible/available, or focus a visible, correctly worded control (e.g. a disabled Save with \"Pick your starting data first\"), never an invisible control with a wrong permission message.",
+      "actual": "Tabbing lands on an invisible control (no focus ring anywhere on screen) and a tooltip appears reading \"You don't have permission to save this question.\" - which is untrue, this account can and does save questions (Save is simply unavailable because no table has been picked yet). The same happens on every pass (2 of 2).",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open https://5501-ivcz977nhep8zpgfafcws.e2b.app/question/notebook (the 'Pick your starting data' page, no table chosen yet).",
+        "Without clicking anywhere, press Tab repeatedly to walk the header: Toggle sidebar, logo, Search, New, Settings.",
+        "Press Tab once more, just after Settings."
+      ],
+      "severity": 1
+    }
+  ]
+}

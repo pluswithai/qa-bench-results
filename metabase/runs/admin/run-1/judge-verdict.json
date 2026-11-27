@@ -1,0 +1,107 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "metabase/areas/admin",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "02e1fd9b544967c495c81e4f3fa84472b513715a6c4a05829148435f06040178",
+    "known_invalid_sha256": "8df704a6459f7851a7057ea37631c06a3edca31f244d2780c5d69f87bdcacc22",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "123",
+    "bugs": "5",
+    "flags": "0",
+    "known_hits": "3",
+    "extra_known_hits": "0",
+    "unverified": "2",
+    "outside_area_known_hits": "0",
+    "outside_area_known_invalid": "0",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "",
+    "outside_area_ground_truth_sha256": "18765609374b28bc9ff8c4d574f183a1cec470472e42a7e8bae343da32e17da8",
+    "outside_area_known_invalid_sha256": "bda5fa1dae2abd3dbc884c784d0bd82ccd854fe93bc63cc4126be5e14c0b4c18",
+    "duplicates": "0",
+    "duplicate_known_hits": "0",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "0",
+    "known_misses": "0",
+    "precision": "1",
+    "recall": "0.024390243902439025",
+    "findings_per_minute": "0.19679654582702766",
+    "correct_findings_per_minute": "0.1180779274962166",
+    "severity_1": "2",
+    "severity_3": "1",
+    "severity_5": "0",
+    "severity_sum": "5",
+    "score": "5",
+    "duration_seconds": "1524.417",
+    "partial": "false",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 7,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Matches the Redirect to HTTPS toggle incorrectly displaying the Site URL explanation, reached through the same General settings inspection."
+      },
+      {
+        "groundTruthIndex": 22,
+        "reproStepsIndex": 0,
+        "findingIndex": 2,
+        "reason": "Matches saving not-an-email as the help-request address on blur without validation. Omitting the final refresh is an insignificant repro difference."
+      },
+      {
+        "groundTruthIndex": 3,
+        "reproStepsIndex": 0,
+        "findingIndex": 4,
+        "reason": "Matches the Anonymous tracking helper description appearing twice in General settings, using the same inspection flow."
+      }
+    ],
+    "invalidMatches": [],
+    "unverified": [
+      {
+        "findingIndex": 1,
+        "reason": "No reviewed entry covers duplication within the Site URL block. This differs from displaying Site URL copy under Redirect to HTTPS."
+      },
+      {
+        "findingIndex": 3,
+        "reason": "No reviewed entry covers People search interpreting % or _ as wildcards. The Chinese-character People search and State Contains '%' reports describe different failures."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 1,
+        "reason": "Duplicated descriptive text is a presentation defect."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 3,
+        "reason": "Search returns unrelated people instead of filtering by the entered characters."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

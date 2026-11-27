@@ -1,0 +1,219 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "gitea/areas/issues",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "355ea9e1b77d4da75647526b5c7235749e72e41afe08c90f9205eb2ca4116132",
+    "known_invalid_sha256": "454d98686051f1d8785500405c256fcd4c68464de1dbd683223ba7df001e90de",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "73",
+    "bugs": "16",
+    "flags": "0",
+    "known_hits": "8",
+    "extra_known_hits": "0",
+    "unverified": "7",
+    "outside_area_known_hits": "0",
+    "outside_area_known_invalid": "0",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "",
+    "outside_area_ground_truth_sha256": "47db07b83af13b7c7dd75acd1b523ed86e8107b60e6f33878e8fb5b68a2acbe2",
+    "outside_area_known_invalid_sha256": "72e79c4023c85c9101fbf2b7613d3daf78b07fded510d117ab5b26f6ac3103f9",
+    "duplicates": "0",
+    "duplicate_known_hits": "0",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "1",
+    "known_misses": "1",
+    "precision": "0.8888888888888888",
+    "recall": "0.1095890410958904",
+    "findings_per_minute": "0.5651250721858979",
+    "correct_findings_per_minute": "0.28256253609294896",
+    "severity_1": "3",
+    "severity_3": "5",
+    "severity_5": "0",
+    "severity_sum": "18",
+    "score": "17",
+    "duration_seconds": "1698.739",
+    "partial": "false",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 11,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Matches global Assigned to you search hiding an issue that appears with either condition alone."
+      },
+      {
+        "groundTruthIndex": 3,
+        "reproStepsIndex": 0,
+        "findingIndex": 3,
+        "reason": "Matches tracked time from excluded issues remaining visible when repository text search returns no results."
+      },
+      {
+        "groundTruthIndex": 17,
+        "reproStepsIndex": 0,
+        "findingIndex": 4,
+        "reason": "Matches negative manual hours exposing untranslated RangeError feedback while correctly rejecting the duration."
+      },
+      {
+        "groundTruthIndex": 5,
+        "reproStepsIndex": 0,
+        "findingIndex": 5,
+        "reason": "Matches the singular participant count incorrectly using the plural label."
+      },
+      {
+        "groundTruthIndex": 4,
+        "reproStepsIndex": 0,
+        "findingIndex": 7,
+        "reason": "Matches January 1, 0001 appearing correctly in the sidebar but as a dash in due-date history."
+      },
+      {
+        "groundTruthIndex": 44,
+        "reproStepsIndex": 0,
+        "findingIndex": 11,
+        "reason": "Matches organization Open/Closed navigation dropping Assignee or Author and broadening the results."
+      },
+      {
+        "groundTruthIndex": 8,
+        "reproStepsIndex": 0,
+        "findingIndex": 13,
+        "reason": "Matches clicking Open from the initial repository list navigating to state=all and including closed issues."
+      },
+      {
+        "groundTruthIndex": 27,
+        "reproStepsIndex": 0,
+        "findingIndex": 15,
+        "reason": "Matches saving a malformed external-tracker regular expression with success feedback and persistent invalid configuration."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 3,
+        "reproStepsIndex": 0,
+        "findingIndex": 14,
+        "reason": "Matches the rejected claim that all-repositories teams should appear in the organization Teams filter."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 1,
+        "reason": "No entry describes Escape implicitly selecting an issue that can then be added as a dependency."
+      },
+      {
+        "findingIndex": 2,
+        "reason": "Cross-field matching in Words mode is distinct from the rejected repository Exact-versus-Words comparison."
+      },
+      {
+        "findingIndex": 6,
+        "reason": "No entry covers dependency-event wording on the blocking issue; the private-dependency disclosure bug is different."
+      },
+      {
+        "findingIndex": 8,
+        "reason": "No entry describes Escape failing to dismiss the assignee picker after a selection."
+      },
+      {
+        "findingIndex": 9,
+        "reason": "No entry describes assignee selections remaining unsaved until the picker closes and being lost on reload."
+      },
+      {
+        "findingIndex": 10,
+        "reason": "No entry covers browser Back restoring a new issue's body while losing its title."
+      },
+      {
+        "findingIndex": 12,
+        "reason": "No entry covers organization sidebar counters ignoring filters while the list and state counts remain filtered."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 3,
+        "reason": "An unintended dependency is persisted on the issue."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "The search omits issues containing both requested words."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 1,
+        "reason": "The reported defect concerns relation wording, not an incorrectly saved dependency."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 1,
+        "reason": "This is a keyboard-dismissal usability defect; clicking outside still closes the picker."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 3,
+        "reason": "An apparently selected assignment is lost instead of being persisted."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 3,
+        "reason": "Returning to the form loses part of the entered draft."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 3,
+        "reason": "The counters report incorrect totals for the described filtered scope."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 3,
+        "reason": "The described impact is unavailable team filtering, although this omission was reviewed as intended."
+      },
+      {
+        "findingIndex": 15,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

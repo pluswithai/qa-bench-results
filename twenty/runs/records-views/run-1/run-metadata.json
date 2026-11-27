@@ -1,0 +1,15 @@
+{
+  "fixture": "twenty/areas/records-views",
+  "run": 1,
+  "started_at": "2026-11-24T04:17:44.303Z",
+  "duration_seconds": 1799.942,
+  "time_limit_seconds": 1800,
+  "stop_reason": "time_limit",
+  "credits": {
+    "total": 929,
+    "testing_team": 809,
+    "verification": 120,
+    "findings_verified": 20
+  },
+  "team_container_errors": 0
+}

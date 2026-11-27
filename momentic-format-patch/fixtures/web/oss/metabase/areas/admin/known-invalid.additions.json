@@ -1,0 +1,48 @@
+{
+  "bugs": [
+    {
+      "name": "Retired segment's edit page (opened by typed address) has no 'retired' notice and its saved edits stay hidden",
+      "summary": "The edit page looks like an ordinary live segment: \\\"EDIT YOUR SEGMENT — Make changes to your segment and leave an explanatory note\\\", the saved name/description/filter, \\\"18760 rows\\\", an enabled Save changes. Nothing says the segment is retired. Editing the name and clicking Save changes sends PUT /api/segment/1 which answers 200, the app returns to /admin/datamodel/segments and that page still shows the empty state \\\"Create segments to add them to the Filter dropdown in the query builder\\\" — the change is not visible anywhere in Admin and there is no control to un-retire or even to list retired segments. (on /admin/datamodel/segment/1)",
+      "expected": "The edit page of a retired segment should show that it is retired (a badge or notice) and either refuse the edit or make clear that saving will not bring it back, so that a person can see what happened to their saved change instead of finding the segment missing from the list.",
+      "actual": "The edit page looks like an ordinary live segment: \\\"EDIT YOUR SEGMENT — Make changes to your segment and leave an explanatory note\\\", the saved name/description/filter, \\\"18760 rows\\\", an enabled Save changes. Nothing says the segment is retired. Editing the name and clicking Save changes sends PUT /api/segment/1 which answers 200, the app returns to /admin/datamodel/segments and that page still shows the empty state \\\"Create segments to add them to the Filter dropdown in the query builder\\\" — the change is not visible anywhere in Admin and there is no control to un-retire or even to list retired segments.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open /admin/datamodel/segments",
+        "Create a segment: \"New segment\", table Sample Database -> Orders, add the filter Total <= 999999, name it, add a description, \"Save changes\" (in this hunt it is the segment at /admin/datamodel/segment/1 named \"agent9-orders-below-999999x2\")",
+        "In the segments list open the row's \"...\" menu and choose \"Retire Segment\", then \"Retire\": the list now shows the empty state \"Create segments to add them to the Filter dropdown in the query builder\"",
+        "Open the retired segment's edit page by its address: /admin/datamodel/segment/1",
+        "Change the name (e.g. append \"z\") and type a note in \"REASON FOR CHANGES\", then click \"Save changes\"",
+        "Land back on /admin/datamodel/segments: the list is still empty and shows no trace of the segment that was just saved"
+      ],
+      "reason": "Works as designed and reached only by a hand-typed address. Retiring hides the segment from the list on purpose: GET /api/segment returns only archived=false (segments/api.clj L61-68) and the docs say a retired segment is no longer selectable but keeps existing questions working (segments.md L46). After retiring, no link in the app leads to /admin/datamodel/segment/1 (shot-4: list is empty); the agent typed the address. The edit itself succeeds (PUT 200) and nothing is lost; staying hidden after the edit is the expected state of a retired segment. A missing 'retired' badge on a page no link reaches is not a defect."
+    },
+    {
+      "name": "API key dialog: a name of only spaces is rejected by the server with 'Value must be a non-blank string.'",
+      "summary": "Typing only spaces into \\\"Key name *\\\" enables the \\\"Create\\\" button; clicking it sends the request, which the server refuses with 400. The field then shows the server's developer wording \\\"Value must be a non-blank string.\\\" and the button becomes \\\"Failed\\\". No key is created, but a name that only looks non-empty passes the form's own required-field check and the user gets a raw validation string instead of a plain message. (on /admin/settings/authentication/api-keys)",
+      "expected": "A key name of only whitespace is treated as empty: \\\"Create\\\" stays disabled (as it is for an empty name), or the page says next to the field that a key name is required, without a round-trip to the server",
+      "actual": "Typing only spaces into \\\"Key name *\\\" enables the \\\"Create\\\" button; clicking it sends the request, which the server refuses with 400. The field then shows the server's developer wording \\\"Value must be a non-blank string.\\\" and the button becomes \\\"Failed\\\". No key is created, but a name that only looks non-empty passes the form's own required-field check and the user gets a raw validation string instead of a plain message.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1 and open https://5501-ifu9zeza11kw2jt1zrm8o.e2b.app/admin/settings/authentication/api-keys (the list is empty: \"No API keys here yet\")",
+        "Click \"Create API key\" (top right) to open the \"Create a new API key\" dialog",
+        "Type two spaces into the \"Key name *\" field",
+        "Choose \"Administrators\" in the group dropdown \"Which group should this key belong to?\"",
+        "Note that \"Create\" is now enabled although the name is blank, and click it"
+      ],
+      "reason": "Validation works. shot-4 shows the field outlined red with a plain-English message directly under it and no key created. The form checks 'required' on the client (utils.ts L10-16) and the server enforces non-blank (schema.clj L109-117); the server's field error is surfaced inline next to the field, which is how Metabase forms are designed to show server validation. Whether the check runs on the client or the server is not a defect, and the wording is readable, not a raw error."
+    },
+    {
+      "name": "Semantic type select keeps the typed search text ('Currency') after Escape although nothing is saved",
+      "summary": "After typing a search text with no matches, the closed Semantic type control displays \\\"Currency\\\" as if it were the field's semantic type, although no save request is sent (no PUT /api/field/48) and after a reload the value is \\\"Entity Name\\\" again — the panel misreports the stored setting with no error. (on /admin/datamodel/database/1/schema/1:PUBLIC/table/1/field/48)",
+      "expected": "A select that could not apply the typed text should keep showing the real value (\\\"Entity Name\\\") and treat the typed text as search text only, or tell the user the choice is invalid; what it displays must be the value that is actually stored.",
+      "actual": "After typing a search text with no matches, the closed Semantic type control displays \\\"Currency\\\" as if it were the field's semantic type, although no save request is sent (no PUT /api/field/48) and after a reload the value is \\\"Entity Name\\\" again — the panel misreports the stored setting with no error.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1, open /admin/datamodel, expand Sample Database, click the table People, then click the field card \"Name\" (address /admin/datamodel/database/1/schema/1:PUBLIC/table/1/field/48).",
+        "In the right-hand Field settings panel note the Semantic type select reads \"Entity Name\".",
+        "Click the Semantic type select and type Currency into its search input.",
+        "The dropdown panel answers \"Didn't find any results\" while the select itself now displays \"Currency\".",
+        "Press Escape (or click elsewhere) to close the dropdown: the select still displays \"Currency\" as the field's semantic type.",
+        "Reload the page: the select is back to \"Entity Name\"; no request was made and nothing was saved."
+      ],
+      "reason": "What the shots show is the user's own search text in a still-focused searchable combobox, not a stored value. In shot-4/shot-5 and frame-4 the input still has the blue focus border right after 'Pressing Escape'; the video only presses Escape and then reloads, it never moves focus away. SemanticTypePicker is a stock Mantine <Select searchable> (L40-59): Escape closes the dropdown but keeps focus and the typed text; the text is reset to the selected option's label on blur. No request is sent and the stored value is unchanged (shot-6), which is correct. Transient editing state of a standard control, no misreport once focus leaves the field."
+    }
+  ]
+}

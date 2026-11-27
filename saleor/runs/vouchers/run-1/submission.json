@@ -1,0 +1,421 @@
+{
+  "fixture": "saleor/areas/vouchers",
+  "run": 1,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 323,
+      "name": "Setup checklist counts 2 codes ready after adding a single voucher code",
+      "summary": "The checklist step says '2 codes ready' while the Voucher codes table contains only the single code 'agent5-codes'. (on /discounts/vouchers/add)",
+      "expected": "The checklist step should say '1 code ready' to match the single code in the codes table and the '1 of 3' completed-step counter.",
+      "actual": "The checklist step says '2 codes ready' while the Voucher codes table contains only the single code 'agent5-codes'.",
+      "reproSteps": [
+        "Go to /discounts/vouchers/add (Create Voucher).",
+        "In the 'Voucher codes' card click 'Add code'.",
+        "Choose 'Manual code', type agent5-codes in 'Enter code' and click 'Confirm'.",
+        "Look at the 'Voucher codes' table: it lists exactly one code, agent5-codes.",
+        "Scroll up to the 'Set up this voucher' checklist and read the 'Add a code' step's summary line."
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 367,
+      "name": "Empty voucher code is accepted and saved in the Create voucher codes table",
+      "summary": "The empty code is accepted: the Voucher codes table gets a row with a blank Code, status 'Draft', the checklist moves to '1 of 3' ('Add a code' done, 'Next up: Assign channels'), and a second empty Confirm is rejected as 'Code already exists' — proving an empty code was stored. The step subtitle even says '2 codes ready' while the table lists one blank row. (on /discounts/vouchers/add)",
+      "expected": "The dialog refuses an empty code with a validation message next to the field (as it does for a duplicate) and no code row is added; the setup checklist must not count 'Add a code' as done.",
+      "actual": "The empty code is accepted: the Voucher codes table gets a row with a blank Code, status 'Draft', the checklist moves to '1 of 3' ('Add a code' done, 'Next up: Assign channels'), and a second empty Confirm is rejected as 'Code already exists' — proving an empty code was stored. The step subtitle even says '2 codes ready' while the table lists one blank row.",
+      "reproSteps": [
+        "Open /discounts/vouchers/add (Create voucher).",
+        "In the 'Voucher codes' card click '+ Add code'.",
+        "Choose 'Manual code' in the dropdown; the dialog 'Enter Voucher Code' opens with an empty 'Enter code' field (placeholder 'Enter code').",
+        "Type nothing and click 'Confirm'.",
+        "Look at the 'Voucher codes' table (screenshot: a row with an empty Code cell and status Draft) and at the checklist above, which now reads '1 of 3' with 'Add a code' marked done.",
+        "Click '+ Add code' > 'Manual code' > 'Confirm' with the field still empty: the dialog now answers 'Code already exists'."
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 390,
+      "name": "Save with an invalid discount percentage shows \"Couldn't create voucher\" but the voucher is created anyway",
+      "summary": "The VoucherCreate mutation runs before the channel-listing validation, so a voucher is created with no discount value and no channels while the person is told the voucher could not be created. The list shows the half-made voucher ('1 code', Active, Offer '–') and clicking Save again after fixing 101 would create a second one. (on /discounts/vouchers/add)",
+      "expected": "When Save is refused (\"Couldn't create voucher - Check the highlighted fields and try again\") nothing should be created, and the voucher list should not gain a new incomplete voucher. The user fixes the field and saves once.",
+      "actual": "The VoucherCreate mutation runs before the channel-listing validation, so a voucher is created with no discount value and no channels while the person is told the voucher could not be created. The list shows the half-made voucher ('1 code', Active, Offer '–') and clicking Save again after fixing 101 would create a second one.",
+      "reproSteps": [
+        "Sign in as admin@example.com and open Discounts > Vouchers > Create voucher (/discounts/vouchers/add).",
+        "In 'Voucher codes' click 'Add code', choose 'Manual code', type agent4-disc1 and click Confirm.",
+        "In the Availability card click Manage, tick 'Select all channels' (Channel-PLN + Channel-USD) and click 'Confirm (2 channels)'.",
+        "Scroll to 'Discount amount' > 'Percentage off, per channel', type 101 in Channel-PLN and 100 in Channel-USD.",
+        "Click Save. A field error 'Invalid percentage value' appears and the toast 'Couldn't create voucher - Check the highlighted fields and try again.' is shown.",
+        "Open Discounts > Vouchers and search for 'agent4'.",
+        "A new voucher row exists: name '1 code', Status 'Active', Offer '–', Scope 'Entire order'. Open it: it shows 'Finish setting up this voucher 1 of 3', code agent4-disc1 present, 'Voucher in 0 of 2 channels', no discount value."
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 434,
+      "name": "Enabling \"Minimum quantity of items\" silently turns off \"Minimal order value\" — the two requirements cannot be combined",
+      "summary": "Turning on 'Minimum quantity of items' switches 'Minimal order value' off and hides its Channel-PLN / Channel-USD amount fields. Turning 'Minimal order value' back on switches 'Minimum quantity of items' off and hides its quantity field. Only one of the two requirements can ever be enabled at a time; the two switches behave as mutually exclusive although nothing on the page says so. (on /discounts/vouchers/add (Requirements section))",
+      "expected": "Both requirements are separate optional controls described as 'Optional thresholds customers must meet before the voucher can be applied'; turning on 'Minimum quantity of items' should leave 'Minimal order value' on with its per-channel amounts, so a voucher can require both a minimum order value and a minimum item quantity.",
+      "actual": "Turning on 'Minimum quantity of items' switches 'Minimal order value' off and hides its Channel-PLN / Channel-USD amount fields. Turning 'Minimal order value' back on switches 'Minimum quantity of items' off and hides its quantity field. Only one of the two requirements can ever be enabled at a time; the two switches behave as mutually exclusive although nothing on the page says so.",
+      "reproSteps": [
+        "Go to /discounts/vouchers/add",
+        "In the right-hand Availability panel click Manage channels, tick Select all channels (Channel-PLN, Channel-USD) and click Confirm",
+        "In the left-hand section list click Requirements",
+        "Turn on the 'Minimal order value' switch and type 25 in Channel-PLN and 100 in Channel-USD",
+        "Turn on the 'Minimum quantity of items' switch",
+        "Observe both switches and the amount fields",
+        "Turn 'Minimal order value' on again, then turn 'Minimum quantity of items' on again and observe"
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 453,
+      "name": "Vouchers list overflows the viewport at phone width: search field cut off and page scrolls sideways",
+      "summary": "The toolbar row is 485 px wide inside a 357 px main area, so the \\\"Search vouchers...\\\" field runs past the right edge of the screen (its right ~143 px are off-screen and unreachable). When the field gets focus the whole document scrolls horizontally: \\\"All vouchers\\\" and \\\"Create voucher\\\" shift left and out of view and the Name column of every row is cut to \\\"ount · 1 code\\\", \\\"rder discount · 1 code\\\". The page stays scrolled sideways after the search text is cleared. (on /discounts/vouchers)",
+      "expected": "The list page fits the 390 px viewport: the search field stays inside the visible area, nothing is clipped and the page never scrolls sideways.",
+      "actual": "The toolbar row is 485 px wide inside a 357 px main area, so the \\\"Search vouchers...\\\" field runs past the right edge of the screen (its right ~143 px are off-screen and unreachable). When the field gets focus the whole document scrolls horizontally: \\\"All vouchers\\\" and \\\"Create voucher\\\" shift left and out of view and the Name column of every row is cut to \\\"ount · 1 code\\\", \\\"rder discount · 1 code\\\". The page stays scrolled sideways after the search text is cleared.",
+      "reproSteps": [
+        "Set the browser viewport to 390 x 844 (phone).",
+        "Sign in as admin@example.com / admin and open Discounts > Vouchers, address /discounts/vouchers.",
+        "Look at the toolbar row under \"All vouchers\": the Filters button and the \"Search vouchers...\" field.",
+        "Click into the \"Search vouchers...\" field and type any text (e.g. agent15-nonexistent-xyz), then clear it with the keyboard."
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 535,
+      "name": "Filter panel at phone width: the value picker of a filter condition is off-screen, so filters cannot be applied",
+      "summary": "The condition row only shows \\\"Where [field] is\\\" and the control for choosing the value is rendered at x=367..567, i.e. outside the 390 px screen and clipped by the filter panel, so it is invisible and cannot be tapped. \\\"Apply\\\" stays disabled, so no filter can be applied on a phone. Same for Status and for Channel (and the row is visibly cut: nothing follows \\\"is\\\"). (on /discounts/vouchers)",
+      "expected": "After choosing a field and the \\\"is\\\" condition, the value selector appears inside the filter panel inside the viewport, can be tapped, and \\\"Apply\\\" becomes usable.",
+      "actual": "The condition row only shows \\\"Where [field] is\\\" and the control for choosing the value is rendered at x=367..567, i.e. outside the 390 px screen and clipped by the filter panel, so it is invisible and cannot be tapped. \\\"Apply\\\" stays disabled, so no filter can be applied on a phone. Same for Status and for Channel (and the row is visibly cut: nothing follows \\\"is\\\").",
+      "reproSteps": [
+        "Set the browser viewport to 390 x 844 and open /discounts/vouchers (signed in as admin@example.com / admin).",
+        "Click the \"Filters\" button above the table.",
+        "Click the first dropdown of the \"Where\" row and choose \"Status\".",
+        "Look at the \"Where\" row: instead of a value selector after \"is\" there is empty space.",
+        "Repeat with \"Channel\" chosen in the first dropdown - the value selector is again missing and \"Apply\" stays greyed out."
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 665,
+      "name": "\"Limit of Uses\" accepts a decimal and silently saves a different (truncated) number",
+      "summary": "Decimals are accepted with no message. Before Save the page previews a fractional cap (\\\"2.9 redemptions left\\\", \\\"0 of 2.9 used\\\") and after Save the same page shows 2 — the entered value is silently truncated to a whole number, so the cap that gets stored is not the one the user typed. (on /discounts/vouchers/add and /discounts/vouchers/{id} (Limits section))",
+      "expected": "A redemption cap is a whole number. The field should reject a fractional value with a message next to the field (as it does for 0 and negative values, which show \\\"Enter a limit of at least 1\\\"), or round it before showing it — the number saved must be the number the page showed before Save.",
+      "actual": "Decimals are accepted with no message. Before Save the page previews a fractional cap (\\\"2.9 redemptions left\\\", \\\"0 of 2.9 used\\\") and after Save the same page shows 2 — the entered value is silently truncated to a whole number, so the cap that gets stored is not the one the user typed.",
+      "reproSteps": [
+        "Open https://5503-ief25m2mkkrkgto7fvk68.e2b.app/discounts/vouchers/Vm91Y2hlcjoxMA%3D%3D (the voucher \"agent8-decimal-limit\") and click \"Limits\" in the left section nav.",
+        "Turn on the toggle \"Limit number of times this discount can be used in total\".",
+        "Type 2.9 into the \"Limit of Uses\" field (the field shows no validation message; the \"Uses left\" hint next to it and the right-hand Redemptions card show \"2.9\").",
+        "Click Save and wait for the \"Voucher updated\" toast.",
+        "Read the Limits section again: \"Limit of Uses\" and \"Uses left\" now show 2, and the Redemptions card shows \"0 of 2 used\".",
+        "Same on create: at /discounts/vouchers/add with the limit on, 1.5 was accepted without any message and the saved voucher showed \"Limit of Uses\" 1 / \"0 of 1 used\"."
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 742,
+      "name": "Save with an empty \\\"Limit of Uses\\\" fails with a 400 but still shows the success toast \\\"Voucher updated\\\"",
+      "summary": "Save sends the update, the server answers 400, and the page shows the green success toast \\\"Voucher updated\\\" anyway. Only the field's own inline error and the \\\"Unsaved changes\\\" note hint that nothing happened; after a reload the voucher still has the previous cap (2) — so the person is told the change saved when it did not. (on /discounts/vouchers/{id} (Limits section))",
+      "expected": "Save with an invalid value should be refused: no success message, an error explaining what is wrong (or Save blocked while the field shows \\\"Enter a limit of at least 1\\\"). A success toast must only appear when the change was actually persisted.",
+      "actual": "Save sends the update, the server answers 400, and the page shows the green success toast \\\"Voucher updated\\\" anyway. Only the field's own inline error and the \\\"Unsaved changes\\\" note hint that nothing happened; after a reload the voucher still has the previous cap (2) — so the person is told the change saved when it did not.",
+      "reproSteps": [
+        "Open https://5503-ief25m2mkkrkgto7fvk68.e2b.app/discounts/vouchers/Vm91Y2hlcjoxMA%3D%3D (the voucher \"agent8-decimal-limit\") and click \"Limits\" in the left section nav.",
+        "The toggle \"Limit number of times this discount can be used in total\" is on with \"Limit of Uses\" = 2.",
+        "Clear the \"Limit of Uses\" field completely: it shows the red message \"Enter a limit of at least 1\".",
+        "Click Save at the bottom right.",
+        "Observe: a green toast \"Voucher updated\" appears (console: POST /graphql/ VoucherUpdate → 400 Bad Request) while the field still shows \"Enter a limit of at least 1\" and the bottom bar still says \"Unsaved changes: General settings\".",
+        "Reload the page: the Limits section still shows \"Limit of Uses\" 2 and the Redemptions card \"0 of 2 used\" — nothing was saved."
+      ]
+    },
+    {
+      "index": 8,
+      "reported_at_seconds": 744,
+      "name": "Countries summary says 'Voucher is limited to these countries' while no country is assigned and the card body says it applies to all countries",
+      "summary": "The card header reads \"Voucher is limited to these countries\" (the sidebar 'Countries' entry has the same subtitle) while the card contents, with no country assigned, read \"Voucher applies to all countries\". (on /discounts/vouchers/Vm91Y2hlcjo4)",
+      "expected": "With no countries assigned the summary should say the voucher applies to all countries (e.g. \"All countries\"), and only say \"limited to these countries\" once at least one country is assigned.",
+      "actual": "The card header reads \"Voucher is limited to these countries\" (the sidebar 'Countries' entry has the same subtitle) while the card contents, with no country assigned, read \"Voucher applies to all countries\".",
+      "reproSteps": [
+        "Open the voucher agent5-countries (/discounts/vouchers/Vm91Y2hlcjo4), which is a 'Free shipping' voucher; the same is visible on /discounts/vouchers/add right after choosing 'Free shipping'.",
+        "Set the Countries card to no country: click 'Assign', untick every country and click 'Assign'.",
+        "Read the line under the 'Countries' heading and the text inside the card below it."
+      ]
+    },
+    {
+      "index": 9,
+      "reported_at_seconds": 778,
+      "name": "\"Name\" column sorts by voucher code, so the list is never in alphabetical name order",
+      "summary": "The rows are ordered by voucher code, not by the name displayed in the column: ascending gives Big order discount, Free shipping, Single Use Vouchers, Percentage order discount (Percentage after Single), and with newer vouchers the top row is \"QA-A-2-1 aaaa…\" above \"Big order discount\". The arrow says the list is sorted by Name when it is sorted by code. (on /discounts/vouchers)",
+      "expected": "A column titled \"Name\" with a sort arrow should order the rows by the names shown (Big order discount, Free shipping, Percentage order discount, Single Use Vouchers when ascending).",
+      "actual": "The rows are ordered by voucher code, not by the name displayed in the column: ascending gives Big order discount, Free shipping, Single Use Vouchers, Percentage order discount (Percentage after Single), and with newer vouchers the top row is \"QA-A-2-1 aaaa…\" above \"Big order discount\". The arrow says the list is sorted by Name when it is sorted by code.",
+      "reproSteps": [
+        "Sign in as admin@example.com / admin and open Discounts > Vouchers (/discounts/vouchers).",
+        "Look at the Name column header: it shows an up arrow (ascending) and the address carries ?asc=true&sort=code.",
+        "Read the rows from top to bottom: \"Big order discount · 1 code\", \"Free shipping · 1 code\", \"Single Use Vouchers · 50 codes\", \"Percentage order discount · 1 code\".",
+        "Open the four vouchers and note their codes: DISCOUNT, FREESHIPPING, SINGLE-USE-050, VCO9KV98LC.",
+        "Click the Name header again (now descending) and compare: the order is exactly the reverse of the code order, not of the names."
+      ]
+    },
+    {
+      "index": 10,
+      "reported_at_seconds": 782,
+      "name": "Re-enabled column jumps to the first position in the vouchers table and the order no longer matches the Pick columns list",
+      "summary": "The re-enabled column is placed at the far left of the table and the table order no longer matches the list in the panel: after turning Status back on the header row read \"Status | Name | Offer | Scope | Redemptions\", and after enabling Starts and Ends it read \"Status | Ends | Starts | Name | Offer …\". The panel is not a picker that can reorder (no drag handles, no arrows), and the changed order is written to the account (UserAccountUpdate), so it persists for the next visit. (on /discounts/vouchers)",
+      "expected": "Hiding a column and showing it again should put the column back where it was (Name, Status, Offer, Scope, Redemptions), and the order in the Pick columns panel should match the order of the table.",
+      "actual": "The re-enabled column is placed at the far left of the table and the table order no longer matches the list in the panel: after turning Status back on the header row read \"Status | Name | Offer | Scope | Redemptions\", and after enabling Starts and Ends it read \"Status | Ends | Starts | Name | Offer …\". The panel is not a picker that can reorder (no drag handles, no arrows), and the changed order is written to the account (UserAccountUpdate), so it persists for the next visit.",
+      "reproSteps": [
+        "Open /discounts/vouchers (columns in default order: Name, Status, Offer, Scope, Redemptions).",
+        "Click the Pick columns icon at the right end of the table header.",
+        "Turn the Status toggle off, then turn it on again.",
+        "Close the panel with Escape and read the table header row.",
+        "Repeat with the Starts and Ends toggles and read the header row again."
+      ]
+    },
+    {
+      "index": 11,
+      "reported_at_seconds": 785,
+      "name": "Voucher page header shows \"· %\" without the discount percentage",
+      "summary": "The header badge reads 'Entire order · %' — the percentage number is missing — although the same voucher's Discount section holds 10 for Channel-PLN and Channel-USD and the vouchers list shows '10% off' for it. (on /discounts/vouchers/{id})",
+      "expected": "The header badge shows the discount it applies, e.g. 'Entire order · 10%', as the list does.",
+      "actual": "The header badge reads 'Entire order · %' — the percentage number is missing — although the same voucher's Discount section holds 10 for Channel-PLN and Channel-USD and the vouchers list shows '10% off' for it.",
+      "reproSteps": [
+        "Sign in as admin@example.com / admin, open https://5503-ief25m2mkkrkgto7fvk68.e2b.app/discounts/vouchers",
+        "Open the voucher 'agent10-double' (10% off, entire order, channels Channel-PLN and Channel-USD)",
+        "Read the badge next to the voucher name in the page header; scroll down to the Discount section to see the stored percentage"
+      ]
+    },
+    {
+      "index": 12,
+      "reported_at_seconds": 798,
+      "name": "\"Clear filters\" also wipes the search term typed in the separate search box",
+      "summary": "The search term is silently deleted: the search box becomes empty, query=free disappears from the address, and the whole voucher list is shown again. The person loses a search they typed although there was no filter condition to clear. (on /discounts/vouchers)",
+      "expected": "Only the (empty) filter conditions are cleared; the search term \\\"free\\\" stays in the search box and the list stays filtered to \\\"Free shipping\\\", since the search box is outside the Filters panel.",
+      "actual": "The search term is silently deleted: the search box becomes empty, query=free disappears from the address, and the whole voucher list is shown again. The person loses a search they typed although there was no filter condition to clear.",
+      "reproSteps": [
+        "Sign in and open /discounts/vouchers.",
+        "Type \"free\" into the \"Search vouchers...\" box and wait: the list narrows to the single voucher \"Free shipping\" and the address gains query=free.",
+        "Click \"Filters\" to open the filter panel (no filter condition is set, \"Where\" row is empty).",
+        "Click \"Clear filters\" in the panel."
+      ]
+    },
+    {
+      "index": 13,
+      "reported_at_seconds": 915,
+      "name": "Channel picker on the Create voucher page is titled \"Manage Products Channel Availability\"",
+      "summary": "On the Create voucher page the same voucher channel dialog is titled \"Manage Products Channel Availability\" — a leftover product-page label, so staff picking channels for a voucher are told they are editing a product's channels. (on /discounts/vouchers/add)",
+      "expected": "The channel dialog for a voucher is titled \\\"Manage Channel Availability\\\", as it is on the saved voucher's page.",
+      "actual": "On the Create voucher page the same voucher channel dialog is titled \"Manage Products Channel Availability\" — a leftover product-page label, so staff picking channels for a voucher are told they are editing a product's channels.",
+      "reproSteps": [
+        "Open https://5503-ief25m2mkkrkgto7fvk68.e2b.app/discounts/vouchers/add (Create voucher).",
+        "In the Setup checklist click \"Add a code\", choose \"Manual code\", type agent9-code1 and click Confirm.",
+        "Click \"Manage channels\" (Setup checklist) or \"Manage\" in the Availability card on the right.",
+        "Read the dialog title.",
+        "Compare with the same dialog on an existing voucher: open a saved voucher (e.g. agent9-layout-voucher) and click \"Manage\" in the Availability card."
+      ]
+    },
+    {
+      "index": 14,
+      "reported_at_seconds": 916,
+      "name": "Clearing Start Date silently saves the start as \"now\" and drops the typed Start Hour",
+      "summary": "The save succeeds (\"Voucher updated\") and the stored start date/hour is silently set to the moment of saving (shown after reload as 11/24/2026, 12:26 AM). The 09:30 that was typed in Start Hour is discarded, and the voucher — previously \"Ended\"/\"Inactive · 2,517 days ago\" for its 2020 window — silently becomes \"Active\". In the second attempt the page even kept showing an empty Start Date and \"Unsaved changes: Schedule\" after the successful save until the page was reloaded. (on /discounts/vouchers/{id})",
+      "expected": "An empty Start Date with an end date already gave the validation \"End date cannot be before the start date\"; so a cleared start date should be refused or the user warned. At minimum the hour the user typed must be kept, and the voucher's status must not change silently to Active.",
+      "actual": "The save succeeds (\"Voucher updated\") and the stored start date/hour is silently set to the moment of saving (shown after reload as 11/24/2026, 12:26 AM). The 09:30 that was typed in Start Hour is discarded, and the voucher — previously \"Ended\"/\"Inactive · 2,517 days ago\" for its 2020 window — silently becomes \"Active\". In the second attempt the page even kept showing an empty Start Date and \"Unsaved changes: Schedule\" after the successful save until the page was reloaded.",
+      "reproSteps": [
+        "Sign in as admin@example.com / admin, open Discounts > Vouchers and open my voucher \"agent6-past-range\" (/discounts/vouchers/Vm91Y2hlcjoxNQ%3D%3D), whose Schedule is Start 01/02/2020 09:30 AM, End 01/03/2020 09:30 AM and whose status is Ended / Inactive.",
+        "In the right-hand Schedule panel type 09:30 AM into \"Start Hour\".",
+        "Clear the \"Start Date\" field so it shows mm/dd/yyyy (leave \"Set end date\" untouched or clear it) — the panel status changes to Active.",
+        "Click Save at the bottom right and wait for the \"Voucher updated\" toast.",
+        "Reload the page: the Schedule now shows Start Date 11/24/2026 and Start Hour 12:26 AM (the moment of saving), not 09:30, and the header status is Active."
+      ]
+    },
+    {
+      "index": 15,
+      "reported_at_seconds": 925,
+      "name": "Filter \\\"Discount type is Percentage\\\" also lists free-shipping vouchers",
+      "summary": "The list still contains free-shipping vouchers: rows whose Offer column reads \\\"Free shipping\\\" and whose Scope reads \\\"Worldwide\\\" are listed under the Percentage condition (e.g. the voucher \\\"Free shipping\\\" with code FREESHIPPING, whose own detail page badges it as \\\"Free shipping\\\"). Applying Discount type = Shipping instead returns exactly those 4 shipping vouchers, so the two conditions contradict each other. (on /discounts/vouchers)",
+      "expected": "Only vouchers whose discount type is percentage (rows whose Offer is a % value) are listed; free-shipping vouchers are excluded, as they are when filtering Discount type = Shipping.",
+      "actual": "The list still contains free-shipping vouchers: rows whose Offer column reads \\\"Free shipping\\\" and whose Scope reads \\\"Worldwide\\\" are listed under the Percentage condition (e.g. the voucher \\\"Free shipping\\\" with code FREESHIPPING, whose own detail page badges it as \\\"Free shipping\\\"). Applying Discount type = Shipping instead returns exactly those 4 shipping vouchers, so the two conditions contradict each other.",
+      "reproSteps": [
+        "Sign in and open /discounts/vouchers.",
+        "Click \"Filters\", in the \"Where\" row choose \"Discount type\", operator \"is\", value \"Percentage\", then click \"Apply\".",
+        "Read the resulting list (address becomes /discounts/vouchers?0%5Bs0.discountType%5D=PERCENTAGE).",
+        "For comparison: in the same condition choose value \"Shipping\" and Apply: 4 vouchers with Offer \"Free shipping\" are listed."
+      ]
+    },
+    {
+      "index": 16,
+      "reported_at_seconds": 962,
+      "name": "At phone width the voucher header drops the voucher name entirely and clips 'Active' to 'Ac'",
+      "summary": "At 390px wide the header shows only the % icon, the 'Entire order ·' chip, the status dot with a clipped 'Ac' (instead of 'Active') and the three buttons. The voucher name is not shown at all — with a long name (e.g. my voucher 'QA-A2-1 aaaa…', 251 characters) it is squeezed to nothing, and with the short catalog name 'Percentage order discount' it is also completely absent. The only way to tell which voucher is open is to scroll down to the Voucher Name field. (on /discounts/vouchers/{id})",
+      "expected": "The voucher's name should stay visible in the page header at phone width (truncated with an ellipsis if needed), and the status label should be readable ('Active'), not clipped to 'Ac'.",
+      "actual": "At 390px wide the header shows only the % icon, the 'Entire order ·' chip, the status dot with a clipped 'Ac' (instead of 'Active') and the three buttons. The voucher name is not shown at all — with a long name (e.g. my voucher 'QA-A2-1 aaaa…', 251 characters) it is squeezed to nothing, and with the short catalog name 'Percentage order discount' it is also completely absent. The only way to tell which voucher is open is to scroll down to the Voucher Name field.",
+      "reproSteps": [
+        "Set the browser window to a phone size (390 × 844).",
+        "Open a saved voucher, e.g. /discounts/vouchers/Vm91Y2hlcjo0 (name 'Percentage order discount').",
+        "Look at the page header at the top of the content area."
+      ]
+    },
+    {
+      "index": 17,
+      "reported_at_seconds": 1061,
+      "name": "\\\"Code Quantity (max 50)\\\" silently drops the second digit: typing 51 leaves 5 and confirms 5 codes",
+      "summary": "No message is shown and the field keeps a different number than typed: typing \\\"51\\\" leaves \\\"5\\\" in the field (the second digit is silently swallowed) and \\\"Confirm\\\" becomes enabled, so confirming generates 5 codes instead of the 51 the person typed. Filling the field with 51 programmatically in one step leaves it completely empty, also with no message. (on /discounts/vouchers/add)",
+      "expected": "The field refuses 51 loudly — a validation message next to the field such as \\\"Code Quantity (max 50)\\\" — and does not keep or accept a different number (5) than the person typed.",
+      "actual": "No message is shown and the field keeps a different number than typed: typing \\\"51\\\" leaves \\\"5\\\" in the field (the second digit is silently swallowed) and \\\"Confirm\\\" becomes enabled, so confirming generates 5 codes instead of the 51 the person typed. Filling the field with 51 programmatically in one step leaves it completely empty, also with no message.",
+      "reproSteps": [
+        "Sign in as admin@example.com and open /discounts/vouchers/add",
+        "In the \"Set up this voucher\" checklist click \"Add codes\"",
+        "Click \"+ Add code\" and choose \"Generate codes\"",
+        "In the \"Generate Voucher Codes\" dialog click the \"Code Quantity (max 50)\" field and type 51"
+      ]
+    },
+    {
+      "index": 18,
+      "reported_at_seconds": 1062,
+      "name": "Assigning two categories to a Products-scope voucher crashes the dashboard with an unexpected-error page",
+      "summary": "Clicking 'Assign (2 items)' replaces the whole dashboard with the error page \"We've encountered an unexpected error / Try to refresh the page or go navigate to a different page and back.\" and the console logs \"TypeError: Cannot read properties of undefined (reading 'id')\". Everything already entered in the voucher form is lost. (on /discounts/vouchers/add)",
+      "expected": "The two chosen categories are attached to the voucher's Eligible products section and the form keeps its values so the voucher can be saved.",
+      "actual": "Clicking 'Assign (2 items)' replaces the whole dashboard with the error page \"We've encountered an unexpected error / Try to refresh the page or go navigate to a different page and back.\" and the console logs \"TypeError: Cannot read properties of undefined (reading 'id')\". Everything already entered in the voucher form is lost.",
+      "reproSteps": [
+        "Open /discounts/vouchers/add (Create voucher).",
+        "Click 'Add codes' (or 'Add code' in the Voucher codes card), choose 'Manual code', type agent5-prod and click 'Confirm'.",
+        "Click 'Manage channels', tick 'Channel-USD' and click 'Confirm (1 channel)'.",
+        "Click 'Set value', leave 'Percentage' and type 10 in the 'Percentage for Channel-USD' field.",
+        "In 'What the voucher discounts' choose 'Products' and scroll down to 'Eligible products'.",
+        "On the 'Categories' row click 'Assign'.",
+        "In the 'Assign Category' dialog tick 'Audiobooks' and 'Apparel' (the button then reads 'Assign (2 items)').",
+        "Click 'Assign (2 items)'."
+      ]
+    },
+    {
+      "index": 19,
+      "reported_at_seconds": 1067,
+      "name": "Typing a filter field name and pressing Enter leaves a dead condition row: no operator, Apply disabled",
+      "summary": "The field keeps the text \\\"Started\\\" as if it were selected, but the operator box stays empty, the value box stays empty and disabled, and \\\"Apply\\\" stays disabled. Clicking the operator box opens nothing (no options), so the condition can never be completed; the user has to remove the row or choose another field. Typing a field name and clicking its option in the dropdown works normally. (on /discounts/vouchers)",
+      "expected": "Enter behaves like choosing the option in the dropdown: the condition gets its operator (and value picker), so it can be filled and applied — or Enter does nothing at all instead of leaving a half-configured row.",
+      "actual": "The field keeps the text \\\"Started\\\" as if it were selected, but the operator box stays empty, the value box stays empty and disabled, and \\\"Apply\\\" stays disabled. Clicking the operator box opens nothing (no options), so the condition can never be completed; the user has to remove the row or choose another field. Typing a field name and clicking its option in the dropdown works normally.",
+      "reproSteps": [
+        "Sign in and open /discounts/vouchers.",
+        "Click \"Filters\", then \"Add condition\" to get an empty \"Where\" row.",
+        "Type a field name into the \"Where\" combobox, e.g. \"Started\" (or \"Discount type\"), and press Enter.",
+        "Click the operator dropdown next to it (the empty box between the field and the wide value box)."
+      ]
+    },
+    {
+      "index": 20,
+      "reported_at_seconds": 1072,
+      "name": "Voucher codes table says \"Selected 1 items\" for a single selected code",
+      "summary": "The table header read \"Selected 1 items\" — plural for a single selected row — and the delete-confirmation dialog said \"Delete voucher codes / These codes will be removed when you save the voucher\" in the plural for that one code. (on /discounts/vouchers/Vm91Y2hlcjoz)",
+      "expected": "With exactly one row selected the counter should read \"Selected 1 item\", and the confirmation dialog should refer to one code.",
+      "actual": "The table header read \"Selected 1 items\" — plural for a single selected row — and the delete-confirmation dialog said \"Delete voucher codes / These codes will be removed when you save the voucher\" in the plural for that one code.",
+      "reproSteps": [
+        "Sign in as admin@example.com and open Discounts > Vouchers.",
+        "Open the voucher 'Single Use Vouchers' (50 codes) from the list.",
+        "Click the Codes section if needed so the voucher codes table is on screen.",
+        "Tick the checkbox of the first code row (SINGLE-USE-050).",
+        "Read the table header where the header checkbox was: it says 'Selected 1 items'."
+      ]
+    },
+    {
+      "index": 21,
+      "reported_at_seconds": 1110,
+      "name": "\"Generate codes\" accepts a long prefix that makes a code longer than the 255-character limit, so the voucher can no longer be saved",
+      "summary": "The prefix field accepts 229 characters without any limit or warning, generates the code, and only at Save does the app refuse the whole voucher with \\\"Ensure this value has at most 255 characters (it has 266).\\\" — a message that does not say which of the 55 codes is too long. The new code stays as a Draft row and the voucher cannot be saved until the person works out which generated code to delete. (on /discounts/vouchers/{id})",
+      "expected": "The prefix field of \\\"Generate Voucher Codes\\\" should refuse or shorten a prefix that would produce a code over the 255-character limit the save step enforces (or at least the save error should name the offending code), so that what the generator accepts can be saved.",
+      "actual": "The prefix field accepts 229 characters without any limit or warning, generates the code, and only at Save does the app refuse the whole voucher with \\\"Ensure this value has at most 255 characters (it has 266).\\\" — a message that does not say which of the 55 codes is too long. The new code stays as a Draft row and the voucher cannot be saved until the person works out which generated code to delete.",
+      "reproSteps": [
+        "Open https://5503-ief25m2mkkrkgto7fvk68.e2b.app/discounts/vouchers/Vm91Y2hlcjo5 (voucher with 54 codes created by me, agent3) and stay on the Details/Codes section.",
+        "Click \"Add code\" in the \"Voucher codes\" card, then choose \"Generate codes\".",
+        "In \"Code Quantity (max 50)\" type 1.",
+        "In \"Code Prefix (Optional)\" paste a 229-character prefix, e.g. \"agent3-\" followed by 222 \"x\" (the field has no maxlength and accepts it silently).",
+        "Click \"Confirm\": the row \"agent3-xxxxxxxx...\" is added with status Draft.",
+        "Click \"Save\".",
+        "The Codes card shows a red error \"Ensure this value has at most 255 characters (it has 266).\" and a toast \"Couldn't save voucher — Fix the codes section and try again.\"; the voucher keeps unsaved changes and the new code is not stored."
+      ]
+    },
+    {
+      "index": 22,
+      "reported_at_seconds": 1123,
+      "name": "Contradictory help text: checklist says a percentage is one value across channels, Discount section says percentages are per channel",
+      "summary": "The two texts contradict each other. The setup checklist under \"Set the discount value\" says \"Percentage discounts use one value across channels. Fixed amounts are set per channel currency.\", while the Discount section of the same voucher says \"Percentage off, per channel — Set a percentage for each channel — values can differ when markets need different offers.\" and does give an input per channel (Percentage for Channel-USD); the list even shows \"Varies by channel\" for vouchers with different percentages per channel. (on /discounts/vouchers/{id})",
+      "expected": "One statement about whether a percentage can differ per channel, the same in both places.",
+      "actual": "The two texts contradict each other. The setup checklist under \"Set the discount value\" says \"Percentage discounts use one value across channels. Fixed amounts are set per channel currency.\", while the Discount section of the same voucher says \"Percentage off, per channel — Set a percentage for each channel — values can differ when markets need different offers.\" and does give an input per channel (Percentage for Channel-USD); the list even shows \"Varies by channel\" for vouchers with different percentages per channel.",
+      "reproSteps": [
+        "Sign in as admin@example.com and open the voucher https://5503-ief25m2mkkrkgto7fvk68.e2b.app/discounts/vouchers/Vm91Y2hlcjoyMA%3D%3D ('agent13-Detail Test')",
+        "Read the helper text under the 'Set the discount value' step in the 'Finish setting up this voucher' checklist: 'Percentage discounts use one value across channels. Fixed amounts are set per channel currency.'",
+        "Click 'Set value' (or 'Discount' in the section menu) to open the Discount section and read under 'Discount amount': 'Percentage off, per channel — Set a percentage for each channel — values can differ when markets need different offers.'"
+      ]
+    },
+    {
+      "index": 23,
+      "reported_at_seconds": 1203,
+      "name": "Unknown voucher address leaves the page on a permanent skeleton with a raw \"Invalid ID\" error",
+      "summary": "The page never finishes loading: it stays in the skeleton/placeholder state (voucher name, schedule fields and availability all grey blocks, Back/Save disabled) indefinitely, and the only feedback is a red toast \"Error / Invalid ID: does-not-exist. Expected: Voucher.\" with no way on but the sidebar. (on /discounts/vouchers/does-not-exist)",
+      "expected": "A page saying in plain words that the voucher does not exist (or cannot be found), with a way back to the vouchers list — not a raw internal error and a loading skeleton that never resolves.",
+      "actual": "The page never finishes loading: it stays in the skeleton/placeholder state (voucher name, schedule fields and availability all grey blocks, Back/Save disabled) indefinitely, and the only feedback is a red toast \"Error / Invalid ID: does-not-exist. Expected: Voucher.\" with no way on but the sidebar.",
+      "reproSteps": [
+        "Sign in as admin@example.com / admin.",
+        "Open the address https://5503-ief25m2mkkrkgto7fvk68.e2b.app/discounts/vouchers/does-not-exist directly (or any voucher id that does not exist).",
+        "Look at the page: the voucher form stays as grey skeleton placeholders and the toast \"Error — Invalid ID: does-not-exist. Expected: Voucher.\" appears.",
+        "Wait several seconds / reload: the skeleton and the raw error message stay."
+      ]
+    },
+    {
+      "index": 24,
+      "reported_at_seconds": 1282,
+      "name": "Assign Countries dialog labels its select-all checkbox \"Select all matching channels\"",
+      "summary": "The select-all checkbox in the 'Assign Countries' dialog is labelled 'Select all matching channels' (and 'Select all channels' before filtering), although every row in the same dialog is a country. (on /discounts/vouchers/add)",
+      "expected": "The select-all checkbox names what it selects, e.g. 'Select all countries' / 'Select all matching countries'.",
+      "actual": "The select-all checkbox in the 'Assign Countries' dialog is labelled 'Select all matching channels' (and 'Select all channels' before filtering), although every row in the same dialog is a country.",
+      "reproSteps": [
+        "Sign in as admin@example.com / admin, open https://5503-ief25m2mkkrkgto7fvk68.e2b.app/discounts/vouchers/add",
+        "Add a code and assign channels, then choose the discount scope 'Free shipping'",
+        "Click 'Countries' in the left section navigation and press 'Assign' in the Countries card",
+        "In the 'Assign Countries' dialog read the select-all checkbox label, then type 'Poland' in 'Filter Countries' and read it again"
+      ]
+    },
+    {
+      "index": 25,
+      "reported_at_seconds": 1404,
+      "name": "At phone width the Eligible products rows crush their help text into a one-word column and it overlaps \"No assigned\"",
+      "summary": "Each row of the card squeezes its description into a ~50px column, so the sentences break one or two words per line ('Discount / lines / in / these / categories.', 'Discount / lines / specific / products / and / all / their / variants.'), and in the Products row the description overlaps the 'No assigned' label ('produ…' runs into 'No assigned'). The same happens in the Categories, Collections and Variants rows. The help text is unreadable. (on /discounts/vouchers/add)",
+      "expected": "The description and the 'No assigned' label should each get a readable width on one or more lines under the section title, with the '+ Assign' button placed without crushing them, and no text overlapping.",
+      "actual": "Each row of the card squeezes its description into a ~50px column, so the sentences break one or two words per line ('Discount / lines / in / these / categories.', 'Discount / lines / specific / products / and / all / their / variants.'), and in the Products row the description overlaps the 'No assigned' label ('produ…' runs into 'No assigned'). The same happens in the Categories, Collections and Variants rows. The help text is unreadable.",
+      "reproSteps": [
+        "Set the browser window to 390 × 844.",
+        "Open /discounts/vouchers/add and scroll to 'What the voucher discounts'.",
+        "Choose the 'Products' discount scope.",
+        "Scroll to the 'Eligible products' card and read the Categories, Collections, Products and Variants rows."
+      ]
+    },
+    {
+      "index": 26,
+      "reported_at_seconds": 1548,
+      "name": "Switching a voucher from Free shipping to Entire order keeps its country restriction but the saved voucher shows no Countries section",
+      "summary": "After the reload the voucher's header reads \"Entire order\" and its navigation has no Countries section, but choosing \"Free shipping\" in Discount (without saving) brings the Countries section back showing \"Valid in 1 country\" — the Poland restriction was kept on the voucher. A staff member working on this entire-order voucher can neither see nor remove that restriction. (on /discounts/vouchers/{id})",
+      "expected": "Either the country restriction is cleared (or clearly declared as still applying) when the scope changes away from Free shipping, or the Countries information stays visible on the saved voucher so its restriction can be seen and changed.",
+      "actual": "After the reload the voucher's header reads \"Entire order\" and its navigation has no Countries section, but choosing \"Free shipping\" in Discount (without saving) brings the Countries section back showing \"Valid in 1 country\" — the Poland restriction was kept on the voucher. A staff member working on this entire-order voucher can neither see nor remove that restriction.",
+      "reproSteps": [
+        "Sign in as admin@example.com / admin and open https://5503-ief25m2mkkrkgto7fvk68.e2b.app/discounts/vouchers/add",
+        "Add the manual code 'agent10-ship-pl', assign both channels, pick the scope 'Free shipping', open Countries > Assign, tick 'Poland' and press 'Assign', type the Voucher Name 'agent10-ship-pl' and Save",
+        "On the saved voucher open Discount, choose 'Entire order', enter 10 for Channel-PLN and 15 for Channel-USD and press Save ('Voucher updated')",
+        "Reload the page: the header badge reads 'Entire order' and the left navigation lists Details, Codes, Discount, Requirements, Limits — no Countries",
+        "Click Discount and choose 'Free shipping' again (do not save); a Countries entry appears in the left navigation — open it and it says 'Valid in 1 country'"
+      ]
+    },
+    {
+      "index": 27,
+      "reported_at_seconds": 1599,
+      "name": "The setup checklist step buttons do nothing at 768 and 390 widths",
+      "summary": "Nothing happens: the page stays where it is, the scroll position does not change and 'Set the discount value' / 'Add a code' stay unticked. The Discount section (and the Codes section) stay many screens below. The same click does move to the matching section at 1280px wide. (on /discounts/vouchers/add)",
+      "expected": "Clicking 'Set value →' (or 'Add codes →') should take the person to the matching section of the form, as it does at desktop width.",
+      "actual": "Nothing happens: the page stays where it is, the scroll position does not change and 'Set the discount value' / 'Add a code' stay unticked. The Discount section (and the Codes section) stay many screens below. The same click does move to the matching section at 1280px wide.",
+      "reproSteps": [
+        "Set the browser window to 768 × 1024 (it also happens at 390 × 844).",
+        "Open /discounts/vouchers/add so the page is at the top with the 'Set up this voucher' checklist visible.",
+        "Click the 'Set value →' button under 'Set the discount value' in the checklist (or 'Add codes →' under 'Add a code')."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "fixture": "gitea/areas/notifications",
+  "run": 3,
+  "started_at": "2026-11-23T17:54:57.711Z",
+  "duration_seconds": 1386.271,
+  "time_limit_seconds": 1800,
+  "stop_reason": "completed",
+  "credits": {
+    "total": 969,
+    "testing_team": 861,
+    "verification": 108,
+    "findings_verified": 18
+  },
+  "team_container_errors": 0
+}

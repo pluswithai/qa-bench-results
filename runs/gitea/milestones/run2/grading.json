@@ -1,0 +1,151 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "findings": 12,
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 6,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Matches whitespace-only titles being accepted and saved as nameless milestones through New Milestone."
+      },
+      {
+        "groundTruthIndex": 20,
+        "reproStepsIndex": 0,
+        "findingIndex": 1,
+        "reason": "Matches literal percent and underscore searches acting as database wildcards on the repository milestone list."
+      },
+      {
+        "groundTruthIndex": 5,
+        "reproStepsIndex": 0,
+        "findingIndex": 2,
+        "reason": "Matches the detail-page Close action redirecting to state=close rather than state=closed. Existing open milestones explain why this list is nonempty."
+      },
+      {
+        "groundTruthIndex": 3,
+        "reproStepsIndex": 0,
+        "findingIndex": 3,
+        "reason": "Matches the saved January 1, 1970 deadline displaying as a dash on the repository milestone list while Edit retains the date."
+      },
+      {
+        "groundTruthIndex": 14,
+        "reproStepsIndex": 0,
+        "findingIndex": 4,
+        "reason": "Matches Sort > Name producing reverse alphabetical order on the repository milestone list."
+      },
+      {
+        "groundTruthIndex": 1,
+        "reproStepsIndex": 0,
+        "findingIndex": 6,
+        "reason": "Matches global Sort > Name removing repos from the URL and restoring milestones excluded by the repository filter."
+      },
+      {
+        "groundTruthIndex": 2,
+        "reproStepsIndex": 0,
+        "findingIndex": 8,
+        "reason": "Matches submitting a milestone search after selecting Latest due date, dropping sort=furthestduedate and restoring default ordering."
+      },
+      {
+        "groundTruthIndex": 25,
+        "reproStepsIndex": 0,
+        "findingIndex": 9,
+        "reason": "Matches an overdue date being red on the repository list but lacking overdue styling on the milestone detail page."
+      },
+      {
+        "groundTruthIndex": 28,
+        "reproStepsIndex": 0,
+        "findingIndex": 5,
+        "reason": "Matches the mobile repository-badge text collision with the milestone icon on global and organization lists, described here as clipping and overlap."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 0,
+        "reproStepsIndex": 0,
+        "findingIndex": 7,
+        "reason": "Matches the rejected exclusive-selection expectation: clicking an active repository intentionally deselects it in this multi-select filter."
+      },
+      {
+        "knownInvalidIndex": 8,
+        "reproStepsIndex": 0,
+        "findingIndex": 11,
+        "reason": "Matches the intentional omission of Owners and all-repositories teams, whose filtering would be equivalent to All."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 10,
+        "reason": "No supplied entry describes out-of-range pagination producing an empty list while highlighting a different page."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 3,
+        "reason": "The claimed impact is incorrect filtering, which would be functional, although the observed behavior is intentional."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 3,
+        "reason": "The paginator displays a current page inconsistent with the requested page and returned results; the page remains usable."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 3,
+        "reason": "The report claims unavailable filtering functionality, although these particular omissions are intentional."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

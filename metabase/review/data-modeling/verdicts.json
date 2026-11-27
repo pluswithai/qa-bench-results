@@ -1,0 +1,537 @@
+{
+  "area": "data-modeling",
+  "bugs": [
+    {
+      "id": "data-modeling-1",
+      "title": "Data reference list cards overflow the content area and their text is cut off (1280px with sidebar open, and at 390px)",
+      "findings": [
+        "run1-01",
+        "run1-08",
+        "run2-03",
+        "run3-02",
+        "run2-22"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "Screenshots show the database/table cards running past the right window edge at the default 1280x720 viewport with the main sidebar open, with descriptions cut mid-word and no right border (run1-01/shot-1, run1-08/shot-1); the same overflow at 390px (run2-22/shot-1). The reference list is a fixed-width column (List max-width 680px, subtitle max-width 600px inside a padded wrapper) that does not shrink with the available width. Layout-only defect, content still reachable by collapsing the sidebar.",
+      "evidence": [
+        "run1-01/shot-1.png",
+        "run1-08/shot-1.png",
+        "run2-03/shot-1.png",
+        "run3-02/shot-1.png",
+        "run2-22/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/common/components/List/List.module.css#L7-L11",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/common/components/List/List.module.css#L72-L76",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/reference/databases/TableList.jsx#L112-L113"
+      ]
+    },
+    {
+      "id": "data-modeling-2",
+      "title": "Data reference detail header does not shrink: title runs under 'See this table' and the Edit button is pushed off-screen",
+      "findings": [
+        "run2-25",
+        "run3-33",
+        "run3-29"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "run3-29/shot-2 (1280px, an ordinary 85-character display name with spaces) shows the heading running off the right edge with the Edit button gone; run3-33/shot-1 (820px) and run2-25/shot-1 (390px) show the title overlapped by 'See this table' and Edit cut off. The header wraps the name in <Ellipsified>, but .headerBody is 'flex: 1 0 auto' (flex-shrink 0), so the row never shrinks and the ellipsis never applies. Layout defect; Edit becomes reachable again by collapsing the main sidebar, hence severity 1.",
+      "evidence": [
+        "run3-29/shot-2.png",
+        "run3-33/shot-1.png",
+        "run2-25/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/reference/components/ReferenceHeader.module.css#L5-L12",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/reference/components/EditableReferenceHeader.jsx#L61-L94"
+      ]
+    },
+    {
+      "id": "data-modeling-3",
+      "title": "Data reference renders a nameless phantom page instead of 'not found' for a database, table or field id that does not exist",
+      "findings": [
+        "run1-04",
+        "run1-05",
+        "run2-02",
+        "run3-03",
+        "run3-05",
+        "run3-18"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "run1-05/shot-1 shows a table page with no name, 'No description yet' inside the 'Actual name in database' badge, links 'Count of' / 'See raw data for' and live 'See this table' / Edit buttons. The selectors fall back to a stub entity ('databases[databaseId] || { id: databaseId }', 'tables[tableId] || { id: tableId }'), so a 404 from /api/database/:id/metadata is swallowed and placeholders are shown as data. Links to a deleted database/table are a real source of such ids; the rest of the app shows a not-found page. Silent failure, severity 3.",
+      "evidence": [
+        "run1-05/shot-1.png",
+        "run1-04/shot-1.png",
+        "run2-02/shot-1.png",
+        "run3-03/shot-1.png",
+        "run3-05/shot-1.png",
+        "run3-18/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/reference/selectors.js#L36-L39",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/reference/selectors.js#L56-L64",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/reference/databases/TableDetailContainer.jsx#L45-L50"
+      ]
+    },
+    {
+      "id": "data-modeling-4",
+      "title": "Data reference 'Questions about this table' page collapses the main navigation sidebar",
+      "findings": [
+        "run2-04",
+        "run3-06"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "run2-04/shot-2 shows /reference/databases/1/tables/2/questions with the main nav gone while sibling reference pages keep it. Cause: PATH_WITH_COLLAPSED_NAVBAR = /\\/(model\\b|question|dashboard|metabot|document).*/ is unanchored, so the '/questions' segment of the reference URL matches the rule meant for question pages and the navbar is closed on every location change (the comment in the same lines shows a word boundary was added to avoid exactly this kind of false match for /browse/models). Accidental; the sidebar can be reopened with the toggle, so severity 1.",
+      "evidence": [
+        "run2-04/shot-2.png",
+        "run3-06/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/redux/app.ts#L77-L86",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/redux/app.ts#L99-L110"
+      ]
+    },
+    {
+      "id": "data-modeling-5",
+      "title": "History of a metric says 'renamed this Card' (internal entity name) instead of metric",
+      "findings": [
+        "run1-09",
+        "run2-33",
+        "run3-22"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "The History tab of a metric reads 'You renamed this Card from ... to ...'. The revision diff builds the sentence from the revision model name ('this {0}' with model-str->i18n-str \"Card\"), regardless of card type, while the rest of the UI calls the object a metric/model/question. Wording-only defect.",
+      "evidence": [
+        "run1-09/shot-1.png",
+        "run2-33/shot-1.png",
+        "run3-22/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/src/metabase/revisions/models/revision/diff.clj#L126-L132",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/src/metabase/revisions/models/revision/diff.clj#L152"
+      ]
+    },
+    {
+      "id": "data-modeling-6",
+      "title": "Glossary table: Term text overflows its column and is drawn over the Definition text (long unbroken term; narrow widths)",
+      "findings": [
+        "run1-11",
+        "run1-16"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "run1-11/shot-1 shows a long unbroken term running across the Definition column and over its text at 1280px; run1-16/shot-1 shows the same overlap with ordinary hyphenated terms at 768px ('TermDefinition' headers touching, definition one word per line). The table uses table-layout: fixed with a 50px th width and no overflow/word-break rule on the cells. Layout defect.",
+      "evidence": [
+        "run1-11/shot-1.png",
+        "run1-16/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/reference/glossary/Glossary.module.css#L5-L18"
+      ]
+    },
+    {
+      "id": "data-modeling-7",
+      "title": "Browse > Models / Metrics shows 'A model' / 'A metric' for items without a description",
+      "findings": [
+        "run1-14",
+        "run2-08",
+        "run3-24",
+        "run3-14"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Deliberate placeholder: getModelDescription / getMetricDescription return t`A model` / t`A metric` when the item has no description. It is a product decision in source, not stored or invented data.",
+      "evidence": [
+        "run1-14/shot-1.png",
+        "run2-08/shot-1.png",
+        "run3-24/shot-1.png",
+        "run3-14/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/browse/models/utils.ts#L14-L20",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/browse/metrics/utils.ts#L11-L17"
+      ]
+    },
+    {
+      "id": "data-modeling-8",
+      "title": "New model editor shows '✓ Saved' on the header button while the 'Save model' dialog is still open",
+      "findings": [
+        "run1-15"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "run1-15/shot-2 shows the header button reading 'Saved' behind the open 'Save model' dialog, before anything is stored. For a brand-new model handleSave only calls onOpenModal(SAVE) and resolves, so the ActionButton (successText 'Saved') reports success for opening a dialog. Misleading status text, no data effect.",
+      "evidence": [
+        "run1-15/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/query_builder/components/DatasetEditor/DatasetEditorInner.tsx#L509-L524",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/query_builder/components/DatasetEditor/DatasetEditorInner.tsx#L697-L705"
+      ]
+    },
+    {
+      "id": "data-modeling-9",
+      "title": "Archive dialog for a metric says 'dashboards or pulses' while the question and model variants say 'alerts'",
+      "findings": [
+        "run1-17"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "ArchiveCardModal uses 'This metric will be removed from any dashboards or pulses using it.' for metrics and '... dashboards or alerts ...' for questions and models in the same function; 'pulses' is the retired name of the feature the menu calls 'Create an alert'. Wording inconsistency (the metric title also still says 'Archive this metric?').",
+      "evidence": [
+        "run1-17/shot-2.png",
+        "run1-17/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/questions/components/ArchiveCardModal/ArchiveCardModal.tsx#L82-L93"
+      ]
+    },
+    {
+      "id": "data-modeling-10",
+      "title": "Move dialog at phone width: search field and Recents row are clipped by the dialog edge",
+      "findings": [
+        "run1-18"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "run1-18/shot-1 (390x844) shows the search input extending past the dialog's right edge and the Recents row cut at 'in O...'; the title is ellipsized. Content does not fit the 310px dialog. Cosmetic, phone width only.",
+      "evidence": [
+        "run1-18/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/questions/components/MoveCardModal/MoveCardModal.tsx#L267-L277"
+      ]
+    },
+    {
+      "id": "data-modeling-11",
+      "title": "Collection picker opens scrolled to an empty trailing column: first column's names are cut at 1280px and the list is off-screen at 390px",
+      "findings": [
+        "run2-06",
+        "run3-28",
+        "run3-27"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "run3-28/shot-1 and run2-06/shot-1 (1280px) show the first column clipped by ~70px ('analytics', 'bor Admin's Personal Collection') next to an empty third column; run3-27/shot-1 (390px) shows a blank dialog body. Columns are fixed at 365px (3 x 365 = 1095 > the 1024px dialog) and AutoScrollBox scrolls the container fully right on open. The auto-scroll itself is deliberate, but it lands on an empty column and cuts the meaningful ones mid-word at a common laptop width; horizontal scrolling recovers it, so cosmetic.",
+      "evidence": [
+        "run3-28/shot-1.png",
+        "run2-06/shot-1.png",
+        "run3-27/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/common/components/EntityPicker/components/AutoScrollBox/AutoScrollBox.tsx#L7-L42",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/common/components/EntityPicker/components/NestedItemPicker/NestedItemPicker.styled.tsx#L6-L11"
+      ]
+    },
+    {
+      "id": "data-modeling-12",
+      "title": "Filter and Summarize buttons are not shown on model/metric pages at phone width",
+      "findings": [
+        "run1-21",
+        "run2-27",
+        "run3-21"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Deliberate: both buttons are rendered with className={cx(CS.hide, CS.smShow)}, i.e. hidden below the small breakpoint by design, while the Editor (notebook) button, which offers filtering and summarizing, stays.",
+      "evidence": [
+        "run1-21/shot-1.png",
+        "run2-27/shot-1.png",
+        "run3-21/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/query_builder/components/view/ViewHeader/components/ViewTitleHeaderRightSide/ViewTitleHeaderRightSide.tsx#L165-L191"
+      ]
+    },
+    {
+      "id": "data-modeling-13",
+      "title": "Hand-typed /metric/new, /metric/0-x, /model/0-x and /model/not-a-number open the new-question flow",
+      "findings": [
+        "run1-22",
+        "run2-05",
+        "run1-23",
+        "run2-32"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "There is no /metric/new route (metrics are created at /metric/query; the only 'new' route is /model/new) and no link in the app produces these addresses. They match '/metric/:slug' or '/model/:slug'; extractEntityId returns undefined (or a falsy 0), so the query builder starts a blank question. Input no real link produces.",
+      "evidence": [
+        "run1-22/shot-1.png",
+        "run2-05/shot-1.png",
+        "run1-23/shot-1.png",
+        "run2-32/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/routes.jsx#L273-L295",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/lib/urls/utils.ts#L7-L10",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/query_builder/actions/core/initializeQB.ts#L271",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/palette/hooks/useCommandPaletteBasicActions.tsx#L180"
+      ]
+    },
+    {
+      "id": "data-modeling-14",
+      "title": "Renaming a trashed metric/model from a tab loaded before the trash is accepted silently and restores the item",
+      "findings": [
+        "run1-24",
+        "run2-26"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "Both tabs belong to the reporting agent, so this is not another agent's change. run1-24/shot-5 and shot-6 show the trashed metric back as a live item ('agent2-twotab-v3' listed in Browse > Metrics, no trash banner) after a rename from the stale tab; run2-26/shot-5 shows the stale tab accepting the rename with no notice. A title rename PUTs the whole card the tab holds (reduxUpdateQuestion sends question.card(), including the stale archived: false), so a rename un-trashes the item with no conflict check. Unintended state change, severity 3. (Lack of live sync between tabs alone would be by design.)",
+      "evidence": [
+        "run1-24/shot-5.png",
+        "run1-24/shot-6.png",
+        "run2-26/shot-5.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/query_builder/actions/core/core.ts#L414-L431",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/query_builder/actions/core/core.ts#L301-L316"
+      ]
+    },
+    {
+      "id": "data-modeling-15",
+      "title": "Whitespace-only name passes the save dialog's validation and fails on the server with 'Value must be a non-blank string.'",
+      "findings": [
+        "run2-10"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "run2-10/shot-2 shows the Save metric dialog with the server message under Name and the button reading 'Failed'. The schema is Yup.string().required() without trim, so a spaces-only name is treated as valid (Save enabled) while an empty one is not; the API then rejects it. Inconsistent client validation; the message is shown inline and readable, nothing is lost, so severity 1.",
+      "evidence": [
+        "run2-10/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/common/components/SaveQuestionForm/schema.ts#L6-L16"
+      ]
+    },
+    {
+      "id": "data-modeling-16",
+      "title": "Editing a metric through 'Editor' saves a new question instead of changing the metric",
+      "findings": [
+        "run2-11"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "By design: the metric page shows an ad-hoc question built on top of the metric (composeQuestion); exploring it with Editor/Filter/Summarize and saving creates a new question ('Save new question'), exactly as for models. The metric itself is changed through '... > Edit metric definition', which the same report says works.",
+      "evidence": [
+        "run2-11/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase-lib/v1/metadata/utils/models.ts#L103-L120",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/common/components/SaveQuestionForm/util.ts#L152-L156"
+      ]
+    },
+    {
+      "id": "data-modeling-17",
+      "title": "Enter in the model description field does not commit the edit",
+      "findings": [
+        "run2-13"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "The description is a multi-line Markdown field (EditableDescription passes isMultiline and isMarkdown); EditableText only submits on Enter when it is not multi-line, so Enter adds a line break and the value is committed on blur. The text was lost because the page was reloaded while the field was still in edit mode. Works as designed.",
+      "evidence": [
+        "run2-13/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/common/components/EditableDescription/EditableDescription.tsx#L23-L37",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/common/components/EditableText/EditableText.tsx#L108-L122"
+      ]
+    },
+    {
+      "id": "data-modeling-18",
+      "title": "Save dialog prefills '<254-char name> - Modified' and disables Save with no message",
+      "findings": [
+        "run2-14"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "run2-14/shot-1 shows 'Save new question' with Save greyed out and no error under Name. The schema limits the name with .max(QUESTION_NAME_MAX_LENGTH), but the prefilled value was never touched, so the form is invalid while the error is not displayed. Real but only reachable with a name of 244+ characters, and typing a shorter name fixes it: severity 1.",
+      "evidence": [
+        "run2-14/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/common/components/SaveQuestionForm/schema.ts#L6-L16"
+      ]
+    },
+    {
+      "id": "data-modeling-19",
+      "title": "Move dialog for a model/metric is titled 'Where do you want to save this?'",
+      "findings": [
+        "run2-17",
+        "run3-11"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "The title is an explicit string chosen for the card move dialog (cards can be saved into a collection or a dashboard); it is not misleading and the confirm button says Move. Deliberate copy, not a defect.",
+      "evidence": [
+        "run2-17/shot-1.png",
+        "run3-11/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/questions/components/MoveCardModal/MoveCardModal.tsx#L266-L277"
+      ]
+    },
+    {
+      "id": "data-modeling-20",
+      "title": "'Last edited by' / 'Last edited at' are empty for every item of the Examples collection",
+      "findings": [
+        "run2-20"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "The Examples collection is Metabase's built-in sample content: run2-04/shot-2 shows the same items as 'Created ... by Metabase Internal'. The two columns come from the most recent revision row (left join revision r ... r.most_recent), and content loaded at startup has no revisions, so there is no editor to show. The same mechanism does show 'Harbor Admin / November 23, 2026' for user-edited items in the Trash list of the same run (run2-23/shot-1). Fixture/sample-content state, not a defect. Caveat: the list also has 'Checkout funnel - Modified', which could not be confirmed as seeded.",
+      "evidence": [
+        "run2-20/shot-1.png",
+        "run2-04/shot-2.png",
+        "run2-23/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/src/metabase/collections_rest/api.clj#L517-L532",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/src/metabase/collections_rest/api.clj#L873-L889"
+      ]
+    },
+    {
+      "id": "data-modeling-21",
+      "title": "Cancel on an untouched new-metric editor asks 'Discard your changes?'",
+      "findings": [
+        "run2-21"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "run2-21/shot-1 shows the discard dialog over an empty 'New metric' editor (no table chosen). MetricEditor deliberately skips its own leave dialog for an unsaved metric, but the route-leave guard uses isDirty, and Question.isDirtyComparedTo returns true for any unsaved question compared against no original (the 'dirty if runnable' branch is skipped, then the serialized card is compared with undefined), so an empty editor counts as changed. Spurious warning, nothing lost.",
+      "evidence": [
+        "run2-21/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/querying/metrics/components/MetricEditor/MetricEditor.tsx#L76-L86",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase-lib/v1/Question.ts#L690-L711",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/query_builder/selectors.js#L609-L630"
+      ]
+    },
+    {
+      "id": "data-modeling-22",
+      "title": "Trash shows no 'Deleted by' / 'Deleted at' for a trashed collection",
+      "findings": [
+        "run2-23",
+        "run3-16"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "run2-23/shot-1 shows every trashed model/metric with 'Harbor Admin / November 23, 2026' and the collection 'E-commerce' with both cells empty. Not a fixture artifact: the collection branch of the items query selects no last_edit_* columns at all, so last-edit-info is never present for a collection and these two columns are always blank for trashed collections. Missing information under headers that promise it; severity 1.",
+      "evidence": [
+        "run2-23/shot-1.png",
+        "run3-16/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/src/metabase/collections_rest/api.clj#L707-L750",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/src/metabase/collections_rest/api.clj#L873-L889"
+      ]
+    },
+    {
+      "id": "data-modeling-23",
+      "title": "Global search treats % and _ as SQL wildcards and returns the whole library",
+      "findings": [
+        "run2-24",
+        "run3-23"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "Searching '%' or '_' returns 70+ items whose names contain neither character. The search term is wrapped as '%term%' and passed to LIKE without escaping LIKE metacharacters (wildcard-tokens in the H2 index specialization, wildcard-match in the in-place search). Wrong search results for any query containing % or _.",
+      "evidence": [
+        "run2-24/shot-1.png",
+        "run3-23/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/src/metabase/search/appdb/specialization/h2.clj#L33-L48",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/src/metabase/search/in_place/util.clj#L8-L11",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/src/metabase/search/in_place/filter.clj#L71-L89"
+      ]
+    },
+    {
+      "id": "data-modeling-24",
+      "title": "Model 'Columns' editor at phone width shows only the settings panel, with no way to pick another column",
+      "findings": [
+        "run3-19"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Deliberate small-screen layout: .TableContainer.isSidebarOpen is display: none below 40em, so the settings sidebar replaces the table whose headers select the column. Model authoring is a desktop workflow and the hiding is an explicit rule, not a regression. A human may still want to judge whether phone editing is in scope.",
+      "evidence": [
+        "run3-19/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/query_builder/components/DatasetEditor/DatasetEditor.module.css#L1-L14"
+      ]
+    },
+    {
+      "id": "data-modeling-25",
+      "title": "Turning the metric 'Number of Orders' into a model is said to add a 'previous 3 years or this year' filter and drop data",
+      "findings": [
+        "run3-25"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "The evidence contradicts the claim. run3-25/shot-3 shows the metric before conversion: the 2027-2029 months are plotted at 0, not 'around 500 each', i.e. the 'previous 3 years or this year' filter is already part of the metric's saved definition and the metric page only pads the series with zero rows. The model and the question it turns back into run that same saved query (21 rows, filter chip visible in run3-25/shot-5). No filter was added and no data was dropped by the conversion.",
+      "evidence": [
+        "run3-25/shot-3.png",
+        "run3-25/shot-5.png",
+        "run3-25/shot-4.png"
+      ],
+      "source": []
+    },
+    {
+      "id": "data-modeling-26",
+      "title": "Turning a metric into a model and back loses its line chart",
+      "findings": [
+        "run3-26"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "By design: turnQuestionIntoModel sets display to 'table' and clears the settings (models are tables) and offers an Undo toast ('This is a model now.'). Turning it back keeps the table display; the chart can be restored with the Visualization button in the footer, so the claim that it cannot be reached is wrong.",
+      "evidence": [
+        "run3-26/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/query_builder/actions/models.ts#L33-L53"
+      ]
+    },
+    {
+      "id": "data-modeling-27",
+      "title": "A very long unbroken search query makes the search results page scroll sideways",
+      "findings": [
+        "run3-30"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "run3-30/shot-1 shows the 'Results for \"aaaa...\"' heading running past the filter column and the window edge for a 300-character unbroken query. The heading has no wrap/ellipsis for unbroken text. Cosmetic, extreme input.",
+      "evidence": [
+        "run3-30/shot-1.png"
+      ],
+      "source": []
+    },
+    {
+      "id": "data-modeling-28",
+      "title": "Display name set on a foreign-key column in the model Columns editor is not used in the model's table view",
+      "findings": [
+        "run3-35"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "run3-35/shot-3 shows the Columns editor with the FK column renamed 'agent8-fk' (and ID -> 'agent8-A2-ID', Subtotal -> 'agent8-sub'); run3-35/shot-4 shows the model's table view using the two other new names but still 'User ID' for the FK column. The column is remapped to a People name: the frontend titles a remapped column with remapped_to_column.display_name, and the backend sets that display name from the remapping dimension's own name, so the model's override is ignored. A saved setting is silently not applied.",
+      "evidence": [
+        "run3-35/shot-3.png",
+        "run3-35/shot-4.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/lib/formatting/column.ts#L4-L10",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/src/metabase/query_processor/middleware/add_remaps.clj#L462-L470"
+      ]
+    }
+  ]
+}

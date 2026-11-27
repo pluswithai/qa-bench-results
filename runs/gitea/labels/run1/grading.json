@@ -1,0 +1,167 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "findings": 12,
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 5,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Matches the repository mobile-layout failure: long label names overlap row metadata and actions at 390px."
+      },
+      {
+        "groundTruthIndex": 8,
+        "reproStepsIndex": 0,
+        "findingIndex": 1,
+        "reason": "Matches saving a whitespace-only repository label name, producing a nameless label row."
+      },
+      {
+        "groundTruthIndex": 13,
+        "reproStepsIndex": 0,
+        "findingIndex": 2,
+        "reason": "Matches an assigned long label overflowing the desktop issue sidebar and clipping at the viewport edge."
+      },
+      {
+        "groundTruthIndex": 3,
+        "reproStepsIndex": 0,
+        "findingIndex": 3,
+        "reason": "The organization heading displays '1 labels', matching this entry. The finding additionally reports usage-count pluralization."
+      },
+      {
+        "groundTruthIndex": 2,
+        "reproStepsIndex": 0,
+        "findingIndex": 4,
+        "reason": "Matches a repository label counting an open PR but linking to an empty issue-only list."
+      },
+      {
+        "groundTruthIndex": 27,
+        "reproStepsIndex": 0,
+        "findingIndex": 6,
+        "reason": "Matches the issue sidebar picker returning no results for an exclusive label's full slash-separated name while partial searches work."
+      },
+      {
+        "groundTruthIndex": 20,
+        "reproStepsIndex": 0,
+        "findingIndex": 7,
+        "reason": "Matches organization label badges overlapping their usage-count column at approximately 768px width."
+      },
+      {
+        "groundTruthIndex": 23,
+        "reproStepsIndex": null,
+        "findingIndex": 10,
+        "reason": "Matches Alt+Enter including a label instead of excluding it. This finding uses the Issues list rather than the Pull Requests list in the supplied case."
+      },
+      {
+        "groundTruthIndex": 4,
+        "reproStepsIndex": null,
+        "findingIndex": 11,
+        "reason": "Matches accepted Sort Order input silently saving as 0 without an error. It uses an overflowing integer during creation rather than 1.0 during editing."
+      },
+      {
+        "groundTruthIndex": 11,
+        "reproStepsIndex": 0,
+        "findingIndex": 5,
+        "reason": "Matches the mobile issue-list Label menu opening off the left edge, making its search and options unreachable."
+      }
+    ],
+    "invalidMatches": [],
+    "unverified": [
+      {
+        "findingIndex": 8,
+        "reason": "No supplied entry describes the organization header's Follow button breaking mid-word on mobile."
+      },
+      {
+        "findingIndex": 9,
+        "reason": "No supplied entry covers saving a stale label editor after another tab deletes the label and receiving a bare 404 page."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 1,
+        "reason": "Button-text wrapping is a presentation defect with no described functional impact."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 5,
+        "reason": "Saving leaves the user on an unusable bare error page without application navigation."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [
+      {
+        "findingIndex": 8,
+        "reference": {
+          "name": "Organization Follow button label splits across lines at mobile width",
+          "summary": "Below 768px on an organization’s profile, the Follow button is squeezed beside the organization name and its label breaks mid-word (“Fol”/“low”; “Unfollow” across three lines).",
+          "expected": "At phone width the Follow/Unfollow button keeps its label on one line, or the header wraps so the button has room.",
+          "actual": "At 390px on an organization page reached from Site Administration > Organizations, the Follow button shrank to about 62×46px and rendered “Fol” and “low” on two lines; after following, “Unfollow” split into “Unf”/“ollo”/“w”. Widths of 768px and up, and a one-letter display name, rendered on one line.",
+          "reproSteps": [
+            [
+              "Sign in as eval and set the viewport to 390×844.",
+              "Open Site Administration > Organizations and open an organization with a typical-length display name.",
+              "Look at the Follow button next to the organization name and observe its label split mid-word across lines."
+            ]
+          ],
+          "severity": 1
+        },
+        "reason": "Matches the mobile organization-header defect where Follow breaks mid-word. It is reached through organization Labels settings rather than the organization profile used in the reference case."
+      }
+    ],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

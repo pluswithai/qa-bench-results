@@ -1,0 +1,302 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "metabase/areas/dashboards",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "a29eb196c93da55c3af4643e298d77fef4d81535a124dba0c35439c999c41a90",
+    "known_invalid_sha256": "a1fbd65686f5b66009e6e0a14915dfd1b66fa897f44669a1ec7e4f29fee4465e",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "95",
+    "bugs": "25",
+    "flags": "0",
+    "known_hits": "7",
+    "extra_known_hits": "0",
+    "unverified": "15",
+    "outside_area_known_hits": "0",
+    "outside_area_known_invalid": "0",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "",
+    "outside_area_ground_truth_sha256": "18765609374b28bc9ff8c4d574f183a1cec470472e42a7e8bae343da32e17da8",
+    "outside_area_known_invalid_sha256": "bda5fa1dae2abd3dbc884c784d0bd82ccd854fe93bc63cc4126be5e14c0b4c18",
+    "duplicates": "0",
+    "duplicate_known_hits": "0",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "3",
+    "known_misses": "3",
+    "precision": "0.7",
+    "recall": "0.07368421052631578",
+    "findings_per_minute": "0.9663516360333197",
+    "correct_findings_per_minute": "0.27057845808932957",
+    "severity_1": "2",
+    "severity_3": "5",
+    "severity_5": "0",
+    "severity_sum": "17",
+    "score": "14",
+    "duration_seconds": "1552.23",
+    "partial": "false",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 68,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Matches the missing “All subscriptions in table view” link after dashboard duplication. The duplication-mode difference does not materially change the flow."
+      },
+      {
+        "groundTruthIndex": 1,
+        "reproStepsIndex": 0,
+        "findingIndex": 2,
+        "reason": "Matches Product breakdown retaining all categories despite a single-category dashboard selection. Widget versus Gizmo is an insignificant test-data difference."
+      },
+      {
+        "groundTruthIndex": 22,
+        "reproStepsIndex": 0,
+        "findingIndex": 6,
+        "reason": "Matches an inline whitespace-only rename leaving a blank title after server rejection, with no feedback until reload restores the saved name."
+      },
+      {
+        "groundTruthIndex": 18,
+        "reproStepsIndex": 0,
+        "findingIndex": 8,
+        "reason": "Matches bullet markers staying at the left edge while horizontal alignment moves their text away. Right rather than Center exposes the same detached-marker behavior."
+      },
+      {
+        "groundTruthIndex": 36,
+        "reproStepsIndex": null,
+        "findingIndex": 9,
+        "reason": "Matches Back returning to an earlier dashboard tab while retaining destination category selections instead of restoring the source filter state. Manual filtering is a different route from the reviewed custom-URL flow."
+      },
+      {
+        "groundTruthIndex": 51,
+        "reproStepsIndex": 0,
+        "findingIndex": 14,
+        "reason": "Matches canceling Move stripping tab and filter query parameters while leaving the current dashboard view unchanged."
+      },
+      {
+        "groundTruthIndex": 14,
+        "reproStepsIndex": null,
+        "findingIndex": 11,
+        "reason": "Matches deleting the active tab leaving no surviving tab selected and an incorrect empty canvas. The steps explicitly click the active tab first, unlike the reviewed initial-selection case."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 8,
+        "reproStepsIndex": 0,
+        "findingIndex": 3,
+        "reason": "Exactly matches saving “not a valid url” as a relative link and reaching a not-found page. Human review accepted this relative-URL behavior."
+      },
+      {
+        "knownInvalidIndex": 27,
+        "reproStepsIndex": 0,
+        "findingIndex": 16,
+        "reason": "Matches a long heading wrapping beyond its fixed-height card and leaving subsequent text unreadable. Human review rejected this behavior as a bug."
+      },
+      {
+        "knownInvalidIndex": 22,
+        "reproStepsIndex": null,
+        "findingIndex": 17,
+        "reason": "Matches a stale save overwriting a card saved in another session, rejected as last-write-wins behavior. Here the stale tab enters edit mode after the competing save, unlike the reviewed case."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 1,
+        "reason": "No reviewed entry describes fullscreen exit requiring two clicks after reload. The fullscreen More info issue is different."
+      },
+      {
+        "findingIndex": 4,
+        "reason": "No reviewed entry covers horizontal clipping of an unbroken word in a Text card. The heading-wrapping and vertical-alignment issues are different."
+      },
+      {
+        "findingIndex": 5,
+        "reason": "No reviewed entry describes the Orders series using a quantity sum instead of an order count."
+      },
+      {
+        "findingIndex": 7,
+        "reason": "No reviewed entry describes this paragraph being clipped at phone width. The rejected long-heading claim concerns a different card and layout condition."
+      },
+      {
+        "findingIndex": 10,
+        "reason": "No reviewed entry covers whitespace-name validation in the Duplicate dialog. Inline rename and dashboard-editor title failures have different outcomes."
+      },
+      {
+        "findingIndex": 12,
+        "reason": "No reviewed entry covers an inert collection Type icon. The report also does not establish which action this icon promises."
+      },
+      {
+        "findingIndex": 13,
+        "reason": "No reviewed entry describes indefinite loading for a nonnumeric dashboard ID. Creating a dashboard from an existing error page is a different failure."
+      },
+      {
+        "findingIndex": 15,
+        "reason": "No reviewed entry covers mobile overflow of the Public link popover. The mobile date-picker overflow concerns a different control."
+      },
+      {
+        "findingIndex": 18,
+        "reason": "No reviewed entry covers Escape failing to dismiss the link-search popover. The accessibility rejections concern specifically identified, different controls."
+      },
+      {
+        "findingIndex": 19,
+        "reason": "No reviewed entry describes the sources-per-quarter table presenting revenue amounts as order counts."
+      },
+      {
+        "findingIndex": 20,
+        "reason": "No reviewed entry covers a final Markdown link disappearing in view mode. The alignment-overflow bug hides the beginning of content under different settings."
+      },
+      {
+        "findingIndex": 21,
+        "reason": "No reviewed entry describes Rename being unavailable when only one dashboard tab remains."
+      },
+      {
+        "findingIndex": 22,
+        "reason": "No reviewed entry covers a custom visualization removing the card’s Edit question menu action."
+      },
+      {
+        "findingIndex": 23,
+        "reason": "No reviewed entry describes the scalar card omitting its No results caption while retaining the empty-state illustration."
+      },
+      {
+        "findingIndex": 24,
+        "reason": "This concerns Set to default for all-selected/default values, not the rejected claim about a nondefault pending selection. The steps do not test whether Set to default applies the selection."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 3,
+        "reason": "The first activation of Exit fullscreen fails to perform its action."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 3,
+        "reason": "The described impact is a saved link navigating to a nonexistent destination."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 1,
+        "reason": "This is a text wrapping and clipping defect."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 3,
+        "reason": "The finding describes an incorrect business metric, supported by conflicting counts."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 1,
+        "reason": "Responsive text layout clips the paragraph without other functional misbehavior."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 1,
+        "reason": "Invalid input is rejected; the described defect is technical, field-associated validation copy rather than an unlabeled error dump."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 3,
+        "reason": "As described, a clickable button fails to perform its expected action."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 5,
+        "reason": "The dashboard route remains unusable on a persistent loading screen."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 15,
+        "severity": 3,
+        "reason": "The overflow makes the copy-link button unreachable, blocking its function."
+      },
+      {
+        "findingIndex": 16,
+        "severity": 1,
+        "reason": "The described failure is visual clipping of heading text."
+      },
+      {
+        "findingIndex": 17,
+        "severity": 3,
+        "reason": "The described save silently removes previously saved dashboard content."
+      },
+      {
+        "findingIndex": 18,
+        "severity": 1,
+        "reason": "This is a keyboard-dismissal usability issue with a working pointer alternative."
+      },
+      {
+        "findingIndex": 19,
+        "severity": 3,
+        "reason": "The table allegedly reports the wrong metric rather than the expected order counts."
+      },
+      {
+        "findingIndex": 20,
+        "severity": 1,
+        "reason": "The described defect is clipping or omission of rendered card content."
+      },
+      {
+        "findingIndex": 21,
+        "severity": 3,
+        "reason": "The tab-renaming function becomes unavailable in the single-tab state."
+      },
+      {
+        "findingIndex": 22,
+        "severity": 3,
+        "reason": "Saving visualization settings removes an existing question-editing action."
+      },
+      {
+        "findingIndex": 23,
+        "severity": 1,
+        "reason": "The empty result is represented visually; only its explanatory caption is missing."
+      },
+      {
+        "findingIndex": 24,
+        "severity": 3,
+        "reason": "The claimed impact is inability to apply a valid widened filter selection, although that impact is not demonstrated."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

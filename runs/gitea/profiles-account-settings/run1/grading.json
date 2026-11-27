@@ -1,0 +1,149 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "findings": 13,
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 10,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Same Website validation banner exposing an internal field key. The different invalid URL scheme does not change the reproduction path."
+      },
+      {
+        "groundTruthIndex": 3,
+        "reproStepsIndex": 0,
+        "findingIndex": 1,
+        "reason": "Same nonexistent-user Block submission replacing settings with a 500 error page."
+      },
+      {
+        "groundTruthIndex": 15,
+        "reproStepsIndex": 0,
+        "findingIndex": 3,
+        "reason": "The primary reproduction and expectation match Follow updating the count without adding the follower card until reload. The report also describes the inverse Unfollow defect."
+      },
+      {
+        "groundTruthIndex": 5,
+        "reproStepsIndex": 0,
+        "findingIndex": 5,
+        "reason": "Same Public Profile introduction using 'show' instead of 'shown'."
+      },
+      {
+        "groundTruthIndex": 1,
+        "reproStepsIndex": null,
+        "findingIndex": 7,
+        "reason": "Same mobile card sizing failure fragmenting identity text. The reproduction uses the Following list rather than the supplied Followers-list case."
+      },
+      {
+        "groundTruthIndex": 0,
+        "reproStepsIndex": 0,
+        "findingIndex": 4,
+        "reason": "Same out-of-range repository settings page falsely claiming the account owns no repositories."
+      }
+    ],
+    "invalidMatches": [],
+    "unverified": [
+      {
+        "findingIndex": 2,
+        "reason": "No supplied entry covers an empty avatar submission reporting success without changing the avatar."
+      },
+      {
+        "findingIndex": 6,
+        "reason": "No entry covers the technical toast when a blocked regular user attempts to follow. The rejected administrator-bypass claim describes different behavior."
+      },
+      {
+        "findingIndex": 8,
+        "reason": "No supplied entry covers the malformed Simplified Chinese hidden-comment explanation."
+      },
+      {
+        "findingIndex": 9,
+        "reason": "No supplied entry covers the packages query falling back to repositories without an active tab indicator."
+      },
+      {
+        "findingIndex": 10,
+        "reason": "No supplied entry covers this German heading error; the Spanish added-commits typo is a different translation defect."
+      },
+      {
+        "findingIndex": 11,
+        "reason": "No entry covers duplicate blocking and its generic error. Blocking nonexistent users and unblocking administrators are different failures."
+      },
+      {
+        "findingIndex": 12,
+        "reason": "No supplied entry covers incorrect singular/plural wording for a follower count of one."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 5,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "The submission displays a false success state despite no upload or avatar change."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 1,
+        "reason": "Following is correctly prevented; the described defect is the technical wording and misleading available action, not a broken page or raw error dump."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 1,
+        "reason": "This is confusing translated explanatory copy without described functional misbehavior."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 1,
+        "reason": "The report accepts a repository fallback; its missing active-tab indication is a navigation presentation defect."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 1,
+        "reason": "This is a grammatical error in a section heading."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 1,
+        "reason": "Duplicate blocking is rejected without an incorrect state change; the defects are error wording and suggestion usability."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 1,
+        "reason": "This is a pluralization defect in the count label."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

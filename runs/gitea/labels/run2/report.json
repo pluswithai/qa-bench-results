@@ -1,0 +1,157 @@
+{
+  "bugs": [
+    {
+      "name": "A label whose name is only spaces is accepted and listed as an empty, nameless label",
+      "summary": "Two labels are created whose name is only whitespace. In the labels list they appear as tiny coloured pills with no text at all (only the colour chip, then \"0 open issues/pull requests\", Edit, Delete), and the heading count grows 15 → 16 → 17. There is no way to tell them apart from the list, and nothing was reported to the user. (on /eval/harbor-handbook/labels)",
+      "expected": "A whitespace-only name is rejected like an empty one (the field is marked required), with a message next to the Name field; no label is created.",
+      "actual": "Two labels are created whose name is only whitespace. In the labels list they appear as tiny coloured pills with no text at all (only the colour chip, then \"0 open issues/pull requests\", Edit, Delete), and the heading count grows 15 → 16 → 17. There is no way to tell them apart from the list, and nothing was reported to the user.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-iat14q7nt2yjqq6nojtsc.e2b.app/eval/harbor-handbook/labels",
+        "Click \"New Label\"",
+        "Type five spaces into the \"Name\" field (the field is marked with a red asterisk as required) — nothing else",
+        "Type #778899 into the \"Color\" field (it must be filled explicitly, otherwise the save is refused)",
+        "Click \"Save\"",
+        "Repeat with two spaces for the Name and color #ab12cd"
+      ]
+    },
+    {
+      "name": "At phone width the label name chip and description overlap the issue count on the Labels list",
+      "summary": "At 390px the label name chip runs into the count: the chip 'agent12-org-label-v2' is 120px wide inside a 114px column and ends where the count link starts, so its last characters sit on top of '1 open issues/pull requests'; the description text 'org level label created by agent12' also runs into the 'issues/pull requests' lines. Both the org settings Labels page and the org-labels section of the repository Labels page show it. (on /org/agent12-org/settings/labels (also the org section of /agent12-org/agent12-labels-repo/labels))",
+      "expected": "At 390px the row should lay its columns out so the label name chip and description stay inside their own column and the 'open issues/pull requests' count stays readable beside them (as it does at 768px and 1440px).",
+      "actual": "At 390px the label name chip runs into the count: the chip 'agent12-org-label-v2' is 120px wide inside a 114px column and ends where the count link starts, so its last characters sit on top of '1 open issues/pull requests'; the description text 'org level label created by agent12' also runs into the 'issues/pull requests' lines. Both the org settings Labels page and the org-labels section of the repository Labels page show it.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Set the browser to a phone width: 390 x 844 CSS pixels.",
+        "Open https://5503-iat14q7nt2yjqq6nojtsc.e2b.app/org/agent12-org/settings/labels (an organization label list that has labels named agent12-org-label-v2 and agent12-zeta).",
+        "Look at the first label row: its name chip, its description 'org level label created by agent12' and the '1 open issues/pull requests' count.",
+        "Repeat on https://5503-iat14q7nt2yjqq6nojtsc.e2b.app/agent12-org/agent12-labels-repo/labels, section 'Organization level labels that can be used with all repositories under this organization'."
+      ]
+    },
+    {
+      "name": "Ticking a label in the PR sidebar Labels picker is not saved; it is only sent on a later click elsewhere",
+      "summary": "The row shows a ✓ but no request is sent at that moment; after a reload the sidebar lists only \\\"documentation\\\" and \\\"enhancement\\\" — agent8-normal was never assigned and no timeline entry exists. A request to /eval/harbor-handbook/issues/labels is only sent when the tester clicks somewhere else on the page afterwards (clicking the page background then saved it), so ticking a label and leaving/reloading the page silently loses the assignment. Seen 5 times of 5 (documentation twice, enhancement once, agent8-normal twice). (on /eval/harbor-handbook/pulls/5)",
+      "expected": "Clicking a label in the picker assigns it: the label chip appears in the Labels sidebar box, a timeline entry \\\"eval added the agent8-normal label\\\" is written, and it is still there after a reload.",
+      "actual": "The row shows a ✓ but no request is sent at that moment; after a reload the sidebar lists only \\\"documentation\\\" and \\\"enhancement\\\" — agent8-normal was never assigned and no timeline entry exists. A request to /eval/harbor-handbook/issues/labels is only sent when the tester clicks somewhere else on the page afterwards (clicking the page background then saved it), so ticking a label and leaving/reloading the page silently loses the assignment. Seen 5 times of 5 (documentation twice, enhancement once, agent8-normal twice).",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-iat14q7nt2yjqq6nojtsc.e2b.app/eval/harbor-handbook/pulls/5 (my own PR \"agent7 labels test: release captain docs\"; the same happens on any issue/PR sidebar).",
+        "In the right sidebar click the \"Labels\" dropdown to open the label picker.",
+        "Type agent8-normal into the \"Filter Label\" box so only that label is listed.",
+        "Click the agent8-normal row once: a ✓ appears next to it and the row is ticked.",
+        "Reload the page (F5).",
+        "Look at the Labels box in the right sidebar and at the Timeline."
+      ]
+    },
+    {
+      "name": "The \"Exclusive\" checkbox cannot be ticked in the New Label and Edit Label dialogs",
+      "summary": "The Exclusive checkbox never ticks: clicking exactly on its square, clicking its \"Exclusive\" text, and focusing it and pressing Space all leave it an empty square, and after Save + reopening Edit it is still unticked. In the same Edit Label dialog, a click of the same kind on the \"Archive Label\" checkbox right below it ticks immediately (blue checkmark), so the two checkboxes behave differently. Browser hit-testing on the Exclusive control reports the surrounding form intercepts the click, while the Archive one resolves to its input. (on /eval/harbor-handbook/labels)",
+      "expected": "Clicking the Exclusive checkbox (or its label) ticks it, and Save stores the exclusive state so it is still ticked when the label is opened again — as happens with the \"Archive Label\" checkbox in the same dialog.",
+      "actual": "The Exclusive checkbox never ticks: clicking exactly on its square, clicking its \"Exclusive\" text, and focusing it and pressing Space all leave it an empty square, and after Save + reopening Edit it is still unticked. In the same Edit Label dialog, a click of the same kind on the \"Archive Label\" checkbox right below it ticks immediately (blue checkmark), so the two checkboxes behave differently. Browser hit-testing on the Exclusive control reports the surrounding form intercepts the click, while the Archive one resolves to its input.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-iat14q7nt2yjqq6nojtsc.e2b.app/eval/harbor-handbook/labels",
+        "Click \"New Label\", type a name into Name and a colour such as #cc00aa into Color",
+        "Click the small square checkbox left of the word \"Exclusive\": nothing changes (two attempts, including a click on the \"Exclusive\" text)",
+        "Click \"Save\": the label is created with Exclusive off",
+        "Click \"Edit\" on that label (agent1-dblclick) and click the Exclusive checkbox again, then click \"Save\" and click \"Edit\" again: Exclusive is still unticked",
+        "In the same Edit dialog click the \"Archive Label\" checkbox just below: it ticks at once (blue checkmark)"
+      ]
+    },
+    {
+      "name": "Saving the Edit Label dialog of a label deleted in another tab lands on a bare \\\"Not Found\\\" page",
+      "summary": "The browser navigates to /eval/harbor-handbook/labels/edit and shows only the bare text \\\"Not Found\\\" on an otherwise blank white page: no app layout, no navigation, no explanation that the label was deleted. The typed edit is lost and the user must use the browser Back button to get anywhere. (on /eval/harbor-handbook/labels/edit)",
+      "expected": "The save fails with a clear message inside the app (e.g. the label no longer exists) and the user stays on the Labels page.",
+      "actual": "The browser navigates to /eval/harbor-handbook/labels/edit and shows only the bare text \\\"Not Found\\\" on an otherwise blank white page: no app layout, no navigation, no explanation that the label was deleted. The typed edit is lost and the user must use the browser Back button to get anywhere.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-iat14q7nt2yjqq6nojtsc.e2b.app/eval/harbor-handbook/labels",
+        "In tab A create a label (\"agent15-race\", color #556677) and click \"Edit\" on it so the \"Edit Label\" dialog opens; leave the dialog open",
+        "In tab B reload the Labels page and click \"Delete\" on the same label \"agent15-race\", then \"Confirm\"; the label is deleted",
+        "Back in tab A, whose \"Edit Label\" dialog is still open, click \"Save\""
+      ]
+    },
+    {
+      "name": "A 50-character label name overflows the issue sidebar and is cut off at the page edge",
+      "summary": "The label chip is wider than its sidebar column: at 1280 px the chip runs from x=963 to beyond the right edge of the window and its text is cut off mid-name (\"agent4-long-0123456789012345678901234567890123\"); at 768 px the chip is 351 px wide inside a 270 px column and ends at x=818, so about 50 px of the name is outside the 768 px viewport with no wrapping and no ellipsis. (on /eval/harbor-handbook/issues/4)",
+      "expected": "The label chip in the issue sidebar \"Labels\" section should wrap or be truncated with an ellipsis inside the sidebar column, so the whole name stays readable and the page does not extend past the viewport.",
+      "actual": "The label chip is wider than its sidebar column: at 1280 px the chip runs from x=963 to beyond the right edge of the window and its text is cut off mid-name (\"agent4-long-0123456789012345678901234567890123\"); at 768 px the chip is 351 px wide inside a 270 px column and ends at x=818, so about 50 px of the name is outside the 768 px viewport with no wrapping and no ellipsis.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-iat14q7nt2yjqq6nojtsc.e2b.app/eval/harbor-handbook/labels",
+        "Click Edit on the label named agent4-long-01234567890123456789012345678901234567 (a label whose name uses the 50-character maximum the Name field allows; create one with New Label if needed)",
+        "Leave everything else as it is and click Save",
+        "Open https://5503-iat14q7nt2yjqq6nojtsc.e2b.app/eval/harbor-handbook/issues/4 and look at the Labels section of the right-hand sidebar (the label was assigned to issue #4 through the sidebar label picker)",
+        "Look at the same page at a 768 px wide window"
+      ]
+    },
+    {
+      "name": "Deleting a label resets the Labels list sort to alphabetical and drops the sort from the address",
+      "summary": "The label is deleted, but the address becomes .../eval/harbor-handbook/labels (the sort parameter is gone) and the list comes back in ascending alphabetical order (the four unnamed labels first, then agent1-...). The chosen sort is lost by the delete. (on /eval/harbor-handbook/labels)",
+      "expected": "The label is deleted and the list keeps the sort I chose: the address still carries sort=reversealphabetically and the rows stay in descending order.",
+      "actual": "The label is deleted, but the address becomes .../eval/harbor-handbook/labels (the sort parameter is gone) and the list comes back in ascending alphabetical order (the four unnamed labels first, then agent1-...). The chosen sort is lost by the delete.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-iat14q7nt2yjqq6nojtsc.e2b.app/eval/harbor-handbook/labels",
+        "Click \"New Label\", type the name \"agent3-repro-zzz\", click one of the colour swatches, click \"Save\" (the colour field has to be set, otherwise Save is refused)",
+        "Open the address .../eval/harbor-handbook/labels?sort=reversealphabetically&state= and check the order: the first rows are \"enhancement\", \"documentation\", then agent8-* items (descending)",
+        "Scroll to the row of \"agent3-repro-zzz\" and click its \"Delete\" link, then \"Confirm\" in the Delete Label dialog"
+      ]
+    },
+    {
+      "name": "Colour picker's hue bar does not set the Color value while the field is empty, so the picked colour is lost",
+      "summary": "The picker reacts (the square turns cyan, the hue thumb moves) but the Color field stays empty and still shows the grey placeholder \\\"#c320f6\\\"; no value is written. Only clicking inside the saturation/brightness square sets the value. A person who picks a colour on the hue bar gets no colour, and the form then refuses to save on the empty required Color field. (on /eval/harbor-handbook/labels)",
+      "expected": "The Color field takes the colour picked on the hue bar (as it does when the field already holds a value), and the label can be saved with the picked colour.",
+      "actual": "The picker reacts (the square turns cyan, the hue thumb moves) but the Color field stays empty and still shows the grey placeholder \\\"#c320f6\\\"; no value is written. Only clicking inside the saturation/brightness square sets the value. A person who picks a colour on the hue bar gets no colour, and the form then refuses to save on the empty required Color field.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-iat14q7nt2yjqq6nojtsc.e2b.app/eval/harbor-handbook/labels",
+        "Click the \"New Label\" button (do not type anything into the Color field: it must stay as the grey placeholder \"#c320f6\")",
+        "Click into the empty Color field to open the colour picker popup",
+        "Click on the hue bar at the bottom of the popup, on the cyan/blue part (about x=391, y=601 in a 1280x720 window)",
+        "Read the Color field"
+      ]
+    },
+    {
+      "name": "PR list \\\"Label\\\" filter dropdown opens off-screen to the left at 390 px, hiding every label name",
+      "summary": "The dropdown opens 337 px to the left of the page: its 422 px-wide panel is placed at x = -337 in a 390 px viewport, so only an ~85 px sliver at the left edge is on screen. The \\\"Label\\\" filter input is cut to its magnifier icon and every label row is drawn off-screen — only a few coloured slivers are visible, with no names to read or click. Reproduced twice out of two tries. (on /eval/harbor-handbook/pulls)",
+      "expected": "The Label filter dropdown opens fully inside the 390 px viewport, with its filter field and the list of label names readable and tappable.",
+      "actual": "The dropdown opens 337 px to the left of the page: its 422 px-wide panel is placed at x = -337 in a 390 px viewport, so only an ~85 px sliver at the left edge is on screen. The \\\"Label\\\" filter input is cut to its magnifier icon and every label row is drawn off-screen — only a few coloured slivers are visible, with no names to read or click. Reproduced twice out of two tries.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Set the browser window to a phone size, 390 x 844.",
+        "Open https://5503-iat14q7nt2yjqq6nojtsc.e2b.app/eval/harbor-handbook/pulls (one open PR, \"agent7 labels test: release captain docs\").",
+        "Click the \"Label\" filter button in the filter row above the PR list (between the search box row and the \"1 Open / 0 Closed\" tabs).",
+        "Look at the dropdown that opens."
+      ]
+    },
+    {
+      "name": "Long label name is clipped inside the issue sidebar Labels picker at 390 px",
+      "summary": "At 390 px wide, inside the open Labels dropdown the row for \"agent1-long-01234567890123456789012345678901234567\" runs to the right edge of the dropdown and is cut off mid-name (the chip and its text are clipped, no wrap, no ellipsis); other long names in the list are clipped the same way. The name cannot be read or told apart from another long name in the picker. (on /eval/harbor-handbook/issues/1)",
+      "expected": "Long label names should wrap inside the dropdown row or be shortened with an ellipsis so the whole entry stays inside the panel at phone width.",
+      "actual": "At 390 px wide, inside the open Labels dropdown the row for \"agent1-long-01234567890123456789012345678901234567\" runs to the right edge of the dropdown and is cut off mid-name (the chip and its text are clipped, no wrap, no ellipsis); other long names in the list are clipped the same way. The name cannot be read or told apart from another long name in the picker.",
+      "reproSteps": [
+        "Set the browser window to 390 x 844 CSS pixels and sign in as eval.",
+        "Open https://5503-iat14q7nt2yjqq6nojtsc.e2b.app/eval/harbor-handbook/issues/1 and scroll down to the sidebar block (it stacks below the comment box at this width).",
+        "Click the \"Labels\" heading to open the label picker.",
+        "Scroll inside the label list down to the entry \"agent1-long-01234567890123456789012345678901234567\"."
+      ]
+    },
+    {
+      "name": "Long label chip on an issue-list row runs off the screen at 390 px",
+      "summary": "At 390 px the row for issue #4 \"Review the release ownership proposal\" shows the label chip \"agent4-long-0123456789012345678901234567890123456…\" running past the right edge of the row and off the screen: the chip text is cut off at the viewport edge with no wrap or ellipsis, and it spills into the space where the comment-count icon sits on other rows. The whole label name cannot be read. (on /eval/harbor-handbook/issues)",
+      "expected": "Long label chips on issue-list rows should wrap or be truncated with an ellipsis inside the row, staying within the 390 px viewport.",
+      "actual": "At 390 px the row for issue #4 \"Review the release ownership proposal\" shows the label chip \"agent4-long-0123456789012345678901234567890123456…\" running past the right edge of the row and off the screen: the chip text is cut off at the viewport edge with no wrap or ellipsis, and it spills into the space where the comment-count icon sits on other rows. The whole label name cannot be read.",
+      "reproSteps": [
+        "Set the browser window to 390 x 844 CSS pixels and sign in as eval.",
+        "Open https://5503-iat14q7nt2yjqq6nojtsc.e2b.app/eval/harbor-handbook/issues (Issues list of eval/harbor-handbook).",
+        "Look at the fourth row, issue #4 \"Review the release ownership proposal\", and at its label chip under the title."
+      ]
+    },
+    {
+      "name": "Label counter says \\\"1 open issues/pull requests\\\" for a single item",
+      "summary": "The counter under a label with exactly one open issue or pull request reads \"1 open issues/pull requests\" — plural for a single item (seen on at least four labels: agent13-tl-renamed, agent2-three, agent4-ns/Bug Fix, agent8-renamed), while \"2 open issues/pull requests\" and \"0 open issues/pull requests\" use the same plural wording. (on /eval/harbor-handbook/labels)",
+      "expected": "The counter line is grammatical for the number it shows, e.g. \"1 open issue/pull request\" when the count is 1 (and plural only for 0 or more than one).",
+      "actual": "The counter under a label with exactly one open issue or pull request reads \"1 open issues/pull requests\" — plural for a single item (seen on at least four labels: agent13-tl-renamed, agent2-three, agent4-ns/Bug Fix, agent8-renamed), while \"2 open issues/pull requests\" and \"0 open issues/pull requests\" use the same plural wording.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-iat14q7nt2yjqq6nojtsc.e2b.app/eval/harbor-handbook/labels",
+        "Scroll down to the rows of the labels \"agent4-ns/Bug Fix\" or \"agent8-renamed\" (each is assigned to exactly one open issue/pull request)",
+        "Read the counter line in the middle column of those rows: it says \"1 open issues/pull requests\"",
+        "Compare with the row of \"documentation\" (2) and any label with no issues (0): both also use the plural \"open issues/pull requests\""
+      ]
+    }
+  ]
+}

@@ -1,0 +1,443 @@
+{
+  "area": "settings-data-model",
+  "bugs": [
+    {
+      "id": "settings-data-model-1",
+      "title": "Reconnect in the \"Sync lost with mailbox\" banner ends on the home page with \"Google apis auth is not enabled\"",
+      "findings": [
+        "run1-01"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Environment. The benchmark instance has no Google OAuth configured, while the seeded workspace contains a Google connected account in a failed state, which is what raises the banner. Reconnect starts the Google OAuth request and the server guard refuses it with exactly this text when the provider is disabled (google-apis-oauth-request-code.guard L65), then redirects through /verify?errorMessage=... to the app (run1-01/shot-3.png). On an instance where a mailbox could really have been connected, the provider is enabled and this path does not occur.",
+      "evidence": [
+        "run1-01/shot-3.png",
+        "run1-01/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/engine/core-modules/auth/guards/google-apis-oauth-request-code.guard.ts#L65",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/information-banner/components/reconnect-account/InformationBannerReconnectAccountInsufficientPermissions.tsx#L36"
+      ]
+    },
+    {
+      "id": "settings-data-model-2",
+      "title": "Role selector is disabled on the API key create page (only Admin)",
+      "findings": [
+        "run1-04",
+        "run2-10"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Works as designed. The selector lists only roles flagged canBeAssignedToApiKeys (SettingsDevelopersRoleSelector L31-L44). The default Member role is created with `canBeAssignedToApiKeys: false` (role.service L442), so Admin is the only eligible role, and the shared Select component disables itself when it has a single option (Select L143-L148) - that is the greyed field in run1-04/shot-2.png. A role becomes selectable here once it is allowed for API keys in the role settings; the agent did not create or enable such a role.",
+      "evidence": [
+        "run1-04/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/settings/developers/components/SettingsDevelopersRoleSelector.tsx#L31-L44",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/engine/metadata-modules/role/role.service.ts#L429-L446",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/ui/input/components/Select.tsx#L143-L148"
+      ]
+    },
+    {
+      "id": "settings-data-model-3",
+      "title": "Skills table: the Type column is empty on every row",
+      "findings": [
+        "run1-06",
+        "run2-07",
+        "run3-05"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "Real, confirmed in source. run1-06/shot-1.png shows the \"Type\" header with nothing under it for built-in and custom skills alike. The cell renders <SettingsItemTypeTag item={skill} /> (SettingsSkillTableRow L52-L54), which returns null unless the item has an applicationId or isRemote (SettingsItemTypeTag L19-L40). The Skill GraphQL type exposes applicationId (skill.dto L52-L53), but SKILL_FRAGMENT does not request it (skillFragment.ts), whereas the equivalent agent fragment does (agentFragment.ts L17). So the column can never show a value. Cosmetic/missing information only: no action depends on it.",
+      "evidence": [
+        "run1-06/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/pages/settings/ai/components/SettingsSkillTableRow.tsx#L52-L54",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/settings/components/SettingsItemTypeTag.tsx#L15-L41",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/ai/graphql/fragments/skillFragment.ts",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/engine/metadata-modules/skill/dtos/skill.dto.ts#L52-L53"
+      ]
+    },
+    {
+      "id": "settings-data-model-4",
+      "title": "Logs tab shows only an \"Upgrade to access audit logs\" card under the filters",
+      "findings": [
+        "run1-07"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Works as designed (plan gating). The selected table is \"Page Views\" (run1-07/shot-1.png), an audit log type. renderResults returns the upgrade card whenever the table is not Application logs and the workspace lacks the AUDIT_LOGS entitlement (SettingsLogs L192-L195); the card itself says \"Only application logs are available on your current plan. Other log types require an Enterprise subscription.\" That card is the explicit state for this plan; a result list or \"no results\" message is not expected.",
+      "evidence": [
+        "run1-07/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/settings/event-logs/components/SettingsLogs.tsx#L101-L116",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/settings/event-logs/components/SettingsLogs.tsx#L166-L195"
+      ]
+    },
+    {
+      "id": "settings-data-model-5",
+      "title": "New Webhook: the Description section repeats the Endpoint URL helper text",
+      "findings": [
+        "run1-08",
+        "run2-12"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "Real copy-paste wording bug. run1-08/shot-1.png shows the same sentence under \"Endpoint URL\" and under \"Description\". Source: both H2Title blocks carry description \"We will send a POST request to this endpoint for each new event in application/json format\" (SettingsDevelopersWebhookForm L116 and L142, the second only adds a full stop).",
+      "evidence": [
+        "run1-08/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/settings/developers/components/SettingsDevelopersWebhookForm.tsx#L114-L143"
+      ]
+    },
+    {
+      "id": "settings-data-model-6",
+      "title": "Renaming a field in one tab sends another tab's open field page to the 404 page",
+      "findings": [
+        "run1-09"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Consequence of a deliberate design, in a two-tab setup the agent built itself. A field's settings page is addressed by the field's API name (/settings/objects/:objectNamePlural/:fieldName) and the page looks the field up by that name (SettingsObjectFieldEdit L105-L109); when none matches it navigates to NotFound (L132-L136). Renaming a custom field with synced label changes its API name, so after the live metadata refresh the old address in tab B points to a field that no longer exists under that name, and the app answers with its standard not-found page (run1-09/shot-4.png; shot-3.png is the form before the rename). The same tab that performs the rename is handled (newNameDuringSave). No data is lost: the form in tab B was untouched. Following a rename across tabs would be nicer, but its absence is not a malfunction.",
+      "evidence": [
+        "run1-09/shot-4.png",
+        "run1-09/shot-3.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/pages/settings/data-model/SettingsObjectFieldEdit.tsx#L100-L136"
+      ]
+    },
+    {
+      "id": "settings-data-model-7",
+      "title": "Object Settings preview card shows \"Lorem ipsum\" for an object with no records",
+      "findings": [
+        "run1-10",
+        "run2-01"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Deliberate sample data. The Preview card (run1-10/shot-2.png) shows an example record when the object has none, and the example value defined for a Text field is this Lorem ipsum sentence: SETTINGS_NON_COMPOSITE_FIELD_TYPE_CONFIGS[TEXT].exampleValues (L67-L71). The same example values feed every field-type preview in the data model settings. It is filler text inside a card labelled \"Preview\", chosen in source, not leftover copy in a real screen.",
+      "evidence": [
+        "run1-10/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/settings/data-model/constants/SettingsNonCompositeFieldTypeConfigs.ts#L64-L73"
+      ]
+    },
+    {
+      "id": "settings-data-model-8",
+      "title": "Hand-typed settings addresses with no matching page (/settings, /settings/does-not-exist) render an empty pane",
+      "findings": [
+        "run1-12",
+        "run1-13",
+        "run2-05"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "An unknown settings address renders an empty pane with no not-found state (no catch-all route). Counted under the rule for addresses the app does not generate.",
+      "evidence": [
+        "run1-12/shot-1.png",
+        "run1-13/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/navigation/components/NavigationDrawerOtherSection.tsx#L31",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/app/components/SettingsRoutes.tsx#L668"
+      ]
+    },
+    {
+      "id": "settings-data-model-9",
+      "title": "Typing in Singular re-derives the Plural name, replacing a custom plural saved earlier",
+      "findings": [
+        "run1-14"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Deliberate rule in the form, and not silent. Every change of the Singular input calls fillLabelPlural, which sets Plural to pluralize(singular) and, when labels and API names are synced, the names too (SettingsDataModelObjectAboutForm L108-L119, L201-L204). The Plural field sits next to Singular and changes while the user types: in run1-14/shot-5.png the Singular input is still focused, Plural already reads \"Agent1 Things\" and the page header still reads \"Agent1 Zorbs\", i.e. nothing is saved until the field loses focus, so the user sees the new plural before it is stored and can retype it. For the usual case (plural is the regular plural of the singular) this is exactly the wanted behaviour; the form has no notion of a \"custom\" plural. A guard for hand-edited plurals would be a reasonable improvement, but the current behaviour is the designed one.",
+      "evidence": [
+        "run1-14/shot-5.png",
+        "run1-14/shot-4.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/settings/data-model/objects/forms/components/SettingsDataModelObjectAboutForm.tsx#L108-L119",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/settings/data-model/objects/forms/components/SettingsDataModelObjectAboutForm.tsx#L199-L205"
+      ]
+    },
+    {
+      "id": "settings-data-model-10",
+      "title": "Escape does not close the \"Workspace Deletion\" dialog once text is typed in its confirmation field",
+      "findings": [
+        "run2-04"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Not shown: the video is cut before the key press and the source closes the dialog on Escape regardless of the field content; left unverified, counted as rejected.",
+      "evidence": [
+        "run2-04/shot-4.png",
+        "run2-04/shot-3.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/ui/layout/modal/components/ConfirmationModal.tsx#L132-L170",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/ui/layout/modal/components/ModalHotkeysAndClickOutsideEffect.tsx#L31-L40",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/ui/input/components/SettingsTextInput.tsx#L55-L71",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/ui/utilities/hotkey/hooks/useHotkeysOnFocusedElement.ts#L32-L75"
+      ]
+    },
+    {
+      "id": "settings-data-model-11",
+      "title": "Data model object table at phone width: Fields and Records columns are off-screen",
+      "findings": [
+        "run2-06"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Designed mobile layout, and the report shows no failed attempt to scroll. Below 768 px the table is deliberately given a 520 px minimum width inside a wrapper with overflow-x: auto and touch scrolling (SettingsObjectTable L53-L64, SETTINGS_OBJECT_TABLE_ROW_MOBILE_MIN_WIDTH L10), with the Name cell kept sticky (L217), i.e. the columns are reached by swiping sideways - exactly the alternative the report itself lists as acceptable. The 520 px measured by the agent is that constant. Evidence is two static screenshots (run2-06/shot-1.png, shot-2.png) with no swipe or scroll tried; overlay scrollbars are not drawn at rest.",
+      "evidence": [
+        "run2-06/shot-1.png",
+        "run2-06/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/pages/settings/data-model/SettingsObjectTable.tsx#L53-L64",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/settings/data-model/object-details/components/SettingsObjectItemTableRowStyledComponents.tsx#L8-L10"
+      ]
+    },
+    {
+      "id": "settings-data-model-12",
+      "title": "New Webhook: removing the only filter leaves an empty \"Select entity\" row and disables Save",
+      "findings": [
+        "run2-11"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Designed validation, and the description of the row is a misreading. The empty \"Select entity / All\" row is not the removed row emptied in place: it is the standing add-a-filter row that is on the form from the start (run2-11/shot-3.png shows it under \"All Objects\" before the click) and is re-appended by addEmptyOperationIfNecessary after every change (L23-L28), which is why it never has a trash icon. The trash click did remove the \"All Objects\" filter (run2-11/shot-2.png). Save is then disabled because the schema requires at least one complete operation (webhookFormSchema L13-L27; canSave = isValid, useWebhookForm L91-L94): a webhook with no event filter would never fire. Picking an entity in the remaining row re-enables Save. An inline hint would be nicer, but nothing is broken.",
+      "evidence": [
+        "run2-11/shot-3.png",
+        "run2-11/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/settings/developers/validation-schemas/webhookFormSchema.ts#L13-L27",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/settings/developers/utils/addEmptyOperationIfNecessary.ts#L4-L29",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/settings/developers/hooks/useWebhookForm.ts#L91-L94",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/settings/developers/hooks/useWebhookForm.ts#L179-L188"
+      ]
+    },
+    {
+      "id": "settings-data-model-13",
+      "title": "AI > Models: \"Default model\" shows Smart Model and Fast Model rows with no selection and nothing to click",
+      "findings": [
+        "run2-13"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Environment plus a misreading of the section. Smart Model and Fast Model are not two alternatives to choose between: they are two separate settings, each with its own model dropdown on the right of the row (SettingsAiModelsTab L120-L152). The dropdowns are missing in run2-13/shot-1.png because the benchmark instance has no AI model configured: the option list is built from the enabled models (L86-L98) and the shared Select renders nothing when it has no option to show (Select L185-L187). With a provider configured each row shows its picker. The rows themselves are not meant to be clickable.",
+      "evidence": [
+        "run2-13/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/pages/settings/ai/components/SettingsAiModelsTab.tsx#L86-L152",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/ui/input/components/Select.tsx#L185-L187"
+      ]
+    },
+    {
+      "id": "settings-data-model-14",
+      "title": "Admin Panel: General shows current v2.26.1 / latest v2.62.2 while Health shows inferred version 2.26.0 and \"Up to date\"",
+      "findings": [
+        "run2-15"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Three different measures, each labelled, not a contradiction. General > About compares the running build (v2.26.1) with the newest published release (run2-15/frame-4.jpg). Health > Upgrade Status (run2-15/shot-4.png) is about upgrade commands, as its subtitle says (\"Upgrade health across instance and workspaces\"): health is UP_TO_DATE when the last executed upgrade command is the last one the installed code expects (deriveHealth, upgrade-status.service L72-L88), i.e. the database is fully migrated for this build, not that no newer release exists. \"Inferred version\" is derived from that command cursor (L112-L115), and commands are named per minor release, so a patch build 2.26.1 correctly infers 2.26.0; the label itself says inferred. The image is simply older than the newest release at test time.",
+      "evidence": [
+        "run2-15/shot-4.png",
+        "run2-15/frame-4.jpg"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/engine/core-modules/upgrade/services/upgrade-status.service.ts#L72-L88",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/engine/core-modules/upgrade/services/upgrade-status.service.ts#L102-L116",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/settings/admin-panel/health-status/components/SettingsAdminHealthStatus.tsx#L59",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/pages/settings/admin-panel/SettingsAdminInferredVersion.tsx#L84-L87"
+      ]
+    },
+    {
+      "id": "settings-data-model-15",
+      "title": "API key created with \"30 days\" expiration reads \"Expires in 29 days\" right after saving",
+      "findings": [
+        "run2-16",
+        "run3-06"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "Real off-by-one in the displayed text, confirmed in source. The key is created with expiresAt = addDays(new Date(), 30) (SettingsDevelopersApiKeysNew L82-L85), so the stored date is right. The label is built by beautifyDateDiff, which uses differenceInDays(expiresAt, now) (date-utils L189): date-fns counts full days only, and a moment after creation the gap is 29 days 23 h 59 min, so it prints 29 (formatExpiration L31-L35). Hence every option reads one day short from the first second: \"Expires in 29 days\" on the key page (run2-16/shot-2.png) and \"In 29 days\" in the list after choosing 30 days (run3-06/shot-3.png, shot-5.png). Wording only; the key really lasts 30 days.",
+      "evidence": [
+        "run2-16/shot-2.png",
+        "run3-06/shot-3.png",
+        "run3-06/shot-5.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/pages/settings/developers/api-keys/SettingsDevelopersApiKeysNew.tsx#L82-L85",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/settings/developers/utils/formatExpiration.ts#L23-L36",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/utils/date-utils.ts#L180-L189"
+      ]
+    },
+    {
+      "id": "settings-data-model-16",
+      "title": "Clearing the \"Erasure of soft-deleted records\" field turns it into 0 and saves 0 days",
+      "findings": [
+        "run3-04"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "clearing the retention field silently stores 0 days for erasing soft-deleted records, a destructive setting, with no warning that an empty value means immediate erasure. The user cannot tell what was saved.",
+      "evidence": [
+        "run3-04/shot-5.png",
+        "run3-04/frame-3.jpg"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/settings/components/SettingsCounter.tsx#L59-L75",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/settings/security/components/SettingsSecuritySettings.tsx#L276-L284",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/engine/core-modules/workspace/dtos/update-workspace-input.ts#L104-L108"
+      ]
+    },
+    {
+      "id": "settings-data-model-17",
+      "title": "New Approved Access Domain: empty Domain shows a length/special-character message instead of \"required\"",
+      "findings": [
+        "run3-07"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "Real wording defect, confirmed in source. Saving the empty form shows \"Domains have to be smaller than 256 characters, cannot contain spaces and cannot contain any special characters.\" under Domain and \"Email cannot be empty\" under Email (run3-07/shot-2.png). The Domain rule is only a regex with that single message and has no empty check, while Email has min(1, \"Email cannot be empty\") (SettingsSecurityApprovedAccessDomain L32-L45), so an empty value fails the regex and is described as too long or containing special characters. The save is correctly blocked; only the message is wrong.",
+      "evidence": [
+        "run3-07/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/pages/settings/security/SettingsSecurityApprovedAccessDomain.tsx#L29-L47"
+      ]
+    },
+    {
+      "id": "settings-data-model-18",
+      "title": "A very long workspace name runs off both edges of the sign-in screen and adds a horizontal scrollbar",
+      "findings": [
+        "run3-08"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "Real layout defect reached only through the app's own field. The workspace Name input has no length limit on the client (NameField) or the server (displayName is only @IsString, update-workspace-input L34-L37), and the sign-in title prints \"Welcome, {name}.\" (SignInUp L122-L129) in a block with no max-width, wrapping or ellipsis rule (auth Title L11-L19). With a 260-character unbroken name the greeting leaves the window on both sides (run3-08/shot-2.png). Cosmetic and needs an unusual name: the form below stays usable.",
+      "evidence": [
+        "run3-08/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/auth/components/Title.tsx#L11-L19",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/pages/auth/SignInUp.tsx#L122-L129",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/engine/core-modules/workspace/dtos/update-workspace-input.ts#L34-L37"
+      ]
+    },
+    {
+      "id": "settings-data-model-19",
+      "title": "REST API playground: link reads \"Find out more about **Twenty**\" with literal asterisks",
+      "findings": [
+        "run3-09"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "Real cosmetic defect, confirmed in source. The OpenAPI base schema sets externalDocs.description to the literal string 'Find out more about **Twenty**' (base-schema.utils L161-L164); the playground prints that field as plain text in the button under the title, so the Markdown markers are shown as characters (run3-09/shot-2.png), next to clean labels such as \"AGPL-3.0\" and \"Terms of Service\". Reached from the app's own \"Launch\" button.",
+      "evidence": [
+        "run3-09/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/engine/core-modules/open-api/utils/base-schema.utils.ts#L161-L164"
+      ]
+    },
+    {
+      "id": "settings-data-model-20",
+      "title": "Communication > Channels: the \"Domain\" column is empty on every row",
+      "findings": [
+        "run3-10"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Plan gating on this instance, and the column is not meant to repeat the domain part of the address. The Domain cell shows the verification status chip of the sending domain that matches the channel address, and renders nothing when no such domain is returned (SettingsWorkspaceEmailChannelDomainStatusCell L18-L34). The domains come from getEmailingDomains, which on a self-hosted instance throws \"Email group requires an Enterprise plan\" unless a valid Enterprise key is present (emailing-domain.resolver L88-L99, email-group-access.service L22-L33). The benchmark instance has no Enterprise key (other tabs show the upgrade cards), so the query returns nothing and every cell is blank (run3-10/shot-1.png); the seeded 20202020.dev.twenty.local domains exist and would show Verified / Pending with the plan active.",
+      "evidence": [
+        "run3-10/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/settings/workspace/components/SettingsWorkspaceEmailChannelDomainStatusCell.tsx#L18-L34",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/engine/core-modules/emailing-domain/emailing-domain.resolver.ts#L88-L99",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/engine/core-modules/emailing-domain/services/email-group-access.service.ts#L22-L33",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/engine/workspace-manager/dev-seeder/core/utils/seed-emailing-domains.util.ts#L10-L17"
+      ]
+    },
+    {
+      "id": "settings-data-model-21",
+      "title": "Email channel without a sender name: header reads \"Sender name\" and there is no Sender name section",
+      "findings": [
+        "run3-11"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Works as designed. The header of this page is not a static title but an editable title field bound to the channel's sender name, with placeholder \"Sender name\" (SettingsWorkspaceCommunicationGroupChannelDetail L166-L179); the shared TitleInput shows its placeholder while the value is empty (TitleInput L228). The seeded channel has no sender name, so the header shows the prompt to type one (run3-11/shot-1.png), while the breadcrumb identifies the channel by its address. The read-only \"Sender name\" section is rendered only when a name exists (L242-L255), which is why the agent's own channel, created with a name, shows both.",
+      "evidence": [
+        "run3-11/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/pages/settings/communications/SettingsWorkspaceCommunicationGroupChannelDetail.tsx#L166-L179",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/pages/settings/communications/SettingsWorkspaceCommunicationGroupChannelDetail.tsx#L242-L255",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/ui/input/components/TitleInput.tsx#L228"
+      ]
+    },
+    {
+      "id": "settings-data-model-22",
+      "title": "Sidebar Link item to example.com shows a red glyph instead of a favicon",
+      "findings": [
+        "run3-12"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "The evidence shows the designed fallback, not a broken image. For a Link item the app tries the site favicon and, on load error, switches to a default globe icon on a tile tinted with the item colour (LinkIconWithLinkOverlay L82-L111, onError L100-L103; DefaultIcon = IconWorld, NavigationMenuItemIcon L99-L112); the default colour of Link items is red (NavigationMenuItemDefaultColorLink L1). Enlarged, run3-12/shot-2.png shows exactly that: a red globe on a light red tile with the grey link badge at its corner. The 404 in the console is the favicon lookup for example.com, which has none, and is the case this fallback handles.",
+      "evidence": [
+        "run3-12/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/navigation-menu-item/display/link/components/LinkIconWithLinkOverlay.tsx#L82-L111",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/navigation-menu-item/display/components/NavigationMenuItemIcon.tsx#L99-L112",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/navigation-menu-item/common/constants/NavigationMenuItemDefaultColorLink.ts#L1"
+      ]
+    },
+    {
+      "id": "settings-data-model-23",
+      "title": "Layout customization: a folder with an empty name makes Save fail with only \"Failed to save layout customization\"",
+      "findings": [
+        "run3-13"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "Real, confirmed in source. The editor lets the folder name be emptied and keeps Save enabled (run3-13/shot-3.png); the server then refuses the whole save with a specific, user-facing message \"Folder name is required\" (flat-navigation-menu-item-validator.service L56-L61), but the client catch block discards it and shows a fixed generic toast (useSaveLayoutCustomization L159-L164; run3-13/shot-4.png). Nothing points at the nameless folder, and all other pending layout edits stay unsaved until the user guesses the cause. Refusing the empty name is correct, so this is rated as a message defect (1); a reviewer who weighs the blocked save more could argue 3.",
+      "evidence": [
+        "run3-13/shot-4.png",
+        "run3-13/shot-3.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/layout-customization/hooks/useSaveLayoutCustomization.ts#L159-L164",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/engine/workspace-manager/workspace-migration/workspace-migration-builder/validators/services/flat-navigation-menu-item-validator.service.ts#L56-L61"
+      ]
+    },
+    {
+      "id": "settings-data-model-24",
+      "title": "Deactivated field page: Danger zone still says \"Deactivate this field\" above an \"Activate\" button",
+      "findings": [
+        "run3-14"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "Real wording defect, confirmed in source. The Danger zone subtitle is the fixed string \"Deactivate this field\" (SettingsObjectFieldEdit L398-L401) while the button under it switches to \"Activate\" when the field is inactive (L403-L417), so on a deactivated field the text describes the opposite of the only state action offered (run3-14/shot-3.png). The page also carries no other sign that the field is deactivated. Cosmetic: Activate and Delete both work.",
+      "evidence": [
+        "run3-14/shot-3.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/pages/settings/data-model/SettingsObjectFieldEdit.tsx#L396-L429"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,255 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "gitea/areas/site-administration",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "982c1a3e9808a262b6b41d5cbaab983c0ff00e93af9f0c3c75538f0e0c18875b",
+    "known_invalid_sha256": "f56ec4720a8cc325bb88362b3c1dcbc016c78ac54f7ca09aebc3dadef5bd45cf",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "32",
+    "bugs": "20",
+    "flags": "0",
+    "known_hits": "8",
+    "extra_known_hits": "0",
+    "unverified": "11",
+    "outside_area_known_hits": "0",
+    "outside_area_known_invalid": "0",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "",
+    "outside_area_ground_truth_sha256": "47db07b83af13b7c7dd75acd1b523ed86e8107b60e6f33878e8fb5b68a2acbe2",
+    "outside_area_known_invalid_sha256": "72e79c4023c85c9101fbf2b7613d3daf78b07fded510d117ab5b26f6ac3103f9",
+    "duplicates": "0",
+    "duplicate_known_hits": "0",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "1",
+    "known_misses": "1",
+    "precision": "0.8888888888888888",
+    "recall": "0.25",
+    "findings_per_minute": "0.8742385928255609",
+    "correct_findings_per_minute": "0.3496954371302244",
+    "severity_1": "6",
+    "severity_3": "2",
+    "severity_5": "0",
+    "severity_sum": "12",
+    "score": "11",
+    "duration_seconds": "1372.623",
+    "partial": "false",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 14,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Entering a worker cap below -1 reports success but silently stores -1; the different queue and negative value are insignificant."
+      },
+      {
+        "groundTruthIndex": 5,
+        "reproStepsIndex": 0,
+        "findingIndex": 4,
+        "reason": "The diagnosis-report button obscures the Stacktrace tab at 390px; the additional tablet observations extend the same overlap defect."
+      },
+      {
+        "groundTruthIndex": 9,
+        "reproStepsIndex": 0,
+        "findingIndex": 5,
+        "reason": "Matches the combined mobile User Accounts and Repositories heading-total overlap; the organization observation is additional."
+      },
+      {
+        "groundTruthIndex": 3,
+        "reproStepsIndex": 0,
+        "findingIndex": 8,
+        "reason": "Malformed editor mappings without '=' are silently discarded on Save, including clearing the field when no valid mapping remains."
+      },
+      {
+        "groundTruthIndex": 17,
+        "reproStepsIndex": 0,
+        "findingIndex": 10,
+        "reason": "Applying a User Accounts filter removes the selected sort parameter and resets the ordering."
+      },
+      {
+        "groundTruthIndex": 20,
+        "reproStepsIndex": 0,
+        "findingIndex": 12,
+        "reason": "Browser Back restores earlier repository results while retaining the later search text; an initially unfiltered list is an insignificant setup difference."
+      },
+      {
+        "groundTruthIndex": 10,
+        "reproStepsIndex": 0,
+        "findingIndex": 15,
+        "reason": "Matches the organization Follow label splitting mid-word at 390px; directly opening the organization does not change the reproduction."
+      },
+      {
+        "groundTruthIndex": 18,
+        "reproStepsIndex": 0,
+        "findingIndex": 16,
+        "reason": "The primary organization search reproduction drops the selected sort; the user-list observation is additional."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 1,
+        "reproStepsIndex": 0,
+        "findingIndex": 2,
+        "reason": "Challenges the intentionally empty default diagnostic list, rather than specifically identifying missing guidance to select a trace tab."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 1,
+        "reason": "No reviewed entry covers SQL wildcard interpretation in user searches."
+      },
+      {
+        "findingIndex": 3,
+        "reason": "No reviewed entry covers empty-body 404 responses for unknown queue IDs."
+      },
+      {
+        "findingIndex": 6,
+        "reason": "No reviewed entry covers the collapsed Monitoring sidebar and missing current-page highlight on queue details."
+      },
+      {
+        "findingIndex": 7,
+        "reason": "No reviewed entry covers an allegedly incorrect release count in monitoring statistics."
+      },
+      {
+        "findingIndex": 9,
+        "reason": "No reviewed entry covers browser Back exposing a cached administrator page after logout."
+      },
+      {
+        "findingIndex": 11,
+        "reason": "No reviewed entry covers queue-table headers and values becoming separate mobile blocks."
+      },
+      {
+        "findingIndex": 13,
+        "reason": "No reviewed entry covers long editor names overflowing the repository clone menu."
+      },
+      {
+        "findingIndex": 14,
+        "reason": "No reviewed entry covers an invalid dashboard update version; comparing installed and advertised versions alone does not establish that the latter is impossible."
+      },
+      {
+        "findingIndex": 17,
+        "reason": "No reviewed entry covers organization deletion issuing an additional POST to a null endpoint."
+      },
+      {
+        "findingIndex": 18,
+        "reason": "No reviewed entry covers repository-table columns and delete controls becoming unreachable at tablet width."
+      },
+      {
+        "findingIndex": 19,
+        "reason": "No reviewed entry covers nonexistent administrator user URLs silently redirecting to the user inventory."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 3,
+        "reason": "Search returns users that do not literally match the entered query."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "Describes missing diagnostic output on initial load, although the tabs still provide it."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 5,
+        "reason": "The requested page is completely blank, without navigation, explanation, or recovery controls."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 1,
+        "reason": "This is a navigation-indicator and minor usability defect; destinations remain accessible."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 3,
+        "reason": "The statistics report an incorrect aggregate count according to the described inventory checks."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 3,
+        "reason": "A signed-out browser displays cached administrative information, including user email addresses."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 1,
+        "reason": "The responsive presentation makes label-value associations difficult to read, without changing the values."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 1,
+        "reason": "The editor label overflows and is clipped; no broken action is described."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 3,
+        "reason": "The claim describes an incorrect update-availability result, not merely a formatting problem."
+      },
+      {
+        "findingIndex": 15,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 16,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 17,
+        "severity": 3,
+        "reason": "Submission sends an unintended failing request, although the actual deletion succeeds."
+      },
+      {
+        "findingIndex": 18,
+        "severity": 3,
+        "reason": "Clipping prevents use of the per-repository delete action, beyond cosmetic truncation."
+      },
+      {
+        "findingIndex": 19,
+        "severity": 3,
+        "reason": "The navigation returns an unrelated list instead of a not-found result or explanatory message."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

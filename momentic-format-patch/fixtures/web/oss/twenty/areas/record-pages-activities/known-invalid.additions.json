@@ -1,0 +1,112 @@
+{
+  "bugs": [
+    {
+      "name": "Completing a related task adds no entry to the company's Timeline",
+      "summary": "The Timeline only shows \\\"You created a related task agent6-task-alpha\\\" — no entry at all for the completion, not even after a full page reload. The record's Timeline still reads as if the task were never completed. Done twice (completed, re-opened to TODO, completed again): no entry either time. (on /object/company/586586e5-ecfe-47c9-83f5-ef0d3717043d)",
+      "expected": "The Timeline shows an activity for the task being completed (e.g. \\\"You completed a related task agent6-task-alpha\\\" with its date), so the record's history agrees with the Tasks tab where the task is now in DONE.",
+      "actual": "The Timeline only shows \\\"You created a related task agent6-task-alpha\\\" — no entry at all for the completion, not even after a full page reload. The record's Timeline still reads as if the task were never completed. Done twice (completed, re-opened to TODO, completed again): no entry either time.",
+      "reproSteps": [
+        "Open the company record /object/company/586586e5-ecfe-47c9-83f5-ef0d3717043d (company \"agent6-co-beta\").",
+        "Open the Tasks tab and click the round checkbox on the left of the task card \"agent6-task-alpha\" (created earlier from this tab): the card moves from TODO 1 to DONE 1 and the counter reads \"Tasks 1 / DONE 1\".",
+        "Click the Timeline tab of the same record (and reload the page).",
+        "Read the Timeline entries."
+      ],
+      "reason": "Works as built; a missing feature, not a broken one. The observation is true (run1-08/shot-5.png: only \"You created a related task agent6-task-alpha\"), but the server only writes a linked-task entry on a target record when the link is created or when the task title changes: computeTimelineActivityPayloadsForActivities reads `event.properties.diff?.title?.after` and returns nothing when the title is not in the diff (L301-L306). Status, due date and body changes of a related task are therefore never propagated to the company timeline. Nothing in the UI promises a \"completed\" entry, the Tasks tab shows the correct DONE state, and no data is lost."
+    },
+    {
+      "name": "Timeline update entries show only the new value and keep the time of the first edit",
+      "summary": "The same single entry stays \\\"You updated 3 fields on agent6-co-beta — 9 minutes ago\\\" and merely rewrites its own line to \\\"Account Owner → Phil Schiler\\\". It never records that the owner had been \\\"Jony Ive\\\" (or that it was set to Jony Ive a few minutes before), and the entry's timestamp remains the one from the first edit 9 minutes earlier even though the owner was changed seconds ago. (on /object/company/586586e5-ecfe-47c9-83f5-ef0d3717043d)",
+      "expected": "Each field change is a timeline entry that shows what the field was and what it became (old → new) and the time of that change, so the record's history shows the Account Owner went from Jony Ive to Phil Schiler just now.",
+      "actual": "The same single entry stays \\\"You updated 3 fields on agent6-co-beta — 9 minutes ago\\\" and merely rewrites its own line to \\\"Account Owner → Phil Schiler\\\". It never records that the owner had been \\\"Jony Ive\\\" (or that it was set to Jony Ive a few minutes before), and the entry's timestamp remains the one from the first edit 9 minutes earlier even though the owner was changed seconds ago.",
+      "reproSteps": [
+        "Open the company record /object/company/586586e5-ecfe-47c9-83f5-ef0d3717043d (\"agent6-co-beta\") on the Timeline tab.",
+        "In the Fields panel, set Account Owner to \"Jony Ive\" (click the Account Owner value, type Jony, pick \"Jony Ive\"); the Timeline shows \"You updated ... Account Owner → Jony Ive\" (here it first even showed \"Account Owner → Empty\").",
+        "A few minutes later set Account Owner to \"Phil Schiler\" the same way, then reload the page.",
+        "Read the Timeline: the same aggregated entry now says \"You updated 3 fields on agent6-co-beta — 9 minutes ago\" with the line \"Account Owner → Phil Schiler\" and no earlier value anywhere."
+      ],
+      "reason": "Both halves are deliberate. (1) The diff row is designed as \"Field -> new value\": EventFieldDiff renders the label, an arrow and only `fieldDiff.after`; the previous value is never rendered for any field. (2) Updates by the same member on the same record are merged into the most recent \"updated\" activity when it is younger than 10 minutes (findRecentTimelineActivities: `createdAt: MoreThan(tenMinutesAgo)`, then objectRecordDiffMerge + update of properties only, so createdAt stays). The evidence matches that rule exactly: run1-09/shot-6.png (edit inside the window) shows one merged entry \"9 minutes ago\", and run1-09/shot-2.png (edit after the window) shows a new separate entry \"You updated Account Owner -> Phil Schiler - less than a minute ago\"."
+    },
+    {
+      "name": "Note created from a record's Notes tab is said to be missing from the Notes list",
+      "summary": "The Notes list (total 1,810 then 1,813 notes) shows every other agent's notes created 1-11 minutes ago but never \\\"agent3-note-alpha\\\", on two separate loads of the list (one of them a full reload). Searching the list rendering for \\\"agent3\\\" returns nothing; the note only exists on the company record and on its own record page. (on /objects/notes)",
+      "expected": "The note \\\"agent3-note-alpha\\\" should be listed in the Notes list like the other notes created in the same minutes (agent8-NoteA, agent10-Note Export, agent7-Note A), showing its title, Google relation and body.",
+      "actual": "The Notes list (total 1,810 then 1,813 notes) shows every other agent's notes created 1-11 minutes ago but never \\\"agent3-note-alpha\\\", on two separate loads of the list (one of them a full reload). Searching the list rendering for \\\"agent3\\\" returns nothing; the note only exists on the company record and on its own record page.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open https://5500-ixmruf4hfnd9dnfal6vzl.e2b.app/object/company/20202020-a305-41e7-8c72-ba44072a4c58 (Google).",
+        "Open the Notes tab and click the \"New note\" (+) button.",
+        "Set the title to \"agent3-note-alpha\" and type a body (\"agent3 line one\" / \"bold and # heading- item one\" / bullets \"item two\", \"last line after blank\").",
+        "Close the side panel and reload the record: the note \"agent3-note-alpha\" is listed in the record's Notes tab with its body, related to Google.",
+        "Open https://5500-ixmruf4hfnd9dnfal6vzl.e2b.app/objects/notes (All Notes, sorted by Creation date descending) and look at the rows around the time the note was created (it said \"Added 7 minutes ago\").",
+        "Its own record page https://5500-ixmruf4hfnd9dnfal6vzl.e2b.app/object/note/be953491-33e2-4b53-b51c-e464a5759f1d opens fine with the full body."
+      ],
+      "reason": "The evidence contradicts the claim. The note's own page header reads \"Notes / agent3-note-alpha (1,809/1,811)\" (run1-11/shot-5.png): the note IS in the All Notes list, at position 1,809 of 1,811, i.e. at the bottom. The list in run1-11/shot-4.png has no sort chip, so it is in manual position order, not \"Creation date descending\" as the steps assume; it only looks date-sorted because notes made with \"New Note\" are put first. Notes created from a record tab are created with `position: 'last'` on purpose (useOpenCreateActivityDrawer L74). The agent only read the first rows of a 1,813-row virtualised list."
+    },
+    {
+      "name": "Calendar tab: second month heading shows \"July\" without a year",
+      "summary": "The November group is headed \"November 2026\" but the second group is headed only \"July\", with no year, so a person cannot tell which year that event belongs to. (on /object/company/20202020-a305-41e7-8c72-ba44072a4c58)",
+      "expected": "Every month group header names the month and the year the same way (\"November 2026\", \"July 2026\" / \"July 2027\").",
+      "actual": "The November group is headed \"November 2026\" but the second group is headed only \"July\", with no year, so a person cannot tell which year that event belongs to.",
+      "reproSteps": [
+        "Open /object/company/20202020-a305-41e7-8c72-ba44072a4c58 (Google) at desktop width.",
+        "Click the Calendar tab in the record's tab bar.",
+        "Read the two month group headings above the two event rows."
+      ],
+      "reason": "Deliberate. The year is printed once per year, on the first month heading of that year in the list: `isLastMonthOfYear = monthTimesByYear[year]?.[0] === monthTime` and `{isLastMonthOfYear && <StyledYear> {year}</StyledYear>}` (CalendarEventsCard L125-L139). In run1-18/shot-1.png \"November 2026\" carries the year and \"July\" below it belongs to the same year 2026; a different year would get its own year label. Not ambiguous, not a defect."
+    },
+    {
+      "name": "Escape in the Due Date editor saves the typed date instead of discarding it",
+      "summary": "The Escape keypress fired POST /graphql (mutation UpdateOneTask) and the field now reads \\\"Mar 15, 2026 9:00 AM\\\" in the Fields panel — the typed value was saved instead of discarded. The old value \\\"Feb 29, 2024 10:00 AM\\\" is gone, and nothing asks whether to keep the change. (on /object/task/743057ac-7c82-4cd7-9ace-52255de94b4f)",
+      "expected": "Escape should cancel the edit: the popover closes and the Due Date keeps its previous value, with nothing written to the task.",
+      "actual": "The Escape keypress fired POST /graphql (mutation UpdateOneTask) and the field now reads \\\"Mar 15, 2026 9:00 AM\\\" in the Fields panel — the typed value was saved instead of discarded. The old value \\\"Feb 29, 2024 10:00 AM\\\" is gone, and nothing asks whether to keep the change.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev",
+        "Open the task record https://5500-ixmruf4hfnd9dnfal6vzl.e2b.app/object/task/743057ac-7c82-4cd7-9ace-52255de94b4f (task agent4-task-alpha, Due Date is Feb 29, 2024 10:00 AM)",
+        "Click the Due Date row, then click the date value again so the date popover with the calendar opens",
+        "In the popover's date text field type 03/15/2026 09:00 AM (the calendar still shows February 2024)",
+        "Press Escape on the keyboard"
+      ],
+      "reason": "The behaviour is real (run1-19/frame-3.jpg: a date typed in the open picker; frame-4.jpg: after Escape the field reads the typed date; shot-5.png: \"Mar 15, 2026 9:00 AM\" stored after the first try) but it is the app-wide, explicit design: in Twenty Escape closes a field editor and persists the draft. RecordInlineCell.handleEscape calls persistFieldFromFieldInputContext(newValue) exactly like Enter/Tab/click-outside (L113-L119); the table cell and the field-list portal do the same, and every field input forwards its current value on Escape (DateTimeInput.handleEscape -> onEscape(internalValue) L79-L85; TextFieldInput, NumberFieldInput, DateFieldInput alike). There is a separate handleCancel that does not persist, so the persist-on-Escape path is a conscious choice, not an accident of the date picker. It differs from the common convention, but it is a product decision visible in source, with no promise broken."
+    },
+    {
+      "name": "Hand-typed record address with an invented (well-formed) UUID shows an editable empty record; an edit is shown, then refused",
+      "summary": "The page shows a normal-looking empty record (?Companies / Untitled (0/0)?, avatar and name stuck as grey loading skeletons, all Fields editable). Clicking the Domain Name field, typing \"agent3-ghost.example\" and pressing Enter shows the value as a saved chip in the field, and only then a toast appears: \"This record does not exist or has been deleted.\" The typed value is nowhere saved and vanishes on reload. No \"record not found\" state is shown before the person can type. (on /object/company/9f1c2d3e-4a5b-4c6d-8e9f-0a1b2c3d4e5f)",
+      "expected": "A record id that does not exist shows a clear \"record not found / does not exist\" message instead of an editable record, and no field accepts a value that cannot be saved (or the value is refused with an error next to the field).",
+      "actual": "The page shows a normal-looking empty record (?Companies / Untitled (0/0)?, avatar and name stuck as grey loading skeletons, all Fields editable). Clicking the Domain Name field, typing \"agent3-ghost.example\" and pressing Enter shows the value as a saved chip in the field, and only then a toast appears: \"This record does not exist or has been deleted.\" The typed value is nowhere saved and vanishes on reload. No \"record not found\" state is shown before the person can type.",
+      "reproSteps": [
+        "Sign in with tim@apple.dev / tim@apple.dev",
+        "Navigate to https://5500-i2bvhtm4sxq8s677s7h83.e2b.app/object/company/9f1c2d3e-4a5b-4c6d-8e9f-0a1b2c3d4e5f (well-formed UUID that does not exist in the workspace)",
+        "Page renders a company record titled 'Untitled' with (0/0), a grey loading skeleton where the name should be, and editable Fields",
+        "Click the 'Domain Name' placeholder value in the Fields section, type agent3-ghost.example and press Enter",
+        "The value is shown as saved in the Domain Name field (with an edit pencil) and only then a toast appears: 'This record does not exist or has been deleted.'",
+        "Reload the page: the typed value is gone and the record is again an empty 'Untitled' shell"
+      ],
+      "reason": "Input no real link produces. The id 9f1c2d3e-4a5b-4c6d-8e9f-0a1b2c3d4e5f was invented and typed into the address bar (finding steps); no link in the app carries it. The observation itself is true: run2-08/shot-1.png shows an \"Untitled (0/0)\" shell with skeletons and editable fields, and run2-08/shot-2.png shows the typed domain as a chip together with the server's refusal toast \"This record does not exist or has been deleted.\" (the designed message of the update runner, common-update-one-query-runner L56); nothing is saved, so no data is at risk. Different failure from record-pages-activities-10 (malformed id -> \"Invalid value for UUID\"), hence its own entry. If a human wants to pursue it: permanently delete a record and open its old address (browser history, shared link); that is the case a real link can produce and this finding does not test it."
+    },
+    {
+      "name": "\"New task\" on a record's Tasks tab creates the task immediately, before a title is typed",
+      "summary": "Clicking \"+\\\" immediately sends a create request (CreateOneTask + CreateOneTaskTarget relating it to Google). After closing the panel without typing anything the count is \\\"Tasks 6\\\" and a new row sits at the top of TODO showing only the grey placeholder text \\\"Task title\\\" — an untitled task now belongs to the company record and was never wanted. (on /object/company/20202020-a305-41e7-8c72-ba44072a4c58 (Tasks tab))",
+      "expected": "Opening the new-task panel should not create a record until the user saves something (a title); closing the panel without typing anything should leave the record's task list unchanged (\"Tasks 5\" and no empty row).",
+      "actual": "Clicking \"+\\\" immediately sends a create request (CreateOneTask + CreateOneTaskTarget relating it to Google). After closing the panel without typing anything the count is \\\"Tasks 6\\\" and a new row sits at the top of TODO showing only the grey placeholder text \\\"Task title\\\" — an untitled task now belongs to the company record and was never wanted.",
+      "reproSteps": [
+        "Open the Google company record: /object/company/20202020-a305-41e7-8c72-ba44072a4c58, signed in as tim@apple.dev, and click the Tasks tab in the record's tab bar.",
+        "Note the tab header count: \"Tasks 5\".",
+        "Click the \"+\" (New task) button at the top right of the Tasks tab.",
+        "Do not type anything anywhere; close the side panel that opened with the \"X\" (Close side panel) button at its top right.",
+        "Look at the Tasks tab again."
+      ],
+      "reason": "Designed, app-wide creation model. The observation is true (run2-11/shot-1.png \"Tasks 5\"; run2-11/shot-3.png panel open with \"Created now\" and already \"Tasks 6\"; run2-11/shot-5.png the \"Task title\" row stays after closing), but Twenty has no draft step anywhere: useOpenCreateActivityDrawer first awaits createOneActivity and createOneActivityTarget and only then opens the record in the side panel with isNewRecord (L68-L75, L102-L111, L128-L132), exactly like \"New record\" in every list (useCreateNewIndexRecord L89-L99 creates, then opens). The grey \"Task title\" text is the designed placeholder for an empty title (TaskRow L123). Nothing in the UI promises a Save/Cancel step, and the empty task can be deleted like any record. A product choice one may dislike, not a defect."
+    },
+    {
+      "name": "Record page at 768/390 px has no big title heading, avatar or \"Added ...\" line",
+      "summary": "At 768 and 390 px the record title heading, the record avatar and the 'Added …' line are not rendered at all, and there is no Title input in the page, so the title of the record cannot be read in full or edited on a tablet or phone. Only the truncated breadcrumb shows part of the title. (on /object/note/6930efc4-a6e1-4f85-a717-cccc109c2bcd)",
+      "expected": "The record page shows the record's title (and lets you rename it) at every width, as it does on desktop.",
+      "actual": "At 768 and 390 px the record title heading, the record avatar and the 'Added …' line are not rendered at all, and there is no Title input in the page, so the title of the record cannot be read in full or edited on a tablet or phone. Only the truncated breadcrumb shows part of the title.",
+      "reproSteps": [
+        "Sign in with tim@apple.dev / tim@apple.dev and open https://5500-i2bvhtm4sxq8s677s7h83.e2b.app/object/note/6930efc4-a6e1-4f85-a717-cccc109c2bcd at a 1280 px wide window: the record title \"agent9-Ünïcode & <b>x</b> 🎉 note\" is shown as a large heading with the record avatar and \"Added 12 minutes ago\" under it, and clicking it turns it into an editable Title field.",
+        "Narrow the window to 768 x 1024 (tablet): the heading, avatar and 'Added …' line are gone; the page starts at the Note/Timeline/Files tabs, then Fields.",
+        "Narrow the window to 390 x 844 (phone): still no title heading and no Title field anywhere on the page; the title only appears cut off in the breadcrumb (\"Notes / agent9-Ünïcode & <b>x</b> ... (5/1,814)\")."
+      ],
+      "reason": "Designed mobile layout, and the \"cannot be edited\" part is not shown. On mobile (and in the side panel) the record page deliberately has no pinned left column: getTabsByDisplayMode returns `pinnedLeftTab: undefined` when `isMobile || isInSidePanel` and puts the Fields tab into the tab list as \"Home\" (L18-L27); the summary card with avatar, heading and \"Added ...\" exists only inside that left panel (PageLayoutLeftPanel L49-L53). That is what run2-12/shot-1.png (768) and shot-2.png (390) show, and it matches the side panel layout (e.g. run2-03/shot-1.png). The title stays in the header: the breadcrumb renders it as a RecordTitleCell, the same click-to-edit cell as the desktop heading, with no mobile condition (ObjectRecordShowPageBreadcrumb L128-L157). It is a display cell that becomes an input only when clicked, so \"no Title input in the page\" proves nothing, and no screenshot or frame shows a click on the breadcrumb title. At 768 px the full title is readable in the breadcrumb; \"Creation date\" is in Fields. (The three-dot button drawn over the counter in shot-2.png is covered by record-pages-activities-19.)"
+    }
+  ]
+}

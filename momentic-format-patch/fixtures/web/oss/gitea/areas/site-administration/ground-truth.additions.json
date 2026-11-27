@@ -1,0 +1,122 @@
+{
+  "bugs": [
+    {
+      "name": "Unknown queue id (/-/admin/monitor/queue/<id>) answers 404 with a completely blank page",
+      "summary": "The browser receives a 404 and renders a completely blank white page: no title, no Gitea navigation or admin menu, no error text and no link back. Identical after a reload (two 404 responses, both blank). (on /-/admin/monitor/queue/14)",
+      "expected": "A not-found page: a message such as 'Page Not Found' with a way back (e.g. to the Queues list), inside the normal page layout.",
+      "actual": "The browser receives a 404 and renders a completely blank white page: no title, no Gitea navigation or admin menu, no error text and no link back. Identical after a reload (two 404 responses, both blank).",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /-/admin/monitor/queue (the list holds 13 queues, numbered 1 to 13)",
+        "Enter the address of a queue that does not exist: /-/admin/monitor/queue/14",
+        "The page loads blank; reload it and it is blank again"
+      ],
+      "severity": 5
+    },
+    {
+      "name": "Admin sidebar collapses 'Monitoring' and loses the 'Queues' highlight on a queue detail page",
+      "summary": "On every queue detail page the 'Monitoring' section in the Admin Settings sidebar is collapsed (no Stats / Cron Tasks / Queues / Trace visible) and no entry is marked as current, so the page the administrator is on is not shown in the menu. On /-/admin/monitor/queue the same menu is expanded and 'Queues' is marked as the current item. Seen on /-/admin/monitor/queue/1, /2, /3, /5 and /9. (on /-/admin/monitor/queue/9)",
+      "expected": "Like on the Queues list page, the sidebar keeps 'Monitoring' expanded and marks 'Queues' as the current page while an individual queue page is open.",
+      "actual": "On every queue detail page the 'Monitoring' section in the Admin Settings sidebar is collapsed (no Stats / Cron Tasks / Queues / Trace visible) and no entry is marked as current, so the page the administrator is on is not shown in the menu. On /-/admin/monitor/queue the same menu is expanded and 'Queues' is marked as the current item. Seen on /-/admin/monitor/queue/1, /2, /3, /5 and /9.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /-/admin/monitor/queue: the Admin Settings sidebar has 'Monitoring' expanded with Stats, Cron Tasks, Queues, Trace, and 'Queues' is marked as the current item",
+        "Open any queue detail page, e.g. /-/admin/monitor/queue/9 (mirror) by its address or through 'Review / Add Workers'",
+        "Look at the Admin Settings sidebar: 'Monitoring' is collapsed (a '>' chevron) and none of its entries is marked as current"
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Statistics summary reports Release 1 while the instance has 0 releases (a tag is counted as a release)",
+      "summary": "The Summary table on Statistics reports Release = 1, while the only repository (eval/harbor-handbook) shows '0 Releases' on its Releases tab, its releases RSS feed has no items, and its tag v1.0.0 offers 'New Release' (no release attached). The admin page therefore reports a release that no view of the instance shows. Every other counter I cross-checked agrees with reality (Repo 1, User 3, Org 0, Branches 2, Issue 4 = IssueOpen 3 + IssueClosed 1, Label 2, Milestone 1, Tags 1, Watch 1, Star 0, PublicKey 0 with no SSH keys). (on /-/admin/monitor/stats)",
+      "expected": "The Release counter should match the releases that exist on the instance. There is exactly one repository (Repo 1) and it has no releases, so Release should read 0 and agree with what the repository's Releases tab, its RSS feed and its Tags page show.",
+      "actual": "The Summary table on Statistics reports Release = 1, while the only repository (eval/harbor-handbook) shows '0 Releases' on its Releases tab, its releases RSS feed has no items, and its tag v1.0.0 offers 'New Release' (no release attached). The admin page therefore reports a release that no view of the instance shows. Every other counter I cross-checked agrees with reality (Repo 1, User 3, Org 0, Branches 2, Issue 4 = IssueOpen 3 + IssueClosed 1, Label 2, Milestone 1, Tags 1, Watch 1, Star 0, PublicKey 0 with no SSH keys).",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Open /-/admin/monitor/stats and scroll down the Summary table: the row 'Release' shows 1 (row 'Tags' also shows 1, 'Repo' 1).",
+        "Open /eval/harbor-handbook/releases: the tab reads '0 Releases | 1 Tag' and the release list is empty.",
+        "Open /eval/harbor-handbook/releases.rss: the feed has no release item.",
+        "Open /eval/harbor-handbook/tags: the only tag v1.0.0 offers a 'New Release' action, i.e. no release is attached to it.",
+        "Reload /-/admin/monitor/stats: 'Release' still shows 1."
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Admin user search treats % and _ as SQL wildcards ('%' lists every account, '_lex' finds alex)",
+      "summary": "Both searches return the whole inventory: the header stays \\\"User Account Management (Total: 3)\\\" and all three rows (alex, eval, maya) are listed, none of which contains % or _. The term is passed into the SQL LIKE pattern unescaped, so a user searching for these characters sees every account as if it matched. (on /-/admin/users)",
+      "expected": "No username or email contains a literal % or _, so the search should return no matching user and say so (the empty-result state), as it does for any other term that matches nothing.",
+      "actual": "Both searches return the whole inventory: the header stays \\\"User Account Management (Total: 3)\\\" and all three rows (alex, eval, maya) are listed, none of which contains % or _. The term is passed into the SQL LIKE pattern unescaped, so a user searching for these characters sees every account as if it matched.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /-/admin/users (Site Administration → Identity & Access → User Accounts). The header reads \"User Account Management (Total: 3)\" with rows alex, eval, maya.",
+        "Type % into the \"Search users...\" box and press Enter.",
+        "Observe the header total and the rows.",
+        "Repeat with _ in the same box and press Enter."
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Admin repository search treats % and _ as SQL wildcards and returns every repository",
+      "summary": "Searching for \"%\" returns Total: 1 with eval/harbor-handbook, and searching for \"_\" also returns Total: 1 with the same repo. The search value is passed into a LIKE pattern unescaped, so \"%\" and \"_\" behave as wildcards and match everything. (on /-/admin/repos)",
+      "expected": "A search for the literal text \"%\" or \"_\" should find no repository, because no repository name contains those characters — the page should show 'Total: 0' and 'No results found.', as it does for 'zzzznomatch'.",
+      "actual": "Searching for \"%\" returns Total: 1 with eval/harbor-handbook, and searching for \"_\" also returns Total: 1 with the same repo. The search value is passed into a LIKE pattern unescaped, so \"%\" and \"_\" behave as wildcards and match everything.",
+      "reproSteps": [
+        "Sign in as eval and open /-/admin/repos (Repository Management, Total: 1, one repo eval/harbor-handbook).",
+        "Type % into the 'Search repos...' box and press Enter (or click the magnifier button).",
+        "Observe: Repository Management (Total: 1) and the row eval/harbor-handbook is listed.",
+        "Repeat with a single underscore _ in the search box."
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Queue detail table on phone widths lists all labels first and all values after, detaching each value from its label",
+      "summary": "At 320px the table collapses into a single column: all captions are listed first (Name, Type, Exemplar Type, Number of Workers, Active Workers, Max Number of Workers, Number in Queue) and then all values in a separate block (notification-service, level, uinotification.issueNotificationOpts, 1, 0, 1, 0). The four numbers have no caption of their own, so a reader cannot tell which count is which, and the table cannot be scrolled sideways to restore the columns. (on /-/admin/monitor/queue/1)",
+      "expected": "The table keeps its two-column layout (or scrolls horizontally), so each value is shown next to its caption: Name=notification-service, Type=level, Exemplar Type=uinotification.issueNotificationOpts, Number of Workers=1, Active Workers=0, Max Number of Workers=1, Number in Queue=0.",
+      "actual": "At 320px the table collapses into a single column: all captions are listed first (Name, Type, Exemplar Type, Number of Workers, Active Workers, Max Number of Workers, Number in Queue) and then all values in a separate block (notification-service, level, uinotification.issueNotificationOpts, 1, 0, 1, 0). The four numbers have no caption of their own, so a reader cannot tell which count is which, and the table cannot be scrolled sideways to restore the columns.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and set the browser window to 320x480 CSS pixels.",
+        "Open https://5503-i4ts0quf2p9cd8sm9ts9s.e2b.app/-/admin/monitor/queue/1 (Queue: notification-service).",
+        "Scroll down to the panel titled \"Queue: notification-service\" and look at its table.",
+        "Try to scroll the table sideways (trackpad/mouse wheel horizontally over the table) to bring the columns back."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Running Processes header counts more processes than the tab lists (e.g. 74 claimed, 48 shown)",
+      "summary": "The header always claims more processes than the list shows: first load \\\"181 Goroutines, 89 Processes\\\" over 63 listed process entries; after a reload \\\"151 Goroutines, 74 Processes\\\" over 48 listed entries (the list visibly ends after the last entry, above the footer). Nobody can find the remaining 26 processes: they are counted but not listed. (on /-/admin/monitor/stacktrace?show=process)",
+      "expected": "The process number in the header equals the number of process entries listed on the page, so an administrator can see every running process the page claims to have.",
+      "actual": "The header always claims more processes than the list shows: first load \\\"181 Goroutines, 89 Processes\\\" over 63 listed process entries; after a reload \\\"151 Goroutines, 74 Processes\\\" over 48 listed entries (the list visibly ends after the last entry, above the footer). Nobody can find the remaining 26 processes: they are counted but not listed.",
+      "reproSteps": [
+        "Sign in as eval, open Site Administration and go to Monitoring -> Trace (or open /-/admin/monitor/stacktrace), then click the \"Running Processes\" tab (address /-/admin/monitor/stacktrace?show=process).",
+        "Read the grey header line above the list, e.g. \"151 Goroutines, 74 Processes\".",
+        "Scroll the list to its end and count the entries (each entry is one \"HTTP: ...\" line with a globe icon and a trash icon on the right): the list ends after 48 entries, directly above the page footer.",
+        "Reload the page and repeat: the header now reads e.g. \"181 Goroutines, 89 Processes\" while the list again has 26 entries fewer than the header claims."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "A long 'Open with' editor name overflows the clone menu and is cut off at the window edge",
+      "summary": "The \"Open with\" entry is rendered as one unbreakable line: the label runs out of the dropdown's right edge and is clipped by the window, so almost none of the editor name is readable. The rest of the menu (Clone, HTTPS/Tea CLI, Download ZIP/TAR.GZ/BUNDLE) is not affected. (on /eval/harbor-handbook (clone menu), set on /-/admin/config/settings)",
+      "expected": "The \"Open with\" menu item should stay inside the clone menu — the long name should wrap or be shortened with an ellipsis — so the menu is readable and its box is not overflowed.",
+      "actual": "The \"Open with\" entry is rendered as one unbreakable line: the label runs out of the dropdown's right edge and is clipped by the window, so almost none of the editor name is readable. The rest of the menu (Clone, HTTPS/Tea CLI, Download ZIP/TAR.GZ/BUNDLE) is not affected.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /-/admin/config/settings.",
+        "In the Repository group, put this one line in the \"Open with\" editors textarea: \"agent12-LongName-LoremIpsumDolorSitAmetConsecteturAdipiscingElitSedDoEiusmodTemporIncididuntUtLaboreEtDoloreMagnaAliquaUtEnimAdMinimVeniamQuisNostrudExercitationUllamcoLaborisNisiUtAliquipExEaCommodoConsequatDuisAuteIrureDolorInReprehenderitInVoluptateVelitEsseCillumDoloreEuFugiatNullaPariaturSintOccaecatCupidatat = agent12://open?url={url}\" and click Save.",
+        "Open /eval/harbor-handbook and click the \"Code\" button to open the clone menu.",
+        "Look at the \"Open with agent12-LongName-Lorem…\" item in the menu."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Confirming an organization deletion also sends a POST to .../settings/null that fails with 404",
+      "summary": "Two POSTs leave the page: one to /org/agent6-org-c/settings/delete (303, the real deletion) and one just before it to /org/agent6-org-c/settings/null, which the server answers 404 (\"Failed to load resource: the server responded with a status of 404\" in the console). The delete itself still goes through. Seen 3 times out of 3 (agent6-org-a, agent6-org-b, agent6-org-c). (on /org/{org}/settings/delete)",
+      "expected": "Confirming the deletion sends exactly one request, to the delete endpoint that the form names, with no failed request and no console error.",
+      "actual": "Two POSTs leave the page: one to /org/agent6-org-c/settings/delete (303, the real deletion) and one just before it to /org/agent6-org-c/settings/null, which the server answers 404 (\"Failed to load resource: the server responded with a status of 404\" in the console). The delete itself still goes through. Seen 3 times out of 3 (agent6-org-a, agent6-org-b, agent6-org-c).",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-iwf64r7qwvwmxm2zjk6v9.e2b.app/-/admin/orgs (this page's row action \"Edit\" and the New Organization page lead to the same flow).",
+        "Create an organization named agent6-org-c (New Organization → Organization Name agent6-org-c → Create Organization).",
+        "Open its settings: click the pencil in the organization's row on /-/admin/orgs, then \"Delete Organization\" in the left menu (address /org/agent6-org-c/settings/delete).",
+        "Type agent6-org-c into \"Organization Name\" and press \"Confirm Deletion\".",
+        "In the \"Delete Organization — This organization will be deleted permanently. Continue?\" dialog press \"Yes\", then read the network requests and the browser console for the action."
+      ],
+      "severity": 1
+    }
+  ]
+}

@@ -1,0 +1,252 @@
+{
+  "fixture": "twenty/areas/settings-data-model",
+  "run": 2,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 312,
+      "name": "Object Settings preview shows Lorem ipsum placeholder text instead of an empty state",
+      "summary": "The preview row under the object name shows the filler text 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum magna enim, dapibus non enim in, lacinia faucibus nunc. Sed interdum ante sed felis facilisis, eget ultricies neque molestie. Mauris auctor, justo eu volutpat cursus, libero erat tempus nulla, non sodales lorem lacus a est.', cut off with an ellipsis, next to a 'L' avatar letter. (on /settings/objects/agent1Widgets#settings)",
+      "expected": "The preview of the object's record should show a sample record label (e.g. the record label field's value) or a clear empty state, like the Companies object preview does with a real record name.",
+      "actual": "The preview row under the object name shows the filler text 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum magna enim, dapibus non enim in, lacinia faucibus nunc. Sed interdum ante sed felis facilisis, eget ultricies neque molestie. Mauris auctor, justo eu volutpat cursus, libero erat tempus nulla, non sodales lorem lacus a est.', cut off with an ellipsis, next to a 'L' avatar letter.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open Settings > Data model (/settings/objects).",
+        "Click 'Add object', fill Singular with 'agent1Widget', Plural with 'agent1Widgets' and click Save.",
+        "On the new object page open the 'Settings' tab (/settings/objects/agent1Widgets#settings).",
+        "Look at the 'Preview' card in the Options section."
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 548,
+      "name": "A navigation folder saved in Layout customization never appears in the workspace sidebar",
+      "summary": "The folder is saved (Settings > Layout 'Overview' Sidebar items went from 14 to 15, and reopening the Layout editor lists 'agent15 Folder' in its sidebar), but the workspace sidebar never shows it - not after Save, not after Cancel and not after a page reload. The only place the folder exists is inside the Layout customization editor. (on /settings/layout → Layout customization)",
+      "expected": "The folder 'agent15 Folder' created and saved in the Layout editor is shown in the workspace sidebar (as it was shown in the editor's sidebar before saving), and it also stays listed in the editor next time it is opened.",
+      "actual": "The folder is saved (Settings > Layout 'Overview' Sidebar items went from 14 to 15, and reopening the Layout editor lists 'agent15 Folder' in its sidebar), but the workspace sidebar never shows it - not after Save, not after Cancel and not after a page reload. The only place the folder exists is inside the Layout customization editor.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev and open Settings > Layout (/settings/layout).",
+        "Click the Customize button to open Layout customization.",
+        "In the left sidebar of the editor click '+ Add menu item', then in the right panel choose Other > Folder. A 'New folder' item appears in the editor sidebar.",
+        "Rename it to 'agent15 Folder' in the folder name field of the right panel.",
+        "Click Save in the blue 'Layout customization' bar at the top and wait for it to finish.",
+        "Click Cancel to leave the customization.",
+        "Reload the workspace (e.g. open /objects/companies) and look at the workspace sidebar."
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 563,
+      "name": "At phone width the object's Fields and Relations lists hide every field name and overlap the 'Name'/'Application' headings",
+      "summary": "Both lists render three columns squeezed into the width of two: the header reads 'Npplication' (the 'Name' and 'Application' headings overlap) and every row shows only the application badge ('Standard…') under Name, while the field/relation name itself ('Avatar', 'Emails', 'Nom', 'Entreprises', 'Opportunités' …) is not visible at all — it is collapsed to zero width. Only the type ('Text', 'Files', 'Belongs to one') is readable, so the user cannot tell which field or relation each row is. (on /settings/objects/people)",
+      "expected": "The Relations and Fields lists stay readable at 390 px: each row shows its name, and the column headings do not overlap.",
+      "actual": "Both lists render three columns squeezed into the width of two: the header reads 'Npplication' (the 'Name' and 'Application' headings overlap) and every row shows only the application badge ('Standard…') under Name, while the field/relation name itself ('Avatar', 'Emails', 'Nom', 'Entreprises', 'Opportunités' …) is not visible at all — it is collapsed to zero width. Only the type ('Text', 'Files', 'Belongs to one') is readable, so the user cannot tell which field or relation each row is.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev.",
+        "Set the viewport to 390 x 844 (phone).",
+        "Open /settings/objects/people (Settings > Data model > People).",
+        "Look at the 'Relations' and 'Fields' lists: read the column headings and the name column of each row."
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 597,
+      "name": "Escape does not close the \"Workspace Deletion\" dialog once text is typed in its confirmation field",
+      "summary": "The dialog stays open; Escape does nothing while the confirmation field holds text. It only closes with the \\\"Cancel\\\" button. Seen 3 of 3 times with text in the field. (on /settings/general)",
+      "expected": "Escape closes the dialog, as it does when the confirmation field is empty (verified: opening the dialog and pressing Escape with an empty field closes it).",
+      "actual": "The dialog stays open; Escape does nothing while the confirmation field holds text. It only closes with the \\\"Cancel\\\" button. Seen 3 of 3 times with text in the field.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open /settings/general",
+        "In the \"Danger zone\" section click the \"Delete workspace\" button; the \"Workspace Deletion\" dialog opens",
+        "Type wrong@example.com into the dialog's confirmation field (placeholder \"tim@apple.dev\")",
+        "Press the Escape key"
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 704,
+      "name": "Unknown Settings address (/settings/foo) renders a blank page with no message and no way back",
+      "summary": "The whole content pane right of the Settings navigation stays empty — no title, no breadcrumb, no error text, no spinner — and stays empty after 5 s and after a reload. Only the sidebar renders. (on /settings/foo)",
+      "expected": "The app shows a \"page not found\" message or redirects to a settings page, with the breadcrumb and title so the person can go on.",
+      "actual": "The whole content pane right of the Settings navigation stays empty — no title, no breadcrumb, no error text, no spinner — and stays empty after 5 s and after a reload. Only the sidebar renders.",
+      "reproSteps": [
+        "Sign in with tim@apple.dev / tim@apple.dev",
+        "Open https://5500-itdsz1qc0x1tnrxqhh3rc.e2b.app/settings/general",
+        "Change the address to https://5500-itdsz1qc0x1tnrxqhh3rc.e2b.app/settings/foo and press Enter",
+        "Wait 5 seconds (and reload once)"
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 722,
+      "name": "Data model object table is cut off at phone width - the Records column cannot be seen",
+      "summary": "At 390 px the object table is 520 px wide inside a 390 px viewport. The 'Fields' column header and its numbers are cut off at the right edge and the 'Records' column (with all record counts) is entirely off-screen with no horizontal way to reach it. The same happens to every row: e.g. 'Agent15 Flow Objects  Custom  11  [0 off-screen]'. (on /settings/objects)",
+      "expected": "At phone width the Objects table fits the screen: all four columns (Name, App, Fields, Records) are visible, or the table can be scrolled sideways to reach them, so a person can read the field and record counts of each object.",
+      "actual": "At 390 px the object table is 520 px wide inside a 390 px viewport. The 'Fields' column header and its numbers are cut off at the right edge and the 'Records' column (with all record counts) is entirely off-screen with no horizontal way to reach it. The same happens to every row: e.g. 'Agent15 Flow Objects  Custom  11  [0 off-screen]'.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev.",
+        "Set the browser to a phone size, 390 x 844.",
+        "Open Settings > Data model (/settings/objects).",
+        "Look at the object list under 'Objects' and read the columns after Name and App."
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 739,
+      "name": "Skills list shows a 'Type' column that is empty for every skill",
+      "summary": "Every row shows only the skill name; the Type column stays empty for all 15 skills (no text, chip or icon in that column anywhere in the list). The neighbouring Tools tab fills its \"App\" column with a \"Standard\" chip, so the column can render values. (on /settings/ai#skills)",
+      "expected": "Each skill's Type is shown in the Type column (or the column header is not shown when no skill has a type).",
+      "actual": "Every row shows only the skill name; the Type column stays empty for all 15 skills (no text, chip or icon in that column anywhere in the list). The neighbouring Tools tab fills its \"App\" column with a \"Standard\" chip, so the column can render values.",
+      "reproSteps": [
+        "Sign in with tim@apple.dev / tim@apple.dev",
+        "Open https://5500-itdsz1qc0x1tnrxqhh3rc.e2b.app/settings/ai",
+        "Click the Skills tab",
+        "Read the list: the 'Type' column header is there but every row is blank in that column"
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 990,
+      "name": "Clearing First Name makes the Last Name edit silently not save (no error shown)",
+      "summary": "Nothing is saved and nothing is said. After the reload the First Name is back to \\\"agent10Fast\\\" and the Last Name is back to the previous \\\"agent10Sent\\\": the user's Last Name edit is discarded silently, with no error message, no toast and no save indicator anywhere on the page. The same happens with a First Name made only of spaces. Observed twice out of two tries (First Name emptied + Last Name change lost both times). (on /settings/profile)",
+      "expected": "Either the page saves both names, or it refuses the empty First Name with a message next to the field (e.g. \"First name is required\"), keeps the typed Last Name change pending, and tells the user nothing was saved.",
+      "actual": "Nothing is saved and nothing is said. After the reload the First Name is back to \\\"agent10Fast\\\" and the Last Name is back to the previous \\\"agent10Sent\\\": the user's Last Name edit is discarded silently, with no error message, no toast and no save indicator anywhere on the page. The same happens with a First Name made only of spaces. Observed twice out of two tries (First Name emptied + Last Name change lost both times).",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev and open Settings > Profile (/settings/profile). The page currently shows First Name \"agent10Fast\", Last Name \"agent10Sent\".",
+        "Click the First Name field, select all and delete it so the field is empty (it shows the grey placeholder).",
+        "Click the Last Name field, select all and type \"agent10E2\".",
+        "Click the \"Picture\" heading so both fields lose focus; the Last Name field keeps showing \"agent10E2\".",
+        "Wait ~4 seconds, then reload the page.",
+        "Read the two fields after the reload."
+      ]
+    },
+    {
+      "index": 8,
+      "reported_at_seconds": 1031,
+      "name": "Skills list sorted by \"Name\" puts \"Word Documents\" between \"Data Manipulation\" and \"Metadata Building\"",
+      "summary": "\"Word Documents\" is listed between \"Data Manipulation\" and \"Metadata Building\", and \"Excel & Spreadsheets\" is last in ascending / first in descending, although W > M and E < M. The sort does not follow the names it displays; it appears to sort on a hidden field. I created a skill of my own (\"agent8-skill-alpha\") and it was placed correctly, so only these two seeded rows are affected. Reproduced on every fresh load of the Skills tab (dark and light theme). (on /settings/ai#skills)",
+      "expected": "With the ascending arrow on the Name column the skills are in alphabetical order by the names shown: ... Data Manipulation, Excel & Spreadsheets, Metadata Building, ... Word Documents, Workflow Building, Workspace Demo Seeding (and reversed when the arrow points down).",
+      "actual": "\"Word Documents\" is listed between \"Data Manipulation\" and \"Metadata Building\", and \"Excel & Spreadsheets\" is last in ascending / first in descending, although W > M and E < M. The sort does not follow the names it displays; it appears to sort on a hidden field. I created a skill of my own (\"agent8-skill-alpha\") and it was placed correctly, so only these two seeded rows are affected. Reproduced on every fresh load of the Skills tab (dark and light theme).",
+      "reproSteps": [
+        "Sign in as tim@apple.dev, open Settings > AI and click the Skills tab (or open /settings/ai#skills).",
+        "The Name column header shows the ascending arrow (Name ↑).",
+        "Read the list from top to bottom: Code Interpreter, Custom Objects Cleanup, Dashboard Building, Data Manipulation, Word Documents, Metadata Building, PDF Processing, PowerPoint, Research, View Building, View Filters & Sorts, Workflow Building, Workspace Demo Seeding, Excel & Spreadsheets.",
+        "Click the Name header to switch to descending and read the list again: it is exactly the reverse, so the same two rows are out of place in both directions."
+      ]
+    },
+    {
+      "index": 9,
+      "reported_at_seconds": 1033,
+      "name": "API key \"Role\" field looks like a dropdown but does nothing, so the role can never be chosen",
+      "summary": "Nothing happens when the Role field or its chevron is clicked, on both the create form and the key detail page; no menu opens and the value stays \\\"Admin\\\". The neighbouring \\\"Expiration Date\\\" field, which looks the same, does open its option list (30 days / 90 days / 1 year / 2 years / Never). So an API key is always created with the Admin role and the promised role selection is unusable. (on /settings/mcp-apis/apis/new (and /settings/mcp-apis/apis/<key id>))",
+      "expected": "Clicking the Role field opens a dropdown of user roles (as the helper text instructs and as the identical Expiration Date field does), so the key's permissions can be chosen.",
+      "actual": "Nothing happens when the Role field or its chevron is clicked, on both the create form and the key detail page; no menu opens and the value stays \\\"Admin\\\". The neighbouring \\\"Expiration Date\\\" field, which looks the same, does open its option list (30 days / 90 days / 1 year / 2 years / Never). So an API key is always created with the Admin role and the promised role selection is unusable.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open Settings > MCP & APIs.",
+        "Open the API tab and click \"Create API key\".",
+        "On the \"New key\" page, read the Role section: the helper text says \"What this API can do: Select a user role to define its permissions.\" and the field shows \"Admin\" with a chevron, exactly like the \"Expiration Date\" field below it.",
+        "Click the Role field (the \"Admin\" text) and then the chevron at its right end.",
+        "For comparison click the \"Expiration Date\" field (\"Never\") below it.",
+        "Then open an existing key (e.g. agent9-key-one at /settings/mcp-apis/apis/2afb0eae-2840-4c2e-8d5d-696fe7de3147) and click its Role field too."
+      ]
+    },
+    {
+      "index": 10,
+      "reported_at_seconds": 1085,
+      "name": "Webhook \\\"Remove filter\\\" leaves an empty, unremovable filter row and silently blocks Save",
+      "summary": "The \\\"All Objects\\\" row is emptied in place: it turns into \\\"Select entity\\\" + \\\"All\\\" with no trash icon, Save becomes disabled (the form is treated as invalid), and there is no remove control left to delete that leftover row and no error message explaining what is missing. Saving the webhook is impossible until the user finds the hidden step of picking an entity again in the dropdown. (on /settings/mcp-apis/webhooks/new)",
+      "expected": "\\\"Remove filter\\\" removes that filter row, the remaining form stays valid (the endpoint URL is filled), and Save stays enabled so the webhook can be created.",
+      "actual": "The \\\"All Objects\\\" row is emptied in place: it turns into \\\"Select entity\\\" + \\\"All\\\" with no trash icon, Save becomes disabled (the form is treated as invalid), and there is no remove control left to delete that leftover row and no error message explaining what is missing. Saving the webhook is impossible until the user finds the hidden step of picking an entity again in the dropdown.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev, open Settings > MCP & APIs, open the Webhooks tab and click \"Create webhook\".",
+        "Type https://example.com/agent9-hook3 in \"Endpoint URL\" — the top-right \"Save\" button becomes enabled.",
+        "In the Filters section, click the trash button (\"Remove filter\") at the right of the row showing \"All Objects\" / \"All\".",
+        "Look at the Filters section and at the top-right \"Save\" button (its disabled state can be confirmed: clicking it does nothing)."
+      ]
+    },
+    {
+      "index": 11,
+      "reported_at_seconds": 1090,
+      "name": "Webhook form: the Description helper text is a copy of the Endpoint URL helper text",
+      "summary": "The Description field's helper line reads \\\"We will send a POST request to this endpoint for each new event in application/json format.\\\" — the same sentence, copied word for word, as the Endpoint URL helper above it. It says nothing about what the Description is for and reads as a copy-paste mistake. (on /settings/mcp-apis/webhooks/new (and any webhook record page))",
+      "expected": "A helper text that describes the Description field (or none), not a duplicate of the Endpoint URL explanation.",
+      "actual": "The Description field's helper line reads \\\"We will send a POST request to this endpoint for each new event in application/json format.\\\" — the same sentence, copied word for word, as the Endpoint URL helper above it. It says nothing about what the Description is for and reads as a copy-paste mistake.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev, open Settings > MCP & APIs, open the Webhooks tab and click \"Create webhook\" (or open an existing webhook record, e.g. /settings/mcp-apis/webhooks/41b98a08-5021-4ccc-9067-f62dc6888056).",
+        "Read the text under the \"Endpoint URL\" heading and then the text under the \"Description\" heading."
+      ]
+    },
+    {
+      "index": 12,
+      "reported_at_seconds": 1123,
+      "name": "\\\"Default model\\\" section shows Smart Model and Fast Model with no indication of which is the default and neither can be selected",
+      "summary": "Both models are plain, unclickable rows: no radio button, checkmark, highlight or \"Default\" badge marks which one is in use, and clicking anywhere on the \"Fast Model\" row or its text changes nothing (no selection, no request, no toast). Reproduced on a fresh load and twice by clicking. Because the write-up of each model is a description (\"Used for chats, agents, and complex reasoning\"), the section cannot be read either as a choice or as a statement of the current default. (on /settings/ai#models)",
+      "expected": "The \"Default model\" section shows which model is currently the workspace default (a selected/checked state on one of the two) and lets the person pick the other one.",
+      "actual": "Both models are plain, unclickable rows: no radio button, checkmark, highlight or \"Default\" badge marks which one is in use, and clicking anywhere on the \"Fast Model\" row or its text changes nothing (no selection, no request, no toast). Reproduced on a fresh load and twice by clicking. Because the write-up of each model is a description (\"Used for chats, agents, and complex reasoning\"), the section cannot be read either as a choice or as a statement of the current default.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open Settings > AI (/settings/ai).",
+        "Click the Models tab (/settings/ai#models).",
+        "Look at the \"Default model\" section (subtitle: \"The default AI model used for chats, agents, and workflows\").",
+        "Click the \"Fast Model\" row, then its text: nothing is selected or highlighted."
+      ]
+    },
+    {
+      "index": 13,
+      "reported_at_seconds": 1127,
+      "name": "Data model Overview diagram is unreadable at phone width (nodes clipped, labels truncated)",
+      "summary": "The diagram is not readable. At 390 px the whole graph is squeezed into a narrow strip at the right edge of the canvas — most node cards are cut by the right edge and every label is truncated to shapes like \\\"Tr\\\", \\\"Workflow 2\\\", \\\"AAM Mod\\\", \\\"AAM Fixed Fie…\\\" — while the rest of the canvas to the left is empty; the page offers no way to bring the hidden part into view (no scrollbar, no fit-to-screen). At 1280x720 the same page opens with the cards piled on top of each other and the top row cut off under the page header, so object names and their field lists cannot be read either. (on /settings/objects/overview)",
+      "expected": "The Overview diagram fits the available width (or can be panned/scrolled and fitted) so that each object card and its label is on screen and readable at 390, 768 and 1280 px.",
+      "actual": "The diagram is not readable. At 390 px the whole graph is squeezed into a narrow strip at the right edge of the canvas — most node cards are cut by the right edge and every label is truncated to shapes like \\\"Tr\\\", \\\"Workflow 2\\\", \\\"AAM Mod\\\", \\\"AAM Fixed Fie…\\\" — while the rest of the canvas to the left is empty; the page offers no way to bring the hidden part into view (no scrollbar, no fit-to-screen). At 1280x720 the same page opens with the cards piled on top of each other and the top row cut off under the page header, so object names and their field lists cannot be read either.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev.",
+        "Open Settings > Data model, then the Overview entry (/settings/objects/overview) at 1280x720: the object cards overlap and the top of the graph is cut off under the page header.",
+        "Set the browser to a phone width (390x844) with the same page open and look at the canvas.",
+        "Observe that the graph is squeezed into a narrow strip at the right edge: nodes are cut off by the right edge and labels are truncated, with the canvas empty to the left."
+      ]
+    },
+    {
+      "index": 14,
+      "reported_at_seconds": 1332,
+      "name": "Admin Panel contradicts itself on the app version and calls an outdated instance \"Up to date\"",
+      "summary": "The two sub-tabs disagree. General > About lists \"Current version v2.26.1\" and \"Latest version v2.62.2\". Health > Upgrade Status lists \"Inferred version 2.26.0\" (a different current version) and reports both \"Instance status: Up to date\" and \"Workspaces status: Up to date\", although the latest version shown on General is v2.62.2 while the running one is v2.26.x. (on /settings/admin-panel)",
+      "expected": "One and the same current version on both sub-tabs, and an instance that is dozens of versions behind the \"Latest version\" is not reported as \"Up to date\".",
+      "actual": "The two sub-tabs disagree. General > About lists \"Current version v2.26.1\" and \"Latest version v2.62.2\". Health > Upgrade Status lists \"Inferred version 2.26.0\" (a different current version) and reports both \"Instance status: Up to date\" and \"Workspaces status: Up to date\", although the latest version shown on General is v2.62.2 while the running one is v2.26.x.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev.",
+        "Open Settings > Admin Panel (address https://5500-itdsz1qc0x1tnrxqhh3rc.e2b.app/settings/admin-panel).",
+        "On the General tab read the About block: Current version v2.26.1, Latest version v2.62.2.",
+        "Click the Health tab and read Upgrade Status: Inferred version 2.26.0, Instance status Up to date, Workspaces status Up to date."
+      ]
+    },
+    {
+      "index": 15,
+      "reported_at_seconds": 1491,
+      "name": "API key expiration chosen as \\\"30 days\\\" is shown as \\\"Expires in 29 days\\\" right after saving",
+      "summary": "Immediately after saving, the key's page shows \\\"Expires in 29 days\\\" for the \\\"30 days\\\" choice and \\\"Expires in 89 days\\\" for the \\\"90 days\\\" choice (and the API tab list shows the same \\\"In 29 days\\\"), always one day short of what was chosen. (on /settings/mcp-apis/apis/new (result on /settings/mcp-apis/apis/<key id> and the API tab list))",
+      "expected": "A key created with the \\\"30 days\\\" expiration reports 30 days of validity (\\\"Expires in 30 days\\\"), and the list column agrees with the chosen option.",
+      "actual": "Immediately after saving, the key's page shows \\\"Expires in 29 days\\\" for the \\\"30 days\\\" choice and \\\"Expires in 89 days\\\" for the \\\"90 days\\\" choice (and the API tab list shows the same \\\"In 29 days\\\"), always one day short of what was chosen.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open Settings > MCP & APIs > API tab > \"Create API key\".",
+        "Type a name (e.g. agent9-exp30) in \"Name\".",
+        "Open the \"Expiration Date\" field (showing \"Never\") and choose \"30 days\".",
+        "Click \"Save\" and read the \"Expiration\" field of the key that was created: it says \"Expires in 29 days\" (the API tab list shows \"In 29 days\" for the same key).",
+        "Repeat with a new key and the \"90 days\" option: the saved key says \"Expires in 89 days\"."
+      ]
+    },
+    {
+      "index": 16,
+      "reported_at_seconds": 1546,
+      "name": "Layout Link nav item accepts \"not a url\" and the saved sidebar link opens a blank error page",
+      "summary": "The value is accepted without any validation or error, is saved into the workspace layout, and the new sidebar item \"agent12-Link\" appears (with a broken icon, after a failed https://twenty-icons.com/not%20a%20url request). Clicking that sidebar item opens a new tab that dies on a blank browser error page (chrome-error://chromewebdata, no content) — a dead nav item the person cannot get anything from. (on /objects/companies (Settings > Layout > Customize layout, new Link nav item))",
+      "expected": "The URL field validates its value (\"not a url\" is refused with a message next to the field, or normalised), and a saved Link nav item opens a real page rather than an error.",
+      "actual": "The value is accepted without any validation or error, is saved into the workspace layout, and the new sidebar item \"agent12-Link\" appears (with a broken icon, after a failed https://twenty-icons.com/not%20a%20url request). Clicking that sidebar item opens a new tab that dies on a blank browser error page (chrome-error://chromewebdata, no content) — a dead nav item the person cannot get anything from.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev, open Settings > Layout (/settings/layout) and click 'Customize' on the 'Customize layout' card (the app opens /objects/companies in Layout customization mode)",
+        "Click 'Add menu item' at the bottom of the left sidebar list, then in the 'New menu item' side panel click 'Link'",
+        "In the side panel set the label to 'agent12-Link' and replace the prefilled URL (https://www.example.com) with 'not a url' — no validation message appears",
+        "Click 'Save' in the top bar",
+        "Click the new 'agent12-Link' item at the bottom of the workspace sidebar"
+      ]
+    }
+  ]
+}

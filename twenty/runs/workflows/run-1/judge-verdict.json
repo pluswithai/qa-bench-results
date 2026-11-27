@@ -1,0 +1,247 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "twenty/areas/workflows",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "dfa253bb812141eb426e106fcf8dd61ff3995cc8e242d67029f7ac4c3dd81972",
+    "known_invalid_sha256": "5e7445e22776cbb32d97624bc512753b29c1806214d83e13d3450f5f181f2a5b",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "136",
+    "bugs": "15",
+    "flags": "0",
+    "known_hits": "5",
+    "extra_known_hits": "0",
+    "unverified": "6",
+    "outside_area_known_hits": "2",
+    "outside_area_known_invalid": "0",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "1",
+    "outside_area_ground_truth_sha256": "f3456299419b269b88f0ddc32ec53ab80fbf3ec14a32ac6ae1366aa22bd3a43a",
+    "outside_area_known_invalid_sha256": "e51afd4a5be9203d46a29a1087513447454829f8cacf9feb7379d606574f27e1",
+    "duplicates": "0",
+    "duplicate_known_hits": "0",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "2",
+    "known_misses": "2",
+    "precision": "0.7142857142857143",
+    "recall": "0.03676470588235294",
+    "findings_per_minute": "0.5274870575189471",
+    "correct_findings_per_minute": "0.17582901917298235",
+    "severity_1": "2",
+    "severity_3": "3",
+    "severity_5": "0",
+    "severity_sum": "11",
+    "score": "9",
+    "duration_seconds": "1706.203",
+    "partial": "false",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 53,
+        "reproStepsIndex": 0,
+        "findingIndex": 1,
+        "reason": "Matches the workflow graph becoming invisible after narrowing the editor to mobile. The node coordinates provide evidence that the graph is displaced rather than deleted."
+      },
+      {
+        "groundTruthIndex": 58,
+        "reproStepsIndex": 0,
+        "findingIndex": 5,
+        "reason": "Matches creation-page reload opening an empty name editor and a subsequent canvas click committing that empty value over the saved name."
+      },
+      {
+        "groundTruthIndex": 5,
+        "reproStepsIndex": 0,
+        "findingIndex": 7,
+        "reason": "Matches initial See Runs navigation from a version record omitting version scope and, in the unscoped variant, showing unrelated workflows' runs."
+      },
+      {
+        "groundTruthIndex": 6,
+        "reproStepsIndex": null,
+        "findingIndex": 12,
+        "reason": "Matches restored drafts showing blank list Statuses while the editor and version remain Draft. This uses detail-page Delete and Restore rather than the reference's bulk table flow; creator attribution is a separate secondary observation."
+      },
+      {
+        "groundTruthIndex": 41,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Matches workflow commands disappearing after resizing from desktop to tablet. The broader claim that commands cannot be used is less supported because command-menu search was not tested."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 52,
+        "reproStepsIndex": 0,
+        "findingIndex": 11,
+        "reason": "Matches the intentionally prohibited initial-draft deletion and its explanatory error. Omitting the trigger does not change the initial-version restriction."
+      },
+      {
+        "knownInvalidIndex": 54,
+        "reproStepsIndex": 0,
+        "findingIndex": 6,
+        "reason": "Matches the rejected negative-Delay claim: a negative duration saves, then execution rejects it with Invalid Configuration. Days versus Seconds does not change the failure."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 2,
+        "reason": "No reference covers Name Contains interpreting percent and underscore as wildcards. The plain-text control and listed nonmatching results clearly describe the claim."
+      },
+      {
+        "findingIndex": 3,
+        "reason": "No reference covers nonexistent or malformed workflow URLs rendering an empty editor. The accepted blank-editor bugs require restoration or viewport resizing instead."
+      },
+      {
+        "findingIndex": 4,
+        "reason": "No reference covers the Workflow Versions record-sort direction selector being ineffective. Saved group ordering and Search Records action sorting are different behaviors."
+      },
+      {
+        "findingIndex": 8,
+        "reason": "No reference establishes hour 25 saving without validation and activating successfully. Rejected per-keystroke hour edits and fractional schedules left Active after activation errors describe different outcomes; saved hour 25 is not verified by reload here."
+      },
+      {
+        "findingIndex": 9,
+        "reason": "No reference covers automatic cancellation or reuse of abandoned Form tests. These runs await unsubmitted answers, unlike the accepted stale-status bugs involving completed runs."
+      },
+      {
+        "findingIndex": 10,
+        "reason": "No reference covers Favorites retaining a workflow's old name after a successful rename. Two rename attempts and a reload make the display inconsistency clear."
+      },
+      {
+        "findingIndex": 13,
+        "reason": "No reference covers oversized workflow-name tooltips. The long-label Form settings defect concerns a different component and failure."
+      },
+      {
+        "findingIndex": 14,
+        "reason": "No reference covers the Version trigger field displaying inaccessible, clipped serialized configuration."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "The filter returns incorrect matching records."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 5,
+        "reason": "The addressed page renders as an unusable blank editor without a proper not-found state."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 3,
+        "reason": "Choosing Descending fails to change the sort, while an alternative control works."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 3,
+        "reason": "The described workflow test fails rather than executing its remaining actions."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 3,
+        "reason": "The finding claims invalid schedule configuration is accepted and activated."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 3,
+        "reason": "The claimed impact is persistent orphaned runs and repeated creation of additional pending runs."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 1,
+        "reason": "The demonstrated defect is a stale navigation label, not a failed rename or wrong navigation target."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 3,
+        "reason": "The offered Discard Draft action rejects the operation and leaves the draft unchanged."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 1,
+        "reason": "The tooltip temporarily obscures content and disappears when the pointer moves away."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 1,
+        "reason": "This is a configuration-field presentation and readability defect, not a raw error dump."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [
+      {
+        "findingIndex": 2,
+        "reference": {
+          "name": "Text Contains filters interpret literal percent and underscore as SQL wildcards",
+          "summary": "Ordinary UI Contains and Does not contain filters interpret typed percent and underscore as SQL wildcard syntax, including records without the typed punctuation or excluding them incorrectly.",
+          "expected": "The UI text operators should match the entered text literally, case-insensitively, rather than expose undocumented SQL wildcard syntax. This expectation concerns conversion of UI values; raw API pattern operators retain their intended wildcard semantics.",
+          "actual": "Name Contains QA% matches QA Alpha and QA Beta although neither name contains a percent sign. Job Title Does not contain 50% excludes a person whose title is 50 off, without a percent sign. Underscore also acts as a one-character wildcard. Ordinary-text controls return the expected records.",
+          "reproSteps": [
+            [
+              "Create fresh People with a unique common name prefix, for example QA Alpha and QA Beta, with neither name containing a percent sign.",
+              "Apply Name > Contains > QA%. Observe names lacking the literal percent sign still included. Compare an ordinary matching prefix and a nonexistent prefix.",
+              "Give a fresh person Job Title 50 off, without a percent sign. Apply Job Title > Does not contain > 50%. Observe the person incorrectly excluded despite not containing that literal text.",
+              "Compare a record actually containing a percent sign and ordinary-text filters. Repeat on fresh data; saving and reloading the filtered view retains the pattern behavior.",
+              "For underscore, compare names differing by one character and apply a Contains value with an underscore in that position; observe the underscore acts as a wildcard rather than requiring the character."
+            ]
+          ],
+          "severity": 3
+        },
+        "reason": "Matches literal percent and underscore being interpreted as wildcards in text Contains filters. The workflow object is an insignificant variation of the same filtering path."
+      },
+      {
+        "findingIndex": 10,
+        "reference": {
+          "name": "Renaming a favorited record leaves its sidebar label and tooltip stale across reloads",
+          "summary": "A completed record rename does not refresh the favorite’s cached sidebar label or tooltip, including after ordinary reload.",
+          "expected": "A favorite should display the current saved record name after renaming and reload, while continuing to navigate to that record.",
+          "actual": "Record header, breadcrumb and index display the saved new name, but the expanded sidebar favorite and collapsed tooltip retain the old name across reloads. Clicking the favorite still opens the correct record.",
+          "reproSteps": [
+            [
+              "Create a fresh Task with a distinctive title and add it to Favorites.",
+              "Rename the Task and wait for saving to complete. Confirm its header, breadcrumb and index show the new title.",
+              "Compare the favorite’s expanded sidebar label and collapsed-sidebar tooltip; both still show the old title.",
+              "Reload and observe the stale favorite name persists while the record title remains correctly saved.",
+              "Controls: favorite a record only after renaming to get the correct label; remove and re-add the affected favorite or clear the disposable browser metadata cache and reload to recover."
+            ]
+          ],
+          "severity": 1
+        },
+        "reason": "Matches a favorited record retaining its old sidebar name after a completed rename and reload. Renaming a Workflow instead of a Task reaches the same failure."
+      }
+    ],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

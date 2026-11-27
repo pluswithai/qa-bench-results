@@ -1,0 +1,404 @@
+{
+  "area": "wiki",
+  "reviewer": "Claude Fable 5.2",
+  "bugs": [
+    {
+      "id": "wiki-1",
+      "title": "ArrowDown in the wiki \"Filter page...\" box empties the box but the page list stays filtered",
+      "findings": [
+        "run1-02",
+        "run3-12"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "Both runs show the typed query (\"beta\" / \"agent\") vanish from the filter box after one ArrowDown while the list stays narrowed to the old matches, so the box and the list disagree and the typed input is lost. Nothing in the wiki template or source makes this deliberate.",
+      "evidence": [
+        "run1-02/shot-3.png",
+        "run1-02/shot-4.png",
+        "run3-12/shot-3.png",
+        "run3-12/shot-4.png"
+      ],
+      "source": [
+        "templates/repo/wiki/view.tmpl (ui floating filter dropdown, input name=search)"
+      ]
+    },
+    {
+      "id": "wiki-2",
+      "title": "Commit diff summary counts ignore the whitespace option, so they contradict the diff shown",
+      "findings": [
+        "run1-03",
+        "run3-07"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "The summary says \"6 additions and 3 deletions\" above a diff with 5 added and 2 removed lines, and \"1 additions and 1 deletions\" above an empty diff. The source computes the summary without the whitespace flag (commit.go calls GetDiffShortStat with no whitespace option) while the diff itself gets WhitespaceBehavior, so the mismatch is an omission, not a choice.",
+      "evidence": [
+        "run1-03/shot-2.png",
+        "run3-07/shot-4.png",
+        "run3-07/shot-5.png"
+      ],
+      "source": [
+        "routers/web/repo/commit.go (lines 326, 332, 398)",
+        "services/gitdiff/gitdiff.go (GetDiffShortStat, line 1321-1335)",
+        "modules/git/repo_compare.go (GetDiffShortStatByCmdArgs)"
+      ]
+    },
+    {
+      "id": "wiki-3",
+      "title": "A long unbroken page name stretches the wiki Pages list past the viewport and pushes \"Last updated\" off-screen",
+      "findings": [
+        "run1-06",
+        "run2-08",
+        "run3-05"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "One long page name widens the Pages table to about 1,900 px at a 1,280 px window (and past 768 px on tablet); the whole page scrolls sideways and the \"Last updated\" column is squeezed to one word per line. The wiki CSS has no wrap or truncation rule for .wiki-pages-list cells.",
+      "evidence": [
+        "run1-06/shot-3.png",
+        "run2-08/shot-4.png",
+        "run3-05/shot-5.png"
+      ],
+      "source": [
+        "templates/repo/wiki/pages.tmpl",
+        "web_src/css/repo/wiki.css (.wiki-pages-list rules)"
+      ]
+    },
+    {
+      "id": "wiki-4",
+      "title": "Table of Contents shows raw HTML tags of a heading (<b>bold heading</b>) instead of its text",
+      "findings": [
+        "run1-07"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "The heading renders as bold text but its Table of Contents entry shows the literal markup \"<b>bold heading</b>\". The TOC text comes from the deprecated v.Text() call (marked nolint) which keeps inline HTML, so it is an unintended leak.",
+      "evidence": [
+        "run1-07/shot-2.png"
+      ],
+      "source": [
+        "modules/markup/markdown/transform_heading.go (txt := v.Text(reader.Source()) //nolint:staticcheck)",
+        "modules/markup/markdown/toc.go"
+      ]
+    },
+    {
+      "id": "wiki-5",
+      "title": "_Sidebar box drops out of the right column when the page body is shorter than the Table of Contents (seen at 768 px)",
+      "findings": [
+        "run2-13"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "At 768 px the Navigation (_Sidebar) box is drawn to the left of the Table of Contents, hanging under the content card instead of under the TOC in the right column. The TOC and the sidebar are both float:right with no clear, so a short body lets the second float slide beside the first.",
+      "evidence": [
+        "run2-13/shot-1.png",
+        "run2-13/shot-3.png"
+      ],
+      "source": [
+        "templates/repo/wiki/view.tmpl (wiki-content-toc, wiki-content-main, wiki-content-sidebar order)",
+        "web_src/css/repo/wiki.css (.wiki-content-main.with-sidebar float:left, .wiki-content-sidebar float:right)"
+      ]
+    },
+    {
+      "id": "wiki-6",
+      "title": "RSS feed item titles carry escaped HTML link markup instead of plain text",
+      "findings": [
+        "run2-17"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "Every <title> in /eval/harbor-handbook.rss contains an escaped anchor, e.g. \"eval commented on issue &lt;a href=...&gt;eval/harbor-handbook#4&lt;/a&gt;\", which plain-text title readers show literally. The source builds the title from HTML locale strings and carries a TODO saying the text/HTML mix \"seems quite strange (maybe not right)\".",
+      "evidence": [
+        "run2-17/shot-2.png"
+      ],
+      "source": [
+        "routers/web/feed/convert.go (TODO at line 71, Title at line 244)",
+        "options/locale/locale_en-US.ini (action.comment_issue, action.commit_repo)"
+      ]
+    },
+    {
+      "id": "wiki-7",
+      "title": "A note made only of spaces saves a wiki revision with a blank commit message",
+      "findings": [
+        "run2-20"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "The revision list shows an empty Message cell for the newest commit, while an empty note gets \"Update agent6-mobile-renamed\". The handler only tests len(form.Message) == 0 without trimming, so a whitespace note skips the default message.",
+      "evidence": [
+        "run2-20/shot-3.png"
+      ],
+      "source": [
+        "routers/web/repo/wiki.go (lines 781-783 and 833-835)",
+        "services/forms/repo_form.go (NewWikiForm.Message)"
+      ]
+    },
+    {
+      "id": "wiki-8",
+      "title": "Deleting a wiki page that was already deleted in another tab answers 500 and gives the user no message",
+      "findings": [
+        "run3-14"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "After \"Yes\" the stale tab stays exactly as it was, with no message. The source confirms the cause: DeleteWikiPage returns os.ErrNotExist for a missing page, the handler turns it into ctx.ServerError (500), and the delete button script only acts on response.ok.",
+      "evidence": [
+        "run3-14/shot-2.png",
+        "run3-14/shot-3.png",
+        "run3-14/frame-6.jpg"
+      ],
+      "source": [
+        "routers/web/repo/wiki.go (DeleteWikiPagePost, lines 847-860)",
+        "services/wiki/wiki.go (DeleteWikiPage, return os.ErrNotExist at line 300)",
+        "web_src/js/features/common-button.ts (lines 67-69)"
+      ]
+    },
+    {
+      "id": "wiki-9",
+      "title": "Escape on the editor's table-size popup raises a JavaScript error banner and does not close the popup",
+      "findings": [
+        "run3-06"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "One screenshot shows a real red \"JavaScript error: Cannot read properties of null (reading 'classList')\" banner from easymde.js, but the reproduction video follows the written steps on a fresh page, presses Escape repeatedly and never shows the banner (the popup just stays open). The easymde chunk only loads after switching to the legacy editor, so the steps miss a precondition: a human should open New Page, switch to the legacy editor (try its fullscreen button), switch back, then open the table popup and press Escape to see whether the banner appears.",
+      "evidence": [
+        "run3-06/shot-3.png",
+        "run3-06/frame-6.jpg",
+        "run3-06/video.webm"
+      ],
+      "source": [
+        "web_src/js/features/comp/ComboMarkdownEditor.ts (switchToEasyMDE lazy import, line 326)"
+      ],
+      "fable": {
+        "verdict": "unsure",
+        "severity": null
+      },
+      "override_reason": "Not reproduced: the error banner appears only in one hunter screenshot; the reproduction video following the reported steps shows no banner, and the owner did not see it either.",
+      "override_by": "owner review 2026-11-24",
+      "rejection_kind": "false-positive",
+      "rejection_note": "not reproduced: the reproduction video and the owner's check show no error"
+    },
+    {
+      "id": "wiki-10",
+      "title": "Home page's \"Glossary\" link opens the Pages list because no Glossary page exists",
+      "findings": [
+        "run1-01"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "The dead link is page content written by an author, not app behaviour, and Gitea deliberately redirects any missing wiki page to the Pages list (if noEntry, ctx.Redirect to /wiki/?action=_pages).",
+      "evidence": [
+        "run1-01/shot-1.png",
+        "run1-01/frame-6.jpg"
+      ],
+      "source": [
+        "routers/web/repo/wiki.go (lines 243-246)"
+      ],
+      "rejection_kind": "product-decision",
+      "rejection_note": "behaviour is deliberate in Gitea 1.24.7 (see reason and source)"
+    },
+    {
+      "id": "wiki-11",
+      "title": "\"View original Git file\" (.md) link on the Pages list opens the rendered page, not raw Markdown",
+      "findings": [
+        "run1-15",
+        "run2-12"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "The link is deliberate: it opens the same page addressed by its real Git file name instead of the friendly name (href is GitEntryName, and a *.md web path is used \"directly as GitPath\"), and the page handler renders it. The tooltip's wording is loose, but it contrasts with \"friendly link\", so it is about the address, not a raw view.",
+      "evidence": [
+        "run2-12/shot-1.png",
+        "run2-12/shot-2.png"
+      ],
+      "source": [
+        "templates/repo/wiki/pages.tmpl (a.wiki-git-entry)",
+        "services/wiki/wiki_path.go (header comment, WebPathToGitPath)",
+        "options/locale/locale_en-US.ini (wiki.original_git_entry_tooltip)"
+      ],
+      "rejection_kind": "product-decision",
+      "rejection_note": "behaviour is deliberate in Gitea 1.24.7 (see reason and source)"
+    },
+    {
+      "id": "wiki-12",
+      "title": "The \"Aa\" monospace toggle in the wiki editor changes nothing visible",
+      "findings": [
+        "run1-17"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "The evidence shows the opposite: the same text is monospace before the click and proportional after it (shot-1 vs shot-2, frame-3 vs frame-5). The missing accessible name is not shown either, since Gitea copies the tooltip text into aria-label.",
+      "evidence": [
+        "run1-17/shot-1.png",
+        "run1-17/shot-2.png",
+        "run1-17/frame-3.jpg",
+        "run1-17/frame-5.jpg"
+      ],
+      "source": [
+        "web_src/js/features/comp/ComboMarkdownEditor.ts (lines 145-157)",
+        "web_src/js/modules/tippy.ts (lines 132-140)"
+      ],
+      "rejection_kind": "false-positive",
+      "rejection_note": "evidence contradicts the claim (the font does change)"
+    },
+    {
+      "id": "wiki-13",
+      "title": "Relative links and image paths on a page with a slash in its title resolve against the wiki root",
+      "findings": [
+        "run1-18",
+        "run1-21"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Gitea 1.24 wikis have no sub-directories: a slash in a title is stored as %2F in one root-level file, and the link resolver states the path options are unused \"because Wiki doesn't support sub-path\". Resolving every relative link from the wiki root is therefore the designed behaviour.",
+      "evidence": [
+        "run1-18/shot-2.png",
+        "run1-21/shot-2.png"
+      ],
+      "source": [
+        "services/wiki/wiki_path.go (TODO: support subdirectory; UserTitleToWebPath; WebPathFromRequest)",
+        "models/renderhelper/repo_wiki.go (ResolveLink, RepoWikiOptions comment)"
+      ],
+      "rejection_kind": "product-decision",
+      "rejection_note": "behaviour is deliberate in Gitea 1.24.7 (see reason and source)"
+    },
+    {
+      "id": "wiki-14",
+      "title": "Commit diff and downloaded .diff show an accented wiki file name percent-encoded",
+      "findings": [
+        "run1-19",
+        "run2-07"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "The percent-encoded text is the file's real name in the wiki Git repository: Gitea deliberately stores wiki files URL-escaped (only spaces are kept), so the diff shows the true path. The second claim of run2-07, that accents are stripped from the content, is contradicted by its own screenshot, where the .diff reads \"Ünïcode rev one — héllo wörld.\".",
+      "evidence": [
+        "run1-19/shot-2.png",
+        "run2-07/shot-2.png",
+        "run2-07/shot-3.png"
+      ],
+      "source": [
+        "services/wiki/wiki_path.go (header comment \"Git Path (only space doesn't need to be escaped)\", WebPathToGitPath)"
+      ],
+      "rejection_kind": "product-decision",
+      "rejection_note": "behaviour is deliberate in Gitea 1.24.7 (see reason and source)"
+    },
+    {
+      "id": "wiki-15",
+      "title": "Hand-typed .md address of an accented wiki page shows the Pages list",
+      "findings": [
+        "run1-20"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "A *.md address is unescaped and used directly as the Git file name, and the stored file is literally \"Caf%C3%A913-Notes.md\", so the typed address /wiki/Caf%C3%A913-Notes.md asks for a file \"Café13-Notes.md\" that does not exist. The app's own link for that file is double-escaped (GitEntryName | PathEscape) and missing pages redirect to the Pages list by design; the agent typed the address instead of using the link.",
+      "evidence": [
+        "run1-20/shot-2.png"
+      ],
+      "source": [
+        "services/wiki/wiki_path.go (WebPathToGitPath)",
+        "templates/repo/wiki/pages.tmpl (a.wiki-git-entry href)",
+        "routers/web/repo/wiki.go (lines 243-246)"
+      ],
+      "rejection_kind": "unsupported-input",
+      "rejection_note": "hand-typed .md address"
+    },
+    {
+      "id": "wiki-16",
+      "title": "Wide Markdown tables in wiki content and in _Sidebar are cut off with no scroll area of their own",
+      "findings": [
+        "run2-01",
+        "run2-21",
+        "run3-16"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Gitea makes every rendered table its own horizontal scroll area (.markup table: display block, max-width 100%, overflow auto), and run2-01's own screenshots show the table scrolled inside the card while the page header stays put. In all three findings the cut sits at the box's inner padding edge, which is that scroll area's clip; no evidence shows a failed attempt to scroll the table itself, and hidden scrollbars are normal in the headless browser.",
+      "evidence": [
+        "run2-01/shot-1.png",
+        "run2-01/shot-2.png",
+        "run2-21/shot-4.png",
+        "run3-16/shot-2.png"
+      ],
+      "source": [
+        "web_src/css/markup/content.css (.markup table, lines 286-291)",
+        "web_src/css/repo/wiki.css"
+      ],
+      "rejection_kind": "false-positive",
+      "rejection_note": "test procedure: the table's own horizontal scroll was not tried"
+    },
+    {
+      "id": "wiki-17",
+      "title": "A wiki address containing %00 returns a blank 400 page",
+      "findings": [
+        "run2-18"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "An encoded NUL byte is malformed input that no link in the app produces, and 400 Bad Request is the correct answer to it. The evidence does not show whether Gitea or the sandbox proxy sent the empty body, and no handler in the wiki router returns a 400.",
+      "evidence": [
+        "run2-18/shot-2.png"
+      ],
+      "source": [
+        "routers/web/repo/wiki.go",
+        "routers/common/middleware.go"
+      ],
+      "rejection_kind": "false-positive",
+      "rejection_note": "environment: the sandbox proxy answers, not Gitea",
+      "override_reason": "Checked 2026-11-24: the empty 400 for %00 comes from the sandbox front proxy (one proxy hop, no Gitea cookies or headers); the request never reached Gitea. Test environment, not counted.",
+      "override_by": "owner check 2026-11-24"
+    },
+    {
+      "id": "wiki-18",
+      "title": "A wiki page re-created under a deleted page's name shows the old page's revisions",
+      "findings": [
+        "run2-22"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Wiki revisions are by design the Git log of the page's file path (FileCommitsCount and CommitsByFileAndRange on pageFilename), so a file re-created at the same path carries the earlier commits, delete commit included. \"Cannot be undone\" refers to the delete action in the UI, not to erasing Git history.",
+      "evidence": [
+        "run2-22/shot-3.png"
+      ],
+      "source": [
+        "routers/web/repo/wiki.go (lines 363, 415, 425-432)",
+        "options/locale/locale_en-US.ini (wiki.delete_page_notice_1)"
+      ],
+      "rejection_kind": "product-decision",
+      "rejection_note": "behaviour is deliberate in Gitea 1.24.7 (see reason and source)"
+    }
+  ],
+  "rejections": [
+    {
+      "kind": "false-positive",
+      "label": "False positive (agent was wrong)",
+      "count": 2,
+      "bugs": [
+        "wiki-12",
+        "wiki-16"
+      ]
+    },
+    {
+      "kind": "unsupported-input",
+      "label": "Address or input the app never produces",
+      "count": 2,
+      "bugs": [
+        "wiki-15",
+        "wiki-17"
+      ]
+    },
+    {
+      "kind": "product-decision",
+      "label": "Product decision (real behaviour Gitea chose on purpose)",
+      "count": 5,
+      "bugs": [
+        "wiki-10",
+        "wiki-11",
+        "wiki-13",
+        "wiki-14",
+        "wiki-18"
+      ]
+    }
+  ]
+}

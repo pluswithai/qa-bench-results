@@ -1,0 +1,288 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "twenty/areas/record-pages-activities",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "c0514808669213daa424c21242586fe11c34c86360e84c6d5d94e97d92a25116",
+    "known_invalid_sha256": "cdd23b97fb4f73ab42c34dedf1842427d79e0b5001967ab83cefec3a8f68e85d",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "64",
+    "bugs": "23",
+    "flags": "0",
+    "known_hits": "9",
+    "extra_known_hits": "1",
+    "unverified": "11",
+    "outside_area_known_hits": "0",
+    "outside_area_known_invalid": "0",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "",
+    "outside_area_ground_truth_sha256": "f3456299419b269b88f0ddc32ec53ab80fbf3ec14a32ac6ae1366aa22bd3a43a",
+    "outside_area_known_invalid_sha256": "e51afd4a5be9203d46a29a1087513447454829f8cacf9feb7379d606574f27e1",
+    "duplicates": "0",
+    "duplicate_known_hits": "0",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "2",
+    "known_misses": "2",
+    "precision": "0.8333333333333334",
+    "recall": "0.140625",
+    "findings_per_minute": "0.7666913711664043",
+    "correct_findings_per_minute": "0.3000096669781582",
+    "severity_1": "5",
+    "severity_3": "4",
+    "severity_5": "0",
+    "severity_sum": "17",
+    "score": "15",
+    "duration_seconds": "1799.942",
+    "partial": "true",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 4,
+        "reproStepsIndex": 0,
+        "findingIndex": 3,
+        "reason": "Matches command-menu typing leaving Search empty while inserting and autosaving the query into the mounted Note body."
+      },
+      {
+        "groundTruthIndex": 16,
+        "reproStepsIndex": 0,
+        "findingIndex": 4,
+        "reason": "Matches browser Back removing the record-tab fragment without restoring the visible tab. Desktop width and the selected destination tab do not materially change the reproduction path."
+      },
+      {
+        "groundTruthIndex": 11,
+        "reproStepsIndex": 0,
+        "findingIndex": 5,
+        "reason": "Matches a Body-popup edit being overwritten when the stale main Note editor is subsequently edited, with the loss confirmed after reload."
+      },
+      {
+        "groundTruthIndex": 13,
+        "reproStepsIndex": 0,
+        "findingIndex": 9,
+        "reason": "Matches selecting Heading 1 from the slash menu without consuming the slash trigger. Its position before rather than after the text does not change the failure."
+      },
+      {
+        "groundTruthIndex": 9,
+        "reproStepsIndex": 0,
+        "findingIndex": 14,
+        "reason": "Matches Company Tasks group headings displaying raw TODO and IN_PROGRESS values instead of the readable labels used by the same Tasks."
+      },
+      {
+        "groundTruthIndex": 20,
+        "reproStepsIndex": 0,
+        "findingIndex": 15,
+        "reason": "The mobile portion matches the oversized Body popup extending beyond the viewport and hiding its expand control. Desktop positioning is an additional claim."
+      },
+      {
+        "groundTruthIndex": 3,
+        "reproStepsIndex": 0,
+        "findingIndex": 20,
+        "reason": "Matches deleting the final related Note removing its card while leaving the Company Notes total stale until reload."
+      },
+      {
+        "groundTruthIndex": 49,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Matches the long-title mobile header defect obscuring the record counter. The claim that all actions become unreachable goes beyond the reference."
+      },
+      {
+        "groundTruthIndex": 22,
+        "reproStepsIndex": 0,
+        "findingIndex": 1,
+        "reason": "Matches mobile Company Tasks rows squeezing task titles into very little readable space; relation-chip clipping is an additional reported effect."
+      },
+      {
+        "groundTruthIndex": 11,
+        "reproStepsIndex": null,
+        "findingIndex": 2,
+        "reason": "Matches the main body editor remaining stale despite an updated Body preview and subsequently overwriting saved content. Another browser tab supplies the saved change rather than the Body popup."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 12,
+        "reproStepsIndex": 0,
+        "findingIndex": 12,
+        "reason": "Matches the explicitly rejected claim that Annual Revenue truncates 1234.56 to 1234 and 99.99 to 99, rather than the accepted hundredfold inflation defect."
+      },
+      {
+        "knownInvalidIndex": 8,
+        "reproStepsIndex": null,
+        "findingIndex": 22,
+        "reason": "Matches a pre-existing seeded attachment failing retrieval with HTTP 404. This path opens a Task image preview rather than attempting a Company attachment download."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 6,
+        "reason": "No reference covers incomplete Timeline sentences after deliberately clearing an activity title; this differs from deleted activities being labeled Untitled."
+      },
+      {
+        "findingIndex": 7,
+        "reason": "No reference covers missing task-completion history. The reference about missing removal history concerns deleting a related Task, not completing it."
+      },
+      {
+        "findingIndex": 8,
+        "reason": "No reference covers aggregated field updates replacing earlier values while retaining the first timestamp; the Timeline subscription and relinking defects describe different failures."
+      },
+      {
+        "findingIndex": 10,
+        "reason": "No reference covers a company-created Note missing from the global Notes list. Checking rendered rows without a conclusive list search leaves the absence less firmly established."
+      },
+      {
+        "findingIndex": 11,
+        "reason": "No reference covers Note-card previews wrapping ordinary words and punctuation at arbitrary character boundaries."
+      },
+      {
+        "findingIndex": 13,
+        "reason": "No reference covers sender-name clipping or missing ellipses in Company Emails rows; the reviewed Emails defect concerns pagination ordering."
+      },
+      {
+        "findingIndex": 16,
+        "reason": "No reference covers currency option labels repeating their currency codes."
+      },
+      {
+        "findingIndex": 17,
+        "reason": "No reference covers inconsistent inclusion of years in Calendar month headings."
+      },
+      {
+        "findingIndex": 18,
+        "reason": "No reference covers Escape committing a Task Due Date. Escape-save defects for currency, address, and attachment rename are distinct field operations."
+      },
+      {
+        "findingIndex": 19,
+        "reason": "No reference covers malformed record URLs rendering a ghost record and exposing raw UUID validation errors."
+      },
+      {
+        "findingIndex": 21,
+        "reason": "No reference covers overflowing relation chips within Note cards. Attachment deletion hiding relation selections is a different failure."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 1,
+        "reason": "The described failure is broken Timeline wording and a missing placeholder name."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 3,
+        "reason": "The claimed functional omission leaves completed task actions absent from activity history."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 3,
+        "reason": "The reported history loses intermediate changes and attributes the latest change to an earlier time."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 3,
+        "reason": "A saved Note is reportedly omitted from the list used to find it."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 1,
+        "reason": "This is a text-wrapping presentation defect without described content loss."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 3,
+        "reason": "As described, saving changes the entered monetary value."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 1,
+        "reason": "Sender labels are visually clipped and crowded against a badge."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 15,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 16,
+        "severity": 1,
+        "reason": "The defect is redundant dropdown-label text."
+      },
+      {
+        "findingIndex": 17,
+        "severity": 1,
+        "reason": "The reported issue is an ambiguous date-group label, not an incorrect saved event date."
+      },
+      {
+        "findingIndex": 18,
+        "severity": 3,
+        "reason": "A cancellation key commits an unwanted date change."
+      },
+      {
+        "findingIndex": 19,
+        "severity": 5,
+        "reason": "The invalid record page exposes user-visible raw UUID validation errors instead of a handled error state."
+      },
+      {
+        "findingIndex": 20,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 21,
+        "severity": 1,
+        "reason": "Saved relations are visually clipped or hidden in the card layout."
+      },
+      {
+        "findingIndex": 22,
+        "severity": 3,
+        "reason": "The attachment preview cannot load the requested file."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

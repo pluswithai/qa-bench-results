@@ -1,0 +1,370 @@
+{
+  "fixture": "metabase/areas/dashboards",
+  "run": 2,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 294,
+      "name": "Duplicating a dashboard silently drops its link card (\"All subscriptions in table view\")",
+      "summary": "The duplicate has no link card: on the copy's Website Analysis tab the whole right-hand row above the \\\"Appendix\\\" heading is missing, so the layout shifts up and the link is gone. The copy has 33 cards against the original's 34 — the missing one is the link card (dashcard 29 in the original, link to the question \\\"All subscriptions in table view\\\"). All text cards, headings and the YouTube iframe card were copied. (on /dashboard/1 → /dashboard/5-e-commerce-insights-duplicate)",
+      "expected": "The duplicate contains everything the original shows, including the link card \\\"All subscriptions in table view\\\" on the Website Analysis tab (34 cards, same tabs and positions).",
+      "actual": "The duplicate has no link card: on the copy's Website Analysis tab the whole right-hand row above the \\\"Appendix\\\" heading is missing, so the layout shifts up and the link is gone. The copy has 33 cards against the original's 34 — the missing one is the link card (dashcard 29 in the original, link to the question \\\"All subscriptions in table view\\\"). All text cards, headings and the YouTube iframe card were copied.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1.",
+        "Open https://5501-ieaktt3pj66aduas4qpqc.e2b.app/dashboard/1 (\"E-commerce Insights\", Examples collection), click the \"Website Analysis\" tab and scroll to the bottom: just above the \"Appendix\" heading there is a link card \"All subscriptions in table view\" on the right.",
+        "Click the \"…\" (Move, trash, and more…) button in the dashboard header and choose \"Duplicate\".",
+        "In the \"Duplicate \\\"E-commerce Insights\\\" and its questions\" dialog keep the default name \"E-commerce Insights - Duplicate\" and click \"Duplicate\".",
+        "The copy opens at /dashboard/5-e-commerce-insights-duplicate; click its \"Website Analysis\" tab and scroll to the bottom.",
+        "Compare the card list with the original (the app's own JSON: GET /api/dashboard/1 has 34 dashcards, GET /api/dashboard/5 has 33)."
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 314,
+      "name": "\"Exit fullscreen\" needs two clicks when the dashboard was loaded/reloaded while in fullscreen",
+      "summary": "Nothing happens. The page stays in fullscreen, the header still shows the \\\"Exit fullscreen\\\" button, and the address still ends in #fullscreen (the click only rewrites the filter parameters, e.g. adds product_category=Doohickey&Gizmo&Gadget&Widget). A second click on the same button then does exit fullscreen. Seen 3 times out of 3 with this sequence; entering fullscreen from the menu and exiting immediately, without a reload, works on the first click. (on /dashboard/1)",
+      "expected": "The dashboard leaves fullscreen on the first click: the left navigation bar comes back, the header shows \\\"Enter fullscreen\\\" again and #fullscreen is removed from the address.",
+      "actual": "Nothing happens. The page stays in fullscreen, the header still shows the \\\"Exit fullscreen\\\" button, and the address still ends in #fullscreen (the click only rewrites the filter parameters, e.g. adds product_category=Doohickey&Gizmo&Gadget&Widget). A second click on the same button then does exit fullscreen. Seen 3 times out of 3 with this sequence; entering fullscreen from the menu and exiting immediately, without a reload, works on the first click.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open https://5501-ieaktt3pj66aduas4qpqc.e2b.app/dashboard/1",
+        "Open the \"Move, trash, and more…\" (…) menu at the top right of the dashboard header and click \"Enter fullscreen\" (the address becomes …/dashboard/1?…#fullscreen and the left navigation bar disappears). Alternatively open /dashboard/1#fullscreen directly.",
+        "Reload the page (F5 / browser reload). The dashboard is still in fullscreen, with the \"Exit fullscreen\" shrink button in the header.",
+        "Click the \"Exit fullscreen\" button once."
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 342,
+      "name": "\"Product breakdown\" card ignores the Product Category filter and keeps showing every category",
+      "summary": "The \\\"Product breakdown\\\" donut keeps all four categories (Doohickey 23.88%, Gadget 26.54%, Gizmo 15.85%, Widget 33.73%) and the same total 2,852, unchanged. Same with only \\\"Doohickey\\\" selected: the pill reads \\\"Product Category: Doohickey\\\", the text says \\\"filtered now for Doohickey\\\", the scatter chart becomes Doohickey-only, but the donut still lists all four categories with total 2,852. (on /dashboard/1 (Portfolio Performance tab))",
+      "expected": "The \\\"Product breakdown\\\" card shows only Widget (100%) and its total equals Widget's total, like the \\\"Total order amount vs. discount given\\\" card on the same tab, which switches to Widget only; the text card right above even says \\\"filtered now for Widget\\\"",
+      "actual": "The \\\"Product breakdown\\\" donut keeps all four categories (Doohickey 23.88%, Gadget 26.54%, Gizmo 15.85%, Widget 33.73%) and the same total 2,852, unchanged. Same with only \\\"Doohickey\\\" selected: the pill reads \\\"Product Category: Doohickey\\\", the text says \\\"filtered now for Doohickey\\\", the scatter chart becomes Doohickey-only, but the donut still lists all four categories with total 2,852.",
+      "reproSteps": [
+        "Sign in and open /dashboard/1",
+        "Click the tab \"Portfolio Performance\"",
+        "Click the \"Product Category\" filter button at the top of the tab",
+        "Untick all values except \"Widget\" (untick Gadget, Gizmo, Doohickey) and click \"Update filter\"",
+        "Look at the \"Product breakdown\" donut card on the left"
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 357,
+      "name": "Link card silently accepts an invalid URL and the saved tile leads to a \"page not found\" error",
+      "summary": "No error message is shown at any point: the card editor keeps the text, Save succeeds, and the tile is stored with href=\\\"not a valid url\\\" (relative). Clicking the tile navigates to /not%20a%20valid%20url and shows \\\"We're a little lost... The page you asked for couldn't be found.\\\" (on /dashboard/6-agent5-cards)",
+      "expected": "The card editor should refuse the invalid URL with an inline error (and the Save should not store a tile whose target is not a URL); a saved link card should open a real page.",
+      "actual": "No error message is shown at any point: the card editor keeps the text, Save succeeds, and the tile is stored with href=\\\"not a valid url\\\" (relative). Clicking the tile navigates to /not%20a%20valid%20url and shows \\\"We're a little lost... The page you asked for couldn't be found.\\\"",
+      "reproSteps": [
+        "Open https://5501-ieaktt3pj66aduas4qpqc.e2b.app/dashboard/6-agent5-cards (dashboard \"agent5-cards\", owned by eval@momentic.ai)",
+        "Click \"Edit dashboard\" in the top-right toolbar",
+        "In the dashboard toolbar click the link icon button (\"Add a link or iframe\") and choose \"Link\" from its menu",
+        "In the URL field of the new card (placeholder https://example.com) type: not a valid url",
+        "Click on empty dashboard canvas outside the card to leave the field, then click \"Save\"",
+        "In view mode the saved card shows \"not a valid url\" with a link icon; click that card"
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 411,
+      "name": "A long unbroken word in a Text card is cut off at the card's right edge instead of wrapping",
+      "summary": "The word is rendered on one line and clipped at the card's right edge: only \\\"Supercalifragilisticexpialidocious_verylongwordwithoutanyspaces_0123\\\" is visible, the rest can never be read — scrolling to the right inside the card does nothing (no horizontal scrollbar, text stays cut). (on /dashboard/6-agent5-cards)",
+      "expected": "The long word should wrap or break (e.g. word-break: break-word) so the whole text stays readable inside the card, as it does in the card's own editor textarea.",
+      "actual": "The word is rendered on one line and clipped at the card's right edge: only \\\"Supercalifragilisticexpialidocious_verylongwordwithoutanyspaces_0123\\\" is visible, the rest can never be read — scrolling to the right inside the card does nothing (no horizontal scrollbar, text stays cut).",
+      "reproSteps": [
+        "Open https://5501-ieaktt3pj66aduas4qpqc.e2b.app/dashboard/6-agent5-cards (dashboard \"agent5-cards\")",
+        "In the Text card (first white card, top-left) hover the card body and scroll down inside it until the line beginning \"Supercalifragilisticexpialidocious...\" is near the top of the card",
+        "Look at the right end of that line"
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 424,
+      "name": "\"Revenue and orders over time\" plots a quantity sum as \"Orders\", contradicting the Count row in its own tooltip",
+      "summary": "The \\\"Orders\\\" series is a sum of a numeric column, not an order count: the tooltip shows Orders 3,215 for Q4 2026 while its own Count row says 904, and the per-quarter \\\"Orders\\\" values (260, 1.1k, 1.2k, 843, 2.6k, 4.4k, 3.2k, about 13,500 in total) contradict the 3,372 total orders shown by the \\\"Total orders by product category\\\" card on the same tab. The card's description (question payload) reads \\\"Cumulative revenue overlaid with number of orders placed each month\\\" while the plotted line is non-cumulative and bucketed by quarter. (on /dashboard/1)",
+      "expected": "The series labelled \\\"Orders\\\" should be the number of orders for the quarter, agreeing with the Count row of its own tooltip (904) and with the order counts the other cards on the dashboard report (3,372 orders in total).",
+      "actual": "The \\\"Orders\\\" series is a sum of a numeric column, not an order count: the tooltip shows Orders 3,215 for Q4 2026 while its own Count row says 904, and the per-quarter \\\"Orders\\\" values (260, 1.1k, 1.2k, 843, 2.6k, 4.4k, 3.2k, about 13,500 in total) contradict the 3,372 total orders shown by the \\\"Total orders by product category\\\" card on the same tab. The card's description (question payload) reads \\\"Cumulative revenue overlaid with number of orders placed each month\\\" while the plotted line is non-cumulative and bucketed by quarter.",
+      "reproSteps": [
+        "Sign in with eval@momentic.ai / momentic-eval-1 and open /dashboard/1 (tab \"Overview\").",
+        "In the card \"Revenue and orders over time\" (top left), hover the rightmost purple bar (x-axis \"Q4 2026\", bar labelled 3.2k).",
+        "Read the tooltip: \"Q4 2026 / Revenue 53,898.26 +22.92% / Orders 3,215 -27.03% / Sum of Discount $497.73 / Count 904\".",
+        "Compare the \"Orders\" number with the \"Count\" row of the same tooltip, then scroll to the card \"Total orders by product category\" and compare with its centre total (3,372)."
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 469,
+      "name": "A whitespace-only dashboard title blanks the header title while the save fails with no message",
+      "summary": "The header title disappears completely — the space left of \\\"Edited a minute ago by you\\\" is empty and the browser tab title becomes \\\"· Dashboard · Metabase\\\" (no name). The save is rejected server-side: PUT /api/dashboard/1 answers 400, the console logs \\\"Request entities,dashboards,1,update failed: {status: 400...}\\\" plus an uncaught page error, and nothing is shown to the user. The old name only comes back after a page reload. Seen 2 times out of 2 tries. (on /dashboard/1)",
+      "expected": "The app should refuse a name that is only whitespace, keep the previous title in the header (as it does for a fully empty title, which is silently rejected), and tell the user the title could not be saved.",
+      "actual": "The header title disappears completely — the space left of \\\"Edited a minute ago by you\\\" is empty and the browser tab title becomes \\\"· Dashboard · Metabase\\\" (no name). The save is rejected server-side: PUT /api/dashboard/1 answers 400, the console logs \\\"Request entities,dashboards,1,update failed: {status: 400...}\\\" plus an uncaught page error, and nothing is shown to the user. The old name only comes back after a page reload. Seen 2 times out of 2 tries.",
+      "reproSteps": [
+        "Open https://5501-ieaktt3pj66aduas4qpqc.e2b.app/dashboard/1 while signed in (eval@momentic.ai).",
+        "Click the dashboard title field at the top left of the header (it shows the dashboard name, e.g. \"E-commerce Insights\").",
+        "Select the whole text and replace it with three spaces only (\" \").",
+        "Press Enter."
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 499,
+      "name": "Text card under \"Overall Business Health\" is cut off mid-line at phone width",
+      "summary": "The paragraph wraps to three lines at phone width but the card keeps its fixed height: the third line (\\\"number of orders\\\") is cut off horizontally, only the upper part of the letters is visible, and the rest cannot be read or scrolled to. (on /dashboard/1)",
+      "expected": "The text card should grow with its content so the whole paragraph is readable at phone width, as it is at desktop width where it fits on two lines.",
+      "actual": "The paragraph wraps to three lines at phone width but the card keeps its fixed height: the third line (\\\"number of orders\\\") is cut off horizontally, only the upper part of the letters is visible, and the rest cannot be read or scrolled to.",
+      "reproSteps": [
+        "Sign in with eval@momentic.ai / momentic-eval-1 and open /dashboard/1 (tab \"Overview\").",
+        "Set the browser window to phone size, 390 x 844.",
+        "Look at the text card directly under the heading \"Overall Business Health\": \"Business KPIs look strong based on the consistent MoM revenue growth following the growth in the number of orders\".",
+        "The paragraph wraps to three lines and its last line is cut off halfway by the bottom edge of the card, right above the card \"Revenue and orders over time\"."
+      ]
+    },
+    {
+      "index": 8,
+      "reported_at_seconds": 509,
+      "name": "Right-aligned Text card leaves the bullet markers stranded at the far left of the card",
+      "summary": "The bullet markers stay pinned at the card's far-left edge while their list items' text is pushed to the right edge, so the bullets are detached from the items they belong to and the list reads as broken. (on /dashboard/6-agent5-cards)",
+      "expected": "With Horizontal Alignment = Right the whole list (marker plus item text) should be right-aligned together, the bullet sitting immediately left of each item's text.",
+      "actual": "The bullet markers stay pinned at the card's far-left edge while their list items' text is pushed to the right edge, so the bullets are detached from the items they belong to and the list reads as broken.",
+      "reproSteps": [
+        "Open https://5501-ieaktt3pj66aduas4qpqc.e2b.app/dashboard/6-agent5-cards (dashboard \"agent5-cards\")",
+        "Click \"Edit dashboard\", then hover the Text card (contains a bold line, a two-item bullet list, a link, literal HTML and an emoji)",
+        "Click the first icon at the card's top-right (\"Show visualization options\")",
+        "Set \"Horizontal Alignment\" to \"Right\" and click \"Done\"",
+        "Click \"Save\" and look at the text card in view mode"
+      ]
+    },
+    {
+      "index": 9,
+      "reported_at_seconds": 546,
+      "name": "Browser Back after a filter change returns to a different tab while keeping the new filter selection",
+      "summary": "The browser Back goes to the URL of the earlier tab state but with the new filter selection: the page comes back on the \\\"Overview\\\" tab (a tab the person left two steps before) with the Product Category filter still showing \\\"3 selections\\\" and the numbers already recalculated for 3 categories. The previous view (Portfolio Performance with all 4 categories) is never restored, and the resulting tab+filter combination is one the person never chose. Seen 2 times out of 2 tries. (on /dashboard/1)",
+      "expected": "Pressing Back once after changing a filter should restore the view that was on screen just before the change: the same tab (Portfolio Performance) with the previous filter selection (4 selections, all categories).",
+      "actual": "The browser Back goes to the URL of the earlier tab state but with the new filter selection: the page comes back on the \\\"Overview\\\" tab (a tab the person left two steps before) with the Product Category filter still showing \\\"3 selections\\\" and the numbers already recalculated for 3 categories. The previous view (Portfolio Performance with all 4 categories) is never restored, and the resulting tab+filter combination is one the person never chose. Seen 2 times out of 2 tries.",
+      "reproSteps": [
+        "Open https://5501-ieaktt3pj66aduas4qpqc.e2b.app/dashboard/1 (Overview tab, Product Category: 4 selections).",
+        "Click the \"Portfolio Performance\" tab.",
+        "Click the \"Product Category\" filter pill, untick \"Gizmo\" and click \"Update filter\" (now 3 selections, URL has product_category=Doohickey&product_category=Gadget&product_category=Widget&tab=2-portfolio-performance).",
+        "Press the browser Back button once.",
+        "Observe the resulting page: the \"Overview\" tab is now active while the Product Category pill still shows \"3 selections\"."
+      ]
+    },
+    {
+      "index": 10,
+      "reported_at_seconds": 634,
+      "name": "Duplicate dialog accepts a whitespace-only name and then shows the raw error \\\"Nullable value must be a non-blank string\\\"",
+      "summary": "The dialog accepts the spaces and the \\\"Duplicate\\\" button stays enabled. Clicking it sends POST /api/dashboard/2/copy which answers 400, the button turns into a grey \\\"Failed\\\" and the raw server wording \\\"Nullable value must be a non-blank string\\\" appears in red under the Name field. No friendly message explains that a blank name is not allowed; only after typing a real name does the button read \\\"Duplicate\\\" again. (on /dashboard/2 (Duplicate dialog))",
+      "expected": "The dialog refuses a name that is only whitespace (like it refuses an empty name with \\\"required\\\"), or the copy is created; the person never sees a raw API validation string.",
+      "actual": "The dialog accepts the spaces and the \\\"Duplicate\\\" button stays enabled. Clicking it sends POST /api/dashboard/2/copy which answers 400, the button turns into a grey \\\"Failed\\\" and the raw server wording \\\"Nullable value must be a non-blank string\\\" appears in red under the Name field. No friendly message explains that a blank name is not allowed; only after typing a real name does the button read \\\"Duplicate\\\" again.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1 and open https://5501-ieaktt3pj66aduas4qpqc.e2b.app/dashboard/2 (\"Release overview\").",
+        "Click the \"…\" (Move, trash, and more…) button in the dashboard header and choose \"Duplicate\".",
+        "In the \"Duplicate \\\"Release overview\\\" and its questions\" dialog, clear the Name field and type three spaces only.",
+        "Click the \"Duplicate\" button."
+      ]
+    },
+    {
+      "index": 11,
+      "reported_at_seconds": 688,
+      "name": "Deleting the currently selected tab leaves no tab selected and keeps the deleted tab's empty canvas and filter on screen",
+      "summary": "No tab is highlighted: both remaining tabs report aria-selected=\\\"false\\\" and neither has the underline. The canvas still shows the deleted tab's content area (\\\"Create a new question or browse your collections for an existing one.\\\" / \\\"Add a chart\\\") and the deleted tab's filter pill \\\"agent3-text-filter\\\" is still rendered, so the person keeps editing a tab that no longer exists. The address bar still stays on ?tab=18-agent3-very-long-tab-name-... i.e. the deleted tab. The state only resolves after clicking a remaining tab or after saving. (on /dashboard/7-agent3-tabs-dashboard)",
+      "expected": "The remaining tab next to the deleted one becomes the selected tab: it gets the blue underline/aria-selected, its own cards are shown, the deleted tab's filter pill disappears, and the address bar reflects a tab that exists.",
+      "actual": "No tab is highlighted: both remaining tabs report aria-selected=\\\"false\\\" and neither has the underline. The canvas still shows the deleted tab's content area (\\\"Create a new question or browse your collections for an existing one.\\\" / \\\"Add a chart\\\") and the deleted tab's filter pill \\\"agent3-text-filter\\\" is still rendered, so the person keeps editing a tab that no longer exists. The address bar still stays on ?tab=18-agent3-very-long-tab-name-... i.e. the deleted tab. The state only resolves after clicking a remaining tab or after saving.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open https://5501-ieaktt3pj66aduas4qpqc.e2b.app/dashboard/7-agent3-tabs-dashboard (dashboard \"agent3-tabs-dashboard\", own test data).",
+        "Click \"Edit dashboard\" (pencil) so the edit bar with Cancel/Save appears.",
+        "Add a text filter to the last tab if needed: click the funnel icon \"Add a filter or parameter\" > \"Text or Category\" > keep label or set it to \"agent3-text-filter\" > \"Done\" > Save. The tab bar reads \"agent3-unsaved-rename | R&D <b>x</b> 🚀 50%\" (third tab with a filter was already deleted in this data set; re-add one to see the filter symptom).",
+        "Click the currently selected tab (blue underline) so it is the active one, then click the small chevron at the right end of that tab.",
+        "In the chevron menu click \"Delete\" (a toast \"Deleted \"<tab name>\"\" with an \"Undo\" button appears).",
+        "Look at the tab bar, the filter row and the address bar without clicking anything."
+      ]
+    },
+    {
+      "index": 12,
+      "reported_at_seconds": 698,
+      "name": "The type icon in the Type column is a clickable button that does nothing",
+      "summary": "Clicking the type icon does nothing at all: the page does not change, no menu, tooltip, preview or navigation appears (the row only shows its hover highlight). Tried on the \\\"agent15-tab1-title\\\" row and on the \\\"agent2-onlydash-copy\\\" row, twice out of two attempts. (on /collection/root)",
+      "expected": "Either the icon opens the item (as the row name does) or it is plain decoration that cannot be clicked or focused.",
+      "actual": "Clicking the type icon does nothing at all: the page does not change, no menu, tooltip, preview or navigation appears (the row only shows its hover highlight). Tried on the \\\"agent15-tab1-title\\\" row and on the \\\"agent2-onlydash-copy\\\" row, twice out of two attempts.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open https://5501-ieaktt3pj66aduas4qpqc.e2b.app/collection/root",
+        "In the item table, click the dashboard icon at the left of the Type column on the row \"agent15-tab1-title\"",
+        "Repeat on the same icon on the row \"agent2-onlydash-copy\""
+      ]
+    },
+    {
+      "index": 13,
+      "reported_at_seconds": 712,
+      "name": "A dashboard address with a non-numeric id spins \"Loading...\" forever instead of a not-found message",
+      "summary": "The page shows the loading spinner with the text \"Loading...\" indefinitely (still spinning after 8+ and 13+ seconds, and again after a reload). No API request for the id is sent, the console stays empty, and the not-found state that a numeric unknown id gets (\"We're a little lost… The page you asked for couldn't be found.\") never appears, so there is no way on from the page. (on /dashboard/abc)",
+      "expected": "Same as for an unknown numeric id (e.g. /dashboard/999999): an in-words \"We're a little lost… The page you asked for couldn't be found.\" state, not a spinner that never stops.",
+      "actual": "The page shows the loading spinner with the text \"Loading...\" indefinitely (still spinning after 8+ and 13+ seconds, and again after a reload). No API request for the id is sent, the console stays empty, and the not-found state that a numeric unknown id gets (\"We're a little lost… The page you asked for couldn't be found.\") never appears, so there is no way on from the page.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1",
+        "In the address bar open https://5501-ieaktt3pj66aduas4qpqc.e2b.app/dashboard/abc (a dashboard address with a non-numeric id)",
+        "Wait 15 seconds and look at the page",
+        "Reload the page and wait another 10 seconds"
+      ]
+    },
+    {
+      "index": 14,
+      "reported_at_seconds": 720,
+      "name": "Cancelling the dashboard \\\"Move\\\" dialog drops the filter and tab parameters from the address while the filtered view stays on screen",
+      "summary": "The address becomes plain /dashboard/1 with no query parameters, while the screen still shows the Widget filter pill and the Widget-filtered numbers (Revenue per quarter 19,909.88 instead of the unfiltered 67,863.4). The dashboard is now in a state its own address does not describe: reloading, bookmarking or sharing that address drops the user's filter selection and shows the dashboard's default filters instead. Seen 2 times out of 2 tries (once with Escape, once with the dialog's Cancel button). (on /dashboard/1)",
+      "expected": "Cancelling the Move dialog should return to the dashboard with its filter and tab parameters intact (the address before the action was /dashboard/1?date_grouping=&date_range=&product_category=Widget&tab=1-overview&vendor=), so a reload or a shared link keeps the filter the person selected.",
+      "actual": "The address becomes plain /dashboard/1 with no query parameters, while the screen still shows the Widget filter pill and the Widget-filtered numbers (Revenue per quarter 19,909.88 instead of the unfiltered 67,863.4). The dashboard is now in a state its own address does not describe: reloading, bookmarking or sharing that address drops the user's filter selection and shows the dashboard's default filters instead. Seen 2 times out of 2 tries (once with Escape, once with the dialog's Cancel button).",
+      "reproSteps": [
+        "Open https://5501-ieaktt3pj66aduas4qpqc.e2b.app/dashboard/1?product_category=Widget&tab=1-overview (signed in as eval@momentic.ai); the Product Category pill shows \"Widget\" and Revenue per quarter shows 19,909.88. Note the address: /dashboard/1?date_grouping=&date_range=&product_category=Widget&tab=1-overview&vendor=",
+        "Click the \"Move, trash, and more…\" (…) button at the top right of the dashboard header.",
+        "Click \"Move\" in the menu; the \"Move dashboard to…\" dialog opens and the address changes to /dashboard/1/move.",
+        "Press Escape (or click Cancel) to close the dialog without moving anything.",
+        "Look at the address bar: it is now /dashboard/1 with no parameters, while the Product Category pill still shows \"Widget\" and the cards still show the Widget-only figures.",
+        "Press the browser reload button."
+      ]
+    },
+    {
+      "index": 15,
+      "reported_at_seconds": 766,
+      "name": "Public link popover runs off the screen at phone width and its copy icon is unreachable",
+      "summary": "The popover is wider than the screen and runs off the right edge: its inner content is 448 px wide inside a 380 px popover on a 390 px viewport. The URL field is 400 px wide, so the link text is cut (\"…/public/da\") and the \"copy icon\" button that belongs to it sits at x=401, entirely off-screen (not visible and not clickable). Only \"Remove public link\" stays reachable. The same popover fits correctly at desktop width. This is a different failure from the copy icon giving no confirmation (it cannot even be reached here). (on /dashboard/1)",
+      "expected": "The \"Public link\" popover fits inside the 390 px screen: the whole public URL is readable in its field and the copy icon is visible and clickable.",
+      "actual": "The popover is wider than the screen and runs off the right edge: its inner content is 448 px wide inside a 380 px popover on a 390 px viewport. The URL field is 400 px wide, so the link text is cut (\"…/public/da\") and the \"copy icon\" button that belongs to it sits at x=401, entirely off-screen (not visible and not clickable). Only \"Remove public link\" stays reachable. The same popover fits correctly at desktop width. This is a different failure from the copy icon giving no confirmation (it cannot even be reached here).",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai, open https://5501-ieaktt3pj66aduas4qpqc.e2b.app/dashboard/1 and set the browser window to a phone size (390 × 844).",
+        "In the dashboard header click the \"Sharing\" icon (share arrows, first icon of the header button row).",
+        "In the Sharing menu click \"Public link\"."
+      ]
+    },
+    {
+      "index": 16,
+      "reported_at_seconds": 815,
+      "name": "A long heading card wraps to a second line that is clipped to the top halves of the letters",
+      "summary": "The heading wraps onto a second line which is clipped by the card: in edit mode and after save the visible text is only \\\"agent5 heading with a very long unbroken word\\\" plus the top halves of the letters of the second line; the rest of the heading (\\\"and a normal tail\\\") cannot be read anywhere on the dashboard. (on /dashboard/6-agent5-cards)",
+      "expected": "The heading card should grow to fit the wrapped heading (or truncate it cleanly with an ellipsis) so the entered heading is fully readable.",
+      "actual": "The heading wraps onto a second line which is clipped by the card: in edit mode and after save the visible text is only \\\"agent5 heading with a very long unbroken word\\\" plus the top halves of the letters of the second line; the rest of the heading (\\\"and a normal tail\\\") cannot be read anywhere on the dashboard.",
+      "reproSteps": [
+        "Open https://5501-ieaktt3pj66aduas4qpqc.e2b.app/dashboard/6-agent5-cards (dashboard \"agent5-cards\")",
+        "Click \"Edit dashboard\", then click on the heading card text at the top (\"agent5 Heading ...\") so it becomes an input",
+        "Select all and type: agent5 heading with a very long unbroken word AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA and a normal tail",
+        "Click on empty canvas outside the card, then click \"Save\"",
+        "Look at the heading at the top of the dashboard in view mode"
+      ]
+    },
+    {
+      "index": 17,
+      "reported_at_seconds": 842,
+      "name": "Saving from a stale second tab silently drops a card another tab already saved",
+      "summary": "Tab B's save silently overwrote the dashboard: after reloading, the dashboard (now titled \"agent6-twotab-B\") contains only the text card — the heading card \"agent6 heading added in tab A\" that tab A had already saved is gone. Neither tab showed any warning that the dashboard had changed in another tab. (on /dashboard/19-agent6-twotab)",
+      "expected": "Saving from the stale tab B warns that the dashboard was changed in another tab (or merges the change) instead of dropping the card tab A saved; the heading card \"agent6 heading added in tab A\" stays on the dashboard",
+      "actual": "Tab B's save silently overwrote the dashboard: after reloading, the dashboard (now titled \"agent6-twotab-B\") contains only the text card — the heading card \"agent6 heading added in tab A\" that tab A had already saved is gone. Neither tab showed any warning that the dashboard had changed in another tab.",
+      "reproSteps": [
+        "Sign in, click New > Dashboard, name it \"agent6-twotab\", click Create (it opens at /dashboard/19-agent6-twotab in edit mode)",
+        "Add a Text card containing \"agent6 twotab text card\" and click Save",
+        "Open the same address /dashboard/19-agent6-twotab in a second browser tab (tab B) and leave it on that stale copy",
+        "In the first tab (tab A) click \"Edit dashboard\", add a Heading card with the text \"agent6 heading added in tab A\" and click Save — tab A now shows both cards",
+        "Switch to tab B (still showing only the text card), click \"Edit dashboard\", change the title to \"agent6-twotab-B\" and click Save",
+        "Reload the page and look at the saved dashboard"
+      ]
+    },
+    {
+      "index": 18,
+      "reported_at_seconds": 859,
+      "name": "Escape does not close the link card's link-search popover",
+      "summary": "The popover stays open after Escape: \\\"Didn't find anything\\\" still covers the dashboard and the card stays in URL-editing state. Only clicking on empty canvas elsewhere closes it. (on /dashboard/6-agent5-cards)",
+      "expected": "Escape should dismiss the link card's search popover (and leave the card editor), as Escape closes other popovers/dialogs in the app.",
+      "actual": "The popover stays open after Escape: \\\"Didn't find anything\\\" still covers the dashboard and the card stays in URL-editing state. Only clicking on empty canvas elsewhere closes it.",
+      "reproSteps": [
+        "Open https://5501-ieaktt3pj66aduas4qpqc.e2b.app/dashboard/6-agent5-cards (dashboard \"agent5-cards\")",
+        "Click \"Edit dashboard\"",
+        "Click the link card that reads \"not a valid url\" (top-right area, second column) — its URL field and a \"Didn't find anything\" popover open below it",
+        "Press the Escape key"
+      ]
+    },
+    {
+      "index": 19,
+      "reported_at_seconds": 1079,
+      "name": "\"Orders according to sources per quarter\" table shows revenue amounts, not order counts",
+      "summary": "The table's cells are currency amounts with cents: Q4 2026 Row total 19,909.88, Grand totals 71,618.92 (the same page's \"Revenue per quarter\" for Q4 2026 is 19,909.88, and the row total of every quarter equals that quarter's revenue, e.g. Q2 2025 916.56 = the revenue figure). The order counts on the same page are whole numbers: \"Orders by product category\" gives 324 for Q4 2026 and 1,213 in total, so a quarter supposedly holding 19,909.88 orders contradicts the 324-orders card right above the table. (on /dashboard/1 (Overview tab, \"Deeper Dive\" section))",
+      "expected": "The table shows order counts per source (whole numbers) whose quarterly and grand totals agree with the orders shown in \"Orders by product category\" (324 for Q4 2026, 1,213 in total)",
+      "actual": "The table's cells are currency amounts with cents: Q4 2026 Row total 19,909.88, Grand totals 71,618.92 (the same page's \"Revenue per quarter\" for Q4 2026 is 19,909.88, and the row total of every quarter equals that quarter's revenue, e.g. Q2 2025 916.56 = the revenue figure). The order counts on the same page are whole numbers: \"Orders by product category\" gives 324 for Q4 2026 and 1,213 in total, so a quarter supposedly holding 19,909.88 orders contradicts the 324-orders card right above the table.",
+      "reproSteps": [
+        "Open /dashboard/1?tab=1-overview&product_category=Widget&date_range=&date_grouping=&vendor= (Product Category set to Widget)",
+        "Scroll down past the \"Deeper Dive\" heading to the cards \"Orders by product category\" and \"Orders according to sources per quarter\"",
+        "Compare the Q4 2026 value of \"Orders by product category\" (324) with the Q4 2026 Row totals of the table (19,909.88) and the table's Grand totals (71,618.92)"
+      ]
+    },
+    {
+      "index": 20,
+      "reported_at_seconds": 1089,
+      "name": "A markdown link typed at the end of a Text card is missing in view mode although edit mode shows it",
+      "summary": "In view mode the card shows only the bold line and the two bullets; the last block (the link \"agent10 link\") is not visible at all, although about 35 px of empty space remains below \"second item\" inside the card. Going into edit mode again, the same card shows \"agent10 link\" at its bottom edge (partly cut), and the page's markup does contain the link with href https://www.metabase.com/learn. After a reload the link is still missing in view mode, so what the editor shows is not what a viewer of the dashboard gets. (on /dashboard/4-agent10-trash-test?tab=7-tab-1)",
+      "expected": "The saved text card renders its markdown exactly as entered and as the editing view shows it: the bold line, the two bullets and the link \"agent10 link\" pointing at https://www.metabase.com/learn.",
+      "actual": "In view mode the card shows only the bold line and the two bullets; the last block (the link \"agent10 link\") is not visible at all, although about 35 px of empty space remains below \"second item\" inside the card. Going into edit mode again, the same card shows \"agent10 link\" at its bottom edge (partly cut), and the page's markup does contain the link with href https://www.metabase.com/learn. After a reload the link is still missing in view mode, so what the editor shows is not what a viewer of the dashboard gets.",
+      "reproSteps": [
+        "Open https://5501-ieaktt3pj66aduas4qpqc.e2b.app/dashboard/4-agent10-trash-test?tab=7-tab-1 (dashboard \"agent10-trash-test\" in Harbor Admin's Personal Collection, tab \"Tab 1\").",
+        "Click \"Edit dashboard\".",
+        "Click the \"Add a heading or text box\" (T) button in the dashboard toolbar and choose \"Text\".",
+        "In the new card's editor type: **agent10 bold** and a list: / - first item / - second item / (blank line) / [agent10 link](https://www.metabase.com/learn)",
+        "Click an empty spot of the dashboard grid, then click \"Save\".",
+        "Look at the saved text card, then reload the page and look again."
+      ]
+    },
+    {
+      "index": 21,
+      "reported_at_seconds": 1216,
+      "name": "A dashboard's only tab cannot be renamed: its chevron menu loses \\\"Rename\\\" when a single tab is left",
+      "summary": "With a single tab the chevron menu shows only \\\"Duplicate\\\": \\\"Rename\\\" is missing, the tab label's textbox is disabled, and clicking or double-clicking the label does nothing — so a one-tab dashboard's tab cannot be renamed from the UI at all, although the same control offers Rename as soon as a second tab exists (with the three-tab state the menu was Rename / Duplicate / Delete). (on /dashboard/10-agent15-tab1-title)",
+      "expected": "The tab's chevron menu should offer \\\"Rename\\\" for a dashboard with a single tab just as it does with several tabs, since the tab strip and the tab's name are shown either way.",
+      "actual": "With a single tab the chevron menu shows only \\\"Duplicate\\\": \\\"Rename\\\" is missing, the tab label's textbox is disabled, and clicking or double-clicking the label does nothing — so a one-tab dashboard's tab cannot be renamed from the UI at all, although the same control offers Rename as soon as a second tab exists (with the three-tab state the menu was Rename / Duplicate / Delete).",
+      "reproSteps": [
+        "Open my dashboard https://5501-ieaktt3pj66aduas4qpqc.e2b.app/dashboard/10-agent15-tab1-title and click the pencil \"Edit dashboard\" button.",
+        "With more than one tab present, click the chevron next to a tab label: the menu shows Rename / Duplicate / Delete (screenshot of the three-tab state).",
+        "Delete the extra tabs so that only \"Tab 1\" is left (chevron > Delete, then Save, re-enter edit mode).",
+        "Click the chevron next to \"Tab 1\": the menu now shows only \"Duplicate\" — no Rename and no Delete.",
+        "Also confirm that clicking or double-clicking the tab label does not open a name field (its textbox stays disabled)."
+      ]
+    },
+    {
+      "index": 22,
+      "reported_at_seconds": 1231,
+      "name": "After saving a custom visualization on a card, its \"…\" menu loses \"Edit question\" while the identical table card keeps it",
+      "summary": "The chart card's \"…\" menu contains only \"Download results\"; \"Edit question\" is missing, while the identical table card right next to it shows both \"Edit question\" and \"Download results\". After a reload the chart card's menu still has only \"Download results\", so there is no way from that card to reach its question. The custom visualization itself saved correctly (bar chart with data labels persists across reloads). (on /dashboard/9-agent8-info-dash)",
+      "expected": "Both cards of the same question offer the same card menu: \"Edit question\" and \"Download results\" — changing the card's visualization should not remove the way to edit its question.",
+      "actual": "The chart card's \"…\" menu contains only \"Download results\"; \"Edit question\" is missing, while the identical table card right next to it shows both \"Edit question\" and \"Download results\". After a reload the chart card's menu still has only \"Download results\", so there is no way from that card to reach its question. The custom visualization itself saved correctly (bar chart with data labels persists across reloads).",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1 and open https://5501-ieaktt3pj66aduas4qpqc.e2b.app/dashboard/9-agent8-info-dash (a dashboard of mine with two \"Release requests\" cards on tab 1)",
+        "Click the pencil \"Edit dashboard\" button",
+        "Hover the LEFT \"Release requests\" card, click the third icon in its toolbar (\"Visualize another way\")",
+        "In the visualization dialog click \"Settings\", turn ON \"Show values on data points\", click \"Save\" in the dialog, then \"Save\" the dashboard",
+        "Reload the page and click the \"…\" menu at the top right of that now bar-chart card: it lists only \"Download results\"",
+        "Click the \"…\" menu at the top right of the RIGHT (unchanged table) card: it lists \"Edit question\" and \"Download results\""
+      ]
+    },
+    {
+      "index": 23,
+      "reported_at_seconds": 1258,
+      "name": "A card with no results shows only the sailboat drawing and no \\\"No results!\\\" line, unlike every other card on the dashboard",
+      "summary": "Every card shows the sailboat drawing plus the line \\\"No results!\\\" except the \\\"Revenue per quarter\\\" card, which shows only the sailboat and then empty white space – no \\\"No results!\\\", no number, no message. Seen 3 times out of 3 loads of the same address (screenshots s60, s61, s62). (on /dashboard/1)",
+      "expected": "Every card that has no rows says so in words, exactly as \\\"Revenue and orders over time\\\", \\\"Total orders by product category\\\", \\\"Revenue by product category\\\" and \\\"Orders according to sources per quarter\\\" do on the same dashboard.",
+      "actual": "Every card shows the sailboat drawing plus the line \\\"No results!\\\" except the \\\"Revenue per quarter\\\" card, which shows only the sailboat and then empty white space – no \\\"No results!\\\", no number, no message. Seen 3 times out of 3 loads of the same address (screenshots s60, s61, s62).",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open https://5501-ieaktt3pj66aduas4qpqc.e2b.app/dashboard/1?date_grouping=&date_range=past3months&product_category=NoSuchCategoryXYZ&tab=1-overview&vendor= (Overview tab with a Product Category value that matches no rows)",
+        "Compare the \"Revenue per quarter\" card at the top right with the \"Revenue and orders over time\" card to its left"
+      ]
+    },
+    {
+      "index": 24,
+      "reported_at_seconds": 1267,
+      "name": "With every value ticked, a multi-select dashboard filter offers no \"Update filter\" — only \"Set to default\"",
+      "summary": "As soon as all four values are ticked, 'Update filter' disappears and the only control left in the popup is 'Set to default' (which saves the selection as the dashboard's default rather than applying it as a view filter). The same happens with nothing ticked. So a user who wants to go from 'Widget' back to all categories has no apply action in the popup; they must use the small reset icon on the pill, which returns to the saved default, not to a chosen selection. (on /dashboard/1 (Overview tab, Product Category filter))",
+      "expected": "The pending selection can be applied, so the filter can be widened from one value to all values: the 'Update filter' button stays available for any non-empty selection, and the dashboard then shows every product category.",
+      "actual": "As soon as all four values are ticked, 'Update filter' disappears and the only control left in the popup is 'Set to default' (which saves the selection as the dashboard's default rather than applying it as a view filter). The same happens with nothing ticked. So a user who wants to go from 'Widget' back to all categories has no apply action in the popup; they must use the small reset icon on the pill, which returns to the saved default, not to a chosen selection.",
+      "reproSteps": [
+        "Open /dashboard/1 and click the 'Product Category' filter pill.",
+        "Tick 'Widget' and 'Doohickey' and 'Gadget' but leave 'Gizmo' unticked: the footer shows the blue 'Update filter' button.",
+        "Tick 'Gizmo' as well (or tick 'Select all') so that all four values are ticked.",
+        "Look at the popup footer."
+      ]
+    }
+  ]
+}

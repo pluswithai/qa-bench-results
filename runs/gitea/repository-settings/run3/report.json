@@ -1,0 +1,218 @@
+{
+  "bugs": [
+    {
+      "name": "Packages page still loads after the Packages unit is disabled (other disabled units return 404)",
+      "summary": "The Packages tab is gone from the repository tabs and the settings page keeps \\\"Enable Repository Packages Registry\\\" unticked after a reload, but /eval/agent4-units/packages still renders the full package page (\\\"There are no packages yet.\\\" with links to package settings and documentation) with HTTP 200. The other five disabled units correctly answer 404 Not Found. (on /eval/agent4-units/packages)",
+      "expected": "With the Packages unit disabled the repository's package page should not be served any more: like the Wiki, Issues, Projects, Releases and Pull Requests URLs of the same repository it should answer 404 Not Found, and the Packages tab should be gone (it is gone).",
+      "actual": "The Packages tab is gone from the repository tabs and the settings page keeps \\\"Enable Repository Packages Registry\\\" unticked after a reload, but /eval/agent4-units/packages still renders the full package page (\\\"There are no packages yet.\\\" with links to package settings and documentation) with HTTP 200. The other five disabled units correctly answer 404 Not Found.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-ie6qt03l9ux7kxa41h7z4.e2b.app/eval/agent4-units/settings",
+        "In Advanced Settings untick \"Enable Repository Packages Registry\" (and also Wiki, Issues, Projects, Releases, Pull Requests) and click the Update Settings button of the Advanced Settings section",
+        "Open https://5503-ie6qt03l9ux7kxa41h7z4.e2b.app/eval/agent4-units/packages",
+        "Compare with https://5503-ie6qt03l9ux7kxa41h7z4.e2b.app/eval/agent4-units/wiki, /projects, /releases, /issues/1 and /pulls, which are all requested the same way"
+      ]
+    },
+    {
+      "name": "Branch protection form throws away everything typed when a validation error occurs",
+      "summary": "The error message 'Required approvals cannot be negative.' appears at the top, but the whole form is blank again: 'Protected Branch Name Pattern' and 'Protected file patterns' are empty and 'Required approvals:' is back to 0, even though the address is now /settings/branches/edit?rule_name=agent5-pat. Everything has to be typed again; only the error text remembers the pattern. Reproduced 2 of 2 times (first with pattern 'main', then with 'agent5-pat' plus file patterns). (on /eval/agent5-branchtest/settings/branches/edit)",
+      "expected": "The rule is refused with 'Required approvals cannot be negative.' next to the field and everything already typed (branch pattern, protected file patterns) is kept, so the person can correct the one wrong value.",
+      "actual": "The error message 'Required approvals cannot be negative.' appears at the top, but the whole form is blank again: 'Protected Branch Name Pattern' and 'Protected file patterns' are empty and 'Required approvals:' is back to 0, even though the address is now /settings/branches/edit?rule_name=agent5-pat. Everything has to be typed again; only the error text remembers the pattern. Reproduced 2 of 2 times (first with pattern 'main', then with 'agent5-pat' plus file patterns).",
+      "reproSteps": [
+        "Sign in as eval and open the repo eval/agent5-branchtest (any repo you own) → Settings → Branches → 'Add New Rule' (/eval/agent5-branchtest/settings/branches/edit).",
+        "Type 'agent5-pat' in 'Protected Branch Name Pattern'.",
+        "Type '.drone.yml;/docs/**/*.txt' in 'Protected file patterns'.",
+        "Type '-1' in 'Required approvals:'.",
+        "Click 'Save Rule'."
+      ]
+    },
+    {
+      "name": "Invalid tag pattern error shows the raw key \"form.NamePattern\" instead of a field name",
+      "summary": "A red banner appears reading exactly: \"form.NamePattern glob pattern is invalid: unexpected end of input.\" — the internal form field key is shown to the user instead of the field label \"Tag Pattern\". (on /eval/harbor-handbook/settings/tags)",
+      "expected": "An error next to the field with human wording, e.g. \"Tag pattern is invalid: unexpected end of input.\"",
+      "actual": "A red banner appears reading exactly: \"form.NamePattern glob pattern is invalid: unexpected end of input.\" — the internal form field key is shown to the user instead of the field label \"Tag Pattern\".",
+      "reproSteps": [
+        "Sign in as eval (password momentic-eval-1) and open https://5503-ie6qt03l9ux7kxa41h7z4.e2b.app/eval/harbor-handbook/settings/tags",
+        "In the 'Tag Pattern' field type a single open bracket: [",
+        "Click 'Protect Tag'"
+      ]
+    },
+    {
+      "name": "Default Merge Style can be set to a merge style that is disabled, and the invalid combination is saved",
+      "summary": "\\\"The repository settings have been updated.\\\" and the stored default merge style is Create merge commit while the Create merge commit style stays unticked (after a reload the form still shows Merge Styles / Create merge commit unticked and Default Merge Style / Create merge commit). The form itself enforces the rule when unticking the current default (it silently switches the dropdown to another style), but the server accepts the invalid combination, so the repository keeps a default merge style it does not allow. (on /eval/agent4-units/settings)",
+      "expected": "The default merge style must be one of the enabled merge styles: either the save is refused with a message next to the field, or choosing it turns the Create merge commit style on. The repository must not end up with a default merge style that is disabled.",
+      "actual": "\\\"The repository settings have been updated.\\\" and the stored default merge style is Create merge commit while the Create merge commit style stays unticked (after a reload the form still shows Merge Styles / Create merge commit unticked and Default Merge Style / Create merge commit). The form itself enforces the rule when unticking the current default (it silently switches the dropdown to another style), but the server accepts the invalid combination, so the repository keeps a default merge style it does not allow.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-ie6qt03l9ux7kxa41h7z4.e2b.app/eval/agent4-units/settings",
+        "In Advanced Settings under Pull Requests untick the merge style \"Create merge commit\" (leave the other styles ticked)",
+        "Open the Default Merge Style dropdown and choose \"Create merge commit\" (it is still offered although its style is unticked)",
+        "Click the Update Settings button of the Advanced Settings section",
+        "Reload the page and read Merge Styles and Default Merge Style"
+      ]
+    },
+    {
+      "name": "A very long tag pattern breaks the page layout: the table widens past the window and the Allowed/Edit/Remove columns go off screen",
+      "summary": "The rule is saved and the protection table grows to 3684px inside a 1280px window (document scrollWidth 3693): the \"Allowed\" column and every row's Edit/Remove buttons are pushed off the right edge, the panel border is cut and the whole settings page gets a horizontal scrollbar. The long pattern has no max length. (on /eval/harbor-handbook/settings/tags)",
+      "expected": "The pattern is either refused for being too long, or shown wrapped/truncated so the table and the Edit/Remove buttons stay inside the page at the normal window width with no sideways scrolling.",
+      "actual": "The rule is saved and the protection table grows to 3684px inside a 1280px window (document scrollWidth 3693): the \"Allowed\" column and every row's Edit/Remove buttons are pushed off the right edge, the panel border is cut and the whole settings page gets a horizontal scrollbar. The long pattern has no max length.",
+      "reproSteps": [
+        "Sign in as eval (password momentic-eval-1) and open https://5503-ie6qt03l9ux7kxa41h7z4.e2b.app/eval/harbor-handbook/settings/tags",
+        "In 'Tag Pattern' paste a long pattern: agent9-long- followed by 640 'a' characters and '*'",
+        "Click 'Protect Tag'",
+        "Look at the protected tags table below the form"
+      ]
+    },
+    {
+      "name": "Repo created from an empty template has no default branch, so the quick-guide git commands have an empty branch name",
+      "summary": "The repository is created with an empty default branch name: the quick guide shows 'git checkout -b' and 'git push -u origin' with no branch after them, so the copy-paste instructions are broken. The repo's Settings → Repository page shows no default branch at all (unlike an empty repo created without a template). (on /repo/create → /eval/agent1-from-empty-tpl)",
+      "expected": "The repository is created with the default branch name 'main', as it is for an empty repository created without a template ('git checkout -b main' / 'git push -u origin main'), and the settings page exposes a default branch.",
+      "actual": "The repository is created with an empty default branch name: the quick guide shows 'git checkout -b' and 'git push -u origin' with no branch after them, so the copy-paste instructions are broken. The repo's Settings → Repository page shows no default branch at all (unlike an empty repo created without a template).",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-ie6qt03l9ux7kxa41h7z4.e2b.app/repo/create",
+        "First make an empty template repo: enter name agent1-public-tpl, tick 'Make repository a template', leave 'Initialize Repository' unticked, click 'Create Repository' (result: an empty repo, no commits)",
+        "Back at /repo/create, open the 'Template' dropdown and choose eval/agent1-public-tpl",
+        "Under 'Template Items' tick 'Git Content (Default Branch)', enter name agent1-from-empty-tpl, click 'Create Repository'",
+        "On the new repo page read the 'Creating a new repository on the command line' block"
+      ]
+    },
+    {
+      "name": "Saving the settings with the Pull Requests unit unticked silently turns the pull request options back on",
+      "summary": "\\\"The repository settings have been updated.\\\" and the pull request options come back ticked: Create merge commit and Enable autodetect manual merge read checked again straight after the save (in an earlier run of the same steps Allow edits from maintainers by default and Delete pull request branch after merge by default, which had been off, also came back on). The greyed section then shows every option ticked, so the settings the owner turned off are silently lost. As a control, saving with Enable Repository Pull Requests still ticked keeps both options off. (on /eval/agent4-units/settings)",
+      "expected": "Saving with Enable Repository Pull Requests unticked should only disable the module. The pull request options the owner had turned off (Create merge commit, Allow edits from maintainers by default, Delete pull request branch after merge by default, Enable autodetect manual merge) must keep their values, whether or not the module is enabled.",
+      "actual": "\\\"The repository settings have been updated.\\\" and the pull request options come back ticked: Create merge commit and Enable autodetect manual merge read checked again straight after the save (in an earlier run of the same steps Allow edits from maintainers by default and Delete pull request branch after merge by default, which had been off, also came back on). The greyed section then shows every option ticked, so the settings the owner turned off are silently lost. As a control, saving with Enable Repository Pull Requests still ticked keeps both options off.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-ie6qt03l9ux7kxa41h7z4.e2b.app/eval/agent4-units/settings",
+        "In Advanced Settings under Pull Requests untick the merge style \"Create merge commit\" and untick \"Enable autodetect manual merge\", leave Enable Repository Pull Requests ticked, and click the Update Settings button of the Advanced Settings section (control run: after the save both stay unticked)",
+        "Now untick \"Enable Repository Pull Requests\" and click Update Settings again",
+        "Read the Pull Requests / Merge Styles section: Create merge commit and Enable autodetect manual merge are ticked again even though nothing was changed but the module switch"
+      ]
+    },
+    {
+      "name": "Protect Tag accepts a pattern of only spaces and saves a rule that shows as an empty row",
+      "summary": "The rule is created and the list gains a row whose Tag Pattern is blank (only a blank cell in the Tag Pattern column); the page says \"The repository settings have been updated.\" A tag name cannot contain spaces, so the rule can never match anything and the row is unreadable. (on /eval/harbor-handbook/settings/tags)",
+      "expected": "The pattern is trimmed and a value with no visible characters is refused with an error next to the field (as the empty field already is), not saved as a blank rule.",
+      "actual": "The rule is created and the list gains a row whose Tag Pattern is blank (only a blank cell in the Tag Pattern column); the page says \"The repository settings have been updated.\" A tag name cannot contain spaces, so the rule can never match anything and the row is unreadable.",
+      "reproSteps": [
+        "Sign in as eval (password momentic-eval-1) and open https://5503-ie6qt03l9ux7kxa41h7z4.e2b.app/eval/harbor-handbook/settings/tags",
+        "In the 'Tag Pattern' field type three spaces (nothing visible)",
+        "Click 'Protect Tag'",
+        "Scroll to the protected tags table"
+      ]
+    },
+    {
+      "name": "Adding a \"new\" branch protection rule with an existing pattern silently overwrites that rule with defaults",
+      "summary": "The page answers 'Branch protection for rule \"main\" has been updated.' and no second rule is created, but the existing rule 'main' is silently rewritten with the form's defaults: Push goes back to 'Disable Push' (it was 'Enable Push'), 'Required approvals' back to 0 (it was 2), Dismiss stale approvals, Block merge on rejected reviews and Block merge if pull request is outdated back to unchecked. The previously configured protection is lost without any warning. Reproduced 2 of 2 times (first with the rule configured with Enable Push/1 approval/status check, then again with Enable Push/2 approvals). (on /eval/agent5-branchtest/settings/branches/edit)",
+      "expected": "Saving a new rule whose pattern is already used by an existing rule is refused with a message such as 'A rule with this pattern already exists', and the existing rule keeps all its settings.",
+      "actual": "The page answers 'Branch protection for rule \"main\" has been updated.' and no second rule is created, but the existing rule 'main' is silently rewritten with the form's defaults: Push goes back to 'Disable Push' (it was 'Enable Push'), 'Required approvals' back to 0 (it was 2), Dismiss stale approvals, Block merge on rejected reviews and Block merge if pull request is outdated back to unchecked. The previously configured protection is lost without any warning. Reproduced 2 of 2 times (first with the rule configured with Enable Push/1 approval/status check, then again with Enable Push/2 approvals).",
+      "reproSteps": [
+        "Sign in as eval, open eval/agent5-branchtest → Settings → Branches (/eval/agent5-branchtest/settings/branches).",
+        "Click 'Add New Rule', type 'main' in 'Protected Branch Name Pattern', choose 'Enable Push' and 'Required approvals: 2', click 'Save Rule' → the rule 'main' is listed; open it with 'Edit' and confirm 'Enable Push' is selected (this is the configured state, screenshot 1).",
+        "Go back to Settings → Branches and click 'Add New Rule' again (new-rule form at .../settings/branches/edit).",
+        "Type the same pattern 'main' in 'Protected Branch Name Pattern', leave everything else at its default ('Disable Push', 'Required approvals: 0').",
+        "Click 'Save Rule' → green message 'Branch protection for rule \"main\" has been updated.'",
+        "Click 'Edit' on the only listed rule 'main' → the form shows 'Disable Push' selected and 'Required approvals: 0' (screenshot 2), i.e. the previously saved settings are gone."
+      ]
+    },
+    {
+      "name": "Archived repo's issue page still offers \"New Issue\", which leads to a generic 404 page",
+      "summary": "The issue page still shows the blue 'New Issue' button; clicking it opens /eval/agent12-archive/issues/new which answers '404 Not Found — The page you are trying to reach either does not exist or you are not authorized to view it.' The same page's own banner says 'This repo is archived. You cannot comment on issues.' and the code page hides its edit controls. (on /eval/agent12-archive/issues/1)",
+      "expected": "On an archived repository the 'New Issue' control should be hidden (as it is for the other write actions), or at least answer with a clear 'this repository is archived' message instead of a generic 404 page.",
+      "actual": "The issue page still shows the blue 'New Issue' button; clicking it opens /eval/agent12-archive/issues/new which answers '404 Not Found — The page you are trying to reach either does not exist or you are not authorized to view it.' The same page's own banner says 'This repo is archived. You cannot comment on issues.' and the code page hides its edit controls.",
+      "reproSteps": [
+        "Sign in as eval and archive a repository (repo agent12-archive, header shows the 'Archived' badge).",
+        "Open an existing issue of that archived repo: /eval/agent12-archive/issues/1.",
+        "The comment box is replaced by the notice 'This repo is archived. You cannot comment on issues.', but the blue 'New Issue' button is still shown in the top right.",
+        "Click 'New Issue'.",
+        "The browser goes to /eval/agent12-archive/issues/new and shows the generic '404 Not Found — The page you are trying to reach either does not exist or you are not authorized to view it.' page."
+      ]
+    },
+    {
+      "name": "Wiki editor open on an archived repo, and saving answers a generic 404 and loses the typed page",
+      "summary": "The wiki editor opens normally on the archived repo (page title, 'New Page' button, content loaded, 'Save Page') with no hint about the archive state. Clicking 'Save Page' answers a bare '404 Not Found — The page you are trying to reach either does not exist or you are not authorized to view it.' page and the text typed into the page is lost. (on /eval/agent12-archive/wiki/Home?action=_edit)",
+      "expected": "An archived repository is read-only (the archive dialog: 'Archiving the repo will make it entirely read-only'; the wiki page hides its Edit link), so the wiki editor should not be offered for an archived repo, or saving should refuse with a clear 'this repository is archived' message and keep the typed text.",
+      "actual": "The wiki editor opens normally on the archived repo (page title, 'New Page' button, content loaded, 'Save Page') with no hint about the archive state. Clicking 'Save Page' answers a bare '404 Not Found — The page you are trying to reach either does not exist or you are not authorized to view it.' page and the text typed into the page is lost.",
+      "reproSteps": [
+        "Sign in as eval and archive a repository that has a wiki page (repo agent12-archive, header shows the 'Archived' badge, wiki page 'Home' exists).",
+        "Open /eval/agent12-archive/wiki/Home?action=_edit — the full wiki editor is rendered on the archived repo, with no archived notice.",
+        "Change the content, e.g. type 'EDITED-WHILE-ARCHIVED' into the page content.",
+        "Click the 'Save Page' button at the bottom.",
+        "The page answers '404 Not Found — The page you are trying to reach either does not exist or you are not authorized to view it.' and nothing is saved; the typed text is gone."
+      ]
+    },
+    {
+      "name": "Branch protection rule pattern of only spaces is accepted and creates a nameless rule that protects nothing",
+      "summary": "The rule is saved and the green message says 'Branch protection for rule \" \" has been updated.', and the Branch Protection list gets a second row whose pattern badge is empty (no branch name at all). The rule protects no branch, yet it exists and can only be told apart from a real rule by its blank label. Reproduced 2 of 2 times. (on /eval/agent5-branchtest/settings/branches)",
+      "expected": "A pattern made only of whitespace is refused with a validation message next to 'Protected Branch Name Pattern', like an empty pattern is, and no rule is created.",
+      "actual": "The rule is saved and the green message says 'Branch protection for rule \" \" has been updated.', and the Branch Protection list gets a second row whose pattern badge is empty (no branch name at all). The rule protects no branch, yet it exists and can only be told apart from a real rule by its blank label. Reproduced 2 of 2 times.",
+      "reproSteps": [
+        "Sign in as eval, open eval/agent5-branchtest → Settings → Branches (/eval/agent5-branchtest/settings/branches).",
+        "Click 'Add New Rule' (form at /eval/agent5-branchtest/settings/branches/edit).",
+        "Click 'Protected Branch Name Pattern' and press the Space bar once, so the field holds a single space.",
+        "Click 'Save Rule'."
+      ]
+    },
+    {
+      "name": "A rejected repository name wipes the description typed in the same form",
+      "summary": "The page answers \"The repository name is already used.\" and re-renders the Basic Settings form from the saved repository: the Repository Name goes back to agent3-settings and the Description box shows the previously saved text (\"repro beforeunload check 4\") instead of what was typed. The typed description is lost with no warning and nothing saved. (on /eval/agent3-settings/settings)",
+      "expected": "The error is shown next to the Repository Name field, and the other values typed in the form (here the Description) are kept so the person can just fix the name and save again.",
+      "actual": "The page answers \"The repository name is already used.\" and re-renders the Basic Settings form from the saved repository: the Repository Name goes back to agent3-settings and the Description box shows the previously saved text (\"repro beforeunload check 4\") instead of what was typed. The typed description is lost with no warning and nothing saved.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-ie6qt03l9ux7kxa41h7z4.e2b.app/eval/agent3-settings/settings (Basic Settings panel).",
+        "Type a new text in the Description box, e.g. \"agent3 typed-then-error description one\".",
+        "Change the Repository Name field to harbor-handbook (a name that already exists).",
+        "Click \"Update Settings\".",
+        "Read the Description box on the page that comes back."
+      ]
+    },
+    {
+      "name": "Whitespace-only description is saved and leaves an empty \\\"Description\\\" block and a dangling colon in the page title",
+      "summary": "The whitespace-only description is saved as-is and the repository home page then shows the \"Description\" heading in the sidebar with nothing under it (no \"No description provided\"), and the browser tab title becomes \"eval/agent3-settings:  - agent3-settings - Gitea: Git with a cup of tea.\" with a dangling colon. Saving a truly empty description on the same page correctly shows \"No description provided\", so the same \"no description\" state renders two different ways. (on /eval/agent3-settings/settings)",
+      "expected": "A description of only spaces is trimmed to empty (or refused), and the repository page treats it like an empty description: sidebar shows \"No description provided\" and the page title has no dangling \": \".",
+      "actual": "The whitespace-only description is saved as-is and the repository home page then shows the \"Description\" heading in the sidebar with nothing under it (no \"No description provided\"), and the browser tab title becomes \"eval/agent3-settings:  - agent3-settings - Gitea: Git with a cup of tea.\" with a dangling colon. Saving a truly empty description on the same page correctly shows \"No description provided\", so the same \"no description\" state renders two different ways.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-ie6qt03l9ux7kxa41h7z4.e2b.app/eval/agent3-settings/settings.",
+        "Delete the current text in the Description box and type only spaces (first tried three spaces, second tried a single Tab character).",
+        "Click \"Update Settings\" and wait for \"The repository settings have been updated.\".",
+        "Open https://5503-ie6qt03l9ux7kxa41h7z4.e2b.app/eval/agent3-settings and look at the Description block in the right sidebar, and at the browser tab title."
+      ]
+    },
+    {
+      "name": "A long branch protection pattern overflows the Branch Protection card at phone width",
+      "summary": "At a phone-sized window (390×844) the rule with the long pattern is drawn with its pattern badge running past the right edge of the Branch Protection panel and off the screen, so the end of the pattern cannot be read; the 'Edit'/'Delete Rule' buttons are pushed down and the row no longer fits its card. At 1280px the same badge stays inside the card. (A static layout problem: it is there whenever a long pattern is listed.) (on /eval/agent5-branchtest/settings/branches)",
+      "expected": "The long pattern is wrapped or truncated with an ellipsis inside the Branch Protection card, at any window width, so the row and its buttons stay inside the panel.",
+      "actual": "At a phone-sized window (390×844) the rule with the long pattern is drawn with its pattern badge running past the right edge of the Branch Protection panel and off the screen, so the end of the pattern cannot be read; the 'Edit'/'Delete Rule' buttons are pushed down and the row no longer fits its card. At 1280px the same badge stays inside the card. (A static layout problem: it is there whenever a long pattern is listed.)",
+      "reproSteps": [
+        "Sign in as eval and open /eval/agent5-branchtest/settings/branches.",
+        "Click 'Add New Rule', type the long pattern 'agent5-verylongpattern-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-*' in 'Protected Branch Name Pattern' and click 'Save Rule'.",
+        "Set the browser window to a phone size (390 × 844) and scroll down to the 'Branch Protection' panel."
+      ]
+    },
+    {
+      "name": "Archived repository's Repository settings still save changes while Branches and Tags settings refuse",
+      "summary": "The Repository settings page of the same archived repo still saves every change with \\\"The repository settings have been updated.\\\": the description typed while archived (\\\"agent4-archived-desc\\\") is stored and shown after a reload, and unticking \\\"Enable Repository Issue Tracker\\\" saved too (the Issues tab disappeared from the archived repo). Branches and Tags settings on that very repository answer \\\"Branch settings are not available if the repo is archived.\\\" / \\\"Tag settings are not available if the repo is archived.\\\", so the guard exists on the sibling settings pages but not on Repository settings, which contradicts the archive dialog's \\\"Archiving the repo will make it entirely read-only\\\". (on /eval/agent4-arch/settings)",
+      "expected": "An archived repository should be read-only for configuration as well, the way its Branches and Tags settings already refuse: the Repository settings page should show a message like \\\"Settings are not available if the repo is archived\\\" and not save, or the archive wording should say which settings stay editable.",
+      "actual": "The Repository settings page of the same archived repo still saves every change with \\\"The repository settings have been updated.\\\": the description typed while archived (\\\"agent4-archived-desc\\\") is stored and shown after a reload, and unticking \\\"Enable Repository Issue Tracker\\\" saved too (the Issues tab disappeared from the archived repo). Branches and Tags settings on that very repository answer \\\"Branch settings are not available if the repo is archived.\\\" / \\\"Tag settings are not available if the repo is archived.\\\", so the guard exists on the sibling settings pages but not on Repository settings, which contradicts the archive dialog's \\\"Archiving the repo will make it entirely read-only\\\".",
+      "reproSteps": [
+        "Sign in as eval, create the repository https://5503-ie6qt03l9ux7kxa41h7z4.e2b.app/repo/create name agent4-arch with Initialize Repository ticked",
+        "Open /eval/agent4-arch/settings, scroll to Danger Zone, click Archive Repo and confirm with Yes (banner \"Archived\" and \"The repo was successfully archived.\")",
+        "On the same settings page type \"agent4-archived-desc\" in Description and click Update Settings",
+        "Reload the page: the description is kept and the message \"The repository settings have been updated.\" is shown",
+        "Still archived, untick \"Enable Repository Issue Tracker\" in Advanced Settings and click Update Settings: it saves and the Issues tab disappears",
+        "Open /eval/agent4-arch/settings/branches and /settings/tags: both say the settings are not available if the repo is archived"
+      ]
+    },
+    {
+      "name": "Saving a stale branch-protection edit resurrects a rule deleted in another tab and says it \"has been updated\"",
+      "summary": "The stale tab accepted the save, showed \"Branch protection for rule \"dev2\" has been updated.\" and the rule \"dev2\" is back in the Branch Protection list — the deleted rule was silently re-created (same for a rule named \"dev\" in a first attempt). No message about the rule having been deleted. (on /eval/agent9-secret/settings/branches/edit?rule_name=dev2)",
+      "expected": "The save is refused with a message that the rule no longer exists (the app should notice the stale form), and no protected-branch rule is created again.",
+      "actual": "The stale tab accepted the save, showed \"Branch protection for rule \"dev2\" has been updated.\" and the rule \"dev2\" is back in the Branch Protection list — the deleted rule was silently re-created (same for a rule named \"dev\" in a first attempt). No message about the rule having been deleted.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-ie6qt03l9ux7kxa41h7z4.e2b.app/eval/agent9-secret/settings/branches",
+        "Click 'Add New Rule', type dev2 in 'Protected Branch Name Pattern', click 'Save Rule'",
+        "Open the rule's edit form in a second browser tab: https://5503-ie6qt03l9ux7kxa41h7z4.e2b.app/eval/agent9-secret/settings/branches/edit?rule_name=dev2",
+        "Back in the first tab click 'Delete Rule' next to dev2 and answer 'Yes' in the 'Delete Branch Protection' dialog - the list now says 'Branch protection for rule \"dev2\" has been removed.'",
+        "In the second (stale) tab click 'Save Rule'",
+        "Look at the Branch Protection list"
+      ]
+    }
+  ]
+}

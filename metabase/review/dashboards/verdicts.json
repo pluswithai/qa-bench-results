@@ -1,0 +1,541 @@
+{
+  "area": "dashboards",
+  "bugs": [
+    {
+      "id": "dashboards-1",
+      "title": "Non-numeric dashboard id (/dashboard/abc) spins on \"Loading...\" forever instead of a not-found page",
+      "findings": [
+        "run1-03",
+        "run2-14",
+        "run3-03"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "A non-numeric dashboard id leaves the page on Loading... forever with no not-found state. Counted under the rule for addresses the app does not generate.",
+      "evidence": [
+        "run1-03/shot-1.png",
+        "run2-14/shot-1.png",
+        "run3-03/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/lib/urls/utils.ts#L7-L10",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/dashboard/containers/DashboardApp/DashboardApp.tsx#L106-L107",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/dashboard/context/context.tsx#L302-L307"
+      ]
+    },
+    {
+      "id": "dashboards-2",
+      "title": "Whitespace-only dashboard name passes client validation; dialog shows raw server validation text and the button turns into \"Failed\" (New dashboard and Duplicate dialogs)",
+      "findings": [
+        "run1-10",
+        "run3-14",
+        "run2-11"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "Both forms validate the name with Yup.string().required() without trimming, so a spaces-only name enables Create/Duplicate and is only refused by the API (400). The server's schema message is then printed under the field verbatim: \"Value must be a non-blank string.\" (create) and the more technical \"Nullable value must be a non-blank string.\" (copy). The save is correctly refused and nothing is lost, so this is a wording / missing client check issue, not a functional one.",
+      "evidence": [
+        "run1-10/shot-1.png",
+        "run2-11/shot-2.png",
+        "run3-14/shot-3.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/dashboard/containers/CreateDashboardForm.tsx#L28-L33",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/dashboard/containers/CopyDashboardForm.tsx#L32-L36"
+      ]
+    },
+    {
+      "id": "dashboards-3",
+      "title": "Text card on the sample dashboard clips its last line at phone width",
+      "findings": [
+        "run1-17",
+        "run2-08",
+        "run3-04"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "At 390 px the 'Business KPIs...' paragraph wraps to three lines but the mobile layout keeps the desktop row height for text cards (text: max(2, desktopHeight)), and the card wrapper is overflow:hidden, so the third line is cut through the glyphs. The inner markdown box is overflow-y:auto, so the text is still reachable by scrolling inside the card (run1-17 observed this), but there is no visible affordance. Visual glitch on Metabase's own shipped dashboard, nothing the dashboard author can fix for phones.",
+      "evidence": [
+        "run1-17/shot-1.png",
+        "run2-08/shot-1.png",
+        "run3-04/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/visualizations/shared/utils/sizes.ts#L42",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/visualizations/visualizations/Text/Text.styled.tsx#L21-L28",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/visualizations/visualizations/Text/Text.styled.tsx#L152-L158"
+      ]
+    },
+    {
+      "id": "dashboards-4",
+      "title": "Long unbroken word in a text card is cut off at the card edge (no wrap, no scroll)",
+      "findings": [
+        "run1-21",
+        "run2-05"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "The text-card markdown container sets overflow-x:hidden and has no overflow-wrap/word-break rule, so any token longer than the card (a long URL or identifier) is clipped with no ellipsis, scrollbar or tooltip; the rest of the token cannot be read in view mode. Seen at 320 px and at desktop width.",
+      "evidence": [
+        "run1-21/shot-2.png",
+        "run2-05/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/visualizations/visualizations/Text/Text.styled.tsx#L152-L158"
+      ]
+    },
+    {
+      "id": "dashboards-5",
+      "title": "Link card's search popover opens by itself on entering edit mode and does not close on Escape",
+      "findings": [
+        "run2-19",
+        "run3-17"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "LinkViz sets autoFocus=true whenever the card mounts with a stored url (previousUrl is undefined on first render), so entering edit mode focuses the link input, scrolls to it, and - because the popover is visible whenever the input is focused and the text is not a URL - opens the search popover ('Didn't find anything') over neighbouring cards. Visibility is tied only to input focus, so Escape does nothing; only clicking elsewhere closes it. Affects link cards whose text is not a full URL ('example.com/agent4-noproto', 'not a valid url').",
+      "evidence": [
+        "run3-17/shot-2.png",
+        "run2-19/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/visualizations/visualizations/LinkViz/LinkViz.tsx#L98-L104",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/visualizations/visualizations/LinkViz/LinkViz.tsx#L159-L186"
+      ]
+    },
+    {
+      "id": "dashboards-6",
+      "title": "Saving a dashboard with an expired/invalid session leaves a blank white page instead of the sign-in redirect",
+      "findings": [
+        "run1-19"
+      ],
+      "verdict": "accept",
+      "severity": 5,
+      "reason": "The 401 itself is environmental (the session was invalidated outside the tab, shared accounts), and losing the unsaved edit is unavoidable, but the app's reaction is the defect: the recording shows a fully blank page for at least 9 s after clicking Save, until the agent reloaded and got the sign-in form. Source gives a consistent mechanism (inferred, not run): the 401 handler clears the current user and pushes /auth/login, but the dashboard is still editing+dirty so the route-leave hook cancels that navigation; with the user cleared, the UserIsAuthenticated wrapper renders nothing, and the 'Discard your changes?' modal lives inside the unmounted tree. Session expiry while editing is a normal real-world event. Severity 5 because the result is a blank page with no message.",
+      "evidence": [
+        "run1-19/shot-1.png",
+        "run1-19/shot-3.png",
+        "run1-19/video.webm"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/app-main.js#L28-L44",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/common/hooks/use-confirm-route-leave-modal.ts#L55-L63",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/dashboard/components/DashboardLeaveConfirmationModal/DashboardLeaveConfirmationModal.tsx#L24-L28",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/route-guards.tsx#L47-L53"
+      ]
+    },
+    {
+      "id": "dashboards-7",
+      "title": "Global search treats % and _ as SQL wildcards (typing \"%\" or \"_\" returns every item)",
+      "findings": [
+        "run1-20"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "Search terms are wrapped as %term% and passed to LIKE without escaping LIKE metacharacters, so '%' and '_' match everything (95-99 results, none containing the character). Any term containing '_' or '%' (e.g. order_id, 100%) therefore returns extra, non-matching items. Not a dashboards feature strictly, but a real search defect.",
+      "evidence": [
+        "run1-20/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/src/metabase/search/in_place/util.clj#L8-L11",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/src/metabase/search/appdb/specialization/h2.clj#L33-L48"
+      ]
+    },
+    {
+      "id": "dashboards-8",
+      "title": "\"Exit fullscreen\" does not exit on the first click after the dashboard was loaded with #fullscreen",
+      "findings": [
+        "run2-02"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "On load with #fullscreen the hash sync sets the app-level isFullscreen=true, but the browser cannot enter real fullscreen without a user gesture, so Mantine's fullscreen flag stays false. The first click on 'Exit fullscreen' calls toggle(), which now ENTERS browser fullscreen; the effect that mirrors that flag sets isFullscreen back to true, undoing the exit. Only the second click leaves. Matches the report (3 of 3, works without a reload).",
+      "evidence": [
+        "run2-02/shot-3.png",
+        "run2-02/shot-5.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/dashboard/hooks/use-dashboard-fullscreen.ts#L9-L31",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/dashboard/hooks/use-location-sync.ts#L55-L90"
+      ]
+    },
+    {
+      "id": "dashboards-9",
+      "title": "Duplicate dialog pre-fills a name longer than the 254-character limit it then refuses",
+      "findings": [
+        "run1-24"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "EntityCopyModal builds the default name as '<name> - Duplicate' without truncation; for a dashboard whose name is at the 254 limit the dialog opens already invalid ('Must be 254 characters or less', Duplicate disabled). Edge case with a clear message and an obvious manual fix, so cosmetic severity.",
+      "evidence": [
+        "run1-24/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/entities/containers/EntityCopyModal.tsx#L49",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/dashboard/containers/CopyDashboardForm.tsx#L32-L36",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/dashboard/constants.ts#L8"
+      ]
+    },
+    {
+      "id": "dashboards-10",
+      "title": "Dashboard title is squeezed into a ~55 px column and breaks mid-word at tablet width in edit mode with the sidebar open",
+      "findings": [
+        "run1-16"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "With the 'Add a chart' sidebar open the header container gets margin-right: var(--sidebar-width); that offset is only dropped when the header container is under 40rem. At 820 px (above the breakpoint, and editing is offered there) title and toolbar share ~430 px, so the title wraps to six lines mid-word. Layout glitch only.",
+      "evidence": [
+        "run1-16/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/dashboard/components/DashboardHeader/DashboardHeaderView.module.css#L22-L30"
+      ]
+    },
+    {
+      "id": "dashboards-11",
+      "title": "Public link popover is wider than a phone screen; the URL is cut and the copy button is off-screen",
+      "findings": [
+        "run2-16"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "The popover content has a fixed width of 28rem (448 px), which matches the 448 px the agent measured on a 390 px viewport; the copy control ends up outside the visible area. Sharing is available at phone width, so the state is reachable normally. Layout issue with a workaround (select the text in the field).",
+      "evidence": [
+        "run2-16/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/embedding/components/PublicLinkPopover/PublicLinkPopover.tsx#L70"
+      ]
+    },
+    {
+      "id": "dashboards-12",
+      "title": "Type-column icon in collection tables is a pointer-cursor <button> with an empty click handler",
+      "findings": [
+        "run2-13"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "The Type cell renders EntityIconCheckBox without 'selectable', which yields a real <button> (IconButtonWrapper, cursor:pointer) whose onClick is () => {}. It looks and focuses like a control but does nothing. Minor affordance/accessibility defect, no functional loss (the name link opens the item).",
+      "evidence": [
+        "run2-13/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/common/components/ItemsTable/Columns.tsx#L130-L142",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/common/components/EntityItem/EntityItem.tsx#L72-L77",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/common/components/IconButtonWrapper/IconButtonWrapper.tsx#L16-L20"
+      ]
+    },
+    {
+      "id": "dashboards-13",
+      "title": "Iframe card accepts an empty snippet and then only shows the generic \"There was a problem rendering this content.\"",
+      "findings": [
+        "run1-23"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "'Done' just toggles preview with no validation, and an empty source falls through to GenericError (lock icon + generic sentence), which is saved and shown to viewers. The message is misleading for an empty card (nothing failed to render) and gives no hint that a URL is missing. Low impact, self-inflicted input, so cosmetic severity.",
+      "evidence": [
+        "run1-23/shot-3.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/visualizations/visualizations/IFrameViz/IFrameViz.tsx#L95-L101",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/visualizations/visualizations/IFrameViz/IFrameViz.tsx#L131-L136",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/visualizations/visualizations/IFrameViz/IFrameViz.tsx#L200-L209"
+      ]
+    },
+    {
+      "id": "dashboards-14",
+      "title": "\"Orders according to sources per quarter\" shows revenue amounts, not order counts",
+      "findings": [
+        "run1-05",
+        "run2-20"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Observation is correct, but it is the content of Metabase's shipped sample dashboard, not app behaviour: the saved question aggregates [metric 9] = 'Revenue' broken out by source and quarter. The app renders the saved query faithfully; only the card's title/description are loosely worded demo content.",
+      "evidence": [
+        "run1-05/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/resources/sample-content.edn#L3593-L3601"
+      ]
+    },
+    {
+      "id": "dashboards-15",
+      "title": "\"Revenue and orders over time\" plots a quantity sum as the \"Orders\" series",
+      "findings": [
+        "run2-06"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Sample-content definition, not an app defect: the card's query has four aggregations (Revenue metric, sum of Quantity, sum of Discount, count) and its settings title the sum-of-quantity series 'Orders'. The chart shows exactly what the saved question defines; the naming is demo content.",
+      "evidence": [
+        "run3-02/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/resources/sample-content.edn#L3665-L3683"
+      ]
+    },
+    {
+      "id": "dashboards-16",
+      "title": "Tooltip of \"Revenue and orders over time\" lists extra rows (Sum of Discount, Count)",
+      "findings": [
+        "run3-02"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Works as configured: the card's visualization settings set graph.tooltip_columns to the count and sum_3 (discount) columns - Metabase's 'additional tooltip columns' feature - so the two extra rows are intended. The console message about that setting is not user-visible and the tooltip shows precisely the configured columns.",
+      "evidence": [
+        "run3-02/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/resources/sample-content.edn#L3683"
+      ]
+    },
+    {
+      "id": "dashboards-17",
+      "title": "Website Analysis funnel cards ignore the Date Range filter",
+      "findings": [
+        "run1-18"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Dashboard filters only affect cards they are wired to. In the shipped sample dashboard the 'Checkout funnel' (card 6) and 'User flow diagram' (card 11) dashcards have parameter_mappings \"[]\", while the subscription cards are mapped to Date Range. Unconnected cards staying unchanged is designed behaviour and a dashboard-authoring choice.",
+      "evidence": [
+        "run1-18/shot-4.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/resources/sample-content.edn#L624-L630",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/resources/sample-content.edn#L683-L689"
+      ]
+    },
+    {
+      "id": "dashboards-18",
+      "title": "\"Best selling products\" card does not react to the Product Category filter",
+      "findings": [
+        "run3-18"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Same cause as the funnel cards: the 'Best selling products' dashcard (card 21) ships with parameter_mappings \"[]\", so the Product Category filter is not connected to it and the list legitimately stays the same. Dashboard configuration, not a filtering bug.",
+      "evidence": [
+        "run3-18/shot-4.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/resources/sample-content.edn#L253-L259"
+      ]
+    },
+    {
+      "id": "dashboards-19",
+      "title": "Website Analysis subscription cards disagree on dates (2022 vs 2023-2026; 'No results' next to 64 recent subscriptions)",
+      "findings": [
+        "run1-25",
+        "run1-26"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Sample data and sample wiring, not app behaviour. 'Number of subscriptions' counts Analytic Events rows (button = Subscribe) whose timestamps are in 2022, while 'Subscription seats over time' and 'Most recent subscription' read the Accounts table (dates up to 2026) - different tables with different date ranges. 'Subscription seats over time' goes empty under 'Previous 3 months' because its Date Range mapping targets the year-bucketed column of stage 1 (2026-01-01 is outside the window), whereas 'Most recent subscription' is filtered on the raw date. Each card returns what its saved query and mapping define.",
+      "evidence": [
+        "run1-25/shot-3.png",
+        "run1-26/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/resources/sample-content.edn#L643-L660",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/resources/sample-content.edn#L742-L749",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/resources/sample-content.edn#L3737-L3746",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/resources/sample-content.edn#L3809-L3817"
+      ]
+    },
+    {
+      "id": "dashboards-20",
+      "title": "A dashboard's only tab cannot be renamed",
+      "findings": [
+        "run1-27",
+        "run2-22"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Deliberate: canRename={isEditing && hasMultipleTabs} and Delete is only added when there are several tabs. With a single tab the tab strip is not shown to viewers at all (showTabs = hasMultipleTabs || isEditing), so the lone tab's name is never displayed and renaming it has no purpose.",
+      "evidence": [
+        "run1-27/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/dashboard/components/DashboardTabs/DashboardTabs.tsx#L35-L37",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/dashboard/components/DashboardTabs/DashboardTabs.tsx#L62-L70",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/dashboard/components/DashboardTabs/DashboardTabs.tsx#L142"
+      ]
+    },
+    {
+      "id": "dashboards-21",
+      "title": "Clicking a chart legend item on a dashboard card opens the question instead of hiding the series",
+      "findings": [
+        "run1-01"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Designed behaviour: on dashboards the legend label click handler opens the underlying question (onOpenQuestion) when there is no clickable breakout; hiding a series is the job of the separate legend dot, which the report itself notes works.",
+      "evidence": [
+        "run1-01/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/visualizations/visualizations/CartesianChart/use-chart-events.ts#L404-L436"
+      ]
+    },
+    {
+      "id": "dashboards-22",
+      "title": "Table card \"Customer survey responses\" is wider than its card and the Body column is cut off",
+      "findings": [
+        "run1-07"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "The table body is a horizontally scrollable grid (overflow:auto); a wide column continuing past the card edge is the normal state of any Metabase table, and the text is clipped at the card edge, not at the page edge as claimed. The recording only shows vertical page scrolling - no horizontal scroll inside the table was attempted - so 'nothing scrolls' is not supported by the evidence.",
+      "evidence": [
+        "run1-07/shot-1.png",
+        "run1-07/frame-6.jpg"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/data-grid/components/DataGrid/DataGrid.module.css#L17"
+      ]
+    },
+    {
+      "id": "dashboards-23",
+      "title": "Phone width in edit mode: \"Add a chart\" panel squeezes the dashboard into a sliver",
+      "findings": [
+        "run1-15"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Dashboard editing is deliberately not offered below the small breakpoint: the Edit button is rendered with visibleOnSmallScreen={false} (display none under 40em). The state was produced by entering edit mode on desktop and then shrinking the window to 390 px, which a phone user cannot reach.",
+      "evidence": [
+        "run1-15/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/dashboard/components/DashboardHeader/buttons/EditDashboardButton.tsx#L27-L34",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/common/components/ToolbarButton/ToolbarButton.tsx#L56-L59"
+      ]
+    },
+    {
+      "id": "dashboards-24",
+      "title": "\"+ New\" button is missing at phone width",
+      "findings": [
+        "run1-22"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Deliberate product decision: the small-screen app bar (AppBarSmall) contains only the nav toggle, logo, search and profile link, and the unit test asserts the New button is not rendered on small screens.",
+      "evidence": [
+        "run1-22/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/nav/components/AppBar/AppBar.unit.spec.tsx#L107-L122",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/nav/components/AppBar/AppBarSmall.tsx#L82-L100"
+      ]
+    },
+    {
+      "id": "dashboards-25",
+      "title": "Text card hides content that exceeds the card height at desktop width (link / later lines 'missing' in view mode)",
+      "findings": [
+        "run2-21",
+        "run3-05"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Text cards have the fixed grid size the author gives them; content taller than the card scrolls inside it (.text-card-markdown has overflow-y:auto). Both reports put ~6-12 lines into a default-height card and never resized it; the 'missing' link/lines are below the fold, not dropped (the report itself finds the link in the markup), and the claim that the rest is unreachable contradicts the in-card scrolling observed in run1-17. The ~35 px of 'free space' is list and card padding. Author-controlled sizing, not data loss.",
+      "evidence": [
+        "run2-21/shot-3.png",
+        "run3-05/shot-3.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/visualizations/visualizations/Text/Text.styled.tsx#L152-L158"
+      ]
+    },
+    {
+      "id": "dashboards-26",
+      "title": "Browser Back after a filter change returns to the previous tab while keeping the new filter value",
+      "findings": [
+        "run2-10"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "By design only tab changes create history entries (push); filter changes rewrite the current entry (replace). Back therefore steps to the previous tab, and filter values - which are dashboard-wide state, not per tab - stay as they are and the URL is re-synced. The outcome follows directly from that explicit choice.",
+      "evidence": [
+        "run2-10/shot-3.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/dashboard/hooks/use-dashboard-url-query.ts#L88-L94",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/dashboard/hooks/use-dashboard-url-query.ts#L104-L121"
+      ]
+    },
+    {
+      "id": "dashboards-27",
+      "title": "Card menu loses \"Edit question\" after the card is given a custom visualization (\"Visualize another way\")",
+      "findings": [
+        "run2-23"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Explicit in source: once a dashcard is a visualizer card, the view-mode menu is rendered with canEdit={!isVisualizerDashboardCard(dashcard)}, so the question-edit entry is intentionally dropped (such a card is its own visualization and may combine several questions). The underlying question(s) stay reachable through the card title menu, so 'no way to reach its question' does not hold.",
+      "evidence": [
+        "run2-23/shot-3.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/dashboard/components/DashCard/DashCardVisualization.tsx#L552-L566",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/dashboard/components/DashCard/DashCardVisualization.tsx#L473-L487",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/dashboard/components/DashCard/DashCardMenu/DashCardMenuItems.tsx#L59-L66"
+      ]
+    },
+    {
+      "id": "dashboards-28",
+      "title": "Small empty card shows only the sailboat and no \"No results!\" line",
+      "findings": [
+        "run2-24"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Designed: NoResultsView omits the text when the card is small ({!isSmall && <ShortMessage>}) and exposes 'No results!' as a tooltip on the illustration instead. 'Revenue per quarter' is the only small card among those compared.",
+      "evidence": [
+        "run2-24/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/visualizations/components/Visualization/NoResultsView/NoResultsView.tsx#L12-L20"
+      ]
+    },
+    {
+      "id": "dashboards-29",
+      "title": "\"Revenue goal for this quarter\" progress bar looks 100% full at value 0",
+      "findings": [
+        "run3-10"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "The evidence contradicts the claim: the bar is entirely the light track colour (background = main colour lightened 25%), i.e. 0% filled, with the pointer at 0. With data, the filled part is the darker green and the remainder is this same light green (compare run2-02/shot-3.png). The side remark about 'Revenue per quarter' is the designed small-card empty state (see the previous bug).",
+      "evidence": [
+        "run3-10/shot-1.png",
+        "run2-02/shot-3.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/visualizations/visualizations/Progress/utils.ts#L127-L144"
+      ]
+    },
+    {
+      "id": "dashboards-30",
+      "title": "Multi-select filter shows \"Set to default\" instead of \"Update filter\" when every value is ticked",
+      "findings": [
+        "run2-25"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Product Category is a required filter whose default is all four values. getUpdateButtonProps deliberately labels the submit button 'Set to default' whenever the pending selection equals the default (or is empty on a required filter); it is still the apply button and sets the view filter to that selection - it does not save a new dashboard default, as the report assumed.",
+      "evidence": [
+        "run2-25/shot-3.png"
+      ],
+      "source": [
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/frontend/src/metabase/parameters/components/UpdateFilterButton/getUpdateButtonProps.ts#L17-L42",
+        "https://github.com/metabase/metabase/blob/f42632893810325d9f74375a4cd29bd31d8daefa/resources/sample-content.edn#L52-L53"
+      ]
+    }
+  ]
+}

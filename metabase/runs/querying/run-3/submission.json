@@ -1,0 +1,198 @@
+{
+  "fixture": "metabase/areas/querying",
+  "run": 3,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 278,
+      "name": "Renaming a saved question to only spaces blanks the title and fails silently (400, no message)",
+      "summary": "The header title is wiped: the page shows no question name at all above the chart, and no error message appears anywhere. The save request PUT /api/card/42 is answered 400 (console: 'Request entities,questions,42,update failed: {status: 400}'). After a page reload the old name 'agent10-renamed-title' is back, so the person is left on a nameless page with no idea the rename failed. (on /question/42-agent10-renamed-title)",
+      "expected": "The rename to a blank/whitespace-only name is refused and the title stays 'agent10-renamed-title', with a visible message next to the title saying the name cannot be blank (like the empty-name case, which does keep the old title).",
+      "actual": "The header title is wiped: the page shows no question name at all above the chart, and no error message appears anywhere. The save request PUT /api/card/42 is answered 400 (console: 'Request entities,questions,42,update failed: {status: 400}'). After a page reload the old name 'agent10-renamed-title' is back, so the person is left on a nameless page with no idea the rename failed.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1 and open /question/42-agent10-renamed-title (saved question 'agent10-renamed-title' in Harbor Admin's Personal Collection; any saved question works).",
+        "Click the question title in the header so it turns into an editable title field.",
+        "Clear the title and type five spaces, then press Enter."
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 319,
+      "name": "Row limit field accepts \"-1\" and shows it, but the question silently runs with the previous limit",
+      "summary": "The notebook keeps displaying \\\"-1\\\" in the Row limit field, but no error is shown and the query is run with the previous limit (3): the table shows 3 rows and \\\"Showing 3 rows\\\" — the query state still says limit 3. The value shown and the value used disagree silently. Seen twice: from a previous limit of 1 and from a previous limit of 3. (on /question/notebook)",
+      "expected": "The limit control should reject a negative limit with a visible message, or apply the value it shows; the results and row count should match the limit displayed in the notebook.",
+      "actual": "The notebook keeps displaying \\\"-1\\\" in the Row limit field, but no error is shown and the query is run with the previous limit (3): the table shows 3 rows and \\\"Showing 3 rows\\\" — the query state still says limit 3. The value shown and the value used disagree silently. Seen twice: from a previous limit of 1 and from a previous limit of 3.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai, open /question/notebook, choose Sample Database > Orders.",
+        "Click the Row limit step icon, type 3 in \"Enter a limit\", press Tab, then click Visualize: the table shows 3 rows (\"Showing 3 rows\").",
+        "Click the Editor button to return to the notebook, then open the Row limit step icon again (the field shows 3).",
+        "Replace the value with -1 (the field displays \"-1\" and keeps it after Tab/blur).",
+        "Click Visualize and read the table and the row count at the bottom right."
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 461,
+      "name": "Two tabs on the same saved question: saving from a stale tab silently overwrites the other tab's saved change",
+      "summary": "Tab 1 saves without any conflict notice and the reloaded page shows only the 'Quantity is equal to 5' filter; the 'Total is between 200 and 300' filter saved from tab 2 is silently gone. Nothing ever told either tab that the question had been changed elsewhere. (on /question/44-agent15-orders-state)",
+      "expected": "When tab 1 saves over a question that was changed and saved from another tab in the meantime, the app warns that the question has a newer version (or refuses/merges), so the change saved from tab 2 is not lost without the person knowing.",
+      "actual": "Tab 1 saves without any conflict notice and the reloaded page shows only the 'Quantity is equal to 5' filter; the 'Total is between 200 and 300' filter saved from tab 2 is silently gone. Nothing ever told either tab that the question had been changed elsewhere.",
+      "reproSteps": [
+        "Sign in, then open the saved question /question/44-agent15-orders-state in tab 1 and the same address in a second tab (tab 2).",
+        "In tab 2 click Filter, pick the Total column, choose operator Between, enter Min 200 and Max 300, click Apply filter, click Save, keep 'Replace original question, \"agent15-orders-state\"' and click Save. The page shows the filter chip 'Total is between 200 and 300' and 'Edited a few seconds ago by you'.",
+        "In tab 1 (still showing the question as it was before tab 2's save) click Filter, pick the Quantity column, tick the value 5, click Apply filter, then click Save and 'Replace original question'.",
+        "In tab 1 the save dialog offers only 'Replace original question' and 'Save as new question' - no notice that the question was changed elsewhere. Click Save.",
+        "Go back to tab 2 and reload the page."
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 617,
+      "name": "Switching the database keeps the previous database's result rows in the results pane and drops the row count",
+      "summary": "The grid still shows the rows (IDs 1 and 2) produced by Sample Database's ORDERS, now under the 'Release operations' database label, and the footer's row count disappears, leaving only the duration ('6ms') - so nothing on screen says those rows are stale or where they came from. Re-running then fails with 'ERROR: relation \"orders\" does not exist', proving the displayed rows cannot come from the selected database. Seen both times I switched databases. (on /question (native SQL editor))",
+      "expected": "Changing the database resets the run state: the old results are cleared (or clearly marked as belonging to the previous database), and the footer keeps telling the truth about what is shown, as the data reference does (it switches to Release operations, whose only table is release_requests).",
+      "actual": "The grid still shows the rows (IDs 1 and 2) produced by Sample Database's ORDERS, now under the 'Release operations' database label, and the footer's row count disappears, leaving only the duration ('6ms') - so nothing on screen says those rows are stale or where they came from. Re-running then fails with 'ERROR: relation \"orders\" does not exist', proving the displayed rows cannot come from the selected database. Seen both times I switched databases.",
+      "reproSteps": [
+        "Sign in, open New → SQL query, pick 'Sample Database'.",
+        "Type SELECT ID FROM ORDERS LIMIT 2 in the code editor and press Ctrl+Enter (or the Run button). The grid shows the two IDs 1 and 2 and the footer says 'Showing 2 rows'.",
+        "Click the database selector at the top-left of the editor ('Sample Database') and choose 'Release operations'.",
+        "Watch the results pane and the footer, then press Ctrl+Enter again."
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 658,
+      "name": "Save dialog accepts a whitespace-only name, then fails with a raw API error \"Value must be a non-blank string.\"",
+      "summary": "The Save button is enabled for a whitespace-only name, POST /api/card returns 400, and the dialog shows the raw server wording 'Value must be a non-blank string.' under the field while the Save button's label changes to 'Failed'. (on /question (new question → Save dialog))",
+      "expected": "A name with only whitespace should be treated like an empty name: the Save button stays disabled or the dialog shows a clear validation message in the user's language before any request is sent.",
+      "actual": "The Save button is enabled for a whitespace-only name, POST /api/card returns 400, and the dialog shows the raw server wording 'Value must be a non-blank string.' under the field while the Save button's label changes to 'Failed'.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1.",
+        "Open /question/notebook, click 'Sample Database' then 'Orders', then click 'Visualize'.",
+        "Click 'Save' in the top right to open the 'Save new question' dialog.",
+        "Leave the Name field empty and note that the dialog's 'Save' button stays disabled.",
+        "Type 5 spaces into the Name field: the 'Save' button becomes enabled (blue).",
+        "Click the dialog's 'Save' button."
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 767,
+      "name": "Text filter \\\"contains %\\\" matches every row instead of names containing a percent sign",
+      "summary": "The filter chip reads 'Name contains %' and the question returns 2,500 rows — the full People table. The '%' is passed to the database as a LIKE wildcard instead of being escaped, so the filter matches everything and does not filter at all. (on /question/notebook)",
+      "expected": "'Name contains %' should match only people whose name contains the character '%' — realistically 0 rows out of the 2,500 in People, like 'Name contains zzzzz' gives 0.",
+      "actual": "The filter chip reads 'Name contains %' and the question returns 2,500 rows — the full People table. The '%' is passed to the database as a LIKE wildcard instead of being escaped, so the filter matches everything and does not filter at all.",
+      "reproSteps": [
+        "Open https://5501-ivcz977nhep8zpgfafcws.e2b.app/question/notebook (signed in as eval@momentic.ai).",
+        "Click 'Sample Database' in the data picker, then the 'People' table.",
+        "In the Filter row click 'Add filters to narrow your answer', pick the 'Name' column.",
+        "Click the operator button ('Is') and choose 'Contains'.",
+        "Type % into the 'Filter value' field and press Enter so it becomes a token.",
+        "With 'Summarize' set to 'Count of rows' (pick 'Pick a function or metric' -> 'Count of rows'), click 'Visualize'.",
+        "Replace the filter value with any ordinary text (for example 'zzzzz') and update the filter: the result is 0 rows, so 2,500 is the full unfiltered table."
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 832,
+      "name": "Row limit accepts a 20-digit number and then breaks the question with a raw \\\"Invalid query\\\" error",
+      "summary": "The notebook accepts the value and runs the query, which fails: the results pane shows \\\"There was a problem with your question … Double check your inputs and retry your query\\\", the row count says \\\"Showing 0 rows\\\", and \\\"Show error details\\\" reveals the raw internal message \\\"Invalid query: {:stages [{:limit [\\\"integer greater than or equal to zero\\\"]}]}\\\". No validation message appears next to the Row limit field. (on /question/notebook)",
+      "expected": "The Row limit field should refuse or clamp a value that cannot be used (or say what the maximum is), instead of accepting it and failing the whole question with a raw internal error.",
+      "actual": "The notebook accepts the value and runs the query, which fails: the results pane shows \\\"There was a problem with your question … Double check your inputs and retry your query\\\", the row count says \\\"Showing 0 rows\\\", and \\\"Show error details\\\" reveals the raw internal message \\\"Invalid query: {:stages [{:limit [\\\"integer greater than or equal to zero\\\"]}]}\\\". No validation message appears next to the Row limit field.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open /question/notebook, choose Sample Database > Orders.",
+        "Add a sort step: sort by Quantity, then add a second sort by Total.",
+        "Click the Row limit step icon and type 99999999999999999999 (twenty 9s) in \"Enter a limit\", press Tab (the field keeps the value).",
+        "Click Visualize."
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 841,
+      "name": "Data picker search treats a typed \"%\" as a wildcard and lists every table and question",
+      "summary": "Typing % returns an unfiltered list of everything - \\\"agent15-orders-state-renamed\\\", \\\"agent11-lifecycle-renamed\\\", \\\"agent10-renamed-title\\\", \\\"Release requests by region and category\\\", \\\"agent9-orders-notebook-ABCDEFGHIJ...\\\", \\\"agent12-orders-all\\\", \\\"Orders\\\", ... - i.e. the % is passed to the search as an SQL LIKE wildcard, so the search box does not search for the text that was typed. (on /question/notebook)",
+      "expected": "The search treats % as a literal character: no table or question has a percent sign in its name, so the picker shows the same empty state it shows for zzznomatch (\\\"No search results\\\" with \\\"Browse all\\\").",
+      "actual": "Typing % returns an unfiltered list of everything - \\\"agent15-orders-state-renamed\\\", \\\"agent11-lifecycle-renamed\\\", \\\"agent10-renamed-title\\\", \\\"Release requests by region and category\\\", \\\"agent9-orders-notebook-ABCDEFGHIJ...\\\", \\\"agent12-orders-all\\\", \\\"Orders\\\", ... - i.e. the % is passed to the search as an SQL LIKE wildcard, so the search box does not search for the text that was typed.",
+      "reproSteps": [
+        "Go to https://5501-ivcz977nhep8zpgfafcws.e2b.app/question/notebook",
+        "In the Data section click the \"Search for tables and more...\" field",
+        "Type zzznomatch and note the empty state \"No search results\"",
+        "Clear the field and type a single percent sign: %"
+      ]
+    },
+    {
+      "index": 8,
+      "reported_at_seconds": 845,
+      "name": "Typing a field name that doesn't exist in the current table closes the whole field picker (no \"no results\" message)",
+      "summary": "The whole 'Select...' popover disappears after the second keystroke, the field to map to reverts to 'Select...' with nothing selected, and no message is shown. The only way on is to click the dropdown again. Happened 3 times out of 3 (2x typing the full word, 1x typing 'q' first which matched and kept the popover open — so the close is tied to a search with no match). (on /question (native SQL editor, Variables and parameters panel))",
+      "expected": "The popover stays open and says no field matches, so the person can clear the search or go back to another table.",
+      "actual": "The whole 'Select...' popover disappears after the second keystroke, the field to map to reverts to 'Select...' with nothing selected, and no message is shown. The only way on is to click the dropdown again. Happened 3 times out of 3 (2x typing the full word, 1x typing 'q' first which matched and kept the popover open — so the close is tied to a search with no match).",
+      "reproSteps": [
+        "Open /question, choose New > SQL query, pick Sample Database.",
+        "Type in the editor: SELECT count(*) FROM ORDERS WHERE {{filter}}",
+        "In the right side panel 'Variables and parameters', open the Variable type dropdown and choose 'Field Filter'.",
+        "In 'Field to map to (required)' click 'Select...' and pick the table Orders in the popover.",
+        "Click the 'Find...' search box at the top of that popover and type 'category' (Orders has no Category column)."
+      ]
+    },
+    {
+      "index": 9,
+      "reported_at_seconds": 915,
+      "name": "Number variable accepts letters and the run fails with a raw \"For input string: abc\" error",
+      "summary": "The N widget accepts the letters (shows 'N: abc'), the query runs and the result pane shows 'An error occurred in your query' with the raw message: For input string: \"abc\". Nothing says the variable needs a number, and no message appears next to the widget. Seen 2 times out of 2 runs with the same value. (on /question (native SQL editor, Variables and parameters panel))",
+      "expected": "Either the number widget refuses non-numeric text as it is typed, or Run shows a clear message that the 'N' variable must be a number.",
+      "actual": "The N widget accepts the letters (shows 'N: abc'), the query runs and the result pane shows 'An error occurred in your query' with the raw message: For input string: \"abc\". Nothing says the variable needs a number, and no message appears next to the widget. Seen 2 times out of 2 runs with the same value.",
+      "reproSteps": [
+        "Open /question, New > SQL query, database Sample Database.",
+        "Type in the editor: SELECT count(*) FROM PRODUCTS WHERE ID > {{n}}",
+        "In 'Variables and parameters' set Variable type to 'Number' (default is Text).",
+        "In the 'N' widget above the editor type abc and press Ctrl+Enter (or the Run button)."
+      ]
+    },
+    {
+      "index": 10,
+      "reported_at_seconds": 1070,
+      "name": "Browser Back after running a new SQL query lands on a raw \\\"Only SELECT statements are allowed\\\" error and loses the typed query",
+      "summary": "The page shows an error state: \"An error occurred in your query — Only SELECT statements are allowed in a native query.\" with \"Showing 0 rows\", and the SQL editor is gone (only an \"OPEN EDITOR\" link). Clicking OPEN EDITOR brings back an empty editor with the placeholder \"SELECT * FROM TABLE_NAME\" — the query that was typed and run is lost. The error also misdescribes the query: the query the person wrote was a SELECT. (on /question (native SQL editor))",
+      "expected": "Back should return to the previous state of the editor with the query text still in it (or to the previous page), not to an error view, and the typed SELECT must not be lost.",
+      "actual": "The page shows an error state: \"An error occurred in your query — Only SELECT statements are allowed in a native query.\" with \"Showing 0 rows\", and the SQL editor is gone (only an \"OPEN EDITOR\" link). Clicking OPEN EDITOR brings back an empty editor with the placeholder \"SELECT * FROM TABLE_NAME\" — the query that was typed and run is lost. The error also misdescribes the query: the query the person wrote was a SELECT.",
+      "reproSteps": [
+        "Open https://5501-ivcz977nhep8zpgfafcws.e2b.app/ (signed in as eval@momentic.ai).",
+        "Click 'New' in the top bar, then 'SQL query'. The database is already Sample Database.",
+        "Click into the SQL editor and type: SELECT 'agent2-tag' AS tag, COUNT(*) AS n FROM orders",
+        "Press Ctrl+Enter to run it: the result table shows agent2-tag / 18,760 and 'Showing 1 row'.",
+        "Press the browser Back button.",
+        "The page now shows the red error 'An error occurred in your query — Only SELECT statements are allowed in a native query.' and 'Showing 0 rows'.",
+        "Click 'OPEN EDITOR': the editor comes back empty, showing only the placeholder SELECT * FROM TABLE_NAME, so the query is lost."
+      ]
+    },
+    {
+      "index": 11,
+      "reported_at_seconds": 1101,
+      "name": "Keyboard Tab reaches the invisible Save button and shows the false tooltip \"You don't have permission to save this question.\"",
+      "summary": "Tabbing lands on an invisible control (no focus ring anywhere on screen) and a tooltip appears reading \"You don't have permission to save this question.\" - which is untrue, this account can and does save questions (Save is simply unavailable because no table has been picked yet). The same happens on every pass (2 of 2). (on /question/notebook)",
+      "expected": "Tabbing past Settings should skip the Save control while it is not visible/available, or focus a visible, correctly worded control (e.g. a disabled Save with \"Pick your starting data first\"), never an invisible control with a wrong permission message.",
+      "actual": "Tabbing lands on an invisible control (no focus ring anywhere on screen) and a tooltip appears reading \"You don't have permission to save this question.\" - which is untrue, this account can and does save questions (Save is simply unavailable because no table has been picked yet). The same happens on every pass (2 of 2).",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open https://5501-ivcz977nhep8zpgfafcws.e2b.app/question/notebook (the 'Pick your starting data' page, no table chosen yet).",
+        "Without clicking anywhere, press Tab repeatedly to walk the header: Toggle sidebar, logo, Search, New, Settings.",
+        "Press Tab once more, just after Settings."
+      ]
+    },
+    {
+      "index": 12,
+      "reported_at_seconds": 1340,
+      "name": "Going to another /question#<query> address in the same tab keeps the previous question and its results on screen",
+      "summary": "The page does not change: it still shows the notebook question \"Count and Sum of Total\" with its filter chips (Total is greater than 100, Discount is not empty) and its results 547 / 66,551.55, while the address bar holds the SQL query B. Only a reload of that same address loads query B (screenshot s48 shows the SQL editor with that statement). (on /question#eyJkYXRhc2V0X3F1ZXJ5Ijp7ImRhdGFiYXNlIjoxLCJsaWIvdHlwZSI6Im1icWwvcXVlcnkiLCJzdGFnZXMiOlt7ImxpYi90eXBlIjoibWJxbC5zdGFnZS9uYXRpdmUiLCJuYXRpdmUiOiJTRUxFQ1QgQ09VTlQoKikgQVMgY250LCBTVU0odG90YWwpIEFTIHN1bV90b3RhbCBGUk9NIG9yZGVycyBXSEVSRSB0b3RhbCA-IDEwMCBBTkQgZGlzY291bnQgSVMgTk9UIE5VTEwifV19LCJkaXNwbGF5IjoidGFibGUiLCJ0eXBlIjoicXVlc3Rpb24iLCJ2aXN1YWxpemF0aW9uX3NldHRpbmdzIjp7fX0=)",
+      "expected": "The editor loads query B (the native SQL query in the address) and its own (empty/prompted) result state, as it does on a reload of the same address.",
+      "actual": "The page does not change: it still shows the notebook question \"Count and Sum of Total\" with its filter chips (Total is greater than 100, Discount is not empty) and its results 547 / 66,551.55, while the address bar holds the SQL query B. Only a reload of that same address loads query B (screenshot s48 shows the SQL editor with that statement).",
+      "reproSteps": [
+        "Sign in, open /question/notebook, pick Sample Database > Orders, add filter Total is greater than 100, click Visualize, and save nothing: the address is now /question#A (hash A is the notebook query) and the results table is shown.",
+        "In the same tab, go to a different ad-hoc address whose hash holds another query, hash B: https://5501-ivcz977nhep8zpgfafcws.e2b.app/question#eyJkYXRhc2V0X3F1ZXJ5Ijp7ImRhdGFiYXNlIjoxLCJsaWIvdHlwZSI6Im1icWwvcXVlcnkiLCJzdGFnZXMiOlt7ImxpYi90eXBlIjoibWJxbC5zdGFnZS9uYXRpdmUiLCJuYXRpdmUiOiJTRUxFQ1QgQ09VTlQoKikgQVMgY250LCBTVU0odG90YWwpIEFTIHN1bV90b3RhbCBGUk9NIG9yZGVycyBXSEVSRSB0b3RhbCA-IDEwMCBBTkQgZGlzY291bnQgSVMgTk9UIE5VTEwifV19LCJkaXNwbGF5IjoidGFibGUiLCJ0eXBlIjoicXVlc3Rpb24iLCJ2aXN1YWxpemF0aW9uX3NldHRpbmdzIjp7fX0=",
+        "Do not reload; look at the page and at the address.",
+        "Reload the page to see that the address itself is valid."
+      ]
+    }
+  ]
+}

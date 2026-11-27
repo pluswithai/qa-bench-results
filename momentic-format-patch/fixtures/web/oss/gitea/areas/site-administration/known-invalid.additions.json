@@ -1,0 +1,124 @@
+{
+  "bugs": [
+    {
+      "name": "After sign-out, browser Back re-displays the cached admin User Accounts page",
+      "summary": "The browser shows the full admin \"User Account Management (Total: 3)\" page again, with the ID, username, email address, Activated/Restricted/2FA and last sign-in columns of alex, eval and maya, and the signed-in \"admin\" avatar in the top bar. No request to /-/admin/users is made: the page is restored from the browser's back-forward cache, so the signed-out person sees the administrator inventory again. Reloading that address does redirect to the sign-in page, so only the cached copy is exposed. (on /-/admin/users)",
+      "expected": "After signing out, pressing Back must not show the administrator's page again: the address should go back to the sign-in page (or a signed-out error), never re-display the admin user inventory with the accounts' email addresses.",
+      "actual": "The browser shows the full admin \"User Account Management (Total: 3)\" page again, with the ID, username, email address, Activated/Restricted/2FA and last sign-in columns of alex, eval and maya, and the signed-in \"admin\" avatar in the top bar. No request to /-/admin/users is made: the page is restored from the browser's back-forward cache, so the signed-out person sees the administrator inventory again. Reloading that address does redirect to the sign-in page, so only the cached copy is exposed.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 (administrator) at https://5503-i4ts0quf2p9cd8sm9ts9s.e2b.app/user/login.",
+        "Open https://5503-i4ts0quf2p9cd8sm9ts9s.e2b.app/-/admin/users — the User Account Management list of 3 accounts is shown.",
+        "Open the avatar menu at the top right and click 'Sign Out'. The anonymous home page appears.",
+        "Press the browser's Back button once.",
+        "Observe: the User Accounts admin page with all accounts and their email addresses is displayed again (no request is sent for it)."
+      ],
+      "reason": "Deliberate: Gitea's cache-control code states that 'max-age=0 + must-revalidate' is preferred over 'no-store' so that browsers can restore pages on navigate-back; the page comes from the browser's back-forward cache with no request, and the server refuses it on reload (redirect to sign-in)."
+    },
+    {
+      "name": "Queue pool settings accept -1 as 'Max Number of workers'",
+      "summary": "The page shows the green message 'Settings Updated', the queue table shows 'Max Number of Workers' = -1 and the input placeholder now reads 'Currently -1'. The negative maximum persists after a reload. (The same form correctly rejects 'abc' with 'Max number of workers must be a number', so only the numeric sign goes unchecked.) (on /-/admin/monitor/queue/1)",
+      "expected": "The maximum number of workers must be a non-negative (positive) whole number: the page refuses -1 with a message next to/instead of saving, as it already does for letters ('Max number of workers must be a number').",
+      "actual": "The page shows the green message 'Settings Updated', the queue table shows 'Max Number of Workers' = -1 and the input placeholder now reads 'Currently -1'. The negative maximum persists after a reload. (The same form correctly rejects 'abc' with 'Max number of workers must be a number', so only the numeric sign goes unchecked.)",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /-/admin/monitor/queue",
+        "Click 'Review / Add Workers' on the first row (notification-service) so that /-/admin/monitor/queue/1 opens",
+        "In the 'Pool Settings' panel, type -1 into the 'Max Number of workers' field (placeholder 'Currently 1')",
+        "Click 'Update Settings'"
+      ],
+      "reason": "Deliberate: the handler explicitly keeps -1 as the lowest valid value (anything below is clamped to -1) and the worker group handles a max of 0 or less by still running one worker, so -1 is an accepted sentinel, not an unchecked sign."
+    },
+    {
+      "name": "Submitting an empty 'Max Number of workers' shows 'Settings Updated' and keeps the value",
+      "summary": "The green \\\"Settings Updated\\\" banner appears exactly as for a real change, but \\\"Max Number of Workers\\\" in the table and the \\\"Currently N\\\" hint still show the old value (2) - nothing was saved and nothing says the field was ignored. (on /-/admin/monitor/queue/9)",
+      "expected": "Either the empty field is refused with a message (as the same form refuses text with \\\"Max number of workers must be a number\\\") or no success banner is shown when nothing changed.",
+      "actual": "The green \\\"Settings Updated\\\" banner appears exactly as for a real change, but \\\"Max Number of Workers\\\" in the table and the \\\"Currently N\\\" hint still show the old value (2) - nothing was saved and nothing says the field was ignored.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-iyz9are0xdg985upn6ktx.e2b.app/-/admin/monitor/queue",
+        "Click \"Review / Add Workers\" of the mirror row to open /-/admin/monitor/queue/9",
+        "Type 2 into the \"Max Number of workers\" field and click \"Update Settings\" (the table then shows Max Number of Workers 2)",
+        "Clear the same field so it is completely empty and click \"Update Settings\""
+      ],
+      "reason": "Deliberate: the handler has an explicit branch for an empty field that re-applies the current value (the placeholder reads 'Currently N'), then confirms the save; no data is lost or changed."
+    },
+    {
+      "name": "Admin tables are clipped at 768 px with no visible scrollbar (queue detail table, repository list)",
+      "summary": "The queue row is cut off at the right edge of the content area: 'Number of Workers' is cut mid-header ('Number of'), and the 'Active Workers', 'Max Number of Workers', 'Number in Queue' columns and the 'Remove all' button are not visible and cannot be reached — no horizontal scrollbar appears. This is a different table from the queue list (the list's table is cut at 390 px and has the 'Review / Add Workers' link; this one is the single-queue table on the detail page, cut at 768 px where it does not stack even though it stacks at 390 px), and the Pool Settings panel below it is unaffected. (on /-/admin/monitor/queue/4)",
+      "expected": "The queue's detail row (name, type, exemplar type, worker counts, queue length) and the 'Remove all' button are all readable and reachable at tablet width, e.g. by stacking the row as it already does at 390 px.",
+      "actual": "The queue row is cut off at the right edge of the content area: 'Number of Workers' is cut mid-header ('Number of'), and the 'Active Workers', 'Max Number of Workers', 'Number in Queue' columns and the 'Remove all' button are not visible and cannot be reached — no horizontal scrollbar appears. This is a different table from the queue list (the list's table is cut at 390 px and has the 'Review / Add Workers' link; this one is the single-queue table on the detail page, cut at 768 px where it does not stack even though it stacks at 390 px), and the Pool Settings panel below it is unaffected.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1",
+        "Set the browser viewport to 768 x 1024 (tablet)",
+        "Open a queue detail page, e.g. /-/admin/monitor/queue/4 (repo_license_updater)",
+        "Look at the queue's row above 'Pool Settings' and try to reach the worker counts and the 'Remove all' button"
+      ],
+      "reason": "Deliberate and not shown as unreachable: admin table panels have 'overflow-x: auto' precisely so wide tables scroll sideways inside the panel on small screens (the finding's own expected alternative); the screenshots only show the unscrolled state, and automated headless Chromium hides scrollbars."
+    },
+    {
+      "name": "'Update Avatar' with no file chosen reports 'The user's avatar has been updated.'",
+      "summary": "The form is posted (POST /-/admin/users/1/avatar → 303) and the user detail page shows the green flash message \"The user's avatar has been updated.\" Nothing was uploaded: on reopening /-/admin/users/1/edit the \"Use Custom Avatar\" radio is still unchecked, the file input still says \"No file chosen\", and the avatar image is the same as before the click. No validation message is shown anywhere. (on /-/admin/users/1/edit)",
+      "expected": "The form refuses the empty submit and says a file must be chosen (or the button does nothing), because no avatar was selected to update.",
+      "actual": "The form is posted (POST /-/admin/users/1/avatar → 303) and the user detail page shows the green flash message \"The user's avatar has been updated.\" Nothing was uploaded: on reopening /-/admin/users/1/edit the \"Use Custom Avatar\" radio is still unchecked, the file input still says \"No file chosen\", and the avatar image is the same as before the click. No validation message is shown anywhere.",
+      "reproSteps": [
+        "Sign in at /user/login as eval / momentic-eval-1",
+        "Open https://5503-i4ts0quf2p9cd8sm9ts9s.e2b.app/-/admin/users/1/edit",
+        "Scroll down to the Avatar section: \"Choose new avatar\" shows \"No file chosen\" and no file is picked",
+        "Click the \"Update Avatar\" button",
+        "Read the green message at the top of the page you land on (/-/admin/users/1), then go back to /-/admin/users/1/edit and look at the Avatar section"
+      ],
+      "reason": "Deliberate: the same form also saves the avatar source choice ('Use Custom Avatar') and the handler has an explicit path for 'no avatar is uploaded', saving those fields and confirming; a file is optional by design."
+    },
+    {
+      "name": "'admin' badge overlaps the account avatar in the mobile navigation menu",
+      "summary": "At 390 px width the blue \"admin\" badge is drawn on top of the account entry in the mobile navigation menu, covering the user's avatar; only a sliver of the avatar is visible at the bottom-left of the badge and the username \"eval\" sits underneath. At desktop width the badge does not hide the account identity this way. (on /-/admin)",
+      "expected": "The role badge should sit next to the avatar/username without covering it, so the administrator recognises their own account entry in the mobile menu.",
+      "actual": "At 390 px width the blue \"admin\" badge is drawn on top of the account entry in the mobile navigation menu, covering the user's avatar; only a sliver of the avatar is visible at the bottom-left of the badge and the username \"eval\" sits underneath. At desktop width the badge does not hide the account identity this way.",
+      "reproSteps": [
+        "Signed in as the administrator eval / momentic-eval-1, open https://5503-i4ts0quf2p9cd8sm9ts9s.e2b.app/-/admin.",
+        "Set the browser window to a phone size (390 x 844).",
+        "Tap the hamburger \"Navigation Menu\" button at the top right to open the navigation menu.",
+        "Look at the account row of the opened menu (above the Admin Settings panel): the \"admin\" badge covers the avatar and the name \"eval\" is squeezed underneath it."
+      ],
+      "reason": "Deliberate: the badge is styled as an absolutely positioned overlay on the navbar avatar (top: -1px; left: 18px) and sits on the avatar the same way at desktop width, as the desktop frames of this same area show; the username stays readable next to it."
+    },
+    {
+      "name": "Pressing Enter on the New Organization form triggers a 'Leave site?' prompt and no validation message",
+      "summary": "Pressing Enter submits the form and the browser then shows a native 'Leave site?' / beforeunload prompt. Dismissing it leaves the person on the New Organization form with their text still in the field and no message at all — the server's answer is never displayed, so it looks as if nothing happened. Clicking the 'Create Organization' button with the same value shows the error normally and no prompt appears. (on /org/create (reached from /-/admin/orgs → \"New Organization\"))",
+      "expected": "Pressing Enter submits the form exactly like clicking 'Create Organization': the validation message 'Organization Name can only contain alphanumeric chars…' appears above the form, the value is kept and no browser 'Leave site?' prompt interrupts the person.",
+      "actual": "Pressing Enter submits the form and the browser then shows a native 'Leave site?' / beforeunload prompt. Dismissing it leaves the person on the New Organization form with their text still in the field and no message at all — the server's answer is never displayed, so it looks as if nothing happened. Clicking the 'Create Organization' button with the same value shows the error normally and no prompt appears.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-i4ts0quf2p9cd8sm9ts9s.e2b.app/-/admin/orgs",
+        "Click 'New Organization' (the form opens at /org/create)",
+        "Type 'my org3' into 'Organization Name *' (a space makes the name invalid, so no organization can be created)",
+        "Press Enter instead of clicking the button",
+        "A native leave-page confirmation appears; dismiss it ('No' / Stay)",
+        "The form is still there with 'my org3' and no error message is shown"
+      ],
+      "reason": "The dirty-form guard can be re-armed by the Enter key's keyup after submit clears it (the source itself notes the 'dirty' class comes back when Enter submits). A local mirror of that script in Chromium showed the prompt only when the key is released within about 20 ms (automation's instant press) and never at 40 ms or more or with a click. A human should press Enter by hand (normal and very quick taps) on /org/create in a real browser: accept (severity 3) if the prompt appears, reject as an automation-timing artifact if it never does. The native prompt is not visible in the frames."
+    },
+    {
+      "name": "Dashboard update banner announces 'Gitea 28.4.0' while the instance runs 1.24.7",
+      "summary": "The red banner on the Site Administration dashboard reads \\\"Gitea 28.4.0 is now available, you are running 1.24.7. Check the blog for more details.\\\" — it announces a release number that does not belong to the instance's own version series: the Configuration Summary (Gitea Version 1.24.7, built with GNU Make 4.4.1, go1.24.9), the page footer (Version: 1.24.7) and the API docs page (Gitea API 1.24.7) all report 1.24.7, and the banner itself repeats \\\"you are running 1.24.7\\\". The banner stays on the dashboard across reloads and appears only there. (on /-/admin)",
+      "expected": "The update banner names an available release of the same Gitea version series as the running instance (1.24.x), or no update banner is shown when no such release can be determined.",
+      "actual": "The red banner on the Site Administration dashboard reads \\\"Gitea 28.4.0 is now available, you are running 1.24.7. Check the blog for more details.\\\" — it announces a release number that does not belong to the instance's own version series: the Configuration Summary (Gitea Version 1.24.7, built with GNU Make 4.4.1, go1.24.9), the page footer (Version: 1.24.7) and the API docs page (Gitea API 1.24.7) all report 1.24.7, and the banner itself repeats \\\"you are running 1.24.7\\\". The banner stays on the dashboard across reloads and appears only there.",
+      "reproSteps": [
+        "Sign in as eval and choose Site Administration from the account menu (address /-/admin, Maintenance -> Dashboard).",
+        "Read the red message at the top: \"Gitea 28.4.0 is now available, you are running 1.24.7. Check the blog for more details.\"",
+        "Reload the page: the same banner is shown again (it is dashboard-only).",
+        "Open Configuration -> Summary (/-/admin/config): \"Gitea Version 1.24.7 built with GNU Make 4.4.1, go1.24.9 ...\", and the footer of every page says \"Version: 1.24.7\"."
+      ],
+      "reason": "External data, not app behaviour: the banner prints whatever the update-check endpoint reports, and https://dl.gitea.com/gitea/version.json returned {\"latest\":{\"version\":\"28.4.0\"}} when fetched during this review (2026-11-23). The app compared and displayed that value as designed."
+    },
+    {
+      "name": "A nonexistent admin user address (/-/admin/users/999) redirects to the user list instead of a Not Found page",
+      "summary": "The address is silently redirected to /-/admin/users and the whole user list is shown, with no error, no message and no sign that the account does not exist. Same for /-/admin/users/999/edit (lands on the list instead of the edit form) and /-/admin/users/abc/edit. Other unknown admin addresses do show the site's own error page (/-/admin/doesnotexist → \\\"404 Not Found — The page you are trying to reach either does not exist or you are not authorized to view it.\\\"), so the same class of address is handled two different ways. Seen 3 times out of 3 tries. (on /-/admin/users/999)",
+      "expected": "The site's \\\"404 Not Found\\\" page (as /-/admin/doesnotexist gives), or a message saying the user does not exist, so the person knows the account is gone rather than landing on an unrelated list.",
+      "actual": "The address is silently redirected to /-/admin/users and the whole user list is shown, with no error, no message and no sign that the account does not exist. Same for /-/admin/users/999/edit (lands on the list instead of the edit form) and /-/admin/users/abc/edit. Other unknown admin addresses do show the site's own error page (/-/admin/doesnotexist → \\\"404 Not Found — The page you are trying to reach either does not exist or you are not authorized to view it.\\\"), so the same class of address is handled two different ways. Seen 3 times out of 3 tries.",
+      "reproSteps": [
+        "Sign in as eval and open /-/admin/users once so the list loads normally.",
+        "Navigate to the address /-/admin/users/999 (a user id that does not exist).",
+        "Look at the page and the address after the page loads; repeat with /-/admin/users/999/edit and /-/admin/users/abc/edit."
+      ],
+      "reason": "Deliberate: the admin user handlers explicitly redirect to /-/admin/users when the user id does not exist, and only other errors produce an error page. A missing message is a preference, not a broken promise."
+    }
+  ]
+}

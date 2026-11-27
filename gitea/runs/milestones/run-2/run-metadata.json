@@ -1,0 +1,15 @@
+{
+  "fixture": "gitea/areas/milestones",
+  "run": 2,
+  "started_at": "2026-11-23T16:27:46.768Z",
+  "duration_seconds": 1508.536,
+  "time_limit_seconds": 1800,
+  "stop_reason": "completed",
+  "credits": {
+    "total": 906,
+    "testing_team": 774,
+    "verification": 132,
+    "findings_verified": 22
+  },
+  "team_container_errors": 0
+}

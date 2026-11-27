@@ -1,0 +1,15 @@
+{
+  "fixture": "metabase/areas/data-modeling",
+  "run": 3,
+  "started_at": "2026-11-23T23:03:56.748Z",
+  "duration_seconds": 1714.084,
+  "time_limit_seconds": 1800,
+  "stop_reason": "completed",
+  "credits": {
+    "total": 1355,
+    "testing_team": 1085,
+    "verification": 270,
+    "findings_verified": 45
+  },
+  "team_container_errors": 0
+}

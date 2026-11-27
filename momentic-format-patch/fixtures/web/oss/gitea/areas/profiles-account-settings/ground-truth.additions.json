@@ -1,0 +1,144 @@
+{
+  "bugs": [
+    {
+      "name": "Follow on a profile with a block relationship fails with the raw toast \"Error 400 when calling /<user>?action=follow\"",
+      "summary": "A red toast appears with the raw technical text \\\"Error 400 when calling /maya?action=follow\\\"; the button stays on \\\"Follow\\\" and nothing else changes. The network request POST /maya?action=follow returns 400 and the console shows \\\"Response Status Error Code 400 from /maya?action=follow\\\". (on /maya)",
+      "expected": "A clear message that following this user is not possible (e.g. \\\"You cannot follow this user\\\" / the button disabled or hidden), and the button state unchanged.",
+      "actual": "A red toast appears with the raw technical text \\\"Error 400 when calling /maya?action=follow\\\"; the button stays on \\\"Follow\\\" and nothing else changes. The network request POST /maya?action=follow returns 400 and the console shows \\\"Response Status Error Code 400 from /maya?action=follow\\\".",
+      "reproSteps": [
+        "Set up the state: sign in as maya / momentic-eval-1, open /alex, click \"Block user\", then \"Block\" in the dialog (maya now blocks alex).",
+        "Sign out and sign in as alex / momentic-contributor-1.",
+        "Open https://5503-ibar5w2u23qskgb6cuz7t.e2b.app/maya (the profile of the user who blocked you).",
+        "Click the \"Follow\" button in the left sidebar."
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Simplified-Chinese \"Hidden comment types\" description is a broken sentence (placeholders vanish, stray quotes)",
+      "summary": "The sentence reads: 「此处选中的注释类型不会显示在问题页面中。比如，勾选”标签“删除所有 \" 添加/删除的 \" 注释。」 — the quotes around 标签 are unmatched (”…“), the placeholders for user and label are gone, and the trailing fragment \" 添加/删除的 \" with stray straight quotes makes no sense. A user cannot tell which comments the option hides. The German and English versions of the same paragraph show the placeholders correctly (\"{user} hat {label} hinzugefügt/entfernt\" / \"(user) added/removed (label)\"). (on /user/settings/appearance)",
+      "expected": "The explanatory sentence under \\\"Hidden comment types\\\" names the label and the placeholder example, e.g. that checking \\\"Label\\\" removes all \\\"(user) added/removed (label)\\\" comments, with correct quotation marks.",
+      "actual": "The sentence reads: 「此处选中的注释类型不会显示在问题页面中。比如，勾选”标签“删除所有 \" 添加/删除的 \" 注释。」 — the quotes around 标签 are unmatched (”…“), the placeholders for user and label are gone, and the trailing fragment \" 添加/删除的 \" with stray straight quotes makes no sense. A user cannot tell which comments the option hides. The German and English versions of the same paragraph show the placeholders correctly (\"{user} hat {label} hinzugefügt/entfernt\" / \"(user) added/removed (label)\").",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1, open /user/settings/appearance",
+        "In the Language dropdown choose 简体中文 and click 更新语言",
+        "Read the paragraph under 隐藏的评论类型"
+      ],
+      "severity": 1
+    },
+    {
+      "name": "German heading \"Ausgeblendeter Kommentartypen\" is ungrammatical",
+      "summary": "The section heading reads \"Ausgeblendeter Kommentartypen\" — grammatically wrong German (genitive singular \"Ausgeblendeter\" with plural \"Kommentartypen\"). The correct wording would be \"Ausgeblendete Kommentartypen\" (as the English original \"Hidden comment types\" says). Visible at 1280 and 390 px width. (on /user/settings/appearance)",
+      "expected": "The heading of the hidden-comment-types section reads correct German, e.g. \"Ausgeblendete Kommentartypen\".",
+      "actual": "The section heading reads \"Ausgeblendeter Kommentartypen\" — grammatically wrong German (genitive singular \"Ausgeblendeter\" with plural \"Kommentartypen\"). The correct wording would be \"Ausgeblendete Kommentartypen\" (as the English original \"Hidden comment types\" says). Visible at 1280 and 390 px width.",
+      "reproSteps": [
+        "Sign in as eval (momentic-eval-1) and open /user/settings/appearance.",
+        "Scroll to the third section, below \"Standard-Theme auswählen\" and \"Sprache\".",
+        "Read the section heading above the 14 checkboxes."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Profile card says \"1 Followers\"",
+      "summary": "The profile card reads \"1 Followers · 0 Following\" — the plural label is used with the value 1, next to the correct singular \"0 Following\" style used elsewhere. (on /eval)",
+      "expected": "\"1 Follower · 0 Following\" when the count is one.",
+      "actual": "The profile card reads \"1 Followers · 0 Following\" — the plural label is used with the value 1, next to the correct singular \"0 Following\" style used elsewhere.",
+      "reproSteps": [
+        "Sign in as alex / momentic-contributor-1 in one browser",
+        "Open https://5503-ibar5w2u23qskgb6cuz7t.e2b.app/eval",
+        "Click the Follow button so eval has exactly one follower",
+        "Read the follower counts under the user name in the left profile card"
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Profile repository search treats \"%\" and \"_\" as wildcards and lists repositories that do not contain them",
+      "summary": "The query '%' returns the repository 'harbor-handbook' (and '_' returns every repo as well). The characters are sent as SQL LIKE wildcards instead of literal text, so a search that should match nothing lists repositories whose names/descriptions do not contain the searched text at all. URL after searching: /eval?tab=repositories&q=%25&sort=recentupdate. (on /eval?tab=repositories)",
+      "expected": "Searching for '%' (or '_') should find no repository, because no repository name or description contains that character; the page should show 'No matching results found.' like it does for any other non-matching query (e.g. 'zzz-no-match').",
+      "actual": "The query '%' returns the repository 'harbor-handbook' (and '_' returns every repo as well). The characters are sent as SQL LIKE wildcards instead of literal text, so a search that should match nothing lists repositories whose names/descriptions do not contain the searched text at all. URL after searching: /eval?tab=repositories&q=%25&sort=recentupdate.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-io7gkkxhkz5bckp0f49nq.e2b.app/eval?tab=repositories",
+        "In the 'Search repos...' box type a single '%' and press Enter (or click the magnifier)",
+        "Note the result list",
+        "Repeat with a single '_' as the query"
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Heatmap caption says \"1 contributions in the last 12 months\"",
+      "summary": "The text under the heatmap reads '1 contributions in the last 12 months' — plural form used with the number 1, so the page's own sentence is ungrammatical (and the same string is used for every count). (on /alex?tab=activity)",
+      "expected": "The count sentence should be singular for one contribution: '1 contribution in the last 12 months'.",
+      "actual": "The text under the heatmap reads '1 contributions in the last 12 months' — plural form used with the number 1, so the page's own sentence is ungrammatical (and the same string is used for every count).",
+      "reproSteps": [
+        "Sign in as eval.",
+        "Open the seeded contributor profile /alex.",
+        "Click the 'Public Activity' tab (or open /alex?tab=activity).",
+        "Read the text under the contribution heatmap: it says '1 contributions in the last 12 months'."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Location saved as spaces only leaves an empty location row (pin icon, no text) on the profile",
+      "summary": "The profile shows a location row that contains only the map-pin icon and no text (a blank line above the email row). The settings form also keeps the spaces: after saving, the Location field looks empty but its placeholder \"Share your approximate location with others\" is gone, because the field holds a whitespace value. The same test done on Full Name and Biography is handled: with \"   \" the profile correctly falls back to the username and shows no bio row, so Location is the inconsistent one. (on /maya (saved from /user/settings))",
+      "expected": "A whitespace-only Location is treated as empty: no location row on the profile (as already happens for a whitespace-only Biography and Full Name), and the settings field shows its placeholder again.",
+      "actual": "The profile shows a location row that contains only the map-pin icon and no text (a blank line above the email row). The settings form also keeps the spaces: after saving, the Location field looks empty but its placeholder \"Share your approximate location with others\" is gone, because the field holds a whitespace value. The same test done on Full Name and Biography is handled: with \"   \" the profile correctly falls back to the username and shows no bio row, so Location is the inconsistent one.",
+      "reproSteps": [
+        "Sign in as maya (password momentic-eval-1) and open https://5503-io7gkkxhkz5bckp0f49nq.e2b.app/user/settings (Profile).",
+        "In the Location field type only three spaces \" \" (keep Full Name, Biography and Website empty).",
+        "Click \"Update Profile\" and wait for \"Your profile has been updated.\"",
+        "Open https://5503-io7gkkxhkz5bckp0f49nq.e2b.app/maya and look at the profile card between the followers line and the email row."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Persian (فارسی) UI is laid out left-to-right: no RTL direction",
+      "summary": "The document keeps lang=\\\"fa-IR\\\" but no dir attribute, so everything is laid out left-to-right: the settings sidebar and logo stay on the left, Persian headings/labels are left-aligned and the checkboxes sit to the left of their Persian labels, both at 1280px and at 390px. (on /user/settings/appearance)",
+      "expected": "With a right-to-left language selected the document should be laid out right-to-left (dir=rtl): the sidebar on the right, headings and labels right-aligned, checkboxes to the right of their labels, the navigation mirrored.",
+      "actual": "The document keeps lang=\\\"fa-IR\\\" but no dir attribute, so everything is laid out left-to-right: the settings sidebar and logo stay on the left, Persian headings/labels are left-aligned and the checkboxes sit to the left of their Persian labels, both at 1280px and at 390px.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-i7o8fz8bj9kf9tmt09ztp.e2b.app/user/settings/appearance",
+        "In the Language dropdown choose \"فارسی\" and click \"Update Language\"",
+        "Read the page: the interface text is Persian but the whole layout stays left-to-right (logo and navigation order, settings sidebar still on the left, Persian headings and checkbox labels left-aligned with the checkboxes on the left)",
+        "Reload the page (the language is kept) and check again; also set the window to 390x844 and check again"
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Submitting a form from a stale tab after sign-out answers a bare \"Invalid CSRF token.\" page",
+      "summary": "A bare white page containing only the text \\\"Invalid CSRF token.\\\" is shown (HTTP 400 on POST /user/settings). There is no site header, no message explaining that the session ended and no sign-in form or link — the visitor is stranded with no way on. (on /user/settings)",
+      "expected": "The stale form submit should end with the visitor being sent to the sign-in page (as every other protected page does when signed out) with a readable message, and no profile change made.",
+      "actual": "A bare white page containing only the text \\\"Invalid CSRF token.\\\" is shown (HTTP 400 on POST /user/settings). There is no site header, no message explaining that the session ended and no sign-in form or link — the visitor is stranded with no way on.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Open https://5503-i7o8fz8bj9kf9tmt09ztp.e2b.app/user/settings in a second tab (tab B) and leave it there.",
+        "In the first tab, open the account menu at the top right and click \"Sign Out\" (the visitor is signed out).",
+        "Back in tab B (still showing the old, signed-in profile settings form), type a value into the \"Location\" field, e.g. agent11-stale-signout, and click the \"Update Profile\" button."
+      ],
+      "severity": 5
+    },
+    {
+      "name": "Persian UI leaves many strings in English (menu entries, Hidden comment types panel); German keeps \"Account\"",
+      "summary": "Large parts of the settings interface stay in English: the side-menu heading \"User Settings\" and the entries \"Blocked users\", \"Packages\" and \"Webhooks\" (all other entries are Persian), the whole \"Hidden comment types\" panel - its heading, its description \"Comment types checked here will not be shown inside issue pages...\" and 13 of the 14 checkbox labels (Reference, Label, Milestone, Assignee, Branch, Time Tracking, Deadline, Dependency, Lock Status, Review request, Added commits, Project, Issue reference; only \"عنوان\" is translated) - and the link text \"Colorblindness Theme Support\". In the same class of failure, the German interface keeps the settings entry \"Account\" in English while every other entry is German (Profil, Erscheinung, Sicherheit ...). (on /user/settings/appearance)",
+      "expected": "A UI the app itself reports as Persian (footer language selector \"فارسی\", <html lang> and the Persian strings elsewhere) shows its menus and labels in Persian, like the rest of the page.",
+      "actual": "Large parts of the settings interface stay in English: the side-menu heading \"User Settings\" and the entries \"Blocked users\", \"Packages\" and \"Webhooks\" (all other entries are Persian), the whole \"Hidden comment types\" panel - its heading, its description \"Comment types checked here will not be shown inside issue pages...\" and 13 of the 14 checkbox labels (Reference, Label, Milestone, Assignee, Branch, Time Tracking, Deadline, Dependency, Lock Status, Review request, Added commits, Project, Issue reference; only \"عنوان\" is translated) - and the link text \"Colorblindness Theme Support\". In the same class of failure, the German interface keeps the settings entry \"Account\" in English while every other entry is German (Profil, Erscheinung, Sicherheit ...).",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /user/settings/appearance.",
+        "In the Language dropdown choose فارسی (Persian): the page reloads in Persian.",
+        "Read the settings side menu on the left and the \"Hidden comment types\" panel with its checkboxes."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Whitespace-only block note is saved and shows a dangling \"Note:\" label with no text",
+      "summary": "The note with only spaces is accepted and stored: after saving a note made of three spaces the row shows the label \\\"Anmerkung:\\\" with nothing after it, and it stays like that after a full reload of /user/settings/blocked_users. The note is neither trimmed away nor treated as empty (a cleared note does remove the label). (on /user/settings/blocked_users)",
+      "expected": "A note that is only whitespace should be trimmed and treated as an empty note: either the edit is refused with a message, or the note is cleared and the row shows no \\\"Anmerkung:\\\" label at all.",
+      "actual": "The note with only spaces is accepted and stored: after saving a note made of three spaces the row shows the label \\\"Anmerkung:\\\" with nothing after it, and it stays like that after a full reload of /user/settings/blocked_users. The note is neither trimmed away nor treated as empty (a cleared note does remove the label).",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-i7o8fz8bj9kf9tmt09ztp.e2b.app/user/settings/blocked_users.",
+        "Block a user (search \"alex\", click \"Sperren\") with the note \"first note\" so the row appears with \"Anmerkung: first note\".",
+        "Click \"Anmerkung bearbeiten\", clear the field and type three spaces only, then click \"Speichern\".",
+        "Look at the blocked-user row and reload the page."
+      ],
+      "severity": 1
+    }
+  ]
+}

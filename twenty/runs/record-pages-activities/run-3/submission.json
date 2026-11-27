@@ -1,0 +1,225 @@
+{
+  "fixture": "twenty/areas/record-pages-activities",
+  "run": 3,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 345,
+      "name": "Task card at 390px truncates the task title to \"C...\" and clips its relation badge",
+      "summary": "The title is squeezed into a ~35px box and reads 'C...'. Next to it the field chip shows 'Comp...' and the green relation badge at the right ('G...') is cut in half by the card's right edge, which ends ~70px before the Tasks section's right edge. (on /object/company/20202020-a305-41e7-8c72-ba44072a4c58 (Companies / Google, Tasks tab))",
+      "expected": "The task card shows the task title so it can be read: 'Conduct vendor evaluation' wrapped or shortened with an ellipsis over a usable width, and its date and relation badge stay inside the card.",
+      "actual": "The title is squeezed into a ~35px box and reads 'C...'. Next to it the field chip shows 'Comp...' and the green relation badge at the right ('G...') is cut in half by the card's right edge, which ends ~70px before the Tasks section's right edge.",
+      "reproSteps": [
+        "Sign in with tim@apple.dev / tim@apple.dev",
+        "Open /objects/companies and click the company 'Google'",
+        "Set the browser window to a phone size, 390 x 844",
+        "On the record click the 'Tasks' tab (the tab holds one task 'Conduct vendor evaluation')"
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 352,
+      "name": "Annual Revenue (currency) drops the decimal part of entered amounts",
+      "summary": "The fractional part is silently discarded as the amount is typed. Typing 6.99 leaves '6' in the input and saves/display $6; typing 5.55 saved $5; typing 1234.56 showed '1,234' in the input and reopening the editor shows '1,234'. No message says only whole numbers are accepted. (on /object/company/68f9fa72-f2a3-4d14-af8c-f827cdb83e33)",
+      "expected": "The currency field keeps what was typed: 6.99 should show/save as $6.99 (reopening the editor shows 6.99).",
+      "actual": "The fractional part is silently discarded as the amount is typed. Typing 6.99 leaves '6' in the input and saves/display $6; typing 5.55 saved $5; typing 1234.56 showed '1,234' in the input and reopening the editor shows '1,234'. No message says only whole numbers are accepted.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open the company record agent1-co at /object/company/68f9fa72-f2a3-4d14-af8c-f827cdb83e33",
+        "In the left 'Fields' panel, click the Annual Revenue value (shows 'Annual Revenue' placeholder) to open the currency editor",
+        "Type 6.99 into the amount box next to the USD selector",
+        "Observe the amount box shows '6' while typing",
+        "Press Enter and read the saved value"
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 416,
+      "name": "Downloading the note's attached file \"Source Code.zip\" fails with a 404 and \"An error occurred.\"",
+      "summary": "Nothing is downloaded. The request GET /file/files-field/f11e0000-00a1-4a7c-8001-202020201c25?token=… answers 404, the console logs \\\"Failed downloading file\\\", and a red toast at the bottom right only says \\\"An error occurred.\\\". The dialog stays open with the same \\\"Download File\\\" button. Reproduced 1/1. (on /object/note/20202020-0001-4e7c-8001-123456789abc (Files tab))",
+      "expected": "The attached archive is downloaded (the dialog says \"Please download the file to access its contents\"), or at least a specific error explains why it cannot be downloaded.",
+      "actual": "Nothing is downloaded. The request GET /file/files-field/f11e0000-00a1-4a7c-8001-202020201c25?token=… answers 404, the console logs \\\"Failed downloading file\\\", and a red toast at the bottom right only says \\\"An error occurred.\\\". The dialog stays open with the same \\\"Download File\\\" button. Reproduced 1/1.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev and go to https://5500-i45u0h4ud1r3um0mrduul.e2b.app/objects/notes",
+        "Open the note \"Meeting Follow-up\" and press the \"Open ... Ctrl ⏎\" button so the full record page is shown",
+        "Open the \"Files\" tab of the record (it shows count 1)",
+        "Click the attached file \"Source Code.zip\"",
+        "In the \"Source Code.zip\" preview dialog press \"Download File\""
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 419,
+      "name": "Escape while editing Annual Revenue saves the change instead of cancelling it",
+      "summary": "The edit is saved: pressing Escape sends the update and the field shows $7, and the timeline records the change — the same keystroke discards the edit in the Linkedin field of the same record, so there is no consistent way to cancel a currency edit. (on /object/company/68f9fa72-f2a3-4d14-af8c-f827cdb83e33)",
+      "expected": "Escape abandons the edit and the Annual Revenue keeps its previous value ($6), as it does for the Linkedin field of the same record.",
+      "actual": "The edit is saved: pressing Escape sends the update and the field shows $7, and the timeline records the change — the same keystroke discards the edit in the Linkedin field of the same record, so there is no consistent way to cancel a currency edit.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open the company record agent1-co at /object/company/68f9fa72-f2a3-4d14-af8c-f827cdb83e33",
+        "Click the Annual Revenue value in the left Fields panel and double-click the '$' amount so the currency editor opens (Annual Revenue is $6)",
+        "Type 7.99 into the amount box (it shows 7)",
+        "Press Escape to cancel the edit",
+        "Look at the Annual Revenue field"
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 510,
+      "name": "Note cards at 390px split words in the middle of the line (word-break)",
+      "summary": "The preview breaks words in the middle: the note 'agent2-title-persist-check' renders 'the quic' / 'k brown fox jumps over the lazy dog re' / 'peatedly to make a long line…', and the site's own note 'Partnership Opportunity' renders 'identified' as 'identifie' / 'd.' and 'market reach' as 'market r' / 'each'. The full words are in the data (the body editor wraps them correctly). (on /object/company/20202020-a305-41e7-8c72-ba44072a4c58 (Notes tab))",
+      "expected": "The card preview wraps at word boundaries, as the note's own editor does, so words are not split across lines.",
+      "actual": "The preview breaks words in the middle: the note 'agent2-title-persist-check' renders 'the quic' / 'k brown fox jumps over the lazy dog re' / 'peatedly to make a long line…', and the site's own note 'Partnership Opportunity' renders 'identified' as 'identifie' / 'd.' and 'market reach' as 'market r' / 'each'. The full words are in the data (the body editor wraps them correctly).",
+      "reproSteps": [
+        "Sign in with tim@apple.dev / tim@apple.dev and set the browser window to 390 x 844",
+        "Open /objects/companies, click 'Google', open the '+4 More' menu and pick 'Notes'",
+        "Read the body preview inside the note cards ('Partnership Opportunity', and the note 'agent2-title-persist-check' whose body is 'agent2 mobile wrapping check: the quick brown fox jumps over the lazy dog repeatedly to make a long line of text that must wrap at the edge without splitting words')"
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 553,
+      "name": "Choosing a block type from the \"/\" menu leaves the \"/\" character in the note body",
+      "summary": "The \"/\" stays in the block as literal text: the bullet item reads \\\"• /\\\", the heading reads \\\"H1 /agent11 heading block\\\", the check item reads \\\"/agent11 checkbox item\\\". The placeholder in the empty editor even says \\\"Type '/' for commands\\\", so the slash is meant to be a shortcut, not content. Happened 3 times out of 3 (Heading 1, Check List, Bullet List). (on /object/note/22cb00de-2e4e-49bf-b6a7-2dc436a7a957)",
+      "expected": "The character typed to open the command menu is a shortcut, so it is consumed: the new block is an empty bullet/heading/check block containing only the text typed after it.",
+      "actual": "The \"/\" stays in the block as literal text: the bullet item reads \\\"• /\\\", the heading reads \\\"H1 /agent11 heading block\\\", the check item reads \\\"/agent11 checkbox item\\\". The placeholder in the empty editor even says \\\"Type '/' for commands\\\", so the slash is meant to be a shortcut, not content. Happened 3 times out of 3 (Heading 1, Check List, Bullet List).",
+      "reproSteps": [
+        "Open the note record /object/note/22cb00de-2e4e-49bf-b6a7-2dc436a7a957 (note \"agent11-note-beta\").",
+        "Click into the body editor under the Note tab and press End, then Enter to create a new empty line.",
+        "Type \"/\" so the block menu (Heading 1, Heading 2, Heading 3, Quote, Toggle List ...) opens.",
+        "Pick a block type from that menu, e.g. \"Bullet List\", \"Heading 1\" or \"Check List\".",
+        "Type the block text, e.g. \"agent11 heading block\"."
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 725,
+      "name": "Emails tab on a company record: sender names cut mid-word (and reduced to initials at 390 px)",
+      "summary": "The sender name column is cut mid-word with no ellipsis: \"Workspace M…2\", \"Person 31, Wo 2\", \"Jennifer Marti 2\", \"Alex Johnson, 2\", \"David Rodrigu 2\" at 768 px; at 390 px only two letters or nothing remain (\"W 2\", \"Pe 2\", \"Je 2\"), so the reader cannot tell who sent the email. The subject and preview in the same row do get an ellipsis, so the clipping is not a deliberate shortening style. (on /object/company/20202020-a305-41e7-8c72-ba44072a4c58 (Emails tab))",
+      "expected": "Each email row shows the sender name, shortened with an ellipsis if the row is too narrow — the behaviour the subject and preview text in the same row already have.",
+      "actual": "The sender name column is cut mid-word with no ellipsis: \"Workspace M…2\", \"Person 31, Wo 2\", \"Jennifer Marti 2\", \"Alex Johnson, 2\", \"David Rodrigu 2\" at 768 px; at 390 px only two letters or nothing remain (\"W 2\", \"Pe 2\", \"Je 2\"), so the reader cannot tell who sent the email. The subject and preview in the same row do get an ellipsis, so the clipping is not a deliberate shortening style.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev.",
+        "Open https://5500-i45u0h4ud1r3um0mrduul.e2b.app/objects/companies and open the company record Google (id 20202020-a305-41e7-8c72-ba44072a4c58).",
+        "Click the Emails tab (address .../object/company/20202020-a305-41e7-8c72-ba44072a4c58#bced110d-dab1-4af0-8e5e-c345240041bc).",
+        "Set the browser to 768 CSS px wide and read the sender names on the left of each email row.",
+        "Set it to 390 x 844, reload the same address and read the sender names again."
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 806,
+      "name": "Notes and tasks created from a company record never show up in the Notes / Tasks lists",
+      "summary": "The note \\\"agent12-QA flow 123\\\" created on the company record is absent from the Notes list rows even after reloading, although its own page loads and says it was added 7 minutes ago; the note page's counter puts it at position 1,809 of 1,815. The task \\\"agent12-task alpha\\\" created on the same record is likewise missing from the Tasks list top rows. Both records are therefore practically unfindable from their object lists. (on /objects/notes (and /objects/tasks))",
+      "expected": "A note/task just created on a company record appears in the Notes / Tasks list in the same place as any other record of that age (near the top of the newest-first list), and the record's position counter agrees with that place.",
+      "actual": "The note \\\"agent12-QA flow 123\\\" created on the company record is absent from the Notes list rows even after reloading, although its own page loads and says it was added 7 minutes ago; the note page's counter puts it at position 1,809 of 1,815. The task \\\"agent12-task alpha\\\" created on the same record is likewise missing from the Tasks list top rows. Both records are therefore practically unfindable from their object lists.",
+      "reproSteps": [
+        "Open my test company record /object/company/187b7fb7-fca8-42bb-b1d7-5fa64a4ed28a (agent12-FlowCo).",
+        "Open its Notes tab, click \"+ New note\", type the title \"agent12-QA flow 123\", press Enter, then type the body \"agent12 body text\". The note appears in the Notes tab (count \"Notes 1\") and on its own page /object/note/eef37bf6-c51d-46d2-8313-5ff22bbb31f6 with the relation agent12-FlowCo.",
+        "Go to /objects/notes (All Notes, newest first - notes another agent created a minute earlier are in the first rows).",
+        "Read the first rows of the list: \"agent12-QA flow 123\" is not among them, also not after a full page reload.",
+        "Open the note's own page again: the header counter reads (1,809/1,815), i.e. the app places this 7-minute-old note at the very end of the same view.",
+        "Same thing with a task: on the same company record open the Tasks tab, click \"+ New task\", title \"agent12-task alpha\", due date Nov 17 2026 - then open /objects/tasks: \"agent12-task alpha\" is not in the top rows (\"agent8-task-2\", \"Untitled\", \"agent13-task\" are)."
+      ]
+    },
+    {
+      "index": 8,
+      "reported_at_seconds": 864,
+      "name": "Company record page shows no content at 768px width — only the navigation stays visible",
+      "summary": "The record content disappears: the page shows only the navigation sidebar (Companies, People, …) and a bottom bar on an empty grey canvas; the record header, the Fields panel and the Timeline are not visible anywhere, and the text is present in the DOM but positioned off the visible page. No way to read or edit the record at this width. (on /object/company/68f9fa72-f2a3-4d14-af8c-f827cdb83e33)",
+      "expected": "At a 768px-wide window the company record still shows its header, Fields panel and Timeline (as it does at 1280px), adapted to the narrower width.",
+      "actual": "The record content disappears: the page shows only the navigation sidebar (Companies, People, …) and a bottom bar on an empty grey canvas; the record header, the Fields panel and the Timeline are not visible anywhere, and the text is present in the DOM but positioned off the visible page. No way to read or edit the record at this width.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open /object/company/68f9fa72-f2a3-4d14-af8c-f827cdb83e33 (company agent1-co)",
+        "At a 1280px-wide window the record page shows header, Fields and Timeline",
+        "Resize the browser window to 768 x 1024",
+        "Look at the page"
+      ]
+    },
+    {
+      "index": 9,
+      "reported_at_seconds": 946,
+      "name": "Event titles in the Calendar events list show the raw internal value \\\"FIELD_RESTRICTED_ADDITIONAL_PERMISSIONS_REQUIRED\\\"",
+      "summary": "At least 10 rows in the first screenful of the list show the event title as \\\"FIELD_RESTRICTED_AD…\\\" (full value \\\"FIELD_RESTRICTED_ADDITIONAL_PERMISSIONS_REQUIRED\\\" in the list data), e.g. the events on Aug 6 2026 11:00 AM, Jun 21 2026 11:45 AM, Feb 26 2027 3:00 PM, Jul 2 2026 2:45 PM, Mar 17 2027 2:00 PM, Jan 18 2027 10:00 AM. An internal permission constant is shown to the user in place of an event name. (on /objects/calendarEvents)",
+      "expected": "Every event row shows a real event name (like \\\"Team Standup\\\", \\\"Client Presentation\\\"); an internal permission constant is never rendered as a record title.",
+      "actual": "At least 10 rows in the first screenful of the list show the event title as \\\"FIELD_RESTRICTED_AD…\\\" (full value \\\"FIELD_RESTRICTED_ADDITIONAL_PERMISSIONS_REQUIRED\\\" in the list data), e.g. the events on Aug 6 2026 11:00 AM, Jun 21 2026 11:45 AM, Feb 26 2027 3:00 PM, Jul 2 2026 2:45 PM, Mar 17 2027 2:00 PM, Jan 18 2027 10:00 AM. An internal permission constant is shown to the user in place of an event name.",
+      "reproSteps": [
+        "Open https://5500-i45u0h4ud1r3um0mrduul.e2b.app/objects/calendarEvents while signed in as tim@apple.dev.",
+        "Read the Title column of the list (no clicking needed)."
+      ]
+    },
+    {
+      "index": 10,
+      "reported_at_seconds": 1043,
+      "name": "Events marked \\\"Is Full Day = True\\\" still show clock times (12:30 PM start, 12:00 AM end)",
+      "summary": "The same event is shown with Is Full Day = True in the list, yet its Start Date is \\\"Sep 14, 2026 12:30 PM\\\" and its End Date \\\"Sep 15, 2026 12:00 AM\\\" both in the list row and in the record's side panel — a specific start time on an all-day event. The same happens for other all-day rows: \\\"Jan 18, 2027 10:00 AM\\\" → \\\"Jan 19, 2027 12:00 AM\\\" (Is Full Day True) and \\\"Nov 17, 2026 11:45 AM\\\" → \\\"Nov 18, 2026 12:00 AM\\\" (Is Full Day True). (on /objects/calendarEvents)",
+      "expected": "An event marked as full day shows whole days without a time (e.g. Start Date Sep 14, 2026 and End Date Sep 15, 2026), so the dates agree with the Is Full Day flag.",
+      "actual": "The same event is shown with Is Full Day = True in the list, yet its Start Date is \\\"Sep 14, 2026 12:30 PM\\\" and its End Date \\\"Sep 15, 2026 12:00 AM\\\" both in the list row and in the record's side panel — a specific start time on an all-day event. The same happens for other all-day rows: \\\"Jan 18, 2027 10:00 AM\\\" → \\\"Jan 19, 2027 12:00 AM\\\" (Is Full Day True) and \\\"Nov 17, 2026 11:45 AM\\\" → \\\"Nov 18, 2026 12:00 AM\\\" (Is Full Day True).",
+      "reproSteps": [
+        "Open https://5500-i45u0h4ud1r3um0mrduul.e2b.app/objects/calendarEvents while signed in as tim@apple.dev.",
+        "In the 6th row, find the event \"Strategic Planning Wor...\" whose Is Full Day column shows a tick (True).",
+        "Read its Start Date (Sep 14, 2026 12:30 PM) and End Date (Sep 15, 2026 12:00 AM) columns.",
+        "Click that row's title to open its side panel and read Start Date and End Date in the Fields section — the same times appear."
+      ]
+    },
+    {
+      "index": 11,
+      "reported_at_seconds": 1052,
+      "name": "Company record Tasks tab shows the raw status value \"IN_PROGRESS\" as a group header",
+      "summary": "A second group header appears reading 'IN_PROGRESS 1' — the raw status enum with an underscore — while the task's own status chip shows 'In progress' and the other groups read 'TODO' and 'DONE'. (on /object/company/166720f3-b26b-4f96-abb7-4bfd5bb2a608 (Tasks tab))",
+      "expected": "The group header for that status should read like the others, e.g. 'IN PROGRESS 1' (matching the 'In progress' status chip), not a raw value with an underscore.",
+      "actual": "A second group header appears reading 'IN_PROGRESS 1' — the raw status enum with an underscore — while the task's own status chip shows 'In progress' and the other groups read 'TODO' and 'DONE'.",
+      "reproSteps": [
+        "Open /objects/companies and open a company record that has a task (here the record 'agent4-Co').",
+        "Click the 'Tasks' tab of the record.",
+        "Create a task with the '+' button and give it a title (here 'agent4-task-one').",
+        "Open that task (click its row) and set its Status to 'In progress' in the Fields panel.",
+        "Look at the Tasks tab of the company record: the new group header reads 'IN_PROGRESS 1'."
+      ]
+    },
+    {
+      "index": 12,
+      "reported_at_seconds": 1153,
+      "name": "'Export to PDF' and 'Export Note' in the record command menu do nothing — no request, no file, no feedback",
+      "summary": "Nothing happens at all: the menu stays open, no spinner, no download, no new tab and no request is sent (the network panel shows no call after the click). Clicking 'Export Note' behaves the same. Other items of the same menu (for example 'Search') do respond, so the menu itself works. (on /object/note/e821a81c-1f0d-415b-9f72-1dd55e2c0d16)",
+      "expected": "Choosing 'Export to PDF' starts an export — a spinner, a request and then a PDF file (download or new tab); 'Export Note' likewise produces the exported note.",
+      "actual": "Nothing happens at all: the menu stays open, no spinner, no download, no new tab and no request is sent (the network panel shows no call after the click). Clicking 'Export Note' behaves the same. Other items of the same menu (for example 'Search') do respond, so the menu itself works.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open the note record /object/note/e821a81c-1f0d-415b-9f72-1dd55e2c0d16 (agent10-note-alpha)",
+        "Click the Command Menu button ('...') at the far right of the record header to open the command panel",
+        "In the panel's 'Other' section click 'Export to PDF'",
+        "Watch the page, the downloads and the network for any reaction",
+        "Click 'Export Note' in the same panel"
+      ]
+    },
+    {
+      "index": 13,
+      "reported_at_seconds": 1215,
+      "name": "Phone number typed on a person record is never saved: Enter and clicking away leave the editor open with no message",
+      "summary": "The phone editor stays open with the number in it and no phone chip is ever created: pressing Enter does nothing, and clicking elsewhere on the page does not close or save the editor either. No validation message appears, and the country selector keeps showing the wrong flag after typing +1 555 000 1111 (it shows a South-American flag while +55 500 011 11 is the pre-formatted value). The Timeline also never shows a Phones change. (on /object/person/d3016b08-5250-41cd-a3df-dfa10199fc32)",
+      "expected": "Enter (or clicking outside the field) saves the number and it appears as a phone chip in the Phones field, or the field shows why the number is not accepted.",
+      "actual": "The phone editor stays open with the number in it and no phone chip is ever created: pressing Enter does nothing, and clicking elsewhere on the page does not close or save the editor either. No validation message appears, and the country selector keeps showing the wrong flag after typing +1 555 000 1111 (it shows a South-American flag while +55 500 011 11 is the pre-formatted value). The Timeline also never shows a Phones change.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open the person record agent3-Person Test (/object/person/d3016b08-5250-41cd-a3df-dfa10199fc32), created earlier from /objects/people with the + New Person button.",
+        "In the left Fields panel double-click the grey 'Phones' placeholder to open the phone editor (a country selector and an input with placeholder 'Phone' appear).",
+        "Type 5550001111 and press Enter. The input reformats to '+55 500 011 11' and nothing is saved.",
+        "Type +1 555 000 1111 and press Enter again, then click on the 'Fields' heading to move the focus away.",
+        "Look at the Phones row and the Timeline tab."
+      ]
+    },
+    {
+      "index": 14,
+      "reported_at_seconds": 1303,
+      "name": "Empty fields (Due Date, Assignee, Body) on a task record cannot be opened for editing — clicking them does nothing",
+      "summary": "The cell only gets a light grey focus/hover highlight; no picker, dropdown or text editor ever appears, so a task's due date, assignee and body cannot be filled in from its record page. The same happens in the task side panel on /objects/tasks. Fields that already have a value (Status chip, filled Due Date) do open their editor. (on /object/task/3643175c-e40b-451c-b7b2-652f3531d2e6 (task record of \"agent8-task-2\"))",
+      "expected": "Clicking an empty field value opens its editor: a date/time picker for Due Date, a person picker for Assignee, a text editor for Body — the same editors that open for fields that already have a value (on the seeded task 'Schedule follow-up call' clicking its filled Due Date value 'Nov 27, 2026 5:34 AM' opens the calendar and time picker).",
+      "actual": "The cell only gets a light grey focus/hover highlight; no picker, dropdown or text editor ever appears, so a task's due date, assignee and body cannot be filled in from its record page. The same happens in the task side panel on /objects/tasks. Fields that already have a value (Status chip, filled Due Date) do open their editor.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev and open /objects/tasks.",
+        "Click the '+ New Task' button (top right). A task named 'agent8-task-2' is created and its side panel opens.",
+        "In the side panel click 'Open' (Ctrl ⏎) to go to the record page /object/task/3643175c-e40b-451c-b7b2-652f3531d2e6.",
+        "In the Fields column click the grey 'Due Date' placeholder value next to the 'Due Date' label, several times.",
+        "Repeat for the grey 'Assignee' placeholder value and the grey 'Body' placeholder value."
+      ]
+    }
+  ]
+}

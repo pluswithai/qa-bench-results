@@ -1,0 +1,74 @@
+{
+  "fixture": "metabase/areas/admin",
+  "run": 1,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 123,
+      "name": "\"Redirect to HTTPS\" setting shows the Site url description text instead of its own",
+      "summary": "The 'Redirect to HTTPS' toggle shows the Site url text: \"This URL is used for things like creating links in emails, auth redirects, and in some embedding scenarios, so changing it could break functionality or get you locked out of this instance.\" It describes a URL and lockout, which makes no sense for an on/off switch and misleads the admin about what the toggle does. (on /admin/settings/general)",
+      "expected": "The 'Redirect to HTTPS' toggle should have its own description explaining what redirecting to HTTPS does.",
+      "actual": "The 'Redirect to HTTPS' toggle shows the Site url text: \"This URL is used for things like creating links in emails, auth redirects, and in some embedding scenarios, so changing it could break functionality or get you locked out of this instance.\" It describes a URL and lockout, which makes no sense for an on/off switch and misleads the admin about what the toggle does.",
+      "reproSteps": [
+        "Sign in with eval@momentic.ai and open /admin/settings/general",
+        "Look at the 'App config' card, at the 'Redirect to HTTPS' toggle below 'Site url'",
+        "Read the description line under the 'Redirect to HTTPS' heading"
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 130,
+      "name": "Site url description paragraph is repeated twice in the same block",
+      "summary": "The sentence \"This URL is used for things like creating links in emails, auth redirects, and in some embedding scenarios, so changing it could break functionality or get you locked out of this instance.\" appears twice in the Site url block: once right after \"Only change this if you know what you're doing!\" and again as a separate identical paragraph above the \"This has been set by the MB_SITE_URL environment variable.\" line. (on /admin/settings/general)",
+      "expected": "The Site url description should appear once.",
+      "actual": "The sentence \"This URL is used for things like creating links in emails, auth redirects, and in some embedding scenarios, so changing it could break functionality or get you locked out of this instance.\" appears twice in the Site url block: once right after \"Only change this if you know what you're doing!\" and again as a separate identical paragraph above the \"This has been set by the MB_SITE_URL environment variable.\" line.",
+      "reproSteps": [
+        "Sign in with eval@momentic.ai and open /admin/settings/general",
+        "In the 'App config' card, read the whole 'Site url' block, from its heading down to the environment-variable line"
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 220,
+      "name": "'Email address for help requests' saves an invalid address with \\\"Changes saved\\\"",
+      "summary": "The value is saved as soon as the field loses focus: a \"Changes saved\" toast appears and the field keeps \"not-an-email\". No validation message, no refused save — the instance's help email is now an invalid address. (on /admin/settings/general)",
+      "expected": "The page should refuse a value that is not an email address (a validation message next to the field) and keep the previous valid address.",
+      "actual": "The value is saved as soon as the field loses focus: a \"Changes saved\" toast appears and the field keeps \"not-an-email\". No validation message, no refused save — the instance's help email is now an invalid address.",
+      "reproSteps": [
+        "Sign in and open /admin/settings/general",
+        "Scroll to the 'Email and tracking' card",
+        "Select the text in the 'Email address for help requests' field and type not-an-email",
+        "Press Tab to leave the field"
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 248,
+      "name": "\"Find someone\" search treats % and _ as wildcards and lists every person",
+      "summary": "Typing % lists all 3 people (Harbor Admin, Jordan Ellis, Maya Chen) and says '3 people found'; a single _ does the same. The backend call /api/user?query=%25 passes the text unescaped, so % and _ act as SQL LIKE wildcards instead of literal characters in the filter. (on /admin/people)",
+      "expected": "A search for % (a character that does not occur in any name or email) finds no people and shows the 'No results found' empty state, as typing 'zzz' already does.",
+      "actual": "Typing % lists all 3 people (Harbor Admin, Jordan Ellis, Maya Chen) and says '3 people found'; a single _ does the same. The backend call /api/user?query=%25 passes the text unescaped, so % and _ act as SQL LIKE wildcards instead of literal characters in the filter.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open /admin/people.",
+        "Click the 'Find someone' search box.",
+        "Type a single % character.",
+        "Wait for the list to update and read the rows and the footer count.",
+        "Also try a single _ character."
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 526,
+      "name": "Anonymous tracking description is repeated twice in the Email and tracking card",
+      "summary": "The sentence \"Enable the collection of anonymous usage data in order to help us improve.\" is rendered twice: once directly under the \"Anonymous tracking\" title and again as a second identical paragraph above \"This has been set by the MB_ANON_TRACKING_ENABLED environment variable.\" (the setting it belongs to is also not shown as a control). (on /admin/settings/general)",
+      "expected": "The Anonymous tracking description should appear once, above the environment-variable note.",
+      "actual": "The sentence \"Enable the collection of anonymous usage data in order to help us improve.\" is rendered twice: once directly under the \"Anonymous tracking\" title and again as a second identical paragraph above \"This has been set by the MB_ANON_TRACKING_ENABLED environment variable.\" (the setting it belongs to is also not shown as a control).",
+      "reproSteps": [
+        "Sign in and open /admin/settings/general",
+        "Scroll down to the 'Email and tracking' card",
+        "Read the 'Anonymous tracking' block"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,342 @@
+{
+  "bugs": [
+    {
+      "name": "Invalid tag name error shows the raw translation key \"form.TagName\"",
+      "summary": "The red error banner shows the raw localization key instead of the field's name: \\\"form.TagName must be a well-formed Git reference name.\\\" (on /eval/harbor-handbook/releases/new)",
+      "expected": "An error with a readable field name, e.g. \\\"Tag name must be a well-formed Git reference name.\\\" (the app's own label for the field is \\\"Tag name\\\").",
+      "actual": "The red error banner shows the raw localization key instead of the field's name: \\\"form.TagName must be a well-formed Git reference name.\\\"",
+      "reproSteps": [
+        "Open https://5503-i1oztpwgvm7yuf0jcznbw.e2b.app/eval/harbor-handbook/releases/new while signed in as eval.",
+        "Type \"..\" into the \"Tag name\" field.",
+        "Click \"Create Tag Only\"."
+      ]
+    },
+    {
+      "name": "Tags search treats \"%\" and \"_\" as wildcards instead of literal characters",
+      "summary": "Percent and underscore are passed through to the server's LIKE pattern unescaped: \"%\" and \"_\" alone return every tag, and \"agent7%tag\" returns the two agent7 tags as if % were \"match anything\". A search for text that does not exist literally returns matching tags, so the filter cannot be used to find a tag whose name really contains % or _. (on /eval/harbor-handbook/tags)",
+      "expected": "The search box filters on the literal text typed: a query containing % or _ (e.g. \"agent7%tag\") matches only tag names that literally contain those characters, so it should show \"0 Tags\" / \"No results found.\" for these queries.",
+      "actual": "Percent and underscore are passed through to the server's LIKE pattern unescaped: \"%\" and \"_\" alone return every tag, and \"agent7%tag\" returns the two agent7 tags as if % were \"match anything\". A search for text that does not exist literally returns matching tags, so the filter cannot be used to find a tag whose name really contains % or _.",
+      "reproSteps": [
+        "Open https://5503-i1oztpwgvm7yuf0jcznbw.e2b.app/eval/harbor-handbook/tags (signed in as eval). The repository has tags v1.0.0, agent7-tag-a, agent7-a-very-long-tag-name-for-layout-testing-0123456789abcdefghij, agent9-tag-msg.",
+        "In the 'Search tags...' box type a single % and press Enter (address becomes /tags?q=%25).",
+        "All 4 tags are listed even though no tag name contains a % character.",
+        "In the same box type a single _ and press Enter (/tags?q=_).",
+        "All 4 tags are listed again, although no tag name contains an underscore-only match that way.",
+        "In the same box type agent7%tag and press Enter (/tags?q=agent7%25tag).",
+        "The list shows 2 tags ('agent7-a-very-long-tag-name-for-layout-testing-0123456789abcdefghij' and 'agent7-tag-a') and the heading says '2 Tags', although no tag name contains a literal %."
+      ]
+    },
+    {
+      "name": "Long release title clips the \"Draft\" label on the Releases list (badge cut to \"D\")",
+      "summary": "The Draft badge is squeezed to 18-21 px wide and clipped by the card edge, showing only \"D\", while the same badge on a short-titled release is 38 px wide and fully readable. (on /eval/harbor-handbook/releases)",
+      "expected": "The whole Draft label stays readable next to a wrapped long title at every width (it moves under the title or the title shrinks), like it does for short titles such as \"agent11 Draft Release\".",
+      "actual": "The Draft badge is squeezed to 18-21 px wide and clipped by the card edge, showing only \"D\", while the same badge on a short-titled release is 38 px wide and fully readable.",
+      "reproSteps": [
+        "Sign in and open /eval/harbor-handbook/releases (the list contains the draft release whose tag is agent13-release-layout-test-tag-with-a-very-long-name and whose title is \"agent13 layout test title with a very long unbrokenwordaaaa… end\").",
+        "Set the browser width to 768 px: the first card's title wraps onto 3 lines and the yellow Draft badge at its right is cut off, only \"D\" shows.",
+        "Set the browser width to 390 px: the Draft badge is again cut to \"D\" at the card's right edge."
+      ]
+    },
+    {
+      "name": "At phone width the release form's checkboxes are drawn on top of their label text",
+      "summary": "At 390px the checkbox is drawn on top of its own label: the empty box sits over the 'as' in \"Mark as Pre-Release\" and, when ticked, the blue ticked square covers those letters, making the label read \"Mark a[s tick]Pre-Release\". The same happens to \"Use the title and content of release as tag message.\" on the New Release form. At 768px and 1440px both checkboxes render correctly (a 15x15 box left of the text, which starts 16px further right). (on /eval/harbor-handbook/releases/edit/agent14-draft (and /releases/new))",
+      "expected": "At phone width the checkbox square sits in the empty space to the left of the label text and the text stays readable, as it does at 768px and 1440px.",
+      "actual": "At 390px the checkbox is drawn on top of its own label: the empty box sits over the 'as' in \"Mark as Pre-Release\" and, when ticked, the blue ticked square covers those letters, making the label read \"Mark a[s tick]Pre-Release\". The same happens to \"Use the title and content of release as tag message.\" on the New Release form. At 768px and 1440px both checkboxes render correctly (a 15x15 box left of the text, which starts 16px further right).",
+      "reproSteps": [
+        "Sign in as eval, open https://5503-i1oztpwgvm7yuf0jcznbw.e2b.app/eval/harbor-handbook/releases/edit/agent14-draft",
+        "Set the browser window to 390 x 844 CSS pixels and scroll down to the 'Mark as Pre-Release' checkbox",
+        "Observe the checkbox square drawn over the letters 'as' of the label instead of left of the text",
+        "Click the label 'Mark as Pre-Release': the blue ticked square appears on top of the same letters",
+        "Also open https://5503-i1oztpwgvm7yuf0jcznbw.e2b.app/eval/harbor-handbook/releases/new at 390px: the checkbox of 'Use the title and content of release as tag message.' is drawn over the word 'content' the same way"
+      ]
+    },
+    {
+      "name": "Tags page at phone width: tag row names and actions (Delete Tag) are cut off and unreachable",
+      "summary": "At 390 px wide the tag row is cut at the card's right edge: the \"New Release\" text is truncated (agent9-tag-msg shows \"Re...\" / \"Ne...\") and \"Delete Tag\" is entirely outside the card. The long tag name of agent7-a-very-long-tag-name-for-layout-testing-0123456789abcdefghij is cut mid-word at the card edge. The page does not scroll sideways, so the cut-off links cannot be reached (the accessibility tree marks Delete Tag as off screen). (on /eval/harbor-handbook/tags)",
+      "expected": "Each tag row wraps at phone width so its name and all its actions (ZIP, TAR.GZ, New Release, Delete Tag) stay inside the card and remain clickable, as they do at 768 px and 1440 px.",
+      "actual": "At 390 px wide the tag row is cut at the card's right edge: the \"New Release\" text is truncated (agent9-tag-msg shows \"Re...\" / \"Ne...\") and \"Delete Tag\" is entirely outside the card. The long tag name of agent7-a-very-long-tag-name-for-layout-testing-0123456789abcdefghij is cut mid-word at the card edge. The page does not scroll sideways, so the cut-off links cannot be reached (the accessibility tree marks Delete Tag as off screen).",
+      "reproSteps": [
+        "Open /eval/harbor-handbook/tags (the repo has several tags, e.g. agent9-tag-msg, agent1-tagonly-1445, agent7-a-very-long-tag-name-for-layout-testing-0123456789abcdefghij).",
+        "Set the browser width to 390 px.",
+        "Look at any tag row: the metadata line ends in a cut-off \"Ne…\" / \"Re…\" at the card's right edge, and the long tag name is cut mid-word.",
+        "Try to scroll the page sideways: it does not move, so Delete Tag cannot be reached."
+      ]
+    },
+    {
+      "name": "Releases list beyond the last page shows a blank area with no message and a wrong active page in the pager",
+      "summary": "The whole list area is empty (white space) with no wording at all, while the header still says \\\"15 Releases\\\"; the pager at the same time marks page \\\"2\\\" as active even though the address asks for page 99, and \\\"Next\\\"/\\\"Last\\\" are still clickable-looking. (on /eval/harbor-handbook/releases)",
+      "expected": "An out-of-range page either redirects to the last real page or shows a wording such as \\\"no releases on this page\\\" with a way back to the list; the pager marks the page actually shown.",
+      "actual": "The whole list area is empty (white space) with no wording at all, while the header still says \\\"15 Releases\\\"; the pager at the same time marks page \\\"2\\\" as active even though the address asks for page 99, and \\\"Next\\\"/\\\"Last\\\" are still clickable-looking.",
+      "reproSteps": [
+        "Sign in as eval and open /eval/harbor-handbook/releases (15 releases exist, so the pager has 2 pages).",
+        "In the address bar change the address to /eval/harbor-handbook/releases?page=2 when only one page of releases exists, or /eval/harbor-handbook/releases?page=99 at any time, and press Enter."
+      ]
+    },
+    {
+      "name": "Deleted release is still shown on its tag page and in its Update Release form (only saving returns 404)",
+      "summary": "The release still shows: /releases/tag/rel-del-a8b renders the full card of the deleted release (title \\\"agent8 second delete test\\\", Draft badge, notes), and /releases/edit/rel-del-a8b opens the Update Release form pre-filled with its title and notes. Only saving fails: clicking Save Draft there answers a 404 Not Found page (POST /releases/edit/rel-del-a8b → 404). Same with a first disposable release rel-del-a8: gone from the list, but still rendered on its tag page and in its edit form a reload and several minutes later. (on /eval/harbor-handbook/releases/tag/rel-del-a8b and /eval/harbor-handbook/releases/edit/rel-del-a8b)",
+      "expected": "After \\\"The release has been deleted.\\\" the release is gone everywhere: its tag page shows only the tag (or a proper 404) and /releases/edit/<tag> no longer serves the release's title and notes.",
+      "actual": "The release still shows: /releases/tag/rel-del-a8b renders the full card of the deleted release (title \\\"agent8 second delete test\\\", Draft badge, notes), and /releases/edit/rel-del-a8b opens the Update Release form pre-filled with its title and notes. Only saving fails: clicking Save Draft there answers a 404 Not Found page (POST /releases/edit/rel-del-a8b → 404). Same with a first disposable release rel-del-a8: gone from the list, but still rendered on its tag page and in its edit form a reload and several minutes later.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1, open https://5503-i1oztpwgvm7yuf0jcznbw.e2b.app/eval/harbor-handbook/releases/new, enter tag name rel-del-a8b and release title \"agent8 second delete test\", click Save Draft",
+        "Check the Releases list: the draft is listed",
+        "Open https://5503-i1oztpwgvm7yuf0jcznbw.e2b.app/eval/harbor-handbook/releases/edit/rel-del-a8b and click the red Delete Release button",
+        "Click Yes in the Delete Release dialog: the page returns to /releases with the message \"The release has been deleted.\" and the release is no longer in the list",
+        "Open https://5503-i1oztpwgvm7yuf0jcznbw.e2b.app/eval/harbor-handbook/releases/tag/rel-del-a8b (also after a reload): the deleted release is still displayed",
+        "Open https://5503-i1oztpwgvm7yuf0jcznbw.e2b.app/eval/harbor-handbook/releases/edit/rel-del-a8b: the Update Release form is pre-filled with the deleted release's title and notes; clicking Save Draft answers \"404 Not Found\""
+      ]
+    },
+    {
+      "name": "Edit release: empty title error shows raw key \"form.Title cannot be empty.\"",
+      "summary": "A red banner above the form reads: 'form.Title cannot be empty.' — the raw translation key 'form.Title' is printed instead of the translated field name. (on /eval/harbor-handbook/releases/edit/agent4-rel-edit)",
+      "expected": "A readable validation message next to the title, e.g. \"Title cannot be empty.\"",
+      "actual": "A red banner above the form reads: 'form.Title cannot be empty.' — the raw translation key 'form.Title' is printed instead of the translated field name.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-i1oztpwgvm7yuf0jcznbw.e2b.app/eval/harbor-handbook/releases/edit/agent4-rel-edit (any existing release works, e.g. the draft agent4-rel-edit).",
+        "Clear the 'Release title' field completely.",
+        "Click 'Save Draft'."
+      ]
+    },
+    {
+      "name": "“Create Tag Only” button disappears after the “release with this tag name already exists” error",
+      "summary": "After the error the button row contains only “Save Draft” and “Publish Release”; “Create Tag Only” is no longer in the page at all (not hidden, removed from the DOM). The form values are kept, but the only way to get the button back is to reload the page, which throws away the typed tag name, title and notes. (on /eval/harbor-handbook/releases/new)",
+      "expected": "The form keeps all three buttons (“Create Tag Only”, “Save Draft”, “Publish Release”) together with the error, so the person can still choose to create only the tag without losing the values they typed.",
+      "actual": "After the error the button row contains only “Save Draft” and “Publish Release”; “Create Tag Only” is no longer in the page at all (not hidden, removed from the DOM). The form values are kept, but the only way to get the button back is to reload the page, which throws away the typed tag name, title and notes.",
+      "reproSteps": [
+        "Go to https://5503-i1oztpwgvm7yuf0jcznbw.e2b.app/eval/harbor-handbook/releases/new (signed in as eval). On the fresh form the bottom-right row has three buttons: “Create Tag Only”, “Save Draft”, “Publish Release”.",
+        "Type the tag name agent1-rel-v1-1432 (a tag that already has a release on this repo) into “Tag name”, and type any text such as “agent1 dup check 2” into “Release title”.",
+        "Click “Save Draft”.",
+        "Read the red banner “A release with this tag name already exists.” and scroll to the bottom-right button row."
+      ]
+    },
+    {
+      "name": "After a failed save the draft release form loses \"Save Draft\"/\"Publish Release\" and offers only \"Update Release\"",
+      "summary": "The form comes back as a plain \"Update Release\" page with only Cancel / Delete Release / a single blue \"Update Release\" button. The draft's \"Save Draft\" and \"Publish Release\" buttons are gone, so the choice between saving the draft and publishing it disappears and the only way to fix the error is to press \"Update Release\", which submits the draft release as a normal update. (on /eval/harbor-handbook/releases/edit/agent3-rel-ext-1)",
+      "expected": "The form shows the error and keeps its draft buttons \"Save Draft\" and \"Publish Release\", so the person can fix the title and still choose to keep it a draft",
+      "actual": "The form comes back as a plain \"Update Release\" page with only Cancel / Delete Release / a single blue \"Update Release\" button. The draft's \"Save Draft\" and \"Publish Release\" buttons are gone, so the choice between saving the draft and publishing it disappears and the only way to fix the error is to press \"Update Release\", which submits the draft release as a normal update.",
+      "reproSteps": [
+        "Sign in as eval and open /eval/harbor-handbook/releases/edit/agent3-rel-ext-1 (a draft release). Note the buttons at the bottom: Cancel, Delete Release, Save Draft, Publish Release.",
+        "Clear the 'Release title' field (leave it empty) and click 'Save Draft'.",
+        "Look at the buttons at the bottom of the reloaded form."
+      ]
+    },
+    {
+      "name": "Published release page has no edit (pencil) control, only drafts do",
+      "summary": "No edit (pencil) control at all on the published release's card — the top-right corner of the card is empty, so the only way to edit it is to type /releases/edit/v1.0.0 by hand. The same card on a draft release (e.g. /releases/tag/agent3-rel-ext-1) does show the pencil, so the control is missing only for the published release. (on /eval/harbor-handbook/releases/tag/v1.0.0)",
+      "expected": "A pencil \"edit\" control is shown to a signed-in admin on the release card, as it is on draft releases, and clicking it opens /eval/harbor-handbook/releases/edit/v1.0.0",
+      "actual": "No edit (pencil) control at all on the published release's card — the top-right corner of the card is empty, so the only way to edit it is to type /releases/edit/v1.0.0 by hand. The same card on a draft release (e.g. /releases/tag/agent3-rel-ext-1) does show the pencil, so the control is missing only for the published release.",
+      "reproSteps": [
+        "Sign in as eval (admin/owner) and open /eval/harbor-handbook/releases/tag/v1.0.0, the published release.",
+        "Look at the right end of the release title bar of the release card.",
+        "Compare with a draft release page, /eval/harbor-handbook/releases/tag/agent3-rel-ext-1, which shows a pencil edit icon in the same place."
+      ]
+    },
+    {
+      "name": "\\\"Use the title and content of release as tag message\\\" is unticked after a tag-name validation error",
+      "summary": "The form re-renders with the error, keeps the tag name, and the \\\"Use the title and content of release as tag message.\\\" checkbox is silently cleared (unticked). A person who fixes only the tag name and submits again publishes without the tag message they asked for. (on /eval/harbor-handbook/releases/new)",
+      "expected": "The ticked checkbox stays ticked (as the tag name, title, notes and \\\"Mark as Pre-Release\\\" do), so the next submit still uses the title and content as the tag message.",
+      "actual": "The form re-renders with the error, keeps the tag name, and the \\\"Use the title and content of release as tag message.\\\" checkbox is silently cleared (unticked). A person who fixes only the tag name and submits again publishes without the tag message they asked for.",
+      "reproSteps": [
+        "Open https://5503-i1oztpwgvm7yuf0jcznbw.e2b.app/eval/harbor-handbook/releases/new signed in as eval.",
+        "Type \"agent12..bad3\" into \"Tag name\" (an invalid Git ref name).",
+        "Tick the checkbox \"Use the title and content of release as tag message.\" (it now shows a tick).",
+        "Click \"Create Tag Only\".",
+        "The page comes back with the red error \"form.TagName must be a well-formed Git reference name.\"; the tag name is kept but the checkbox is now unticked."
+      ]
+    },
+    {
+      "name": "At phone width the \\\"RSS Feed\\\" button overlaps the \\\"14 Tags\\\" tab on the release page",
+      "summary": "The \\\"RSS Feed\\\" control is drawn on top of the \\\"14 Tags\\\" tab: its white box starts at x=156 while the \\\"14 Tags\\\" tab runs from x=111 to x=187, so the right third of the Tags tab is covered (the accessibility tree marks the RSS Feed link as \\\"partly covered\\\" and the tab itself as partly hidden). The \\\"RSS Feed\\\" text is squeezed onto two lines (\\\"RSS\\\" / \\\"Feed\\\") inside the box. A tap on the covered part of the Tags tab therefore lands on the RSS feed link instead of the Tags page. (on /eval/harbor-handbook/releases/tag/rel-att-agent2-tag)",
+      "expected": "At phone width the \\\"16 Releases\\\" / \\\"14 Tags\\\" tabs, the \\\"RSS Feed\\\" and \\\"New Release\\\" controls sit next to each other without overlapping, each fully visible and clickable on its own.",
+      "actual": "The \\\"RSS Feed\\\" control is drawn on top of the \\\"14 Tags\\\" tab: its white box starts at x=156 while the \\\"14 Tags\\\" tab runs from x=111 to x=187, so the right third of the Tags tab is covered (the accessibility tree marks the RSS Feed link as \\\"partly covered\\\" and the tab itself as partly hidden). The \\\"RSS Feed\\\" text is squeezed onto two lines (\\\"RSS\\\" / \\\"Feed\\\") inside the box. A tap on the covered part of the Tags tab therefore lands on the RSS feed link instead of the Tags page.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-i1oztpwgvm7yuf0jcznbw.e2b.app/eval/harbor-handbook/releases/tag/rel-att-agent2-tag at desktop width",
+        "Set the browser window to a phone width of 390 x 844 CSS pixels",
+        "Look at the header row of the release page that holds \"16 Releases\", \"14 Tags\", \"RSS Feed\" and \"New Release\"",
+        "Note that the white \"RSS Feed\" box overlaps the right part of the \"14 Tags\" tab and its label is wrapped over two lines"
+      ]
+    },
+    {
+      "name": "Tags panel heading says \"1 Tags\" for a single filtered result",
+      "summary": "The panel heading reads \"1 Tags\" while the tab above correctly reads \"11 Tags\" and exactly one row is listed, so the singular form is wrong and inconsistent with the tab's own pluralisation. (on /eval/harbor-handbook/tags)",
+      "expected": "The heading uses the singular form when exactly one tag is listed, like the tab does (\"1 Tag\"), e.g. \"1 Tag\".",
+      "actual": "The panel heading reads \"1 Tags\" while the tab above correctly reads \"11 Tags\" and exactly one row is listed, so the singular form is wrong and inconsistent with the tab's own pluralisation.",
+      "reproSteps": [
+        "Open https://5503-i1oztpwgvm7yuf0jcznbw.e2b.app/eval/harbor-handbook/tags (signed in as eval).",
+        "Type v1.0.0 in the 'Search tags...' box and press Enter (address becomes /tags?q=v1.0.0).",
+        "Exactly one tag row (v1.0.0) is listed.",
+        "Read the panel heading above the search box: it says '1 Tags'."
+      ]
+    },
+    {
+      "name": "Source-archive link of a deleted tag shows a raw plain-text error instead of a 404 page",
+      "summary": "The page shows only the raw plain-text line \\\"unrecognized repository reference: agent8-del-tag-1\\\" on a blank white page (HTTP 404, no header, no navigation, no styling) instead of the app's own 404 page (\\\"404 Not Found / The page you are trying to reach either does not exist or you are not authorized to view it.\\\") that the same missing tag returns on /releases/tag/agent8-del-tag-1. (on /eval/harbor-handbook/archive/agent8-del-tag-1.zip)",
+      "expected": "A download link for a tag that no longer exists answers the app's normal 404 page, like the tag's own page does; not a raw unstyled error string.",
+      "actual": "The page shows only the raw plain-text line \\\"unrecognized repository reference: agent8-del-tag-1\\\" on a blank white page (HTTP 404, no header, no navigation, no styling) instead of the app's own 404 page (\\\"404 Not Found / The page you are trying to reach either does not exist or you are not authorized to view it.\\\") that the same missing tag returns on /releases/tag/agent8-del-tag-1.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-i1oztpwgvm7yuf0jcznbw.e2b.app/eval/harbor-handbook/releases/new",
+        "Enter tag name agent8-del-tag-1 and click Create Tag Only (the tag is created)",
+        "Open https://5503-i1oztpwgvm7yuf0jcznbw.e2b.app/eval/harbor-handbook/tags: the row for agent8-del-tag-1 offers ZIP and TAR.GZ download links (…/archive/agent8-del-tag-1.zip)",
+        "Click Delete Tag on that row and confirm with Yes (\"The tag has been deleted.\")",
+        "Open https://5503-i1oztpwgvm7yuf0jcznbw.e2b.app/eval/harbor-handbook/archive/agent8-del-tag-1.zip"
+      ]
+    },
+    {
+      "name": "A 300-character tag name in a draft makes the whole Releases list blank (no release cards at all)",
+      "summary": "The Releases page shows only the tag name \\\"agent12-aaaa…\\\" running across one line and below it a completely blank white area: no release cards, no titles, no Edit links, nothing. The page also scrolls sideways to about 4288px wide at a 1280px viewport, so every other release in the repo becomes invisible. (on /eval/harbor-handbook/releases)",
+      "expected": "The long tag name wraps or is truncated inside its row, the page does not scroll sideways, and all release cards (tag, title, Draft label, notes, Edit link) stay visible.",
+      "actual": "The Releases page shows only the tag name \\\"agent12-aaaa…\\\" running across one line and below it a completely blank white area: no release cards, no titles, no Edit links, nothing. The page also scrolls sideways to about 4288px wide at a 1280px viewport, so every other release in the repo becomes invisible.",
+      "reproSteps": [
+        "Signed in as eval, open https://5503-i1oztpwgvm7yuf0jcznbw.e2b.app/eval/harbor-handbook/releases/new.",
+        "Paste a 300+ character tag name into \"Tag name\" (e.g. \"agent12-\" followed by 300 \"a\"), type \"agent12 long tag draft\" into \"Release title\".",
+        "Click \"Save Draft\".",
+        "The Releases list (https://5503-i1oztpwgvm7yuf0jcznbw.e2b.app/eval/harbor-handbook/releases) then shows only the long tag name line and a blank page; none of the other releases are visible."
+      ]
+    },
+    {
+      "name": "New Release form says \"New tag. This tag will be created from the target.\" for a tag that already exists and has a release",
+      "summary": "The helper line keeps saying 'New tag. This tag will be created from the target.' for the existing tag agent15-tag-alex; no request is made when the name is typed. After Save Draft the page shows the red banner 'A release with this tag name already exists.' while the helper line under the same field still says 'New tag. This tag will be created from the target.' — two contradictory statements on one screen. (on /eval/harbor-handbook/releases/new)",
+      "expected": "After typing an existing tag name the helper line should say the tag already exists (like the v1.0.0 case), and the page should not claim a new tag will be created.",
+      "actual": "The helper line keeps saying 'New tag. This tag will be created from the target.' for the existing tag agent15-tag-alex; no request is made when the name is typed. After Save Draft the page shows the red banner 'A release with this tag name already exists.' while the helper line under the same field still says 'New tag. This tag will be created from the target.' — two contradictory statements on one screen.",
+      "reproSteps": [
+        "Sign in as maya / momentic-eval-1 and open https://5503-i1oztpwgvm7yuf0jcznbw.e2b.app/eval/harbor-handbook/releases/new?tag=v1.0.0 (the form shows 'Existing tag.' under the Tag name field).",
+        "Replace the Tag name with agent15-tag-alex, a tag that already exists and already has a draft release (see /eval/harbor-handbook/tags).",
+        "Read the helper line under the Tag name field.",
+        "Type a Release title (agent15 maya duplicate tag attempt) and click Save Draft."
+      ]
+    },
+    {
+      "name": "Whitespace-only release title is accepted and leaves the release with no title",
+      "summary": "The spaces-only title is accepted, the page redirects to the Releases list, and the release entry for agent4-rel-edit has no title at all — the heading is missing entirely (only the Draft badge, \"eval released this now\" and the notes are shown). Opening the edit page again shows an apparently empty title field, so the release is stored with a blank title. (on /eval/harbor-handbook/releases/edit/agent4-rel-edit)",
+      "expected": "A title made only of spaces is refused with the same validation as an empty title (\"Title cannot be empty\"), and the release keeps its previous title.",
+      "actual": "The spaces-only title is accepted, the page redirects to the Releases list, and the release entry for agent4-rel-edit has no title at all — the heading is missing entirely (only the Draft badge, \"eval released this now\" and the notes are shown). Opening the edit page again shows an apparently empty title field, so the release is stored with a blank title.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-i1oztpwgvm7yuf0jcznbw.e2b.app/eval/harbor-handbook/releases/edit/agent4-rel-edit (the draft release agent4-rel-edit).",
+        "Replace the whole 'Release title' value with three spaces only.",
+        "Click 'Save Draft'.",
+        "Look at the release entry on the Releases list that the page returns to."
+      ]
+    },
+    {
+      "name": "Repo activity feed item titles contain escaped HTML link markup instead of plain text",
+      "summary": "The titles contain escaped HTML anchors and double-escaped tag names: <title>eval pushed tag &lt;a href=&#34;https://.../src/tag/agent10-feed-%3Cx%3E-tag&#34;&gt;agent10-feed-&amp;lt;x&amp;gt;-tag&lt;/a&gt; to &lt;a href=&#34;https://.../eval/harbor-handbook&#34;&gt;eval/harbor-handbook&lt;/a&gt;</title>. A feed reader shows the raw markup, and a tag named agent10-feed-<x>-tag is shown as \"agent10-feed-&lt;x&gt;-tag\". Deleting a tag produces the same markup in the title (\"eval deleted tag agent7-tag-c from &lt;a href=…&gt;eval/harbor-handbook&lt;/a&gt;\"). (on /eval/harbor-handbook.rss)",
+      "expected": "Each item <title> is plain text describing the event, e.g. \"eval pushed tag agent10-feed-<x>-tag to eval/harbor-handbook\", with tag names shown as the characters the user typed (as the tags feed /tags.rss does with proper escaping).",
+      "actual": "The titles contain escaped HTML anchors and double-escaped tag names: <title>eval pushed tag &lt;a href=&#34;https://.../src/tag/agent10-feed-%3Cx%3E-tag&#34;&gt;agent10-feed-&amp;lt;x&amp;gt;-tag&lt;/a&gt; to &lt;a href=&#34;https://.../eval/harbor-handbook&#34;&gt;eval/harbor-handbook&lt;/a&gt;</title>. A feed reader shows the raw markup, and a tag named agent10-feed-<x>-tag is shown as \"agent10-feed-&lt;x&gt;-tag\". Deleting a tag produces the same markup in the title (\"eval deleted tag agent7-tag-c from &lt;a href=…&gt;eval/harbor-handbook&lt;/a&gt;\").",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Create a tag, e.g. open /eval/harbor-handbook/releases/new, type a tag name such as agent10-feed-<x>-tag and click \"Create Tag Only\" (a tag created by another run works too).",
+        "Open the repository activity feed at /eval/harbor-handbook.rss.",
+        "Read the <title> of the newest <item>."
+      ]
+    },
+    {
+      "name": "Editing a draft release rewrites its \\\"released this\\\" date to the save time and re-sorts it to the top of the list",
+      "summary": "The draft's date is rewritten to the time of the save: after the first save the row moved to the top of the list and read \\\"released this 2 minutes ago\\\" for a release created at 15:32:24 (was 2026-11-23 15:32:24 on creation, 15:35:31 after the first save, 15:37:52 after the second save). The list re-sorts, so an edited old release is presented as the newest release. (on /eval/harbor-handbook/releases)",
+      "expected": "Saving edits keeps the release's own date: the row keeps showing the date the release was created (and for a published release, the date it was released), and its position in the list does not change because of an edit.",
+      "actual": "The draft's date is rewritten to the time of the save: after the first save the row moved to the top of the list and read \\\"released this 2 minutes ago\\\" for a release created at 15:32:24 (was 2026-11-23 15:32:24 on creation, 15:35:31 after the first save, 15:37:52 after the second save). The list re-sorts, so an edited old release is presented as the newest release.",
+      "reproSteps": [
+        "Signed in as eval, open /eval/harbor-handbook/releases/new, enter tag name \"agent11-rel-draft\", title \"agent11 Draft Release\", notes \"agent11 draft notes\", click \"Save Draft\". Note the date in the row (released this ...).",
+        "Open /eval/harbor-handbook/releases/edit/agent11-rel-draft, change the title to \"agent11 Draft Release EDITED\" and click \"Save Draft\".",
+        "Back on the releases list, read the date next to \"released this\" for row agent11-rel-draft: it is now the save time, and the row has jumped to the top of the list.",
+        "Repeat: edit the same release again (title \"agent11 Draft Release EDITED again\"), Save Draft, and the date moves to that save time again."
+      ]
+    },
+    {
+      "name": "Draft release says \"eval released this\" although it was never published",
+      "summary": "The draft's page shows the yellow \"Draft\" badge and directly beneath it \"eval released this now\", and the same \"eval released this\" wording appears on the Releases list entry of every draft. (on /eval/harbor-handbook/releases/tag/agent5-tagonly-1)",
+      "expected": "A release that is still a draft (badge \"Draft\", never published) should not claim it was released; the line should say it was saved/created as a draft, or show nothing about releasing.",
+      "actual": "The draft's page shows the yellow \"Draft\" badge and directly beneath it \"eval released this now\", and the same \"eval released this\" wording appears on the Releases list entry of every draft.",
+      "reproSteps": [
+        "Signed in as eval, go to https://5503-i1oztpwgvm7yuf0jcznbw.e2b.app/eval/harbor-handbook/releases/new",
+        "Fill Tag name with agent5-tagonly-1 (an existing tag), Release title with \"agent5 Secret Draft Title\" and click Save Draft",
+        "On the Releases list click the release title \"agent5 Secret Draft Title\" (or open /eval/harbor-handbook/releases/tag/agent5-tagonly-1)",
+        "Read the metadata line under the title, and compare it with the Releases list entry for the same release"
+      ]
+    },
+    {
+      "name": "Releases RSS feed is empty although the repository has a published release",
+      "summary": "The feed contains only the channel header (title, description, pubDate) and no <item> element at all, on every reload, while /eval/harbor-handbook/tags.rss does list an item for the same v1.0.0 tag. (on /eval/harbor-handbook/releases.rss)",
+      "expected": "The releases feed lists the repository's published release(s) — at least one <item> with the title \"Add engineering handbook and release checklist\" for tag v1.0.0 — as the Releases tab and /releases/tag/v1.0.0 show it.",
+      "actual": "The feed contains only the channel header (title, description, pubDate) and no <item> element at all, on every reload, while /eval/harbor-handbook/tags.rss does list an item for the same v1.0.0 tag.",
+      "reproSteps": [
+        "Open /eval/harbor-handbook/releases: the tab bar says 19 Releases and the list contains the published (no Draft badge) release \"Add engineering handbook and release checklist\" for tag v1.0.0.",
+        "Open /eval/harbor-handbook/releases/tag/v1.0.0: the release page confirms the published release (no Draft label, Source Code (ZIP)/(TAR.GZ) downloads).",
+        "Open /eval/harbor-handbook/releases.rss (the target of the \"RSS Feed\" button on the Releases tab) and reload it.",
+        "The feed has an empty channel: no <item> elements at all."
+      ]
+    },
+    {
+      "name": "A 155-character tag name on a draft release makes the releases list scroll sideways at 1280px and crushes the release card into a narrow strip",
+      "summary": "The page becomes wider than the screen and scrolls sideways: scrolling right moves the whole page ~640px left and reveals empty white space, the tag label spills out of its column and prints as one line across the page, and the release card is crushed into a ~100px strip at the right edge where the title wraps one word/character per line (\\\"agent1 / 1 / layout / title / bbbbbb…\\\"). The row is several screens tall and its content is unreadable. The same page renders normally with a ~60-character tag name. (on /eval/harbor-handbook/releases)",
+      "expected": "The releases list stays exactly as wide as the screen at 1280px; the tag label wraps or is truncated inside its column and the release card keeps its normal width, so no horizontal scrolling appears.",
+      "actual": "The page becomes wider than the screen and scrolls sideways: scrolling right moves the whole page ~640px left and reveals empty white space, the tag label spills out of its column and prints as one line across the page, and the release card is crushed into a ~100px strip at the right edge where the title wraps one word/character per line (\\\"agent1 / 1 / layout / title / bbbbbb…\\\"). The row is several screens tall and its content is unreadable. The same page renders normally with a ~60-character tag name.",
+      "reproSteps": [
+        "Signed in as eval with the browser at 1280x720, open /eval/harbor-handbook/releases/new.",
+        "Type this tag name in \"Tag name\": agent11-layout-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa (155 characters), title \"agent11 layout title bbbbbbbb…\" (about 115 b's with no spaces), then click \"Save Draft\".",
+        "Back on /eval/harbor-handbook/releases the new draft is the first row: its tag label runs across the page and the release card is squeezed into a narrow strip at the far right.",
+        "Scroll the page to the right: the whole page shifts sideways and empty white space appears, so the list is wider than the 1280px screen.",
+        "Reload: the same broken layout and sideways scroll are still there."
+      ]
+    },
+    {
+      "name": "Edit form for a tag without a release loads, then submitting it ends on a bare 404 page",
+      "summary": "The form is rendered as if a release existed (empty title and notes, \"Delete Release\" and \"Update Release\" buttons), but clicking \"Update Release\" posts to the edit address, the server answers 404 and the person is thrown onto a bare \"404 Not Found — The page you are trying to reach either does not exist or you are not authorized to view it.\" page. The typed title/notes are lost. Happens both with an empty and with a filled title. (on /eval/harbor-handbook/releases/edit/agent4-tagonly-1)",
+      "expected": "Either the edit form is not offered for a tag that has no release, or submitting it creates/validates the release and shows a readable message; it must never end on a bare 404 page.",
+      "actual": "The form is rendered as if a release existed (empty title and notes, \"Delete Release\" and \"Update Release\" buttons), but clicking \"Update Release\" posts to the edit address, the server answers 404 and the person is thrown onto a bare \"404 Not Found — The page you are trying to reach either does not exist or you are not authorized to view it.\" page. The typed title/notes are lost. Happens both with an empty and with a filled title.",
+      "reproSteps": [
+        "Sign in as eval. On https://5503-i1oztpwgvm7yuf0jcznbw.e2b.app/eval/harbor-handbook/releases/new type tag name 'agent4-tagonly-1' and click 'Create Tag Only' (this makes a tag with no release, as the Releases list already has, e.g. agent5-tagonly-1).",
+        "On the Releases list click the pencil (edit) icon of a tag that has no release — the list links it to /eval/harbor-handbook/releases/edit/agent4-tagonly-1.",
+        "The 'Update Release' form loads with an empty 'Release title' and empty notes.",
+        "Type any title, e.g. 'agent4 tagonly release title'.",
+        "Click 'Update Release'."
+      ]
+    },
+    {
+      "name": "After Back the tag search field shows a different term than the results it displays",
+      "summary": "The page is back at ?q=agent&page=2 and lists the \\\"agent\\\" matches (heading \\\"14 Tags\\\": agent9-tag-msg, agent1-tagonly-1445, agent9-tag/slash1, agent7-a-very-long-tag-name…), but the search field now reads \\\"agent4\\\". The field and the results disagree, so a user cannot tell which term the list belongs to, and pressing the search button would silently search \\\"agent4\\\". (on /eval/harbor-handbook/tags)",
+      "expected": "After Back, the page shows the previous search results and the search field shows that same term (\\\"agent\\\"), so the field matches the results and the address.",
+      "actual": "The page is back at ?q=agent&page=2 and lists the \\\"agent\\\" matches (heading \\\"14 Tags\\\": agent9-tag-msg, agent1-tagonly-1445, agent9-tag/slash1, agent7-a-very-long-tag-name…), but the search field now reads \\\"agent4\\\". The field and the results disagree, so a user cannot tell which term the list belongs to, and pressing the search button would silently search \\\"agent4\\\".",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-i1oztpwgvm7yuf0jcznbw.e2b.app/eval/harbor-handbook/tags?q=agent&page=2 (heading \"14 Tags\", 4 rows, pager page 2 active)",
+        "Type agent4 into the \"Search tags...\" field and press Enter (the page now lists the single agent4-tagonly-1 result)",
+        "Press the browser's Back button once",
+        "Look at the search field and at the listed tags"
+      ]
+    },
+    {
+      "name": "Releases list: the tag-name link on a release card leads nowhere (href=\"#\")",
+      "summary": "The tag-name link in the left column of each release card has href=\"#\": clicking it only appends “#” to the page address and reloads/jumps the list to the top. It never opens the tag, the release or anything else, and no tooltip or menu appears. The release title link right next to it correctly opens /releases/tag/&lt;tag&gt;. (on /eval/harbor-handbook/releases)",
+      "expected": "The tag name in the list opens the tag/release page (as the release title link beside it does), or is plain non-interactive text if it is not meant to be a link.",
+      "actual": "The tag-name link in the left column of each release card has href=\"#\": clicking it only appends “#” to the page address and reloads/jumps the list to the top. It never opens the tag, the release or anything else, and no tooltip or menu appears. The release title link right next to it correctly opens /releases/tag/&lt;tag&gt;.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-i1oztpwgvm7yuf0jcznbw.e2b.app/eval/harbor-handbook/releases.",
+        "In the first release card, click the tag name in the left column (for example “agent12-onlynotes”, next to the tag icon).",
+        "Watch the page: the address becomes .../releases# and the list stays/jumps to the top; nothing else happens (no tag page, no message, no menu)."
+      ]
+    },
+    {
+      "name": "Release notes table with a long unbroken cell is cut off at phone width with no way to scroll to it",
+      "summary": "At 390 px width the second column's header \"A very long cell\" is missing entirely and the long unbroken cell text is cut off at the right edge of the release card; the page cannot be scrolled sideways, so the cut text can never be read. The same clipped table appears in the release's card on /releases. (on /eval/harbor-handbook/releases/tag/agent5-md-1)",
+      "expected": "The table should fit the card at phone width (cells wrap or the table gets its own horizontal scroll) so every cell stays readable; nothing should be cut off at the card edge.",
+      "actual": "At 390 px width the second column's header \"A very long cell\" is missing entirely and the long unbroken cell text is cut off at the right edge of the release card; the page cannot be scrolled sideways, so the cut text can never be read. The same clipped table appears in the release's card on /releases.",
+      "reproSteps": [
+        "Signed in as eval, open https://5503-i1oztpwgvm7yuf0jcznbw.e2b.app/eval/harbor-handbook/releases/edit/agent5-md-1 (draft release \"agent5 markdown stress test\", tag agent5-md-1)",
+        "Put this in Describe this release: a Markdown table whose second column cell holds one unbroken 155-character run of the letter w (| Short | A very long cell | with a row | x | www… |), and click Save Draft",
+        "Set the viewport to 390 x 844 and open /eval/harbor-handbook/releases/tag/agent5-md-1 (also visible on /eval/harbor-handbook/releases)",
+        "Look at the table in the release body and try to scroll the page sideways"
+      ]
+    },
+    {
+      "name": "Enter in the Release title field runs \\\"Create Tag Only\\\": a tag is created and the typed release title is lost",
+      "summary": "Pressing Enter in the Release title field submits the form with \"Create Tag Only\", not Save Draft: the page jumps to /eval/harbor-handbook/src/tag/agent15-sub-d4 showing 'Tag \"agent15-sub-d4\" has been created.', no release is created (the Releases counter stays at 30, the Tags counter grows), and the typed title \"agent15 enter submit d4 title\" is lost — /eval/harbor-handbook/releases/tag/agent15-sub-d4 shows the bare tag name as its heading with no release. A \"leave site?\" browser confirmation also pops up on this Enter submit (it does not when clicking Save Draft). Same result twice (agent15-sub-d3, agent15-sub-d4). (on /eval/harbor-handbook/releases/new)",
+      "expected": "Enter in the Release title field should submit the release like the primary action (Save Draft) and keep the typed title, or at least do nothing; it must not quietly create a tag only and throw away the release title and notes.",
+      "actual": "Pressing Enter in the Release title field submits the form with \"Create Tag Only\", not Save Draft: the page jumps to /eval/harbor-handbook/src/tag/agent15-sub-d4 showing 'Tag \"agent15-sub-d4\" has been created.', no release is created (the Releases counter stays at 30, the Tags counter grows), and the typed title \"agent15 enter submit d4 title\" is lost — /eval/harbor-handbook/releases/tag/agent15-sub-d4 shows the bare tag name as its heading with no release. A \"leave site?\" browser confirmation also pops up on this Enter submit (it does not when clicking Save Draft). Same result twice (agent15-sub-d3, agent15-sub-d4).",
+      "reproSteps": [
+        "Sign in as maya / momentic-eval-1 and open https://5503-i1oztpwgvm7yuf0jcznbw.e2b.app/eval/harbor-handbook/releases/new",
+        "Type agent15-sub-d4 in the 'Tag name' field",
+        "Type 'agent15 enter submit d4 title' in the 'Release title' field (screenshot: both filled)",
+        "Press Enter while the cursor is still in the Release title field"
+      ]
+    }
+  ]
+}

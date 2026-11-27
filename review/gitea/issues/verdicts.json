@@ -1,0 +1,414 @@
+{
+  "area": "issues",
+  "reviewer": "Claude Fable 5.2",
+  "bugs": [
+    {
+      "id": "issues-1",
+      "title": "Assignees picker: ticks, unticks and \"Clear assignees\" are only sent when the picker closes (reload with it open loses them)",
+      "findings": [
+        "run1-04",
+        "run1-09",
+        "run1-10",
+        "run2-06",
+        "run3-10"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Gitea documents that multi-select sidebar pickers defer the update until the dropdown is hidden; every video reloads the page while the picker is still open, so nothing had been submitted yet. Closing the picker (click outside) does send POST /issues/assignee, as run1-10 and run3-10 themselves report.",
+      "evidence": [
+        "run1-04/shot-1.png",
+        "run1-04/shot-3.png",
+        "run1-04/video.webm",
+        "run1-09/frame-6.jpg",
+        "run2-06/frame-6.jpg",
+        "run3-10/shot-2.png"
+      ],
+      "source": [
+        "web_src/js/features/repo-issue-sidebar.md",
+        "web_src/js/features/repo-issue-sidebar-combolist.ts",
+        "templates/repo/issue/sidebar/assignee_list.tmpl"
+      ],
+      "rejection_kind": "false-positive",
+      "rejection_note": "test procedure: page reloaded with the picker still open (Gitea saves on close)",
+      "confirmed_by": "owner manual check 2026-11-24: on a clean instance, unticking an assignee and closing the picker with a click outside does save; the change is lost only when the page is reloaded with the picker still open (designed defer-until-close)."
+    },
+    {
+      "id": "issues-2",
+      "title": "Escape no longer closes a sidebar picker (Assignees/Labels) once an entry has been clicked with the mouse",
+      "findings": [
+        "run1-02",
+        "run3-09"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "Both videos end with the Assignees picker still open after Escape was pressed on a ticked entry, while the same Escape closes the picker when nothing was clicked (run1-02 frame-2 shows Labels closing). Nothing in the source makes this deliberate: Escape is handled on the dropdown's keydown and stops working once the click moves focus away. Low impact (a click outside still closes it).",
+      "evidence": [
+        "run1-02/frame-2.jpg",
+        "run1-02/frame-6.jpg",
+        "run1-02/video.webm",
+        "run3-09/frame-4.jpg",
+        "run3-09/video.webm"
+      ],
+      "source": [
+        "web_src/fomantic/build/components/dropdown.js",
+        "web_src/js/modules/fomantic/dropdown.ts",
+        "web_src/js/modules/fomantic/aria.md",
+        "web_src/js/features/repo-issue-sidebar-combolist.ts"
+      ]
+    },
+    {
+      "id": "issues-3",
+      "title": "\"Add dependency\" commits the first suggestion when the list is closed without a pick (Escape or clicking \"+\"), linking an issue the user never chose",
+      "findings": [
+        "run1-06",
+        "run3-02"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "Typing 2 and clicking \"+\" linked #19 (first suggestion) instead of #2, and pressing Escape on the freshly opened list left the first issue selected, which \"+\" then added (even one from another repository). The dropdown is initialised without turning off the library's force-selection-on-blur default, which Gitea does disable elsewhere, so this looks like an oversight and Escape choosing a value breaks the cancel convention.",
+      "evidence": [
+        "run1-06/shot-4.png",
+        "run1-06/shot-2.png",
+        "run3-02/frame-3.jpg",
+        "run3-02/shot-1.png",
+        "run3-02/shot-2.png"
+      ],
+      "source": [
+        "web_src/js/features/repo-issue.ts",
+        "web_src/fomantic/build/components/dropdown.js",
+        "web_src/js/features/repo-home.ts",
+        "templates/repo/issue/sidebar/issue_dependencies.tmpl",
+        "routers/web/repo/issue_dependency.go"
+      ]
+    },
+    {
+      "id": "issues-4",
+      "title": "\"Add dependency\" search: typing \"#1\" does not find issue #1",
+      "findings": [
+        "run2-03"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "The box is a keyword search over title, body and comments; only a query that is a bare integer is also matched against the issue number (strconv.Atoi), so \"#1\" is searched as literal text and \"1\" works. A missing convenience, not a broken promise.",
+      "evidence": [
+        "run2-03/shot-3.png",
+        "run2-03/shot-4.png"
+      ],
+      "source": [
+        "modules/indexer/issues/internal/model.go",
+        "modules/indexer/issues/db/db.go",
+        "modules/indexer/issues/indexer.go",
+        "web_src/js/features/repo-issue.ts"
+      ],
+      "fable": {
+        "verdict": "reject",
+        "severity": null
+      },
+      "override_reason": "The list labels issues as \"#1\", so typing \"#1\" is what a user does; it returns #19 and #11 and not #1, which misleads.",
+      "override_by": "owner review 2026-11-23"
+    },
+    {
+      "id": "issues-5",
+      "title": "Issue search for an emoji that is in a title returns no results",
+      "findings": [
+        "run1-05"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "The default issue indexer (bleve) is a word index built with the unicode word tokenizer, which emits letters and numbers only; emoji and other symbols are not indexed, so an emoji-only query matches nothing. A limitation of the chosen full-text design, not a malfunction.",
+      "evidence": [
+        "run1-05/shot-1.png",
+        "run1-05/shot-4.png"
+      ],
+      "source": [
+        "modules/indexer/issues/bleve/bleve.go",
+        "modules/setting/indexer.go"
+      ],
+      "rejection_kind": "product-decision",
+      "rejection_note": "behaviour is deliberate in Gitea 1.24.7 (see reason and source)"
+    },
+    {
+      "id": "issues-6",
+      "title": "\"Words\" search mode needs all words in the same field (title, body or comments)",
+      "findings": [
+        "run3-03"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Every indexer backend builds the Words query as \"all words in the title\" OR \"all words in the body\" OR \"all words in the comments\" (bleve, database and Elasticsearch alike), so words split across title and body do not match. Consistent, explicit search semantics rather than a defect.",
+      "evidence": [
+        "run3-03/shot-1.png",
+        "run3-03/shot-2.png"
+      ],
+      "source": [
+        "modules/indexer/issues/bleve/bleve.go",
+        "modules/indexer/internal/bleve/query.go",
+        "modules/indexer/issues/db/db.go",
+        "modules/indexer/issues/elasticsearch/elasticsearch.go",
+        "options/locale/locale_en-US.ini"
+      ],
+      "rejection_kind": "product-decision",
+      "rejection_note": "behaviour is deliberate in Gitea 1.24.7 (see reason and source)"
+    },
+    {
+      "id": "issues-7",
+      "title": "Time Tracker sidebar block shows only its heading and gear when no time is tracked",
+      "findings": [
+        "run1-15"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "By template the block is a heading-plus-gear dropdown: Set estimated time, Start timer and Add Time live inside the gear menu, and nothing else is rendered until an estimate or tracked time exists. The controls are there (click the gear); a missing empty-state line is a preference.",
+      "evidence": [
+        "run1-15/shot-1.png",
+        "run1-15/shot-2.png"
+      ],
+      "source": [
+        "templates/repo/issue/sidebar/stopwatch_timetracker.tmpl",
+        "services/context/repo.go"
+      ],
+      "rejection_kind": "product-decision",
+      "rejection_note": "behaviour is deliberate in Gitea 1.24.7 (see reason and source)"
+    },
+    {
+      "id": "issues-8",
+      "title": "Issue number is drawn inside the title (\"8#\" before the last word) when the title ends with right-to-left text",
+      "findings": [
+        "run2-08"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "The heading shows \"agent3-title-only 8# مرحبا\" instead of the title followed by #8; the template prints the title and the index span with no bidi isolation, so the trailing Arabic word pulls the number into its right-to-left run. Visual defect only.",
+      "evidence": [
+        "run2-08/shot-1.png",
+        "run2-08/shot-3.png"
+      ],
+      "source": [
+        "templates/repo/issue/view_title.tmpl"
+      ]
+    },
+    {
+      "id": "issues-9",
+      "title": "Long line in a fenced code block is clipped at the block edge; page claimed to scroll sideways",
+      "findings": [
+        "run2-13"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Markdown code blocks are rendered as code-overflow-scroll (overflow-x: auto), so a long line scrolls inside the block by design, and .markup has overflow hidden so it cannot widen the page. No screenshot or frame shows the page scrolled sideways; the layout is the normal 1280px one, the 1706px figure is only asserted.",
+      "evidence": [
+        "run2-13/shot-1.png",
+        "run2-13/frame-6.jpg"
+      ],
+      "source": [
+        "modules/markup/markdown/markdown.go",
+        "web_src/css/markup/content.css"
+      ],
+      "rejection_kind": "false-positive",
+      "rejection_note": "evidence does not show the claim (page not wider)"
+    },
+    {
+      "id": "issues-10",
+      "title": "New-issue link ignores ?labels= and ?assignee= parameters",
+      "findings": [
+        "run2-15"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "In 1.24.7 the new-issue page reads only title, body, milestone, project and template (plus field:*) from the query string; labels/assignee prefill is a feature Gitea does not offer or document here, not one that misbehaves.",
+      "evidence": [
+        "run2-15/shot-1.png"
+      ],
+      "source": [
+        "routers/web/repo/issue_new.go"
+      ],
+      "rejection_kind": "unsupported-input",
+      "rejection_note": "query parameters Gitea does not offer"
+    },
+    {
+      "id": "issues-11",
+      "title": "Double-clicking the bulk \"Close\" button: second request reported to answer 500 (intermittent)",
+      "findings": [
+        "run2-16"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "The screenshots and video only show the correct end state (issue closed once, no error on screen); the 500 and the console error are asserted from the network log and happened in 1 of 2 tries. The source makes it plausible (a concurrent second close hits ErrIssueAlreadyChanged and is returned as a 500, which the client swallows), so a human should check the run's network/console log and decide whether an invisible, intermittent 500 on a duplicate request counts (severity 3 if accepted).",
+      "evidence": [
+        "run2-16/shot-1.png",
+        "run2-16/frame-4.jpg",
+        "run2-16/frame-6.jpg"
+      ],
+      "source": [
+        "routers/web/repo/issue_list.go",
+        "models/issues/issue_update.go",
+        "web_src/js/features/repo-common.ts",
+        "web_src/js/features/repo-issue-list.ts"
+      ],
+      "fable": {
+        "verdict": "unsure",
+        "severity": null
+      },
+      "override_reason": "Intermittent (1 of 2), no visible effect: the issue closes once and no error is shown to the user.",
+      "override_by": "owner review 2026-11-23",
+      "rejection_kind": "false-positive",
+      "rejection_note": "environment: intermittent, no visible effect"
+    },
+    {
+      "id": "issues-12",
+      "title": "Search mode picked in the dropdown (Fuzzy) is lost when another dashboard section is clicked",
+      "findings": [
+        "run2-17"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "The tester changed the mode dropdown but never submitted the search (the address stayed /issues?q=agent12), then followed a server-rendered link, which cannot know an unsubmitted form value. Once the search is submitted the mode is in the address and the template carries search_mode in every section and state link.",
+      "evidence": [
+        "run2-17/frame-6.jpg",
+        "run2-17/shot-4.png"
+      ],
+      "source": [
+        "templates/user/dashboard/issues.tmpl",
+        "templates/shared/search/combo.tmpl",
+        "routers/web/user/home.go"
+      ],
+      "rejection_kind": "false-positive",
+      "rejection_note": "test procedure: search mode changed but the search was never submitted"
+    },
+    {
+      "id": "issues-13",
+      "title": "Tabbing across the issue-list filters leaves each opened menu open, stacking Label, Milestone and Author menus on top of each other",
+      "findings": [
+        "run2-18"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "Opening a dropdown on keyboard focus is intended (documented in dropdown.ts), but the screenshots show the previous menus staying open when focus moves on, so three menus overlap each other and the list. Gitea's own notes say a dropdown hides when focus leaves it; here it does not. Visual clutter only.",
+      "evidence": [
+        "run2-18/shot-2.png",
+        "run2-18/shot-5.png"
+      ],
+      "source": [
+        "web_src/js/modules/fomantic/dropdown.ts",
+        "web_src/js/modules/fomantic/aria.md",
+        "web_src/fomantic/build/components/dropdown.js"
+      ]
+    },
+    {
+      "id": "issues-14",
+      "title": "Assignee entry in the issue sidebar is a dead link (href=\"#\")",
+      "findings": [
+        "run2-19"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "Clicking the assignee only adds # to the address. The server template renders that entry as a link to the issue list filtered by the assignee, but on load the sidebar script rebuilds the list from clones of the picker rows (href=\"#\") because assignee rows are not pre-marked checked, so the intended link is lost. (The intended target is the filtered list, not the profile the tester expected.)",
+      "evidence": [
+        "run2-19/shot-1.png",
+        "run2-19/frame-6.jpg"
+      ],
+      "source": [
+        "templates/repo/issue/sidebar/assignee_list.tmpl",
+        "web_src/js/features/repo-issue-sidebar-combolist.ts",
+        "templates/repo/issue/sidebar/label_list_item.tmpl"
+      ]
+    },
+    {
+      "id": "issues-15",
+      "title": "Timeline of the blocking issue says \"added a new dependency #15\" while its sidebar says \"Blocks #15\"",
+      "findings": [
+        "run3-07"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "Gitea deliberately writes the same dependency comment into both issues (\"Make two comments, one in each issue\"), each naming the other issue, with one shared text \"added a new dependency\". The wording on the blocking side is loose, but it is the designed mirror entry, not wrong data; the sidebar gives the direction.",
+      "evidence": [
+        "run3-07/shot-2.png"
+      ],
+      "source": [
+        "models/issues/comment.go",
+        "templates/repo/issue/view_content/comments.tmpl",
+        "options/locale/locale_en-US.ini"
+      ],
+      "fable": {
+        "verdict": "reject",
+        "severity": null
+      },
+      "override_reason": "On the blocking issue the timeline wording states the opposite direction of the sidebar on the same page; designed mirror entry, but confusing.",
+      "override_by": "owner review 2026-11-23"
+    },
+    {
+      "id": "issues-16",
+      "title": "Back to the new-issue form restores the body but not the Title",
+      "findings": [
+        "run3-11"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "The tester left a dirty form after confirming the app's leave-page warning, so the draft was announced as lost; the body coming back is the browser's own form restore, and the title input carries autocomplete=\"off\" on purpose, which excludes it from that restore. Gitea does not promise draft recovery here.",
+      "evidence": [
+        "run3-11/shot-1.png",
+        "run3-11/shot-2.png"
+      ],
+      "source": [
+        "templates/repo/issue/new_form.tmpl",
+        "web_src/js/features/common-form.ts"
+      ],
+      "rejection_kind": "product-decision",
+      "rejection_note": "behaviour is deliberate in Gitea 1.24.7 (see reason and source)"
+    },
+    {
+      "id": "issues-17",
+      "title": "Dashboard/org Issues: left-hand section counters do not follow the Author and Assignee filters",
+      "findings": [
+        "run3-13"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "The code explicitly clears poster and assignee before computing the left-hand counters (\"Below stats are for the left sidebar\"), and the section links drop those two filters as well, so each counter equals what its link opens; the Open/Closed tabs do follow the filters. Intended, if debatable, design.",
+      "evidence": [
+        "run3-13/shot-1.png",
+        "run3-13/shot-2.png"
+      ],
+      "source": [
+        "routers/web/user/home.go",
+        "templates/user/dashboard/issues.tmpl"
+      ],
+      "rejection_kind": "product-decision",
+      "rejection_note": "behaviour is deliberate in Gitea 1.24.7 (see reason and source)"
+    }
+  ],
+  "rejections": [
+    {
+      "kind": "false-positive",
+      "label": "False positive (agent was wrong)",
+      "count": 4,
+      "bugs": [
+        "issues-1",
+        "issues-9",
+        "issues-11",
+        "issues-12"
+      ]
+    },
+    {
+      "kind": "unsupported-input",
+      "label": "Address or input the app never produces",
+      "count": 1,
+      "bugs": [
+        "issues-10"
+      ]
+    },
+    {
+      "kind": "product-decision",
+      "label": "Product decision (real behaviour Gitea chose on purpose)",
+      "count": 5,
+      "bugs": [
+        "issues-5",
+        "issues-6",
+        "issues-7",
+        "issues-16",
+        "issues-17"
+      ]
+    }
+  ]
+}

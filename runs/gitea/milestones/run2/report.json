@@ -1,0 +1,149 @@
+{
+  "bugs": [
+    {
+      "name": "Milestone with a spaces-only title is created instead of rejected",
+      "summary": "The milestone is created: the green banner says 'The milestone \\\" \\\" has been created.' and the milestone list shows a nameless row at the top (milestone icon, '0% 0 Open 0 Closed Updated now No due date', with Edit/Close/Delete), which a user cannot tell apart from any other blank entry. (on /eval/harbor-handbook/milestones/new)",
+      "expected": "The Title field is required, so a title of only whitespace should be refused with a validation message next to the field (as an empty Title is: 'Please fill out this field.'), and no milestone should be created.",
+      "actual": "The milestone is created: the green banner says 'The milestone \\\" \\\" has been created.' and the milestone list shows a nameless row at the top (milestone icon, '0% 0 Open 0 Closed Updated now No due date', with Edit/Close/Delete), which a user cannot tell apart from any other blank entry.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1",
+        "Open https://5503-iyzv7z1seljoi3fg0srip.e2b.app/eval/harbor-handbook/milestones/new",
+        "Leave the Description and Due Date empty, type five spaces in the Title field",
+        "Click Create Milestone"
+      ]
+    },
+    {
+      "name": "Milestone search treats % and _ as wildcards and lists every milestone",
+      "summary": "The list is not filtered at all: the counter jumps from the normal open count to \"12 Open\" and every milestone of the repository is listed, although no milestone title or description contains a \"%\" character. Searching \"_\" does the same (returns every milestone). The page address becomes ?state=open&q=%25, so the character did reach the filter. (on /eval/harbor-handbook/milestones)",
+      "expected": "The search should look for the literal character and list only the milestones whose title or description contains \"%\" — none of them, so an empty result list.",
+      "actual": "The list is not filtered at all: the counter jumps from the normal open count to \"12 Open\" and every milestone of the repository is listed, although no milestone title or description contains a \"%\" character. Searching \"_\" does the same (returns every milestone). The page address becomes ?state=open&q=%25, so the character did reach the filter.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1",
+        "Open https://5503-iyzv7z1seljoi3fg0srip.e2b.app/eval/harbor-handbook/milestones (7 milestones were listed at the time, none with a % in its name)",
+        "Type % in the milestone Search... box and press Enter",
+        "The result URL is /eval/harbor-handbook/milestones?state=open&q=%25 and the whole milestone list is returned",
+        "Repeat with _ in the search box: again every milestone is returned"
+      ]
+    },
+    {
+      "name": "Closing a milestone from its detail page lands on a list of open milestones, and the closed milestone disappears from view",
+      "summary": "The redirect goes to /eval/harbor-handbook/milestones?state=close, an address the app does not understand as \"closed\": the \"Open\" tab is the active one and the list shows open milestones only (every entry still has an \"Edit / Close / Delete\" action). The milestone that was just closed (agent8-close-state) is not in the list at all, so nothing on the page confirms the close. The Closed count in the tab did increase, but the closed milestone can only be seen after manually clicking the \"Closed\" tab. Reloading ?state=close keeps showing the open list. (on /eval/harbor-handbook/milestone/{id} → /eval/harbor-handbook/milestones?state=close)",
+      "expected": "The user is taken to a list that shows the result of the action - the Closed list (or the milestone still visible with a \"Reopen\" action) - so they can confirm the milestone is now closed. The Open/Closed tabs agree with the list shown.",
+      "actual": "The redirect goes to /eval/harbor-handbook/milestones?state=close, an address the app does not understand as \"closed\": the \"Open\" tab is the active one and the list shows open milestones only (every entry still has an \"Edit / Close / Delete\" action). The milestone that was just closed (agent8-close-state) is not in the list at all, so nothing on the page confirms the close. The Closed count in the tab did increase, but the closed milestone can only be seen after manually clicking the \"Closed\" tab. Reloading ?state=close keeps showing the open list.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Go to /eval/harbor-handbook/milestones/new, type the title \"agent8-close-state\", a due date 2026-06-30, and click \"Create Milestone\".",
+        "On the milestones list, click the new milestone's title to open its detail page (e.g. /eval/harbor-handbook/milestone/13).",
+        "Click the \"Close\" button at the top right of the detail page."
+      ]
+    },
+    {
+      "name": "Milestone due date 1970-01-01 is shown as a bare dash in the list and on the detail page",
+      "summary": "The date is stored and round-trips in the Edit form (input shows 01/01/1970), but the milestone list shows only the calendar icon followed by a bare hyphen ('📅 -') and the milestone detail page shows '📅 - 0% Completed' with no date at all. A milestone saved with 1970-01-02 in the same field shows correctly as 'Jan 2, 1970', so the exact epoch date is the trigger. (on /eval/harbor-handbook/milestones)",
+      "expected": "The list and the detail page show the saved due date as 'Jan 1, 1970', the same date the Edit form shows.",
+      "actual": "The date is stored and round-trips in the Edit form (input shows 01/01/1970), but the milestone list shows only the calendar icon followed by a bare hyphen ('📅 -') and the milestone detail page shows '📅 - 0% Completed' with no date at all. A milestone saved with 1970-01-02 in the same field shows correctly as 'Jan 2, 1970', so the exact epoch date is the trigger.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1",
+        "Open https://5503-iyzv7z1seljoi3fg0srip.e2b.app/eval/harbor-handbook/milestones/new",
+        "Type the title 'agent6-<b>x</b> & \"q\"' and set Due Date to 01/01/1970",
+        "Click Create Milestone",
+        "Search the list for 'agent6-<b>' and read the due date line of the result"
+      ]
+    },
+    {
+      "name": "\"Name\" sort lists milestones in reverse alphabetical order (Z→A)",
+      "summary": "The list is sorted Z→A: \"repro-agent6-<b>x</b> & \\\"q\\\"\" is first, then agent9-ms-alpha-renamed, agent8-close-state, agent6-…, agent5-…, agent4-beta, agent4-alpha, agent2-beta, agent13-…, agent12-…, agent11-…, agent1-beta, agent1-alpha, Handbook 1.1, and the two untitled milestones last. The URL is ?sort=name&state=open and a reload keeps the reverse order. (on /eval/harbor-handbook/milestones)",
+      "expected": "Choosing \"Name\" sorts the list by title from A to Z (agent1-alpha first, then agent1-beta, … Handbook 1.1 last), the usual direction for a name sort with no direction label.",
+      "actual": "The list is sorted Z→A: \"repro-agent6-<b>x</b> & \\\"q\\\"\" is first, then agent9-ms-alpha-renamed, agent8-close-state, agent6-…, agent5-…, agent4-beta, agent4-alpha, agent2-beta, agent13-…, agent12-…, agent11-…, agent1-beta, agent1-alpha, Handbook 1.1, and the two untitled milestones last. The URL is ?sort=name&state=open and a reload keeps the reverse order.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-iyzv7z1seljoi3fg0srip.e2b.app/eval/harbor-handbook/milestones",
+        "Click the 'Sort' dropdown at the right end of the filter row (next to '17 Open / 3 Closed')",
+        "Choose 'Name'",
+        "Read the titles from top to bottom"
+      ]
+    },
+    {
+      "name": "At 390px the repository name label on milestone cards is cut off mid-word and the milestone icon overlaps it",
+      "summary": "The label text is clipped mid-word with no ellipsis - it reads \"agent14-ms-org/agent14-ms-re\" - and the milestone (fork) icon is pressed against/over the last letters. The sidebar list a few pixels above shows the same repository in full as \"agent14-ms-org/agent14-ms-repo\". The same clipping appears on /org/agent14-ms-org/milestones. Any repository name longer than about 22 characters hits it. (on /milestones (and /org/{org}/milestones))",
+      "expected": "The repository name is shown in full, or shortened with an ellipsis, and the milestone icon stands clear of the text.",
+      "actual": "The label text is clipped mid-word with no ellipsis - it reads \"agent14-ms-org/agent14-ms-re\" - and the milestone (fork) icon is pressed against/over the last letters. The sidebar list a few pixels above shows the same repository in full as \"agent14-ms-org/agent14-ms-repo\". The same clipping appears on /org/agent14-ms-org/milestones. Any repository name longer than about 22 characters hits it.",
+      "reproSteps": [
+        "Sign in as eval and set the browser window to 390 x 844 CSS pixels (phone width).",
+        "Open /milestones.",
+        "In the Search... box type agent14-ms and press Enter, so that cards of the repository agent14-ms-org/agent14-ms-repo are listed.",
+        "Look at the grey repository label at the left of each milestone card (e.g. the card of agent14-ms-gamma) and compare it with the same repository name in the 'In your repositories' list above."
+      ]
+    },
+    {
+      "name": "Sort menu's \"Name\" option clears the active repository filter",
+      "summary": "The repository filter is silently dropped: the address becomes /milestones?sort=name&state=open&q= (no repos parameter), no repository is highlighted in the sidebar any more, the \"3 Open\" counter turns into \"27 Open\", and the list shows milestones of every repository (eval/harbor-handbook, eval/agent7-ms-hunt-482, agent14-ms-org, ...). The other six sort options keep the filter. (on /milestones)",
+      "expected": "Choosing a sort order keeps the selected repository filter (as the other six sort options do): the list stays limited to the filtered repository's milestones and the filter counter stays at 3.",
+      "actual": "The repository filter is silently dropped: the address becomes /milestones?sort=name&state=open&q= (no repos parameter), no repository is highlighted in the sidebar any more, the \"3 Open\" counter turns into \"27 Open\", and the list shows milestones of every repository (eval/harbor-handbook, eval/agent7-ms-hunt-482, agent14-ms-org, ...). The other six sort options keep the filter.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-iyzv7z1seljoi3fg0srip.e2b.app/milestones",
+        "In the left sidebar \"In your repositories\" click a repository row, e.g. agent15-ms-org/agent15-ms-repo - the list narrows to that repository (counter reads 3 Open) and the row is highlighted",
+        "Click \"Sort\" and choose \"Name\"",
+        "Compare the list and the counter with the state before"
+      ]
+    },
+    {
+      "name": "Clicking a repository in \"In your repositories\" hides that repository's milestones instead of showing only them",
+      "summary": "The clicked repository is the one excluded: it loses its highlight and its milestones vanish from the list, while every other repository stays selected. With nothing selected yet, one click therefore shows all repositories except the one just clicked. (on /milestones)",
+      "expected": "Clicking a repository name in 'In your repositories' should filter the milestone list to that repository only, highlight that repository, and list its milestones.",
+      "actual": "The clicked repository is the one excluded: it loses its highlight and its milestones vanish from the list, while every other repository stays selected. With nothing selected yet, one click therefore shows all repositories except the one just clicked.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /milestones. The left sidebar 'In your repositories' lists repositories with counts (eval/harbor-handbook 21, eval/agent7-ms-hunt-482 3, agent14-ms-org/agent14-ms-repo 3, agent14-ms-org/agent14-ms-repo2 1, agent15-ms-org/agent15-ms-repo 3); no repository is highlighted and the list on the right shows milestones of all repositories.",
+        "Click 'eval/harbor-handbook' in that sidebar.",
+        "Observe the address (?repos=[4%2C5%2C3%2C]) and the list: harbor-handbook is the only repository NOT highlighted and there is no harbor-handbook milestone left in the list (7 items, all from agent14-ms-org / agent15-ms-org).",
+        "Go back to /milestones and click 'eval/agent7-ms-hunt-482' instead: same result, its milestones disappear from the list (?repos=[1%2C4%2C5%2C5%2C])."
+      ]
+    },
+    {
+      "name": "Searching the milestone list throws away the chosen sort order",
+      "summary": "After submitting the search the URL is ?state=open&q=agent6 (the sort parameter is gone) and the list is back in the default order: agent6-dblclick (No due date), agent6-<b>x</b>..., repro-agent6..., agent6-due-nonleap (Dec 31, 2030), agent6-enter-submit (Dec 31, 9999) — the descending due-date order the person had chosen is lost. (on /eval/harbor-handbook/milestones)",
+      "expected": "The chosen sort (\"Latest due date\") is kept while searching: the URL keeps sort=furthestduedate and the matching milestones stay in descending due-date order (agent6-enter-submit 9999-12-31 first, then agent6-due-nonleap 2030-12-31, ...).",
+      "actual": "After submitting the search the URL is ?state=open&q=agent6 (the sort parameter is gone) and the list is back in the default order: agent6-dblclick (No due date), agent6-<b>x</b>..., repro-agent6..., agent6-due-nonleap (Dec 31, 2030), agent6-enter-submit (Dec 31, 9999) — the descending due-date order the person had chosen is lost.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-iyzv7z1seljoi3fg0srip.e2b.app/eval/harbor-handbook/milestones?sort=furthestduedate&state=open (or choose Sort > 'Latest due date'); the list is in descending due-date order, starting with agent6-enter-submit (Dec 31, 9999)",
+        "Type agent6 into the 'Search...' box at the top of the list",
+        "Press Enter (or click the magnifier button)",
+        "Read the order of the results and the address bar"
+      ]
+    },
+    {
+      "name": "Overdue due date is red on the milestone list but not on the milestone detail page",
+      "summary": "The repository milestones list prints the past due date 'Jun 30, 2026' in red, but the milestone detail page shows the identical date in plain grey text with no overdue marking, so a person on the detail page cannot see that the milestone is overdue. (on /eval/harbor-handbook/milestone/12)",
+      "expected": "The same milestone shows the same due-date state everywhere: if the list flags the past due date in red as overdue, the detail page should flag it too (or neither should).",
+      "actual": "The repository milestones list prints the past due date 'Jun 30, 2026' in red, but the milestone detail page shows the identical date in plain grey text with no overdue marking, so a person on the detail page cannot see that the milestone is overdue.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-iyzv7z1seljoi3fg0srip.e2b.app/eval/harbor-handbook/milestones/new",
+        "Create a milestone named agent5-ms-future with Due Date 2026-06-30 (today is 2026-11-23, so the date is in the past) and save it",
+        "On the repository Milestones list (/eval/harbor-handbook/milestones) scroll to the agent5-ms-future row: its due date 'Jun 30, 2026' is printed in red, i.e. the list marks the milestone as overdue",
+        "Open the milestone by its name (/eval/harbor-handbook/milestone/12): the header reads 'Jun 30, 2026 66% Completed' with the date in ordinary grey text, no red, no 'overdue' wording"
+      ]
+    },
+    {
+      "name": "A page past the last milestone page shows an empty list with no message while the counter says 26 Open",
+      "summary": "The list is completely blank: no milestone rows and no message such as \"there are no milestones\". The Open/Closed tabs still count \"26 Open / 2 Closed\", the search box and New Milestone button are there, and the pager shows \"First Previous 1 2 Next Last\" with page 2 highlighted as the current page even though page 3 was requested and nothing is listed. Next/Last are disabled as if page 2 were the last page. (on /eval/harbor-handbook/milestones?page=3&state=open)",
+      "expected": "The page falls back to the last existing page (or page 1) and lists the milestones, or it says that there are no milestones on this page and links back — the counter (26 Open) and the visible list should agree, and the highlighted pager page should be the one shown.",
+      "actual": "The list is completely blank: no milestone rows and no message such as \"there are no milestones\". The Open/Closed tabs still count \"26 Open / 2 Closed\", the search box and New Milestone button are there, and the pager shows \"First Previous 1 2 Next Last\" with page 2 highlighted as the current page even though page 3 was requested and nothing is listed. Next/Last are disabled as if page 2 were the last page.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-iyzv7z1seljoi3fg0srip.e2b.app/eval/harbor-handbook/milestones?state=open (20 milestones on page 1, pager shows pages 1 and 2)",
+        "Open https://5503-iyzv7z1seljoi3fg0srip.e2b.app/eval/harbor-handbook/milestones?page=3&state=open , i.e. one page past the last (the same happens with ?page=9)",
+        "Look at the list area, the Open/Closed counters and the pager"
+      ]
+    },
+    {
+      "name": "Organization milestones team filter lists no team although the organization has two",
+      "summary": "The dropdown opens with the heading \"Filter by team repositories\" and a single entry \"All\" (→ /org/agent15-ms-org/milestones). None of the organization's teams is listed, so no team can be selected and the milestones cannot be filtered by team repositories. Seen on two attempts: first when the organization had only the Owners team (1 member, 2 repositories), then again after a second team (agent15-team, access to all repositories) was created. (on /org/agent15-ms-org/milestones)",
+      "expected": "The menu lists the organization's teams (Owners and agent15-team) and picking one filters the milestone list to that team's repositories.",
+      "actual": "The dropdown opens with the heading \"Filter by team repositories\" and a single entry \"All\" (→ /org/agent15-ms-org/milestones). None of the organization's teams is listed, so no team can be selected and the milestones cannot be filtered by team repositories. Seen on two attempts: first when the organization had only the Owners team (1 member, 2 repositories), then again after a second team (agent15-team, access to all repositories) was created.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Open https://5503-iyzv7z1seljoi3fg0srip.e2b.app/org/agent15-ms-org/teams: the organization has two teams, Owners (1 member, 2 repositories) and agent15-team (access to all repositories).",
+        "Open https://5503-iyzv7z1seljoi3fg0srip.e2b.app/org/agent15-ms-org/milestones and click 'Teams' in the organization header bar.",
+        "Read the dropdown that opens: 'Filter by team repositories' followed by the single entry 'All'."
+      ]
+    }
+  ]
+}

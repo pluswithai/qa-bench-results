@@ -1,0 +1,405 @@
+{
+  "area": "record-pages-activities",
+  "bugs": [
+    {
+      "id": "record-pages-activities-1",
+      "title": "Timeline sentences lose the record name when the label is empty (\"You updated 2 fields on\", \"was created by You\")",
+      "findings": [
+        "run1-07"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "Real, cosmetic. run1-07/shot-3.png shows the note with an empty title: header and breadcrumb fall back to \"Untitled\", but the Timeline reads \"You updated 2 fields on\" (dangling \"on\") and \" was created by You\"; shot-1.png shows the same rows complete once the title is back. Source: EventRow passes labelIdentifier.name, which getObjectRecordIdentifier builds as `${labelIdentifierFieldValue}` with no fallback (L54), and the rows interpolate it as-is (EventRowMainObjectUpdated L87 `${fieldCount} fields on ${recordLabel}`, EventRowMainObject L54-55). The linked-activity row of the same timeline does fall back to \"Untitled\" (EventRowActivity L67), so the missing fallback is an oversight, not a choice. An empty title is a normal state (every new note/task starts untitled). \"Title -> Empty\" is the designed rendering of a cleared field and is not part of the defect.",
+      "evidence": [
+        "run1-07/shot-3.png",
+        "run1-07/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/activities/timeline-activities/rows/main-object/components/EventRowMainObjectUpdated.tsx#L87",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/activities/timeline-activities/rows/main-object/components/EventRowMainObject.tsx#L54-L55",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-metadata/utils/getObjectRecordIdentifier.ts#L54",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/activities/timeline-activities/rows/activity/components/EventRowActivity.tsx#L59-L68"
+      ]
+    },
+    {
+      "id": "record-pages-activities-2",
+      "title": "Completing a related task adds no entry to the company's Timeline",
+      "findings": [
+        "run1-08"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Works as built; a missing feature, not a broken one. The observation is true (run1-08/shot-5.png: only \"You created a related task agent6-task-alpha\"), but the server only writes a linked-task entry on a target record when the link is created or when the task title changes: computeTimelineActivityPayloadsForActivities reads `event.properties.diff?.title?.after` and returns nothing when the title is not in the diff (L301-L306). Status, due date and body changes of a related task are therefore never propagated to the company timeline. Nothing in the UI promises a \"completed\" entry, the Tasks tab shows the correct DONE state, and no data is lost.",
+      "evidence": [
+        "run1-08/shot-5.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/modules/timeline/services/timeline-activity.service.ts#L301-L306"
+      ]
+    },
+    {
+      "id": "record-pages-activities-3",
+      "title": "Timeline update entries show only the new value and keep the time of the first edit",
+      "findings": [
+        "run1-09"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Both halves are deliberate. (1) The diff row is designed as \"Field -> new value\": EventFieldDiff renders the label, an arrow and only `fieldDiff.after`; the previous value is never rendered for any field. (2) Updates by the same member on the same record are merged into the most recent \"updated\" activity when it is younger than 10 minutes (findRecentTimelineActivities: `createdAt: MoreThan(tenMinutesAgo)`, then objectRecordDiffMerge + update of properties only, so createdAt stays). The evidence matches that rule exactly: run1-09/shot-6.png (edit inside the window) shows one merged entry \"9 minutes ago\", and run1-09/shot-2.png (edit after the window) shows a new separate entry \"You updated Account Owner -> Phil Schiler - less than a minute ago\".",
+      "evidence": [
+        "run1-09/shot-6.png",
+        "run1-09/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/modules/timeline/repositories/timeline-activity.repository.ts#L66-L88",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/modules/timeline/repositories/timeline-activity.repository.ts#L115-L128",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/activities/timeline-activities/rows/main-object/components/EventFieldDiff.tsx#L69-L107"
+      ]
+    },
+    {
+      "id": "record-pages-activities-4",
+      "title": "Note created from a record's Notes tab is said to be missing from the Notes list",
+      "findings": [
+        "run1-11",
+        "run2-06",
+        "run3-08"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "The evidence contradicts the claim. The note's own page header reads \"Notes / agent3-note-alpha (1,809/1,811)\" (run1-11/shot-5.png): the note IS in the All Notes list, at position 1,809 of 1,811, i.e. at the bottom. The list in run1-11/shot-4.png has no sort chip, so it is in manual position order, not \"Creation date descending\" as the steps assume; it only looks date-sorted because notes made with \"New Note\" are put first. Notes created from a record tab are created with `position: 'last'` on purpose (useOpenCreateActivityDrawer L74). The agent only read the first rows of a 1,813-row virtualised list.",
+      "evidence": [
+        "run1-11/shot-5.png",
+        "run1-11/shot-4.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/activities/hooks/useOpenCreateActivityDrawer.ts#L74"
+      ]
+    },
+    {
+      "id": "record-pages-activities-5",
+      "title": "Note card body preview breaks ordinary words in the middle",
+      "findings": [
+        "run1-12",
+        "run2-16",
+        "run3-05"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "Real, cosmetic. run1-12/shot-1.png shows \"Complement / ary strengths\" split across two lines in the Partnership Opportunity card; run1-12/shot-2.png (same card, narrower column) shows \"identified / .\" and \"market rea / ch\", and another card splits \"ESC_ADD / ED\". Source: the card body is styled with `line-break: anywhere` (NoteTile StyledCardContent L48), which lets the browser break at any character, so plain prose is cut mid-word with no hyphen. Deterministic, seeded data, no other agent involved.",
+      "evidence": [
+        "run1-12/shot-1.png",
+        "run1-12/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/activities/notes/components/NoteTile.tsx#L45-L53"
+      ]
+    },
+    {
+      "id": "record-pages-activities-6",
+      "title": "Emails tab clips participant names mid-word with no ellipsis, flush against the message count",
+      "findings": [
+        "run1-14",
+        "run2-22",
+        "run3-07"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "Real, cosmetic. run1-14/shot-1.png: \"Workspace Membe 2\", \"William Miller, Jame 2\", \"Maria Garcia, Micha 2\", \"John Smith, Worksp 2\" - every row is hard-clipped. Source shows an ellipsis was intended but cannot work: StyledSenderNames declares `text-overflow: ellipsis` together with `display: flex` (L37-L43); text-overflow does not apply to the text of a flex container, so the 20%-wide heading (L21-L26) just cuts the text and the count follows with no gap. Note the trailing number is the thread message count (numberOfMessagesInThread, L184), not a recipient count as the report says; that does not change the verdict.",
+      "evidence": [
+        "run1-14/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/activities/emails/components/EmailThreadPreview.tsx#L21-L43",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/activities/emails/components/EmailThreadPreview.tsx#L183-L184"
+      ]
+    },
+    {
+      "id": "record-pages-activities-7",
+      "title": "Currency dropdown shows the code twice in every unselected option (\"UAE dirham (AED) (AED)\")",
+      "findings": [
+        "run1-17"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "Real, cosmetic wording bug, fully explained by source. run1-17/shot-2.png: \"UAE dirham (AED) (AED)\", \"Afghan afghani (AFN) (AFN)\", \"Albanian lek (ALL) (ALL)\". CURRENCIES already builds the label as `${label} (${key})` (Currencies.ts L9) and the picker appends the code again for every non-selected item: text={`${item.label} (${item.value})`} (CurrencyPickerDropdownSelect L62). The selected item uses the label alone (L53), which is why only the first row is correct.",
+      "evidence": [
+        "run1-17/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/settings/data-model/constants/Currencies.ts#L9",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/ui/input/components/internal/currency/components/CurrencyPickerDropdownSelect.tsx#L48-L64"
+      ]
+    },
+    {
+      "id": "record-pages-activities-8",
+      "title": "Calendar tab: second month heading shows \"July\" without a year",
+      "findings": [
+        "run1-18"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Deliberate. The year is printed once per year, on the first month heading of that year in the list: `isLastMonthOfYear = monthTimesByYear[year]?.[0] === monthTime` and `{isLastMonthOfYear && <StyledYear> {year}</StyledYear>}` (CalendarEventsCard L125-L139). In run1-18/shot-1.png \"November 2026\" carries the year and \"July\" below it belongs to the same year 2026; a different year would get its own year label. Not ambiguous, not a defect.",
+      "evidence": [
+        "run1-18/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/activities/calendar/components/CalendarEventsCard.tsx#L123-L141"
+      ]
+    },
+    {
+      "id": "record-pages-activities-9",
+      "title": "Escape in the Due Date editor saves the typed date instead of discarding it",
+      "findings": [
+        "run1-19"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "The behaviour is real (run1-19/frame-3.jpg: a date typed in the open picker; frame-4.jpg: after Escape the field reads the typed date; shot-5.png: \"Mar 15, 2026 9:00 AM\" stored after the first try) but it is the app-wide, explicit design: in Twenty Escape closes a field editor and persists the draft. RecordInlineCell.handleEscape calls persistFieldFromFieldInputContext(newValue) exactly like Enter/Tab/click-outside (L113-L119); the table cell and the field-list portal do the same, and every field input forwards its current value on Escape (DateTimeInput.handleEscape -> onEscape(internalValue) L79-L85; TextFieldInput, NumberFieldInput, DateFieldInput alike). There is a separate handleCancel that does not persist, so the persist-on-Escape path is a conscious choice, not an accident of the date picker. It differs from the common convention, but it is a product decision visible in source, with no promise broken.",
+      "evidence": [
+        "run1-19/frame-3.jpg",
+        "run1-19/frame-4.jpg",
+        "run1-19/shot-5.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/record-inline-cell/components/RecordInlineCell.tsx#L93-L119",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/ui/field/input/components/DateTimeInput.tsx#L79-L85",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/record-table/record-table-cell/components/RecordTableCellFieldInput.tsx#L68-L74"
+      ]
+    },
+    {
+      "id": "record-pages-activities-10",
+      "title": "Hand-typed record address /object/company/does-not-exist shows an empty record shell and \"Invalid value for UUID\" toasts",
+      "findings": [
+        "run1-20",
+        "run2-09"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "A malformed record id renders an empty record shell and raw \"Invalid value for UUID\" toasts. Counted under the rule for addresses the app does not generate.",
+      "evidence": [
+        "run1-20/shot-1.png"
+      ],
+      "source": []
+    },
+    {
+      "id": "record-pages-activities-11",
+      "title": "Note card Relations row hard-clips the second chip and hides further relations with no \"+N\"",
+      "findings": [
+        "run1-22"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "Real, cosmetic/layout. run1-22/shot-2.png (1440 px) shows the second chip cut as \"Jeffery Grif\" with no ellipsis at the card edge, and run1-22/shot-3.png (390 px) \"Jeffery Gri\"; no count chip follows. The component is meant to handle this: ActivityTargetChips renders ExpandableList with isChipCountDisplayed, which should hide overflowing chips and show \"+N\" (ExpandableList L101-L106, L178-L187). In ExpandableList only the last child may shrink (StyledChildContainer flex-shrink: 0, `&:last-child { flex-shrink: 1 }`, L37-L45), so a hard cut on the second chip without ellipsis means it is not the last child: a third relation exists, collapsed to zero width, exactly as reported, and the \"+N\" indicator never appeared. Limit of this review: the third relation (Lee Jones) is not visible in any screenshot; it is inferred from the clipping pattern plus the report. The note belongs to another agent, who was still editing it: in the later run1-22/shot-1.png the second chip ends with a proper ellipsis (\"Jeffery Gr..\"), consistent with the third relation having been removed by then; that later change does not explain the earlier hard clip (also visible in run1-12/shot-2.png). Relations stay reachable by opening the note, hence severity 1.",
+      "evidence": [
+        "run1-22/shot-2.png",
+        "run1-22/shot-3.png",
+        "run1-22/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/activities/components/ActivityTargetChips.tsx#L24-L39",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/ui/layout/expandable-list/components/ExpandableList.tsx#L28-L45",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/ui/layout/expandable-list/components/ExpandableList.tsx#L178-L187",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/ui/layout/expandable-list/utils/isFirstOverflowingChildElement.ts"
+      ]
+    },
+    {
+      "id": "record-pages-activities-12",
+      "title": "Body field editor on a task/note record opens above the top of the window: blank white panel, text invisible while editing",
+      "findings": [
+        "run2-02"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "Real. run2-02/shot-1.png and run2-02/shot-4.png (two different tasks, 1280x720): clicking Body in the Fields panel opens a white overlay that runs from above the top edge of the window down to y~381 with no text, caret or placeholder. run2-02/shot-2.png and shot-3.png show the Body row holding the typed text afterwards (\"repro typed line one.\", \"agent11 body text line one.\"), so the text is entered but cannot be seen while editing. Source explains it: the editor content box has `min-height: 400px` (BlockEditor L36-L42) inside a container capped at `min(60vh, 500px)` (RichTextFieldInput L33-L45), so the overlay is ~416 px tall even for one line. RecordInlineCellEditMode places it `bottom-start` with flip() and shift() (L71-L90): with the Body row at y~363 in a 720 px-high window it fits neither below nor above, flip falls back to the side with less overflow (above), and shift() only corrects the cross axis, so the top of the overlay, where the first lines of text are, lands above the viewport. Deterministic layout, page fully rendered, not a load artifact. It depends on window height (a taller window leaves room below). The body stays editable in the Note tab on the right, hence 3 and not 5.",
+      "evidence": [
+        "run2-02/shot-1.png",
+        "run2-02/shot-4.png",
+        "run2-02/shot-2.png",
+        "run2-02/shot-3.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/blocknote-editor/components/BlockEditor.tsx#L36-L42",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/record-field/ui/meta-types/input/components/RichTextFieldInput.tsx#L33-L52",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/record-inline-cell/components/RecordInlineCellEditMode.tsx#L71-L90"
+      ]
+    },
+    {
+      "id": "record-pages-activities-13",
+      "title": "Tasks tab rows with the side panel open: due date runs into the card border and the relation chip disappears",
+      "findings": [
+        "run2-03"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "Real, cosmetic. run2-03/shot-1.png (1280x720, side panel open, tabs column ~240 px): \"Nov 30, 2026\", \"Nov 28, 2026\" and \"Nov 27, 2026\" touch and are cut by the right border of the card (last digit clipped), titles are reduced to \"a...\", and rows with a due date show no relation chip, while the row without a date still shows \"Google\"; run2-11/shot-5.png shows the same rows complete at full width (date + Google chip). Source: the right side is `max-width: 50%` (TaskRow L61-L65), the due date is `white-space: nowrap` with no shrink or ellipsis (L47-L59) and the relations container is `overflow: clip; width: 100%` (L67-L70), so the date overflows its half and the chip is squeezed to nothing. Opening a task from this tab always produces this narrow state, so it is an ordinary path. Nothing is lost (the panel shows the values), hence 1.",
+      "evidence": [
+        "run2-03/shot-1.png",
+        "run2-03/shot-2.png",
+        "run2-11/shot-5.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/activities/tasks/components/TaskRow.tsx#L47-L70",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/activities/components/ActivityRow.tsx#L6-L14"
+      ]
+    },
+    {
+      "id": "record-pages-activities-14",
+      "title": "Body field row on a note/task is hard-clipped at the panel edge with no ellipsis",
+      "findings": [
+        "run2-04"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "Real, cosmetic. run2-04/shot-1.png: in the note side panel the Body row reads `agent3 body check: <b>x</b> & \"quotes` and stops at the panel edge mid-word with no ellipsis (same in run2-03/shot-3.png; on the full record page run2-13/shot-3.png the row is cut after \"&\"). Source: RichTextFieldDisplay renders the first non-empty line in a bare `<div><span>` (L10-L14), whereas plain text fields go through TextDisplay -> OverflowingTextWithTooltip, which adds the ellipsis and a tooltip (TextDisplay L21-L25). So the rich-text preview simply has no truncation handling and is cut by the cell's overflow. The text is not overflowing the window as the report says, it is clipped; the full body is readable right below in the Note editor, hence 1.",
+      "evidence": [
+        "run2-04/shot-1.png",
+        "run2-03/shot-3.png",
+        "run2-13/shot-3.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/record-field/ui/meta-types/display/components/RichTextFieldDisplay.tsx#L5-L15",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/ui/field/display/components/TextDisplay.tsx#L16-L28"
+      ]
+    },
+    {
+      "id": "record-pages-activities-15",
+      "title": "Hand-typed record address with an invented (well-formed) UUID shows an editable empty record; an edit is shown, then refused",
+      "findings": [
+        "run2-08"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Input no real link produces. The id 9f1c2d3e-4a5b-4c6d-8e9f-0a1b2c3d4e5f was invented and typed into the address bar (finding steps); no link in the app carries it. The observation itself is true: run2-08/shot-1.png shows an \"Untitled (0/0)\" shell with skeletons and editable fields, and run2-08/shot-2.png shows the typed domain as a chip together with the server's refusal toast \"This record does not exist or has been deleted.\" (the designed message of the update runner, common-update-one-query-runner L56); nothing is saved, so no data is at risk. Different failure from record-pages-activities-10 (malformed id -> \"Invalid value for UUID\"), hence its own entry. If a human wants to pursue it: permanently delete a record and open its old address (browser history, shared link); that is the case a real link can produce and this finding does not test it.",
+      "evidence": [
+        "run2-08/shot-1.png",
+        "run2-08/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/engine/api/common/common-query-runners/common-update-one-query-runner.service.ts#L56"
+      ]
+    },
+    {
+      "id": "record-pages-activities-16",
+      "title": "Timeline field-update card clips the value chip mid-word with no ellipsis at 768 px and below",
+      "findings": [
+        "run2-10"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "Real, cosmetic. run2-10/shot-1.png (768 px) and run2-10/shot-2.png (390 px): the chip after \"Domain Name ->\" reads \"agent15-domain-one.tes\" and is cut by the card edge, no ellipsis; run2-10/shot-3.png (1280 px) shows the full \"agent15-domain-one.test\". At 768 px the page has ~400 px of free space to the right of the card. Source: EventCard shrinks to `max-width: 300px` at `max-width: 768px` (EventCard L15-L22, MOBILE_VIEWPORT = 768) and clips with `overflow: hidden` (L36); the row declares `text-overflow: ellipsis` on a `display: flex` container (EventFieldDiff L21-L31, EventFieldDiffValue L16-L23), where text-overflow has no effect on the child chip, so the intended ellipsis never appears. Same root pattern as record-pages-activities-6 but a different component. The value is intact in the Fields panel, hence 1.",
+      "evidence": [
+        "run2-10/shot-1.png",
+        "run2-10/shot-2.png",
+        "run2-10/shot-3.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/activities/timeline-activities/rows/components/EventCard.tsx#L9-L38",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/activities/timeline-activities/rows/main-object/components/EventFieldDiff.tsx#L21-L31",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/activities/timeline-activities/rows/main-object/components/EventFieldDiffValue.tsx#L16-L23",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-ui/src/theme-constants/constants.ts#L3"
+      ]
+    },
+    {
+      "id": "record-pages-activities-17",
+      "title": "\"New task\" on a record's Tasks tab creates the task immediately, before a title is typed",
+      "findings": [
+        "run2-11"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Designed, app-wide creation model. The observation is true (run2-11/shot-1.png \"Tasks 5\"; run2-11/shot-3.png panel open with \"Created now\" and already \"Tasks 6\"; run2-11/shot-5.png the \"Task title\" row stays after closing), but Twenty has no draft step anywhere: useOpenCreateActivityDrawer first awaits createOneActivity and createOneActivityTarget and only then opens the record in the side panel with isNewRecord (L68-L75, L102-L111, L128-L132), exactly like \"New record\" in every list (useCreateNewIndexRecord L89-L99 creates, then opens). The grey \"Task title\" text is the designed placeholder for an empty title (TaskRow L123). Nothing in the UI promises a Save/Cancel step, and the empty task can be deleted like any record. A product choice one may dislike, not a defect.",
+      "evidence": [
+        "run2-11/shot-1.png",
+        "run2-11/shot-3.png",
+        "run2-11/shot-5.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/activities/hooks/useOpenCreateActivityDrawer.ts#L58-L137",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/record-table/hooks/useCreateNewIndexRecord.ts#L77-L121",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/activities/tasks/components/TaskRow.tsx#L122-L124"
+      ]
+    },
+    {
+      "id": "record-pages-activities-18",
+      "title": "Record page at 768/390 px has no big title heading, avatar or \"Added ...\" line",
+      "findings": [
+        "run2-12"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Designed mobile layout, and the \"cannot be edited\" part is not shown. On mobile (and in the side panel) the record page deliberately has no pinned left column: getTabsByDisplayMode returns `pinnedLeftTab: undefined` when `isMobile || isInSidePanel` and puts the Fields tab into the tab list as \"Home\" (L18-L27); the summary card with avatar, heading and \"Added ...\" exists only inside that left panel (PageLayoutLeftPanel L49-L53). That is what run2-12/shot-1.png (768) and shot-2.png (390) show, and it matches the side panel layout (e.g. run2-03/shot-1.png). The title stays in the header: the breadcrumb renders it as a RecordTitleCell, the same click-to-edit cell as the desktop heading, with no mobile condition (ObjectRecordShowPageBreadcrumb L128-L157). It is a display cell that becomes an input only when clicked, so \"no Title input in the page\" proves nothing, and no screenshot or frame shows a click on the breadcrumb title. At 768 px the full title is readable in the breadcrumb; \"Creation date\" is in Fields. (The three-dot button drawn over the counter in shot-2.png is covered by record-pages-activities-19.)",
+      "evidence": [
+        "run2-12/shot-1.png",
+        "run2-12/shot-2.png",
+        "run2-03/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/page-layout/utils/getTabsByDisplayMode.ts#L18-L27",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/page-layout/components/PageLayoutLeftPanel.tsx#L47-L53",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/record-show/components/ObjectRecordShowPageBreadcrumb.tsx#L128-L157"
+      ]
+    },
+    {
+      "id": "record-pages-activities-19",
+      "title": "Long record name takes the whole record header: the three-dot button is drawn over the record counter and the favorite / previous / next buttons leave the header",
+      "findings": [
+        "run2-13"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "Partly real, cosmetic; two of the report's claims are wrong. Real (run2-13/shot-1.png and shot-2.png, 1280 px, 200-character title, versus run2-13/shot-3.png with the short title): the breadcrumb fills the header up to the window edge, the three-dot Command Menu button is painted on top of the counter so its end is unreadable (\"(1,809/1,817\"), and the star and previous/next buttons are no longer in the header. The same overlap of the three-dot button and the counter is visible with an ordinary title at 390 px in run2-12/shot-2.png, so it is not only an extreme-input effect. Source: PageCardHeader lays the header out as `grid-template-columns: minmax(0, auto) minmax(0, 1fr)` (L33-L36), so the breadcrumb column takes its full content width first and the action column (StyledRight, `min-width: 0`, L72-L81) is left with zero; no space is reserved for the buttons. Wrong in the report: the title IS truncated with an ellipsis (visible in both shots), and the three-dot button is still there. The pinned buttons are not lost either: PinnedCommandMenuItemButtons measures its container and moves items that do not fit into the command menu by design (L49-L56; SidePanelCommandMenuItemDisplayPage L78-L85), so favorite/previous/next remain reachable through the three-dot menu. What remains is the overlapped counter and a header that starves its own actions on a wide window, hence 1.",
+      "evidence": [
+        "run2-13/shot-1.png",
+        "run2-13/shot-2.png",
+        "run2-13/shot-3.png",
+        "run2-12/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/ui/layout/page/components/PageCardHeader.tsx#L26-L40",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/ui/layout/page/components/PageCardHeader.tsx#L72-L81",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/command-menu-item/display/components/PinnedCommandMenuItemButtons.tsx#L19-L56",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/command-menu-item/display/components/SidePanelCommandMenuItemDisplayPage.tsx#L78-L85",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/record-show/components/ObjectRecordShowPageBreadcrumb.tsx#L42-L50"
+      ]
+    },
+    {
+      "id": "record-pages-activities-20",
+      "title": "Standard field label is spelled \"Linkedin\" instead of \"LinkedIn\"",
+      "findings": [
+        "run2-19"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "Real, cosmetic spelling of a brand name. run2-19/shot-1.png: the Contact section shows the label \"Linkedin\" and the empty-value placeholder \"Linkedin\" (also in run2-03/shot-1.png). Source: the standard company field is declared with label msg`Linkedin` and description \"The company Linkedin account\" (compute-company-standard-flat-field-metadata L176-L177; the person field likewise, L160-L161). The product's own catalogs show the intended spelling: several locales translate the same msgid as \"LinkedIn\" (e.g. hu-HU.po L4616-L4617, also cs-CZ, fi-FI, tr-TR, zh-CN), while en.po keeps \"Linkedin\". A one-word label typo in default data, nothing functional; an admin can rename the field.",
+      "evidence": [
+        "run2-19/shot-1.png",
+        "run2-03/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-company-standard-flat-field-metadata.util.ts#L176-L177",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/engine/workspace-manager/twenty-standard-application/utils/field-metadata/compute-person-standard-flat-field-metadata.util.ts#L160-L161",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/engine/core-modules/i18n/locales/hu-HU.po#L4616-L4617"
+      ]
+    },
+    {
+      "id": "record-pages-activities-21",
+      "title": "Calendar events list shows the internal value \"FIELD_RESTRICTED_ADDITIONAL_PERMISSIONS_REQUIRED\" as the event title",
+      "findings": [
+        "run3-10"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "Real. run3-10/shot-1.png: in \"All Calendar events - 800\" several rows have the title chip \"FIELD_RESTRICTED_AD...\" with avatar letter \"F\" (Aug 6 2026, Jun 21 2026, Feb 26 2027) between normal titles. Source: for events the user may only see as metadata, the server overwrites title and description with the sentinel string FIELD_RESTRICTED_ADDITIONAL_PERMISSIONS_REQUIRED (apply-calendar-events-visibility-restrictions.service L122-L131; the constant is that literal text). The frontend is meant to translate it: the timeline calendar card compares the title with the constant and renders the \"Not shared\" component instead (EventCardCalendarEvent L171-L172, L195-L197), and emails do the same (EmailThreadMessage L43-L44). The generic record list has no such handling (in twenty-front the constant is referenced only in those timeline and email components: EventCardCalendarEvent, EventCardMessage, EmailThreadMessage), so the raw internal token is printed as the record name. Not an invented address: the page is the object's standard index view (compute-standard-calendar-event-views L13-L18). The restriction itself works (the real title is hidden); the defect is an internal constant shown to the user in place of the designed \"Not shared\" state, in at least 3 of 17 visible rows. Severity 3: more than cosmetic, but no error and no broken page.",
+      "evidence": [
+        "run3-10/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/modules/calendar/common/query-hooks/calendar-event/services/apply-calendar-events-visibility-restrictions.service.ts#L122-L131",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-shared/src/constants/FieldRestrictedAdditionalPermissionsRequired.ts",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/activities/timeline-activities/rows/calendar/components/EventCardCalendarEvent.tsx#L171-L197",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/activities/emails/components/EmailThreadMessage.tsx#L43-L44",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/engine/workspace-manager/twenty-standard-application/utils/view/compute-standard-calendar-event-views.util.ts#L13-L18"
+      ]
+    }
+  ]
+}

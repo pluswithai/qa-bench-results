@@ -1,0 +1,87 @@
+{
+  "bugs": [
+    {
+      "name": "Column picker puts a (re-)enabled column at the first position of the vouchers table",
+      "summary": "The re-enabled column is placed at the far left of the table and the table order no longer matches the list in the panel: after turning Status back on the header row read \"Status | Name | Offer | Scope | Redemptions\", and after enabling Starts and Ends it read \"Status | Ends | Starts | Name | Offer …\". The panel is not a picker that can reorder (no drag handles, no arrows), and the changed order is written to the account (UserAccountUpdate), so it persists for the next visit. (on /discounts/vouchers)",
+      "expected": "Hiding a column and showing it again should put the column back where it was (Name, Status, Offer, Scope, Redemptions), and the order in the Pick columns panel should match the order of the table.",
+      "actual": "The re-enabled column is placed at the far left of the table and the table order no longer matches the list in the panel: after turning Status back on the header row read \"Status | Name | Offer | Scope | Redemptions\", and after enabling Starts and Ends it read \"Status | Ends | Starts | Name | Offer …\". The panel is not a picker that can reorder (no drag handles, no arrows), and the changed order is written to the account (UserAccountUpdate), so it persists for the next visit.",
+      "reproSteps": [
+        "Open /discounts/vouchers (columns in default order: Name, Status, Offer, Scope, Redemptions).",
+        "Click the Pick columns icon at the right end of the table header.",
+        "Turn the Status toggle off, then turn it on again.",
+        "Close the panel with Escape and read the table header row.",
+        "Repeat with the Starts and Ends toggles and read the header row again."
+      ],
+      "reason": "Works as designed. useColumns has an explicit option newColumnPosition = \"start\" (default) and onToggle prepends the added column ([columnId, ...selectedColumns]); the voucher grid uses that default and lets the user reorder by dragging headers (onColumnMoved={handlers.onMove}), so table order is not meant to mirror the picker list. Persisting the order is the intended list-settings behaviour. The extra claims of run3-03 are contradicted by its own evidence: after a toggle every column is persisted at 200 px (PersistedColumn.withDefaultWidth), 6 columns = 1200 px in a ~1000 px grid, so Redemptions is only scrolled off to the right (shot-3/shot-4 show exactly 5 columns of 200 px with the toggle still on; the agent never scrolled horizontally). Empty Min. Spent cells are the channel-dependent column with no channel selected (datagrid.ts min-spent case renders moneyCell(null) when no listing matches selectedChannelId)."
+    },
+    {
+      "name": "\"Code Quantity (max 50)\" ignores keystrokes that would exceed 50",
+      "summary": "No message is shown and the field keeps a different number than typed: typing \\\"51\\\" leaves \\\"5\\\" in the field (the second digit is silently swallowed) and \\\"Confirm\\\" becomes enabled, so confirming generates 5 codes instead of the 51 the person typed. Filling the field with 51 programmatically in one step leaves it completely empty, also with no message. (on /discounts/vouchers/add)",
+      "expected": "The field refuses 51 loudly — a validation message next to the field such as \\\"Code Quantity (max 50)\\\" — and does not keep or accept a different number (5) than the person typed.",
+      "actual": "No message is shown and the field keeps a different number than typed: typing \\\"51\\\" leaves \\\"5\\\" in the field (the second digit is silently swallowed) and \\\"Confirm\\\" becomes enabled, so confirming generates 5 codes instead of the 51 the person typed. Filling the field with 51 programmatically in one step leaves it completely empty, also with no message.",
+      "reproSteps": [
+        "Sign in as admin@example.com and open /discounts/vouchers/add",
+        "In the \"Set up this voucher\" checklist click \"Add codes\"",
+        "Click \"+ Add code\" and choose \"Generate codes\"",
+        "In the \"Generate Voucher Codes\" dialog click the \"Code Quantity (max 50)\" field and type 51"
+      ],
+      "reason": "Deliberate input mask. handleChange drops any change whose value is not a number, contains \".\" or is > MAX_VOUCHER_CODES (50), exactly like the letters it also ignores; the limit is printed in the field label \"Code Quantity (max 50)\". Typing 51 therefore leaves the visible value 5 (shot-1), and Confirm generates the 5 codes that the field shows (shot-2), not a hidden different number. The \"fill 51 in one step leaves it empty\" variant is the same rule applied to a programmatic fill, not a user path."
+    },
+    {
+      "name": "Generated code with a 229-character prefix is rejected at Save by the 255-character limit",
+      "summary": "The prefix field accepts 229 characters without any limit or warning, generates the code, and only at Save does the app refuse the whole voucher with \\\"Ensure this value has at most 255 characters (it has 266).\\\" — a message that does not say which of the 55 codes is too long. The new code stays as a Draft row and the voucher cannot be saved until the person works out which generated code to delete. (on /discounts/vouchers/{id})",
+      "expected": "The prefix field of \\\"Generate Voucher Codes\\\" should refuse or shorten a prefix that would produce a code over the 255-character limit the save step enforces (or at least the save error should name the offending code), so that what the generator accepts can be saved.",
+      "actual": "The prefix field accepts 229 characters without any limit or warning, generates the code, and only at Save does the app refuse the whole voucher with \\\"Ensure this value has at most 255 characters (it has 266).\\\" — a message that does not say which of the 55 codes is too long. The new code stays as a Draft row and the voucher cannot be saved until the person works out which generated code to delete.",
+      "reproSteps": [
+        "Open https://5503-ief25m2mkkrkgto7fvk68.e2b.app/discounts/vouchers/Vm91Y2hlcjo5 (voucher with 54 codes created by me, agent3) and stay on the Details/Codes section.",
+        "Click \"Add code\" in the \"Voucher codes\" card, then choose \"Generate codes\".",
+        "In \"Code Quantity (max 50)\" type 1.",
+        "In \"Code Prefix (Optional)\" paste a 229-character prefix, e.g. \"agent3-\" followed by 222 \"x\" (the field has no maxlength and accepts it silently).",
+        "Click \"Confirm\": the row \"agent3-xxxxxxxx...\" is added with status Draft.",
+        "Click \"Save\".",
+        "The Codes card shows a red error \"Ensure this value has at most 255 characters (it has 266).\" and a toast \"Couldn't save voucher — Fix the codes section and try again.\"; the voucher keeps unsaved changes and the new code is not stored."
+      ],
+      "reason": "The app handles the input correctly, just late. The generator builds `${prefix}-${uuid}` (229 + 1 + 36 = 266), the API rejects it, and the dashboard shows the API message inline in the Codes card (\"Ensure this value has at most 255 characters (it has 266).\") plus the toast \"Couldn't save voucher - Fix the codes section and try again.\" (shot-3, shot-4). Nothing is saved wrongly, nothing is lost, and the oversized code is the only Draft row, pinned at the top of the list, so it is not hard to find. A missing client-side maxlength on an optional prefix, exercised only with an artificial 229-character paste, is an enhancement request, not a defect; the message is a readable validation sentence, not a raw technical error."
+    },
+    {
+      "name": "Country list of a former free-shipping voucher is kept (hidden) after switching to Entire order",
+      "summary": "After the reload the voucher's header reads \"Entire order\" and its navigation has no Countries section, but choosing \"Free shipping\" in Discount (without saving) brings the Countries section back showing \"Valid in 1 country\" — the Poland restriction was kept on the voucher. A staff member working on this entire-order voucher can neither see nor remove that restriction. (on /discounts/vouchers/{id})",
+      "expected": "Either the country restriction is cleared (or clearly declared as still applying) when the scope changes away from Free shipping, or the Countries information stays visible on the saved voucher so its restriction can be seen and changed.",
+      "actual": "After the reload the voucher's header reads \"Entire order\" and its navigation has no Countries section, but choosing \"Free shipping\" in Discount (without saving) brings the Countries section back showing \"Valid in 1 country\" — the Poland restriction was kept on the voucher. A staff member working on this entire-order voucher can neither see nor remove that restriction.",
+      "reproSteps": [
+        "Sign in as admin@example.com / admin and open https://5503-ief25m2mkkrkgto7fvk68.e2b.app/discounts/vouchers/add",
+        "Add the manual code 'agent10-ship-pl', assign both channels, pick the scope 'Free shipping', open Countries > Assign, tick 'Poland' and press 'Assign', type the Voucher Name 'agent10-ship-pl' and Save",
+        "On the saved voucher open Discount, choose 'Entire order', enter 10 for Channel-PLN and 15 for Channel-USD and press Save ('Voucher updated')",
+        "Reload the page: the header badge reads 'Entire order' and the left navigation lists Details, Codes, Discount, Requirements, Limits — no Countries",
+        "Click Discount and choose 'Free shipping' again (do not save); a Countries entry appears in the left navigation — open it and it says 'Valid in 1 country'"
+      ],
+      "reason": "The premise that a hidden restriction still applies is wrong. In the API the country check exists only in the shipping-voucher path (_get_shipping_voucher_discount_for_checkout: \"if voucher.countries and address.country.code not in voucher.countries\"); get_voucher_discount_for_checkout never looks at countries for ENTIRE_ORDER or SPECIFIC_PRODUCT. The dashboard accordingly shows the Countries section only for the shipping type (showCountries: data.discountType === SHIPPING). The stored list is inert for an entire-order voucher and simply comes back if the type is switched to Free shipping again (shot-4, unsaved). No customer-facing effect, no data loss: works as designed."
+    },
+    {
+      "name": "Schedule error \"End date cannot be before the start date.\" stays after the dates are corrected",
+      "summary": "The error text 'End date cannot be before the start date.' and the red border on End Date stay on screen after the value is corrected to a valid one. On the create page Save then succeeded and the voucher was created (toast 'Voucher created') while the error was still shown; only a page reload clears it. (on /discounts/vouchers/add and /discounts/vouchers/Vm91Y2hlcjo1)",
+      "expected": "When the end date/time is corrected to a value after the start, the validation message and the red field highlight disappear immediately (or at the latest on the next save attempt), and the panel shows no error.",
+      "actual": "The error text 'End date cannot be before the start date.' and the red border on End Date stay on screen after the value is corrected to a valid one. On the create page Save then succeeded and the voucher was created (toast 'Voucher created') while the error was still shown; only a page reload clears it.",
+      "reproSteps": [
+        "Open https://5503-iczexfc5c5jr1740fp5kf.e2b.app/discounts/vouchers/add (signed in as admin@example.com).",
+        "In the Schedule panel set Start Date 12/31/2025 and End Date 01/01/2025 (end before start), then correct the values to a valid range: Start Date 06/15/2027 10:00 AM, End Date 06/15/2027 11:00 AM.",
+        "Click Save (or, on an existing voucher, change End Hour to 09:00 AM, click Save, then change End Hour back to 11:00 AM).",
+        "Read the Schedule panel: the red error 'End date cannot be before the start date.' is still displayed and the End Date field is still highlighted red, although the end is now after the start."
+      ],
+      "reason": "The inline error is the API message of the last failed save (DiscountDates reads apiErrors from the mutation result; VoucherDetails passes voucherUpdateOpts.data.voucherUpdate.errors straight through) and nothing clears it when the field changes, so a now-valid range keeps a red End Date and a false message (shot-4: start 10:00, end 11:00 same day, error still shown). On an existing voucher it becomes a dead end: changing End Hour back to its saved value makes the form pristine, Save is disabled, and the false error can only be removed by reloading (shot-5: error shown, Save greyed out). The screen states something untrue about valid data; no data is affected, so cosmetic. Note: errors persisting until the next submit is Saleor's general pattern, which is why this is the weakest accept; the part of the report saying the error survives a successful create is contradicted by shot-3 (voucher created, no error)."
+    },
+    {
+      "name": "Voucher with unfinished setup is listed and filtered as \"Active\"",
+      "summary": "The voucher is reported as Active: the Status=Active filter returns it on the list, and the detail page's header badge reads 'Active'. Yet the same detail page's own checklist reads 'Finish setting up this voucher — 1 of 3 — Customers can't redeem this voucher until the required steps are done', with no channels and no discount value set. The list status says the voucher works; the voucher's own page says it cannot be redeemed. (on /discounts/vouchers)",
+      "expected": "A voucher that the app itself says cannot be redeemed should not be listed and filtered as 'Active'; its status should agree with its own setup state (not active / not redeemable).",
+      "actual": "The voucher is reported as Active: the Status=Active filter returns it on the list, and the detail page's header badge reads 'Active'. Yet the same detail page's own checklist reads 'Finish setting up this voucher — 1 of 3 — Customers can't redeem this voucher until the required steps are done', with no channels and no discount value set. The list status says the voucher works; the voucher's own page says it cannot be redeemed.",
+      "reproSteps": [
+        "Go to /discounts/vouchers and open the voucher that has the code agent1-code-1 (or any voucher with only 1 of 3 required steps done).",
+        "On its detail page read the header badge 'Active' and the checklist 'Finish setting up this voucher — 1 of 3 — Customers can't redeem this voucher until the required steps are done'. Availability says 'Voucher in 0 of 2 channels'.",
+        "Go to /discounts/vouchers, open Filters, set Where = Status, is = Active, Apply, and search for the code agent1-code-1.",
+        "The voucher is returned by the Active filter even though its own page says it cannot be redeemed."
+      ],
+      "reason": "Deliberate definition, not a contradiction. \"Active / Scheduled / Ended\" is the schedule phase: the dashboard derives it from start/end date only (getPromotionStatus), the Schedule card on the same page says so (\"Outside this range, the voucher cannot be redeemed\"), and the API's status filter is date/usage based as well (filter_status -> VoucherQueryset.active: start_date <= now, end_date null or >= now, usage limit not reached). Channel assignment and discount value are a separate axis that the page reports explicitly through the setup checklist (\"Customers can't redeem this voucher until the required steps are done\") and the Availability card (\"Voucher in 0 of 2 channels\") in shot-1. Both statements are true at once."
+    }
+  ]
+}

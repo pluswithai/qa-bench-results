@@ -1,0 +1,221 @@
+{
+  "fixture": "gitea/areas/labels",
+  "run": 3,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 272,
+      "name": "Organization labels list header says \"1 labels\" instead of \"1 label\"",
+      "summary": "The header reads \"1 labels\" while only one label (agent9-alpha) is listed. (on /org/agent9-label-lab/settings/labels)",
+      "expected": "The header should read \"1 label\" for a single label (plural only from 2).",
+      "actual": "The header reads \"1 labels\" while only one label (agent9-alpha) is listed.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1",
+        "Create an organization with no labels and open its Settings > Labels page (/org/<org>/settings/labels)",
+        "Click 'New Label', type Name 'agent9-alpha' and Description 'first test label', pick the red preset colour (#e11d21) and click 'Save'",
+        "Read the heading above the label list"
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 332,
+      "name": "At 768px the long label name chip overlaps the \"0 open issues/pull requests\" count",
+      "summary": "The name chip grows past its 234px column (measured 284px wide, from x=30 to x=314) and is drawn over the clock icon and the beginning of \\\"0 open issues/pull requests\\\" at x=264, so the count is partly covered by the chip at 768px width. (on /eval/harbor-handbook/labels (768 × 1024 viewport))",
+      "expected": "The label name chip stays inside its own column (wraps or truncates inside it) so the issue count \\\"0 open issues/pull requests\\\" next to it stays fully readable.",
+      "actual": "The name chip grows past its 234px column (measured 284px wide, from x=30 to x=314) and is drawn over the clock icon and the beginning of \\\"0 open issues/pull requests\\\" at x=264, so the count is partly covered by the chip at 768px width.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and set the browser viewport to 768 × 1024.",
+        "Open https://5503-ihto2i2dj1c31tlfb1unv.e2b.app/eval/harbor-handbook/labels",
+        "Look at the row of the long label \"agent13-mobile-label-with-an-extremely-long-name-t…\" (second row, sort Alphabetically)."
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 339,
+      "name": "New Label accepts a name of only spaces, creating a blank label chip",
+      "summary": "The label is created anyway: the list jumps to 13 labels and the first row shows a small empty pill (name of spaces) with no text next to the \\\"0 open issues/pull requests\\\" count — a label nobody can identify or use meaningfully. (on /eval/harbor-handbook/labels)",
+      "expected": "The required Name field refuses a value made only of whitespace (like it refuses an empty one), or the name is trimmed and the form shows an error next to Name.",
+      "actual": "The label is created anyway: the list jumps to 13 labels and the first row shows a small empty pill (name of spaces) with no text next to the \\\"0 open issues/pull requests\\\" count — a label nobody can identify or use meaningfully.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /eval/harbor-handbook/labels",
+        "Click \"New Label\"",
+        "In \"Name\" type five spaces only; in \"Color\" type #00aabb (the colour field is required)",
+        "Click \"Save\""
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 411,
+      "name": "Label count \"2 open issues/pull requests\" leads to a list with only 1 item because pull requests are counted but not listed",
+      "summary": "The labels page shows \"2 open issues/pull requests\" for both \"documentation\" and \"enhancement\", but the link opens /eval/harbor-handbook/issues?labels=1 (and ?labels=2) which lists only 1 open item (#4), shows \"1 Open / 0 Closed\", and \"No results\" for labels whose only target is a PR. The second counted item is the pull request #5, which carries both labels but is never listed by the link, so the number and its list can never agree. (on /eval/harbor-handbook/labels)",
+      "expected": "The number on the label matches what its link shows: clicking \"2 open issues/pull requests\" opens a list with the 2 items (the issue and the pull request), or the label counts only issues and says 1.",
+      "actual": "The labels page shows \"2 open issues/pull requests\" for both \"documentation\" and \"enhancement\", but the link opens /eval/harbor-handbook/issues?labels=1 (and ?labels=2) which lists only 1 open item (#4), shows \"1 Open / 0 Closed\", and \"No results\" for labels whose only target is a PR. The second counted item is the pull request #5, which carries both labels but is never listed by the link, so the number and its list can never agree.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-ihto2i2dj1c31tlfb1unv.e2b.app/eval/harbor-handbook/labels",
+        "Read the count next to the label \"documentation\": it says \"2 open issues/pull requests\" (the label \"enhancement\" also says 2)",
+        "Click that \"2 open issues/pull requests\" link (it goes to /eval/harbor-handbook/issues?labels=1)",
+        "Compare the list: it shows 1 open issue (#4) and the pills read \"1 Open / 0 Closed\"",
+        "Open https://5503-ihto2i2dj1c31tlfb1unv.e2b.app/eval/harbor-handbook/pulls and see that pull request #5 \"agent5-label-test pull request\" carries the same two labels, which the count includes but the link never lists"
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 484,
+      "name": "Label count reads \"1 open issues/pull requests\" (plural) for a label with a single issue",
+      "summary": "The count reads \"1 open issues/pull requests\" — plural wording with the number 1 — while other rows read \"0 open issues/pull requests\" and \"3 open issues/pull requests\". This is a different failure from agent14's chip-overlap bug: it is the wording itself, visible at any width. (on /eval/harbor-handbook/labels)",
+      "expected": "The count uses the singular for one item, e.g. \"1 open issue/pull request\".",
+      "actual": "The count reads \"1 open issues/pull requests\" — plural wording with the number 1 — while other rows read \"0 open issues/pull requests\" and \"3 open issues/pull requests\". This is a different failure from agent14's chip-overlap bug: it is the wording itself, visible at any width.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-ihto2i2dj1c31tlfb1unv.e2b.app/eval/harbor-handbook/labels?sort=mostissues&state=",
+        "Find the label row 'agent13-mobile-label-with-an-extremely-long-name-t', which is used by exactly one open issue/PR",
+        "Read the count text between the label chip and the Edit/Delete actions"
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 547,
+      "name": "New Label accepts a name that already exists, creating a second label called \"documentation\"",
+      "summary": "The label is created without any warning: the list now shows two separate rows both named \"documentation\" — the original blue chip (description \"Handbook and onboarding improvements\") and a new red chip with an empty description and \"0 open issues/pull requests\". In an issue's label picker these two labels appear as two chips with the same text, so a person cannot tell which one they are assigning by name. The duplicate was created on the first attempt (label id 20, colour #e11d21). (on /eval/harbor-handbook/labels)",
+      "expected": "The form refuses a name that already exists in the repository with a message next to the Name field (labels are identified by name in the issue/PR label picker), and no second label is created.",
+      "actual": "The label is created without any warning: the list now shows two separate rows both named \"documentation\" — the original blue chip (description \"Handbook and onboarding improvements\") and a new red chip with an empty description and \"0 open issues/pull requests\". In an issue's label picker these two labels appear as two chips with the same text, so a person cannot tell which one they are assigning by name. The duplicate was created on the first attempt (label id 20, colour #e11d21).",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-ihto2i2dj1c31tlfb1unv.e2b.app/eval/harbor-handbook/labels (repo harbor-handbook, Issues → Labels). The list already has a blue label named \"documentation\" with the description \"Handbook and onboarding improvements\".",
+        "Click the \"New Label\" button (top right).",
+        "Type documentation into the Name field.",
+        "Click a colour preset swatch (e.g. the first red swatch) so the required Color field gets a value.",
+        "Click Save."
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 592,
+      "name": "Assigning a label that was deleted meanwhile fails with a 500 and is silently ignored",
+      "summary": "The label gets a check mark as if assigned, and nothing tells the user anything is wrong. When the picker is closed the request POST /eval/harbor-handbook/issues/labels fails with 500 Internal Server Error, the check mark is gone, the sidebar still shows only \"documentation\" and no error message is displayed anywhere. The stale deleted label also remains in the picker's list until the page is reloaded. (on /eval/harbor-handbook/issues/7 (sidebar label picker))",
+      "expected": "The app tells the user the label could not be applied (it no longer exists) instead of failing silently with a 500 server error, and the deleted label does not stay listed as assignable.",
+      "actual": "The label gets a check mark as if assigned, and nothing tells the user anything is wrong. When the picker is closed the request POST /eval/harbor-handbook/issues/labels fails with 500 Internal Server Error, the check mark is gone, the sidebar still shows only \"documentation\" and no error message is displayed anywhere. The stale deleted label also remains in the picker's list until the page is reloaded.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "On /eval/harbor-handbook/labels create a label named 'agent11-vanish' (description 'Agent11 delete while picker open test', colour #ff8800) and Save.",
+        "Open /eval/harbor-handbook/issues/7 (issue 'agent11-dialog-fixture') and open the label picker from the 'Labels' row of the right sidebar — 'agent11-vanish' is listed.",
+        "In a second browser tab open /eval/harbor-handbook/labels and delete the label 'agent11-vanish' (Delete → Confirm, page says 'The label has been deleted.').",
+        "Back in the first tab, click 'agent11-vanish' in the still-open picker — a check mark appears next to it as if the label had been assigned.",
+        "Click somewhere else on the issue page to close the picker."
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 643,
+      "name": "/eval/harbor-handbook/labels/new returns a completely blank white page (405, no message)",
+      "summary": "The page is completely blank — white, no title, no navigation, no message. The console shows \"Failed to load resource: the server responded with a status of 405 (Method Not Allowed)\" for that address; the page state was 43% error with an empty body. Same result on reload. (on /eval/harbor-handbook/labels/new)",
+      "expected": "A proper page with a clear message — e.g. the labels page, the same New Label dialog, or Gitea's \"404 Not Found / not authorized\" page as other unknown addresses show — never a blank white page.",
+      "actual": "The page is completely blank — white, no title, no navigation, no message. The console shows \"Failed to load resource: the server responded with a status of 405 (Method Not Allowed)\" for that address; the page state was 43% error with an empty body. Same result on reload.",
+      "reproSteps": [
+        "Sign in to https://5503-ihto2i2dj1c31tlfb1unv.e2b.app/ (here as alex, the Contributor account)",
+        "Open the address https://5503-ihto2i2dj1c31tlfb1unv.e2b.app/eval/harbor-handbook/labels/new directly",
+        "Look at the page (and read the browser console)"
+      ]
+    },
+    {
+      "index": 8,
+      "reported_at_seconds": 686,
+      "name": "\"Least issues\" sort ignores the numbers it shows for labels that also have closed issues, so the list is out of order",
+      "summary": "The list is not in ascending order of the numbers shown: the tail reads agent14-tablet-label \"1 open issues/pull requests\", documentation \"2 open issues/pull requests\", then agent7-count \"1 open issues/pull requests\", then enhancement. The label with 1 open item is listed after the label with 2. After removing the label from closed issue #3 (leaving agent7-count with only its 1 open issue), the same sort put agent7-count correctly before documentation, so the order follows a count that includes closed issues, while the number on the page counts only open ones. (on /eval/harbor-handbook/labels?sort=leastissues&state=)",
+      "expected": "Under \"Least issues\" the labels are ordered by the number shown next to them, smallest first, so a label with \"1 open issues/pull requests\" always comes before a label with \"2 open issues/pull requests\".",
+      "actual": "The list is not in ascending order of the numbers shown: the tail reads agent14-tablet-label \"1 open issues/pull requests\", documentation \"2 open issues/pull requests\", then agent7-count \"1 open issues/pull requests\", then enhancement. The label with 1 open item is listed after the label with 2. After removing the label from closed issue #3 (leaving agent7-count with only its 1 open issue), the same sort put agent7-count correctly before documentation, so the order follows a count that includes closed issues, while the number on the page counts only open ones.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-ihto2i2dj1c31tlfb1unv.e2b.app/eval/harbor-handbook/labels",
+        "Create a label named \"agent7-count\" (a color must be typed in the Color field first, e.g. #00aabb)",
+        "Open open issue #2 (https://5503-ihto2i2dj1c31tlfb1unv.e2b.app/eval/harbor-handbook/issues/2), click \"Labels\" in the right sidebar, pick \"agent7-count\", then click anywhere outside the picker so it saves",
+        "Open closed issue #3 (https://5503-ihto2i2dj1c31tlfb1unv.e2b.app/eval/harbor-handbook/issues/3) and give it the same \"agent7-count\" label the same way",
+        "Go back to the labels page, open the \"Sort\" menu and choose \"Least issues\" (or open .../labels?sort=leastissues&state=)",
+        "Scroll to the end of the label list and compare the order of the last labels with their counts"
+      ]
+    },
+    {
+      "index": 9,
+      "reported_at_seconds": 773,
+      "name": "At 390px the organization header breaks: the name wraps and the \"Follow\" button label splits into \"Foll / ow\"",
+      "summary": "The organization header is broken at 390px: the oversized avatar takes half the width, the organization name wraps into two lines (\"agent1-\" / \"org\"), and the \"Follow\" button is squeezed so its label is split into \"Foll\" / \"ow\" on two lines. The action buttons next to it are squashed against the name. (on /org/agent1-org/settings/labels (390 × 844))",
+      "expected": "The organization name and the \"Follow\" button stay on one line (or the button keeps its label on one line), with the avatar scaled down, so the header is readable on a phone-sized screen.",
+      "actual": "The organization header is broken at 390px: the oversized avatar takes half the width, the organization name wraps into two lines (\"agent1-\" / \"org\"), and the \"Follow\" button is squeezed so its label is split into \"Foll\" / \"ow\" on two lines. The action buttons next to it are squashed against the name.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1, create an organization named agent1-org (/org/create), then open https://5503-ihto2i2dj1c31tlfb1unv.e2b.app/org/agent1-org/settings/labels.",
+        "Set the browser window to a phone size, 390 × 844 CSS pixels.",
+        "Look at the organization header at the top of the page."
+      ]
+    },
+    {
+      "index": 10,
+      "reported_at_seconds": 839,
+      "name": "Saving an edit of a label deleted meanwhile ends on a bare \\\"Not Found\\\" page",
+      "summary": "Saving lands on a bare error page: the whole page is the raw text \\\"Not Found\\\" with no navigation, no error message and no way back except the browser (address /eval/harbor-handbook/labels/edit, POST answered 404). The edit typed in tab A is lost with no explanation. (on /eval/harbor-handbook/labels)",
+      "expected": "The app says the label no longer exists (a message such as \\\"the label was deleted meanwhile\\\") and returns the person to the labels list, not a raw 404 page.",
+      "actual": "Saving lands on a bare error page: the whole page is the raw text \\\"Not Found\\\" with no navigation, no error message and no way back except the browser (address /eval/harbor-handbook/labels/edit, POST answered 404). The edit typed in tab A is lost with no explanation.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1, open /eval/harbor-handbook/labels and create a test label \"agent12-twotab-del\" (colour #aa00aa)",
+        "Open the labels page in a second tab",
+        "In tab A click \"Edit\" on agent12-twotab-del, type the new name \"agent12-twotab-del-A\" and do not save",
+        "In tab B click \"Delete\" on the same label and confirm with \"Confirm\" — tab B shows \"The label has been deleted.\"",
+        "Return to tab A, whose Edit form still holds agent12-twotab-del-A, and click \"Save\""
+      ]
+    },
+    {
+      "index": 11,
+      "reported_at_seconds": 987,
+      "name": "Colour preview square shows no colour for a 3-digit hex the app accepts (#f00)",
+      "summary": "The small preview swatch next to the field shows the empty/transparent checkerboard (as if no colour were set), although the value is accepted: clicking Save stores #ff0000 and the label chip in the list is solid red. The colour picker popup that opens under the field shows red at the same moment, so the field's own preview contradicts both the picker and the saved result. (on /eval/harbor-handbook/labels)",
+      "expected": "The preview swatch shows the colour that will be saved (red), exactly like the picker beside it and the resulting label chip.",
+      "actual": "The small preview swatch next to the field shows the empty/transparent checkerboard (as if no colour were set), although the value is accepted: clicking Save stores #ff0000 and the label chip in the list is solid red. The colour picker popup that opens under the field shows red at the same moment, so the field's own preview contradicts both the picker and the saved result.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /eval/harbor-handbook/labels",
+        "Click 'Edit' on a label (the label 'agent2-combo' was used)",
+        "Select the value in the 'Color' field and type the 3-digit hex #f00",
+        "Look at the small colour preview square at the left inside the Color field, then click Save and look at the label chip in the list"
+      ]
+    },
+    {
+      "index": 12,
+      "reported_at_seconds": 1077,
+      "name": "At 390px the Label filter dropdown opens off-screen to the left, so no label can be read or picked",
+      "summary": "The panel is laid out from x = -459 to x = 84 (width 543) and from y = 321 to y = 821, so about 460 of its 543 pixels sit off the left edge of the screen. Only a ~80px strip with the search magnifier icon and a sliver of the first rows is visible; the texts 'All labels', 'No label' and every label name (documentation, enhancement, ...) are outside the screen and cannot be read or clicked, so the label filter cannot be used at 390px. (on /eval/harbor-handbook/issues)",
+      "expected": "The Label filter panel opens fully inside the 390px viewport, listing 'All labels', 'No label' and each label name, and every option can be read and clicked.",
+      "actual": "The panel is laid out from x = -459 to x = 84 (width 543) and from y = 321 to y = 821, so about 460 of its 543 pixels sit off the left edge of the screen. Only a ~80px strip with the search magnifier icon and a sliver of the first rows is visible; the texts 'All labels', 'No label' and every label name (documentation, enhancement, ...) are outside the screen and cannot be read or clicked, so the label filter cannot be used at 390px.",
+      "reproSteps": [
+        "Signed in as eval / momentic-eval-1.",
+        "Set the browser window to 390 x 844 px.",
+        "Open https://5503-ihto2i2dj1c31tlfb1unv.e2b.app/eval/harbor-handbook/issues?state=all&type=all&labels=2",
+        "Click the 'Label' filter button in the row 'Label Milestone Project Author Assignee Type Sort'.",
+        "Look at the panel that opens under the Label button and at the same panel after a reload (it does the same)."
+      ]
+    },
+    {
+      "index": 13,
+      "reported_at_seconds": 1086,
+      "name": "Activity feed loses label changes: a removal event replaces the earlier addition and lists only one of the removed labels",
+      "summary": "The feed does not keep those two events. After reloading the issue the activity list has four label events: \"eval added the documentation label\", \"eval removed the documentation label\", \"eval added the documentation label\" and \"eval removed the documentation label\" — the \"added the agent5-exclusive test1 enhancement labels\" event is gone, and the removal of agent5-exclusive test1 and enhancement is not recorded at all, although the sidebar correctly shows \"No Label\" (all three were removed). (on /eval/harbor-handbook/issues/7)",
+      "expected": "The activity list keeps one event per label change: adding agent5-exclusive test1 and enhancement, and removing all three labels, are each shown in the history.",
+      "actual": "The feed does not keep those two events. After reloading the issue the activity list has four label events: \"eval added the documentation label\", \"eval removed the documentation label\", \"eval added the documentation label\" and \"eval removed the documentation label\" — the \"added the agent5-exclusive test1 enhancement labels\" event is gone, and the removal of agent5-exclusive test1 and enhancement is not recorded at all, although the sidebar correctly shows \"No Label\" (all three were removed).",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /eval/harbor-handbook/issues/7 (issue 'agent11-dialog-fixture').",
+        "Open the label picker on the 'Labels' row of the right sidebar and select the labels 'agent5-exclusive test1' and 'enhancement' (documentation is already assigned); close the picker. The activity feed shows 'eval added the agent5-exclusive test1 enhancement labels now' and the sidebar lists agent5-exclusive test1, documentation, enhancement.",
+        "Open the picker again and click 'Clear labels'; close the picker. The sidebar goes back to 'No Label'.",
+        "Reload the issue."
+      ]
+    },
+    {
+      "index": 14,
+      "reported_at_seconds": 1563,
+      "name": "Alt+Enter in the Label filter excludes nothing: it applies a normal include filter for the label",
+      "summary": "Alt+Enter behaves as a plain include: the page ends on /eval/harbor-handbook/issues?type=all&state=open&labels=2 (label 2 = enhancement) and the list shows only the 3 issues that HAVE enhancement (#8, #6, #4) out of 9 open issues — the opposite of excluding them. A request to ?labels=-2 is fired first and aborted, then the include filter is applied; the dropdown gives no excluded state at all. (on /eval/harbor-handbook/issues)",
+      "expected": "Alt+Enter on a label in the Label filter excludes that label: the list shows the 6 issues that do NOT have 'enhancement', the chosen label is visibly marked as excluded and can be removed again.",
+      "actual": "Alt+Enter behaves as a plain include: the page ends on /eval/harbor-handbook/issues?type=all&state=open&labels=2 (label 2 = enhancement) and the list shows only the 3 issues that HAVE enhancement (#8, #6, #4) out of 9 open issues — the opposite of excluding them. A request to ?labels=-2 is fired first and aborted, then the include filter is applied; the dropdown gives no excluded state at all.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /eval/harbor-handbook/issues (9 open issues, 3 of them have the label 'enhancement')",
+        "Click the 'Label' filter button in the toolbar so its dropdown opens, and note the hint 'Use alt + click/enter to exclude labels'",
+        "Type 'enhancement' into the dropdown's filter box, press ArrowDown to highlight the 'enhancement' option, then press Alt+Enter",
+        "Read the address bar and the resulting list and the Open/Closed counters"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "fixture": "gitea/areas/pull-requests",
+  "run": 2,
+  "started_at": "2026-11-23T16:53:11.443Z",
+  "duration_seconds": 1543.997,
+  "time_limit_seconds": 1800,
+  "stop_reason": "completed",
+  "credits": {
+    "total": 1099,
+    "testing_team": 967,
+    "verification": 132,
+    "findings_verified": 22
+  },
+  "team_container_errors": 0
+}

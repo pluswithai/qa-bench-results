@@ -1,0 +1,386 @@
+{
+  "fixture": "gitea/areas/repository-code",
+  "run": 1,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 288,
+      "name": "\"Create new branch\" dialog closes silently when Branch Name is empty, with no validation message",
+      "summary": "The dialog closes as if it succeeded. No branch is created (the list still shows 2 branches) and no message of any kind is shown. The browser console logs \"An invalid form control with name='new_branch_name' is not focusable.\" so the user is left with a dialog that vanished and no explanation. (on /eval/harbor-handbook/branches)",
+      "expected": "The dialog stays open and the required \"Branch Name *\" field is flagged with a message next to it (the field is marked required with an asterisk), and no branch is created.",
+      "actual": "The dialog closes as if it succeeded. No branch is created (the list still shows 2 branches) and no message of any kind is shown. The browser console logs \"An invalid form control with name='new_branch_name' is not focusable.\" so the user is left with a dialog that vanished and no explanation.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-imhfwk4zvki4x702wdb5s.e2b.app/eval/harbor-handbook/branches",
+        "In the \"Default Branch\" row for main, click the \"Create new branch from \"main\"\" icon (the branch-with-plus icon at the right of the row)",
+        "In the \"Create new branch\" dialog leave the \"Branch Name *\" field empty and click \"Confirm\"",
+        "Watch the dialog and the branch list"
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 288,
+      "name": "Tag search treats % and _ as wildcards: a search for \"%\" lists v1.0.0, which contains no \"%\"",
+      "summary": "Searching \"%\" returns '1 Tags' and lists the tag v1.0.0 (with its SHA, ZIP, TAR.GZ links); searching \"_\" returns the same row. The % and _ are passed through as SQL LIKE wildcards instead of being searched literally, so the filter matches every tag. (on /eval/harbor-handbook/tags)",
+      "expected": "The search box filters tag names by the text typed; since no tag name contains '%' or '_', it should answer 'No results found.' like it does for zzz.",
+      "actual": "Searching \"%\" returns '1 Tags' and lists the tag v1.0.0 (with its SHA, ZIP, TAR.GZ links); searching \"_\" returns the same row. The % and _ are passed through as SQL LIKE wildcards instead of being searched literally, so the filter matches every tag.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-imhfwk4zvki4x702wdb5s.e2b.app/eval/harbor-handbook/tags",
+        "Type zzz in the 'Search tags...' box and press Enter: the list correctly says 'No results found.'",
+        "Type % in the 'Search tags...' box and press Enter (address becomes /tags?q=%25)",
+        "Look at the result count and the row list",
+        "Repeat with _ in the box"
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 343,
+      "name": "File finder on a non-existent branch shows a blank list with no error, and claims \"No matching file found\"",
+      "summary": "The find page renders with an empty result area and no message at all; typing any query then answers \"No matching file found\", which says the files do not match rather than that the branch does not exist. The app's own 404 page is shown for the same non-existent branch on the Code page, so the two screens disagree. (on /eval/harbor-handbook/find/branch/no-such-branch-xyz)",
+      "expected": "The page should say the branch does not exist (as /eval/harbor-handbook/src/branch/no-such-branch-xyz does with a 404 Not Found page), not present an empty, unexplained finder that answers \"No matching file found\" for every query.",
+      "actual": "The find page renders with an empty result area and no message at all; typing any query then answers \"No matching file found\", which says the files do not match rather than that the branch does not exist. The app's own 404 page is shown for the same non-existent branch on the Code page, so the two screens disagree.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Navigate to https://5503-imhfwk4zvki4x702wdb5s.e2b.app/eval/harbor-handbook/find/branch/no-such-branch-xyz (branch does not exist; e.g. a mistyped or deleted branch name).",
+        "Observe the file finder page: only the input box is shown, the result area is completely empty with no message.",
+        "Type \"r\" into the input (a query that matches README.md, docs/releases.md and docs/contributing.md on the real branches).",
+        "Observe the message shown."
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 347,
+      "name": "Pressing Enter in the \"Add a directory…\" field on the upload page ends on a 404 'Path … doesn't exist' page",
+      "summary": "Pressing Enter submits the upload form (POST to /_upload/main/ → 303) and the app navigates to https://5503-imhfwk4zvki4x702wdb5s.e2b.app/eval/harbor-handbook/src/branch/main/agent3-dir-two, which renders the raw error page '404 Not Found — Path agent3-dir-two doesn't exist in branch/main' with only a 'Go Back' link. The typed directory is lost and the upload form is gone. (on /eval/harbor-handbook/_upload/main/)",
+      "expected": "Enter in the directory field either does nothing or only adds the directory crumb; the person stays on the upload page with the directory set as the target ('Upload files to \"agent3-dir-two\"'). No navigation to a directory that does not exist and no 404 page.",
+      "actual": "Pressing Enter submits the upload form (POST to /_upload/main/ → 303) and the app navigates to https://5503-imhfwk4zvki4x702wdb5s.e2b.app/eval/harbor-handbook/src/branch/main/agent3-dir-two, which renders the raw error page '404 Not Found — Path agent3-dir-two doesn't exist in branch/main' with only a 'Go Back' link. The typed directory is lost and the upload form is gone.",
+      "reproSteps": [
+        "Sign in and open https://5503-imhfwk4zvki4x702wdb5s.e2b.app/eval/harbor-handbook/_upload/main/",
+        "Click the 'Add a directory…' field next to the repository name in the breadcrumb and type a new directory name followed by a slash, e.g. agent3-dir-two/ (the breadcrumb shows the new directory).",
+        "Press Enter (as a person does after typing a path).",
+        "Observe the resulting page."
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 361,
+      "name": "Code search from the repository's sidebar \"Search code...\" runs a Words search but the mode selector shows \"Exact\"",
+      "summary": "The search that arrives from the sidebar box runs in Words mode: README.md is returned and lines 8-9 are shown (\\\"focuses\\\" and \\\"onboarding\\\" matched on separate lines) while the dropdown still reads \\\"Exact\\\". Re-running the identical term with \\\"Exact\\\" really selected gives \\\"No matching results found.\\\" So the same query returns results under a mode that says it should not, and two entry points to the same search disagree. (on /eval/harbor-handbook/search)",
+      "expected": "With the mode selector showing \\\"Exact\\\" (\\\"Include only results that match the exact search term\\\"), the search should use the Exact mode, so the literal phrase \\\"focuses onboarding\\\" — which appears in no file — should give \\\"No matching results found.\\\" The mode shown and the mode used should be the same.",
+      "actual": "The search that arrives from the sidebar box runs in Words mode: README.md is returned and lines 8-9 are shown (\\\"focuses\\\" and \\\"onboarding\\\" matched on separate lines) while the dropdown still reads \\\"Exact\\\". Re-running the identical term with \\\"Exact\\\" really selected gives \\\"No matching results found.\\\" So the same query returns results under a mode that says it should not, and two entry points to the same search disagree.",
+      "reproSteps": [
+        "Open https://5503-imhfwk4zvki4x702wdb5s.e2b.app/eval/harbor-handbook (Code page of the seeded repo, signed in as eval).",
+        "In the right-hand sidebar box labelled \"Search code...\", type: focuses onboarding (this phrase does not exist in any file: README.md line 9 has \"The next release focuses on onboarding and making ownership clear.\").",
+        "Press Enter.",
+        "The results page opens at /eval/harbor-handbook/search?q=focuses+onboarding with the search-type dropdown showing \"Exact\".",
+        "Now set the dropdown to \"Exact\" explicitly (it already shows Exact) and press Enter / click the Search button to re-run the same term."
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 362,
+      "name": "Rename branch error shows raw internal field name \"form.To must be a well-formed Git reference name\"",
+      "summary": "A red banner at the top of the page reads exactly: \"form.To must be a well-formed Git reference name.\" — the internal form field name (\"form.To\") is shown to the user instead of a readable sentence. The dialog closes and the branch keeps its old name. (on /eval/harbor-handbook/branches)",
+      "expected": "A readable message such as \"The branch name is not a valid Git reference name\" naming the branch name, not the internal form field.",
+      "actual": "A red banner at the top of the page reads exactly: \"form.To must be a well-formed Git reference name.\" — the internal form field name (\"form.To\") is shown to the user instead of a readable sentence. The dialog closes and the branch keeps its old name.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-imhfwk4zvki4x702wdb5s.e2b.app/eval/harbor-handbook/branches",
+        "In the row of branch \"agent9-branch\" click the pencil icon (\"Rename Branch\")",
+        "Type an invalid Git branch name into the \"Rename \"agent9-branch\" to:\" field: first \"agent9 renamed\" (with a space), then \"agent9..bad\"",
+        "Click \"Confirm\""
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 408,
+      "name": "Regexp code search with an unclosed parenthesis returns a 500 error page with raw git grep stderr",
+      "summary": "A full-page \\\"500 Internal Server Error\\\" is returned, with the raw internal error: \\\"An error occurred: gitgrep.PerformSearch, git.GrepSearch: unable to run git grep: exit status 128, stderr: fatal: -e option, '(': missing closing parenthesis\\\". The search form and its results are gone; the person has to go back and retype the term. (on /eval/harbor-handbook/search)",
+      "expected": "An invalid regular expression should be reported as a validation error on the search page (as search modes do for bad input), keeping the search box and the typed term, not replace the whole app with a 500 error page and raw git stderr output.",
+      "actual": "A full-page \\\"500 Internal Server Error\\\" is returned, with the raw internal error: \\\"An error occurred: gitgrep.PerformSearch, git.GrepSearch: unable to run git grep: exit status 128, stderr: fatal: -e option, '(': missing closing parenthesis\\\". The search form and its results are gone; the person has to go back and retype the term.",
+      "reproSteps": [
+        "Open https://5503-imhfwk4zvki4x702wdb5s.e2b.app/eval/harbor-handbook/search (signed in as eval).",
+        "Open the \"Search type\" dropdown on the right of the search box and choose \"Regexp\".",
+        "Type a single opening parenthesis into the \"Search code...\" box: (",
+        "Press Enter (same with clicking the Search button)."
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 417,
+      "name": "Compare view says \"These branches are equal\" when the head is behind the base and the branches differ",
+      "summary": "The page shows the same \"These branches are equal.\" message for docs/release-owners..main and docs/release-owners..v1.0.0, although docs/release-owners has 2 commits while main/v1.0.0 have 1 — the refs are not equal, the comparison is only empty in that direction. The identical wording is also used for main..main, where the refs really are equal. (on /eval/harbor-handbook/compare/docs/release-owners..v1.0.0)",
+      "expected": "When the two refs point at different commits but there is nothing to merge in that direction, the page should say the comparison is empty / the head is behind the base (e.g. \"No commits between main and docs/release-owners\"). The wording \"These branches are equal\" should be reserved for refs pointing at the very same commit, as with main..main.",
+      "actual": "The page shows the same \"These branches are equal.\" message for docs/release-owners..main and docs/release-owners..v1.0.0, although docs/release-owners has 2 commits while main/v1.0.0 have 1 — the refs are not equal, the comparison is only empty in that direction. The identical wording is also used for main..main, where the refs really are equal.",
+      "reproSteps": [
+        "Open https://5503-imhfwk4zvki4x702wdb5s.e2b.app/eval/harbor-handbook/compare/main..docs/release-owners as eval / momentic-eval-1 and note it shows \"1 Commits\" with docs/releases.md changed.",
+        "Click the swap icon next to the base selector (link \"Switch head and base\") to compare docs/release-owners..main.",
+        "Observe the message in the panel: \"These branches are equal.\"",
+        "Open https://5503-imhfwk4zvki4x702wdb5s.e2b.app/eval/harbor-handbook/compare/docs/release-owners..v1.0.0 (branch docs/release-owners against tag v1.0.0) and observe the same message.",
+        "For reference, open https://5503-imhfwk4zvki4x702wdb5s.e2b.app/eval/harbor-handbook/commits/branch/docs/release-owners: it lists 2 commits, while .../commits/branch/main and the v1.0.0 tag list 1 commit."
+      ]
+    },
+    {
+      "index": 8,
+      "reported_at_seconds": 553,
+      "name": "Commit message field on the New File page shows the raw placeholder Add '{filename}' instead of the file name",
+      "summary": "The placeholder is the untranslated template string: it reads Add '{filename}' with the literal word {filename}, in the Commit Changes box. (on /eval/harbor-handbook/_new/main/)",
+      "expected": "The commit summary field's placeholder names the file being created, e.g. Add 'agent8-notes.md'.",
+      "actual": "The placeholder is the untranslated template string: it reads Add '{filename}' with the literal word {filename}, in the Commit Changes box.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Open https://5503-imhfwk4zvki4x702wdb5s.e2b.app/eval/harbor-handbook/_new/main/ (Code tab > Add File > New File).",
+        "Type a file name into the 'Name your file…' field, e.g. agent8-notes.md.",
+        "Scroll down to the 'Commit Changes' box and read the commit summary field."
+      ]
+    },
+    {
+      "index": 9,
+      "reported_at_seconds": 593,
+      "name": "Commit diff summary keeps unfiltered additions/deletions after choosing \"Ignore whitespace when comparing lines\"",
+      "summary": "The whitespace-only change is correctly dropped from the rendered diff (docs/releases.md badge falls from 4 to 2, the visible diff holds 3 green lines and 1 red line in total), but the summary line still says \\\"3 changed files with 4 additions and 2 deletions\\\", so the page states a different number of additions and deletions than the diff it shows (6 changes in the summary vs 4 in the diff and in the sum of the file badges). (on /eval/harbor-handbook/commit/f04aac46fd)",
+      "expected": "The additions/deletions summary at the top follows the whitespace filter, like the diff itself and the per-file badges do: 3 additions and 1 deletion (1 addition each in docs/agent6-del2.md and docs/repro-agent6-delete-me.md, 1 addition + 1 deletion in docs/releases.md).",
+      "actual": "The whitespace-only change is correctly dropped from the rendered diff (docs/releases.md badge falls from 4 to 2, the visible diff holds 3 green lines and 1 red line in total), but the summary line still says \\\"3 changed files with 4 additions and 2 deletions\\\", so the page states a different number of additions and deletions than the diff it shows (6 changes in the summary vs 4 in the diff and in the sum of the file badges).",
+      "reproSteps": [
+        "Go to https://5503-imhfwk4zvki4x702wdb5s.e2b.app/eval/harbor-handbook/commit/f04aac46fd?style=unified&whitespace=show-all (commit \"agent7-diff-probe: edit release checklist\" on branch agent7-diff-probe). The summary line reads \"3 changed files with 4 additions and 2 deletions\" and docs/releases.md carries the badge 4 (2 additions + 2 deletions, one of them a trailing-whitespace-only change to the line \"- [ ] Tag the approved commit.\").",
+        "In the diff toolbar click the \"Whitespace\" dropdown and choose \"Ignore whitespace when comparing lines\" (the address becomes ...whitespace=ignore-all).",
+        "Reload the page at https://5503-imhfwk4zvki4x702wdb5s.e2b.app/eval/harbor-handbook/commit/f04aac46fd?style=unified&whitespace=ignore-all and count the coloured lines and the per-file badges."
+      ]
+    },
+    {
+      "index": 10,
+      "reported_at_seconds": 595,
+      "name": "Tags list header says '1 Tags' while the tab beside it says '1 Tag'",
+      "summary": "The list header reads '1 Tags' while the tab directly above it reads '1 Tag', and the list holds exactly one tag (v1.0.0). The same header reads '0 Tags' when a search matches nothing, so only the singular is wrong. (on /eval/harbor-handbook/tags)",
+      "expected": "The header uses the singular for one tag, matching the '1 Tag' tab ('1 Tag'), as it already uses '0 Tags' for none.",
+      "actual": "The list header reads '1 Tags' while the tab directly above it reads '1 Tag', and the list holds exactly one tag (v1.0.0). The same header reads '0 Tags' when a search matches nothing, so only the singular is wrong.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-imhfwk4x702wdb5s.e2b.app/eval/harbor-handbook/tags",
+        "Compare the tab '1 Tag' with the list header just below it"
+      ]
+    },
+    {
+      "index": 11,
+      "reported_at_seconds": 779,
+      "name": "After the \"file contents have changed\" warning, \"Commit Changes\" is disabled, so the retry the warning asks for is impossible",
+      "summary": "The red warning \"The file contents have changed since you started editing. Click here to see them or Commit Changes again to overwrite them.\" is shown, the patch text and commit message are still filled in, but the \"Commit Changes\" button is disabled and cannot be clicked. The only way to re-enable it is to type something in the code editor (i.e. change the patch), which contradicts the instruction. (on /eval/harbor-handbook/_diffpatch/agent4-patchtmp)",
+      "expected": "As the page's own message instructs, pressing \"Commit Changes\" again should overwrite/apply the patch (or at least the button stays usable so the user can retry).",
+      "actual": "The red warning \"The file contents have changed since you started editing. Click here to see them or Commit Changes again to overwrite them.\" is shown, the patch text and commit message are still filled in, but the \"Commit Changes\" button is disabled and cannot be clicked. The only way to re-enable it is to type something in the code editor (i.e. change the patch), which contradicts the instruction.",
+      "reproSteps": [
+        "Sign in as eval (password momentic-eval-1). Create a test branch (Branches page -> Create new branch from \"main\" -> name agent4-patchtmp).",
+        "Tab 1: open https://5503-imhfwk4zvki4x702wdb5s.e2b.app/eval/harbor-handbook/_diffpatch/agent4-patchtmp/ and paste a patch that adds a file, e.g. 'diff --git a/agent4-race.md b/agent4-race.md', 'new file mode 100644', '--- /dev/null', '+++ b/agent4-race.md', '@@ -0,0 +1,1 @@', '+race test'; type commit message 'agent4: race test patch'.",
+        "Tab 2: open the same _diffpatch/agent4-patchtmp/ address and commit another patch (adds agent4-race2.md, message 'agent4: race2 file') so the branch head moves.",
+        "Back in tab 1 press \"Commit Changes\".",
+        "Look at the form: the red warning says to press Commit Changes again, the patch and the message are still in the form, but the \"Commit Changes\" button is pale/disabled and does nothing."
+      ]
+    },
+    {
+      "index": 12,
+      "reported_at_seconds": 816,
+      "name": "Apply Patch commits an empty file and silently drops the pasted content when the diff has +++ but no valid hunk",
+      "summary": "The patch is applied and committed without any error: the commit \"agent4: broken patch\" reports \"1 changed files with 0 additions and 0 deletions\" and creates agent4-broken.md with 0 B (\"The file is empty.\"). The line of content the user pasted was silently thrown away. (on /eval/harbor-handbook/_diffpatch/agent4-patchtmp)",
+      "expected": "Either the content below the +++ line is kept in the file, or the patch is refused with an error (an empty diff / \"No valid patches in input\"), as happens with a patch that has no diff header at all. It should not commit an empty file while the page shows success for a patch that carries content.",
+      "actual": "The patch is applied and committed without any error: the commit \"agent4: broken patch\" reports \"1 changed files with 0 additions and 0 deletions\" and creates agent4-broken.md with 0 B (\"The file is empty.\"). The line of content the user pasted was silently thrown away.",
+      "reproSteps": [
+        "Sign in as eval (momentic-eval-1) and open https://5503-imhfwk4zvki4x702wdb5s.e2b.app/eval/harbor-handbook/_diffpatch/agent4-patchtmp/ (any branch you can commit to).",
+        "Paste this into the patch editor: 'diff --git a/agent4-broken.md b/agent4-broken.md', 'new file mode 100644', '--- /dev/null', '+++ b/agent4-broken.md', 'this hunk has no @@ header and no + markers'.",
+        "Type commit message 'agent4: broken patch' and press \"Commit Changes\".",
+        "The page goes to the commit page /eval/harbor-handbook/commit/c981e2b5919300322e46e8f5600fe615da3a2a68: it shows '1 changed files with 0 additions and 0 deletions' and the new file agent4-broken.md with 0 B; open the file and it says 'The file is empty.'"
+      ]
+    },
+    {
+      "index": 13,
+      "reported_at_seconds": 836,
+      "name": "Archive download for a non-existent tag answers a bare page with the raw git error \"unrecognized repository reference\"",
+      "summary": "The address answers 404 with a bare unstyled white page showing only the raw git message \"unrecognized repository reference: no-such-tag\" — no site navigation, no repository header, no wording a visitor understands and no way back. (on /eval/harbor-handbook/archive/no-such-tag.zip)",
+      "expected": "A clear error page inside the site's layout, e.g. \"404 Not Found — the tag no-such-tag does not exist\", with navigation and a link back to the repository.",
+      "actual": "The address answers 404 with a bare unstyled white page showing only the raw git message \"unrecognized repository reference: no-such-tag\" — no site navigation, no repository header, no wording a visitor understands and no way back.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Open https://5503-imhfwk4zvki4x702wdb5s.e2b.app/eval/harbor-handbook/tags and note the v1.0.0 row's ZIP link (/eval/harbor-handbook/archive/v1.0.0.zip).",
+        "Change the tag in that address to one that does not exist: https://5503-imhfwk4zvki4x702wdb5s.e2b.app/eval/harbor-handbook/archive/no-such-tag.zip (a stale bookmark or a deleted tag gives the same address).",
+        "Look at the page that comes back, and reload it."
+      ]
+    },
+    {
+      "index": 14,
+      "reported_at_seconds": 848,
+      "name": "At tablet width the branch row actions overflow: \"New Pull Request\" is cut to \"New Pull Rec\" and the Delete branch icon is clipped by the page edge",
+      "summary": "Each row's \"New Pull Request\" button is wider than its cell, so its label is hidden behind the next cell and shows only \"New Pull Rec\". The last action, the \"Delete Branch\" trash icon, sits at x=747..777 in a 768 px window, so its right part is cut off by the page edge, and scrolling the table or the page to the right does not move it. At 1280 px wide the same page shows the full \"New Pull Request\" label and all five icons. (on /eval/harbor-handbook/branches)",
+      "expected": "The branch row should fit at tablet width: the \"New Pull Request\" label readable and every action icon (compare/RSS/download/rename/delete) fully visible and reachable.",
+      "actual": "Each row's \"New Pull Request\" button is wider than its cell, so its label is hidden behind the next cell and shows only \"New Pull Rec\". The last action, the \"Delete Branch\" trash icon, sits at x=747..777 in a 768 px window, so its right part is cut off by the page edge, and scrolling the table or the page to the right does not move it. At 1280 px wide the same page shows the full \"New Pull Request\" label and all five icons.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Set the browser window to 768 x 1024 (tablet).",
+        "Open https://5503.imhfwk4zvki4x702wdb5s.e2b.app/eval/harbor-handbook/branches.",
+        "Look at the action area at the right of each branch row, e.g. the row of agent4-patchtmp.",
+        "Try to scroll the list to the right to reach the clipped trash icon."
+      ]
+    },
+    {
+      "index": 15,
+      "reported_at_seconds": 923,
+      "name": "Commit search results no longer show the tag badge that the commit list shows on the same commit",
+      "summary": "In the search results the row for 4ff25d14a0 shows only the message 'Add engineering handbook and release checklist', without the 'v1.0.0' tag badge that is shown for the identical row in the unfiltered commit list. The badge is missing for every result row, in both 'This Branch' and 'All Branches' searches. (on /eval/harbor-handbook/commits/branch/docs/release-owners/search?q=release)",
+      "expected": "The same commit is shown with the same data in both views, including the 'v1.0.0' tag badge that marks it in the branch history.",
+      "actual": "In the search results the row for 4ff25d14a0 shows only the message 'Add engineering handbook and release checklist', without the 'v1.0.0' tag badge that is shown for the identical row in the unfiltered commit list. The badge is missing for every result row, in both 'This Branch' and 'All Branches' searches.",
+      "reproSteps": [
+        "Open the commit history of the branch docs/release-owners (/eval/harbor-handbook/commits/branch/docs/release-owners) and look at the last row: commit 4ff25d14a0 'Add engineering handbook and release checklist' carries the tag badge 'v1.0.0'.",
+        "Type 'release' in the 'Search commits...' box and submit (the page goes to /commits/branch/docs/release-owners/search?q=release).",
+        "Look at the row for the same commit 4ff25d14a0 in the search results."
+      ]
+    },
+    {
+      "index": 16,
+      "reported_at_seconds": 930,
+      "name": "Failed applies show raw internal error text: Unable to apply patch \\\"Error: Stdout: Stderr: error: ... Err: exit status 128\\\"",
+      "summary": "The red flash message is the raw internal git/Go error with its nested quotes broken: Unable to apply patch \"Error: Stdout: Stderr: error: No valid patches in input (allow with \"--allow-empty\") Err: exit status 128\". Other failures are equally raw, e.g. \"Error: Stdout: Stderr: error: agent4-no-such-file.md: does not exist in index Err: exit status 1\" and \"Error: Stdout: Stderr: error: invalid path '../../agent4-evil.md' Err: exit status 128\". (on /eval/harbor-handbook/_diffpatch/agent4-patchtmp)",
+      "expected": "A plain-language message such as \"The text you pasted is not a valid patch\" / \"The file the patch tries to change does not exist\", without the internal \"Stdout:/Stderr:/Err: exit status\" plumbing.",
+      "actual": "The red flash message is the raw internal git/Go error with its nested quotes broken: Unable to apply patch \"Error: Stdout: Stderr: error: No valid patches in input (allow with \"--allow-empty\") Err: exit status 128\". Other failures are equally raw, e.g. \"Error: Stdout: Stderr: error: agent4-no-such-file.md: does not exist in index Err: exit status 1\" and \"Error: Stdout: Stderr: error: invalid path '../../agent4-evil.md' Err: exit status 128\".",
+      "reproSteps": [
+        "Sign in as eval (momentic-eval-1) and open https://5503-imhfwk4zvki4x702wdb5s.e2b.app/eval/harbor-handbook/_diffpatch/agent4-patchtmp/ (any writable branch).",
+        "Type plain text in the patch editor: 'this is definitely not a unified diff' / 'just some plain words'.",
+        "Type a commit message and press \"Commit Changes\".",
+        "Read the red message at the top of the page."
+      ]
+    },
+    {
+      "index": 17,
+      "reported_at_seconds": 935,
+      "name": "Repository RSS feed item titles contain escaped HTML anchors, so a reader shows raw <a href=…> markup",
+      "summary": "Each item title carries escaped HTML: e.g. <title>eval pushed to &lt;a href=&#34;.../src/branch/agent14-lifecycle&#34;&gt;agent14-lifecycle&lt;/a&gt; at &lt;a href=&#34;.../eval/harbor-handbook&#34;&gt;eval/harbor-handbook&lt;/a&gt;</title>, so a feed reader displays raw anchor markup instead of the sentence. The description element has the same escaped anchors. (on /eval/harbor-handbook.rss)",
+      "expected": "A feed reader shows the plain sentence, e.g. \"eval pushed to agent14-lifecycle at eval/harbor-handbook\", as the item title.",
+      "actual": "Each item title carries escaped HTML: e.g. <title>eval pushed to &lt;a href=&#34;.../src/branch/agent14-lifecycle&#34;&gt;agent14-lifecycle&lt;/a&gt; at &lt;a href=&#34;.../eval/harbor-handbook&#34;&gt;eval/harbor-handbook&lt;/a&gt;</title>, so a feed reader displays raw anchor markup instead of the sentence. The description element has the same escaped anchors.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Open https://5503-imhfwk4zvki4x702wdb5s.e2b.app/eval/harbor-handbook (Code tab) or /tags and click the RSS Feed icon; it points to /eval/harbor-handbook.rss.",
+        "Open https://5503-imhfwk4zvki4x702wdb5s.e2b.app/eval/harbor-handbook.rss in the browser and read the first <item> elements."
+      ]
+    },
+    {
+      "index": 18,
+      "reported_at_seconds": 1025,
+      "name": "Upload page commit summary placeholder shows an empty quoted path: Upload files to \"\"",
+      "summary": "The commit summary field's placeholder on the Upload File page reads: Upload files to \"\" — the target path is an empty string inside a pair of quotes, so the field shows raw empty data instead of the repository root. A commit made with that placeholder would carry the literal message \"Upload files to \\\"\\\"\". (on /eval/harbor-handbook/_upload/main/)",
+      "expected": "The placeholder should name the real target, e.g. \"Upload files to \\\"/\\\"\" or simply \"Upload files\" when the upload goes to the repository root, not an empty quoted value.",
+      "actual": "The commit summary field's placeholder on the Upload File page reads: Upload files to \"\" — the target path is an empty string inside a pair of quotes, so the field shows raw empty data instead of the repository root. A commit made with that placeholder would carry the literal message \"Upload files to \\\"\\\"\".",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-imhfwk4zvki4x702wdb5s.e2b.app/eval/harbor-handbook/_upload/main/ (Upload File on the Code page).",
+        "Look at the \"Commit Changes\" box: the commit summary input's placeholder text is Upload files to \"\" — with an empty pair of quotes."
+      ]
+    },
+    {
+      "index": 19,
+      "reported_at_seconds": 1053,
+      "name": "\\\"Create a new branch\\\" on the Apply Patch page with an existing branch name silently commits onto that branch and opens a branch-against-itself compare page",
+      "summary": "No message says the branch already exists. The commit \"agent4: new branch name test\" (abc0276d75) was created directly on the existing branch agent4-patchtmp (visible in its commit history), no new branch was created, and the browser lands on /eval/harbor-handbook/compare/agent4-patchtmp...agent4-patchtmp, a \"New Pull Request\" page comparing agent4-patchtmp with itself that says \"These branches are equal. There is no need to create a pull request.\" (on /eval/harbor-handbook/_diffpatch/agent4-patchtmp)",
+      "expected": "The page should refuse a branch name that already exists (as the Create branch dialog does: it reports the name is taken) and not commit, or at least tell the user the branch existed. It should not silently commit onto the existing branch and then open a pull-request comparison of a branch with itself.",
+      "actual": "No message says the branch already exists. The commit \"agent4: new branch name test\" (abc0276d75) was created directly on the existing branch agent4-patchtmp (visible in its commit history), no new branch was created, and the browser lands on /eval/harbor-handbook/compare/agent4-patchtmp...agent4-patchtmp, a \"New Pull Request\" page comparing agent4-patchtmp with itself that says \"These branches are equal. There is no need to create a pull request.\"",
+      "reproSteps": [
+        "Sign in as eval (momentic-eval-1), open https://5503-imhfwk4zvki4x702wdb5s.e2b.app/eval/harbor-handbook/_diffpatch/agent4-patchtmp/ (the branch agent4-patchtmp already exists).",
+        "Paste a patch that adds a file: 'diff --git a/agent4-newbranch.md b/agent4-newbranch.md', 'new file mode 100644', '--- /dev/null', '+++ b/agent4-newbranch.md', '@@ -0,0 +1,1 @@', '+new branch test'.",
+        "Type commit message 'agent4: new branch name test'.",
+        "Select the radio \"Create a new branch for this commit and start a pull request.\"",
+        "In the branch name field type an existing branch name: agent4-patchtmp, then press the button, now labelled \"Propose file change\".",
+        "The page lands on /eval/harbor-handbook/compare/agent4-patchtmp...agent4-patchtmp with \"These branches are equal. There is no need to create a pull request.\"; the commit history of agent4-patchtmp nevertheless contains the new commit abc0276d75 'agent4: new branch name test'."
+      ]
+    },
+    {
+      "index": 20,
+      "reported_at_seconds": 1076,
+      "name": "Commit search results heading says \\\"1 Commits\\\" for a single result",
+      "summary": "The results panel heading reads \\\"1 Commits\\\" (plural) for a single matching commit, while the page's own header correctly writes the singular \\\"1 Tag\\\" and \\\"18 Commits\\\" for the plural case. (on /eval/harbor-handbook/commits/branch/main/search)",
+      "expected": "\\\"1 Commit\\\" - the app elsewhere uses singular for one item (\\\"1 Tag\\\").",
+      "actual": "The results panel heading reads \\\"1 Commits\\\" (plural) for a single matching commit, while the page's own header correctly writes the singular \\\"1 Tag\\\" and \\\"18 Commits\\\" for the plural case.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-imhfwk4zvki4x702wdb5s.e2b.app/eval/harbor-handbook/commits/branch/main",
+        "In the \"Search commits...\" box type captain, open the scope dropdown and choose All Branches, then submit (or open https://5503-imhfwk4zvki4x702wdb5s.e2b.app/eval/harbor-handbook/commits/branch/main/search?q=captain&all=1).",
+        "Read the results panel heading above the table, which has exactly one row."
+      ]
+    },
+    {
+      "index": 21,
+      "reported_at_seconds": 1183,
+      "name": "Commit graph at phone width: messages cut to three characters, dates cut off, no lane lines",
+      "summary": "At 390 px the commit graph is unreadable: every commit message is truncated to three or four characters plus an ellipsis (\"rev…\", \"age…\", \"Del…\", \"Add…\", \"Upd…\"), the date/author column runs off the right edge (\"Nov 23, 2026, 3:46:21 PM\" is cut mid-text and \"Harbor Admin Sep 1, 2025, 9:00:00 AM\" is cut off), and the coloured lane lines of the graph that identify each branch are not drawn — only the commit dots remain. (on /eval/harbor-handbook/graph)",
+      "expected": "On a phone the commit graph should stay readable: messages shown with enough width to read (wrapping instead of 3-character truncation), the date fully visible or moved below the row, and the branch lanes visible, without sideways scrolling.",
+      "actual": "At 390 px the commit graph is unreadable: every commit message is truncated to three or four characters plus an ellipsis (\"rev…\", \"age…\", \"Del…\", \"Add…\", \"Upd…\"), the date/author column runs off the right edge (\"Nov 23, 2026, 3:46:21 PM\" is cut mid-text and \"Harbor Admin Sep 1, 2025, 9:00:00 AM\" is cut off), and the coloured lane lines of the graph that identify each branch are not drawn — only the commit dots remain.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1, set the browser to a phone size 390 x 844.",
+        "Open https://5503-imhfwk4zvki4x702wdb5s.e2b.app/eval/harbor-handbook/graph (or the same address with ?branch=refs%2Fheads%2Fmain to filter on main).",
+        "Look at the rows of the graph: the commit messages are cut to 3-4 characters with an ellipsis, the dates are cut at the right edge of the screen, and no lane lines are drawn from the dots."
+      ]
+    },
+    {
+      "index": 22,
+      "reported_at_seconds": 1229,
+      "name": "File view and blame header claim one line more than the file has (\\\"10 lines\\\" over 9 rows, \\\"7 lines\\\" over 6 rows)",
+      "summary": "Both headers claim one line more than the file has: docs/releases.md shows \\\"7 lines | 182 B\\\" above rows numbered 1–6, and README.md shows \\\"10 lines | 354 B\\\" above rows numbered 1–9. The raw views hold exactly 182 bytes / 6 newlines and 354 bytes / 9 newlines, and the commit diff adds 6 and 9 lines respectively — so the real counts are 6 and 9, not 7 and 10. The same wrong count appears in the blame page header (\\\"10 lines\\\" above 9 blame rows for README.md). (on /eval/harbor-handbook/src/commit/4ff25d14a0/README.md and /docs/releases.md)",
+      "expected": "The header reads \\\"6 lines\\\" for docs/releases.md and \\\"9 lines\\\" for README.md, matching the numbered rows, the raw file's byte/line count and the commit diff.",
+      "actual": "Both headers claim one line more than the file has: docs/releases.md shows \\\"7 lines | 182 B\\\" above rows numbered 1–6, and README.md shows \\\"10 lines | 354 B\\\" above rows numbered 1–9. The raw views hold exactly 182 bytes / 6 newlines and 354 bytes / 9 newlines, and the commit diff adds 6 and 9 lines respectively — so the real counts are 6 and 9, not 7 and 10. The same wrong count appears in the blame page header (\\\"10 lines\\\" above 9 blame rows for README.md).",
+      "reproSteps": [
+        "Open https://5503-imhfwk4zvki4x702wdb5s.e2b.app/eval/harbor-handbook/src/commit/4ff25d14a0c71fb629f63a4a48ec556389c136eb/README.md?display=source — the header line above the code reads \"10 lines | 354 B | Markdown\".",
+        "Count the numbered rows in the file body: they run 1 to 9 (nine rows).",
+        "Open the \"Raw\" link of the same file: /eval/harbor-handbook/raw/commit/4ff25d14a0c71fb629f63a4a48ec556389c136eb/README.md — the response is 354 bytes long, has 9 newlines and ends with a single \"\\n\", i.e. 9 lines. The commit page of 4ff25d14a0 shows the same file as \"@@ -0,0 +1,9 @@\" with 9 added lines.",
+        "Repeat on docs/releases.md: https://5503-imhfwk4zvki4x702wdb5s.e2b.app/eval/harbor-handbook/src/commit/4ff25d14a0c71fb629f63a4a48ec556389c136eb/docs/releases.md?display=source says \"7 lines | 182 B\" above rows numbered 1–6; its raw view is 182 bytes with 6 newlines.",
+        "For the blame variant: /eval/harbor-handbook/blame/commit/4ff25d14a0c71fb629f63a4a48ec556389c136eb/README.md also says \"10 lines\" above 9 blame rows."
+      ]
+    },
+    {
+      "index": 23,
+      "reported_at_seconds": 1295,
+      "name": "The \\\"All Branches\\\" scope on the commit history is silently discarded when the search box is empty: the selector snaps back to \\\"This Branch\\\" and the same commits stay",
+      "summary": "The page goes to /commits/branch/main/search?q=&all=true, answers with a redirect back to /commits/branch/main, and shows the scope selector back on \\\"This Branch\\\" with the identical 20 commits and the heading \\\"20 Commits\\\" — no message at all. The repository has 12 other branches with commits that are not on main, so an all-branches list would differ; the option simply never applies. With a search text typed (q=agent7) the same option does work (\\\"All Branches\\\", 3 Commits), so only the empty-query case drops the scope. (on /eval/harbor-handbook/commits/branch/main)",
+      "expected": "The commit list switches to all branches (rows from the other 12 branches, heading count matching), or the page says that a search text is needed for the scope — the chosen scope must not be silently thrown away.",
+      "actual": "The page goes to /commits/branch/main/search?q=&all=true, answers with a redirect back to /commits/branch/main, and shows the scope selector back on \\\"This Branch\\\" with the identical 20 commits and the heading \\\"20 Commits\\\" — no message at all. The repository has 12 other branches with commits that are not on main, so an all-branches list would differ; the option simply never applies. With a search text typed (q=agent7) the same option does work (\\\"All Branches\\\", 3 Commits), so only the empty-query case drops the scope.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-imhfwk4zvki4x702wdb5s.e2b.app/eval/harbor-handbook/commits/branch/main.",
+        "Click the scope dropdown at the right of the \"Search commits...\" box (it shows \"This Branch\") and choose \"All Branches\" — the control now reads \"All Branches\".",
+        "Leave the search box empty and press the magnifier button next to it (\"Search...\").",
+        "Look at the scope control, the URL, the heading and the listed commits."
+      ]
+    },
+    {
+      "index": 24,
+      "reported_at_seconds": 1414,
+      "name": "Raw view keeps serving the previous commit's file content after a new commit",
+      "summary": "The Raw view shows the file's older content \"FIRST-CHANGE\" (the version from commit 4cff4eff46, 13 B) instead of the current \"MAIN-SECOND-CHANGE\" (19 B). It stays stale on reload, on a fresh tab with the same URL, and after the file page has just been showing the new content. Adding a query string to the same raw URL (/raw/branch/main/docs/agent6-fresh.md?v=1) returns the correct \"MAIN-SECOND-CHANGE\", so the plain raw response is being served from a cacheable copy in the browser while the branch has moved on. The commit-scoped raw view /raw/commit/96251ed24c/docs/agent6-fresh.md is correct, and so is /src/commit/96251ed24c/docs/agent6-fresh.md. (on /eval/harbor-handbook/raw/branch/main/docs/agent6-fresh.md)",
+      "expected": "Raw shows the file content of the newest commit on the branch, i.e. MAIN-SECOND-CHANGE (19 B).",
+      "actual": "The Raw view shows the file's older content \"FIRST-CHANGE\" (the version from commit 4cff4eff46, 13 B) instead of the current \"MAIN-SECOND-CHANGE\" (19 B). It stays stale on reload, on a fresh tab with the same URL, and after the file page has just been showing the new content. Adding a query string to the same raw URL (/raw/branch/main/docs/agent6-fresh.md?v=1) returns the correct \"MAIN-SECOND-CHANGE\", so the plain raw response is being served from a cacheable copy in the browser while the branch has moved on. The commit-scoped raw view /raw/commit/96251ed24c/docs/agent6-fresh.md is correct, and so is /src/commit/96251ed24c/docs/agent6-fresh.md.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-imhfwk4zvki4x702wdb5s.e2b.app/eval/harbor-handbook/src/branch/main/docs/agent6-fresh.md (file created by agent6, then edited and committed once more: commit 96251ed24c \"agent6 main second change\", 19 B, content MAIN-SECOND-CHANGE).",
+        "While the file content was still FIRST-CHANGE (commit 4cff4eff46), open its Raw view once so that the browser has it: /eval/harbor-handbook/raw/branch/main/docs/agent6-fresh.md.",
+        "Commit the new content MAIN-SECOND-CHANGE to main, go back to the file page (it shows 19 B and MAIN-SECOND-CHANGE at commit 96251ed24c) and click the Raw link in the file toolbar.",
+        "Compare: the Raw page shows FIRST-CHANGE. Reload it, and also open the same raw URL in a new tab: still FIRST-CHANGE.",
+        "For comparison add a query string: /eval/harbor-handbook/raw/branch/main/docs/agent6-fresh.md?v=1 shows MAIN-SECOND-CHANGE."
+      ]
+    },
+    {
+      "index": 25,
+      "reported_at_seconds": 1442,
+      "name": "Create tag with an existing name answers \"Branch \\\"v1.0.0\\\" cannot be created as a tag…\" — wrong object and garbled wording",
+      "summary": "The flash message reads: Branch \"v1.0.0\" cannot be created as a tag with same name already exists in the repository. It calls the tag a \"Branch\" and the sentence is garbled, although the dialog that produced it is titled \"Create tag\" with a \"Tag name\" field. (on /eval/harbor-handbook/commit/b600079441)",
+      "expected": "A message about the tag being created, e.g. 'Tag \"v1.0.0\" already exists in this repository.', matching the 'Create tag' dialog and its 'Tag name' field.",
+      "actual": "The flash message reads: Branch \"v1.0.0\" cannot be created as a tag with same name already exists in the repository. It calls the tag a \"Branch\" and the sentence is garbled, although the dialog that produced it is titled \"Create tag\" with a \"Tag name\" field.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-imhfwk4zvki4x702wdb5s.e2b.app/eval/harbor-handbook/commit/b600079441",
+        "Click 'Operations' at the top right of the commit box, then 'Create tag' in the menu",
+        "Type v1.0.0 (an existing tag) in the 'Tag name' field and click the blue 'Create tag' button",
+        "Read the red flash message at the top of the page"
+      ]
+    },
+    {
+      "index": 26,
+      "reported_at_seconds": 1509,
+      "name": "Search result line-number links land on the rendered Markdown view where #L anchors highlight nothing",
+      "summary": "The link opens /eval/harbor-handbook/src/commit/96251ed24c54cdaafa7ec432b0d29e0f1cbcdb72/README.md#L5 and the page shows the rendered markdown from the top with no line highlighted and no scroll to line 5: the DOM has no element with id L5 and no line-number cells at all (checked: getElementById('L5') is null, 0 line-number cells), and the #L5 in the address is silently ignored. The same happens for the line links of docs/contributing.md and docs/releases.md results, i.e. every result of the code search in this repository, because all its files are Markdown. (on /eval/harbor-handbook/search?q=release&type=code)",
+      "expected": "Clicking the line number of a search result should open the file with that line shown and marked (the .txt file agent11-anchor.txt on branch agent11-anchors does highlight #L5/L7-L9 correctly), or the result should offer no line-number link when the target view cannot show lines.",
+      "actual": "The link opens /eval/harbor-handbook/src/commit/96251ed24c54cdaafa7ec432b0d29e0f1cbcdb72/README.md#L5 and the page shows the rendered markdown from the top with no line highlighted and no scroll to line 5: the DOM has no element with id L5 and no line-number cells at all (checked: getElementById('L5') is null, 0 line-number cells), and the #L5 in the address is silently ignored. The same happens for the line links of docs/contributing.md and docs/releases.md results, i.e. every result of the code search in this repository, because all its files are Markdown.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Open https://5503.imhfwk4zvki4x702wdb5s.e2b.app/eval/harbor-handbook/search?q=release&type=code.",
+        "In the first result card (README.md) click the line number \"5\" on the left of the line \"- [Contributor guide](docs/contributing.md)\".",
+        "Observe the address (…/src/commit/96251ed24c54cdaafa7ec432b0d29e0f1cbcdb72/README.md#L5) and the page: rendered markdown from the top, no highlighted line."
+      ]
+    }
+  ]
+}

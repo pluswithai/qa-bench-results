@@ -1,0 +1,73 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "findings": 5,
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 15,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Matches submitting Update Avatar without a file and seeing the raw Avatar.Open filesystem error."
+      },
+      {
+        "groundTruthIndex": 14,
+        "reproStepsIndex": 0,
+        "findingIndex": 1,
+        "reason": "Matches invalid Default Branch validation exposing form.DefaultBranch on New Repository."
+      },
+      {
+        "groundTruthIndex": 5,
+        "reproStepsIndex": 0,
+        "findingIndex": 2,
+        "reason": "Matches duplicate branch-pattern creation overwriting the existing protection settings with new-form defaults without confirmation."
+      },
+      {
+        "groundTruthIndex": 1,
+        "reproStepsIndex": 0,
+        "findingIndex": 3,
+        "reason": "Matches saving an invalid branch-protection glob and receiving HTTP 500. The finding does not check the additional persistence behavior documented in ground truth."
+      }
+    ],
+    "invalidMatches": [],
+    "unverified": [
+      {
+        "findingIndex": 4,
+        "reason": "No reviewed entry covers saving repository metadata after archiving; the archived-editor and stale-submission bugs describe different failures."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 5,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 3,
+        "reason": "Describes settings changes being accepted and persisted despite the claimed read-only restriction."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

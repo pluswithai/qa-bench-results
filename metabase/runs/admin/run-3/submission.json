@@ -1,0 +1,91 @@
+{
+  "fixture": "metabase/areas/admin",
+  "run": 3,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 155,
+      "name": "People search treats SQL wildcards as patterns: \"%\" and \"_\" return every person",
+      "summary": "The search passes the typed text to the database as an unescaped LIKE pattern: \\\"_\\\" and \\\"%\\\" both return all 3 people (\\\"3 people found\\\") and \\\"J_\\\" returns Jordan Ellis as if \\\"_\\\" matched the \\\"o\\\" in \\\"Jordan\\\". A person searching for a literal underscore or percent gets a wrong, much wider result list. (on /admin/people)",
+      "expected": "Search matches the literal text typed. No name or email contains an underscore or a percent sign, so \\\"_\\\", \\\"%\\\" and \\\"J_\\\" should return \\\"No results found\\\" (the literal substring \\\"_\\\" is in no record).",
+      "actual": "The search passes the typed text to the database as an unescaped LIKE pattern: \\\"_\\\" and \\\"%\\\" both return all 3 people (\\\"3 people found\\\") and \\\"J_\\\" returns Jordan Ellis as if \\\"_\\\" matched the \\\"o\\\" in \\\"Jordan\\\". A person searching for a literal underscore or percent gets a wrong, much wider result list.",
+      "reproSteps": [
+        "Sign in with eval@momentic.ai / momentic-eval-1 and open /admin/people.",
+        "Type \"zzz\" in the \"Find someone\" search box: the list says \"No results found\" (correct).",
+        "Clear the box and type a single \"_\" (underscore).",
+        "Clear the box and type \"%\" (percent sign).",
+        "Also try \"J_\": only Jordan Ellis is listed."
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 192,
+      "name": "A long group name is not wrapped and breaks the Groups table (Members column pushed off-screen, page scrolls sideways)",
+      "summary": "The long name is rendered on one unbroken line that runs past the right edge of the card. The \\\"Members\\\" column header and its counts are pushed out of view, the row's action menu goes off-screen, and the document becomes 1803px wide in a 1280px window (horizontal scrolling). All other group rows below are also affected because the table widens. (on /admin/people/groups)",
+      "expected": "The group name wraps or is truncated inside the Group name cell, the Members column and its counts stay visible, and the page does not scroll horizontally.",
+      "actual": "The long name is rendered on one unbroken line that runs past the right edge of the card. The \\\"Members\\\" column header and its counts are pushed out of view, the row's action menu goes off-screen, and the document becomes 1803px wide in a 1280px window (horizontal scrolling). All other group rows below are also affected because the table widens.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open /admin/people/groups",
+        "Click \"Create a group\"",
+        "Type the name agent2-longname- followed by 150 letter A characters (one unbroken word)",
+        "Press Enter to add the group"
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 221,
+      "name": "Help text is shown twice for \"Site url\" and \"Anonymous tracking\" on General settings",
+      "summary": "The help text of \"Site url\" is rendered twice (the second copy without the 'Only change this if you know what you're doing!' lead-in), and the help text of \"Anonymous tracking\" is rendered twice with an empty gap between the copies. (on /admin/settings/general)",
+      "expected": "Each setting shows its help text once.",
+      "actual": "The help text of \"Site url\" is rendered twice (the second copy without the 'Only change this if you know what you're doing!' lead-in), and the help text of \"Anonymous tracking\" is rendered twice with an empty gap between the copies.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open /admin/settings/general",
+        "Look at the \"Site url\" setting in the App config card: below the first description paragraph the identical paragraph 'This URL is used for things like creating links in emails, auth redirects, and in some embedding scenarios, so changing it could break functionality or get you locked out of this instance.' is repeated",
+        "Scroll to the \"Email and tracking\" card and look at \"Anonymous tracking\": the sentence 'Enable the collection of anonymous usage data in order to help us improve.' is printed twice, one above the other"
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 224,
+      "name": "\"Redirect to HTTPS\" shows the Site url help text",
+      "summary": "Under the \"Redirect to HTTPS\" label the help text reads \"This URL is used for things like creating links in emails, auth redirects, and in some embedding scenarios, so changing it could break functionality or get you locked out of this instance.\" — the description of the Site url setting, not of a HTTPS redirect switch. (on /admin/settings/general)",
+      "expected": "A help text describing what the switch does (redirecting HTTP requests of this instance to HTTPS).",
+      "actual": "Under the \"Redirect to HTTPS\" label the help text reads \"This URL is used for things like creating links in emails, auth redirects, and in some embedding scenarios, so changing it could break functionality or get you locked out of this instance.\" — the description of the Site url setting, not of a HTTPS redirect switch.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open /admin/settings/general",
+        "In the \"App config\" card, read the \"Redirect to HTTPS\" setting below \"Site url\"",
+        "Compare its help text with the help text of \"Site url\" above it"
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 249,
+      "name": "Multiplier validation message \"Enter an integer.\" is clipped behind the footer, so Save is disabled with no visible reason",
+      "summary": "The Multiplier input gets a red border and 'Save changes' becomes disabled, but no message is readable: the \"Enter an integer.\" alert element exists at the very bottom of the form (y≈612, height 14) and is clipped/hidden behind the card's footer bar with the Discard changes / Save changes buttons. The user sees no reason for the disabled save button. (on /admin/performance/databases)",
+      "expected": "The page shows a readable validation message (e.g. \"Enter an integer.\") next to the Multiplier field explaining why the value is rejected and why Save changes is disabled.",
+      "actual": "The Multiplier input gets a red border and 'Save changes' becomes disabled, but no message is readable: the \"Enter an integer.\" alert element exists at the very bottom of the form (y≈612, height 14) and is clipped/hidden behind the card's footer bar with the Discard changes / Save changes buttons. The user sees no reason for the disabled save button.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open https://5501-itaimuntp31v9cnvbnnkm.e2b.app/admin/performance/databases",
+        "Select the 'Adaptive: use a query's average execution time...' cache invalidation policy so the Minimum query duration and Multiplier fields appear",
+        "Type 2.5 into the Multiplier field",
+        "Look at the Multiplier field and the Save changes button"
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 278,
+      "name": "\"Email address for help requests\" accepts non-email text and saves it",
+      "summary": "The field accepts any text: \"not-an-email\" and \"agent14 no at sign\" were both saved immediately (PUT /api/setting/admin-email → 204) with no error shown, and after reload the field still holds the invalid value. No validation message appears next to the field. (on /admin/settings/general)",
+      "expected": "The page refuses a value that is not an email address (error under the field, nothing saved) and keeps the previous address.",
+      "actual": "The field accepts any text: \"not-an-email\" and \"agent14 no at sign\" were both saved immediately (PUT /api/setting/admin-email → 204) with no error shown, and after reload the field still holds the invalid value. No validation message appears next to the field.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open /admin/settings/general",
+        "In the \"Email and tracking\" card, clear the \"Email address for help requests\" field and type \"not-an-email\"",
+        "Press Tab to leave the field (changes save on blur)",
+        "Observe the \"Changes saved\" toast and that the field still shows \"not-an-email\" with no error; reload the page and the invalid value is still there",
+        "Repeat with the value \"agent14 no at sign\" — same result"
+      ]
+    }
+  ]
+}

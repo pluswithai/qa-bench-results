@@ -1,0 +1,95 @@
+{
+  "area": "milestones",
+  "bugs": [
+    {
+      "id": "milestones-1",
+      "title": "New Milestone: pressing Enter in Title raises the browser leave-page prompt; if dismissed, nothing is created",
+      "findings": [
+        "run1-12",
+        "run3-06"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Automation key-timing artifact: the prompt only fires with instant key presses (0/20 at human key-hold in a replica of Gitea's script).",
+      "evidence": [
+        "run1-12/shot-1.png",
+        "run1-12/shot-2.png",
+        "run3-06/shot-3.png",
+        "run3-06/shot-4.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/web_src/js/vendor/jquery.are-you-sure.ts",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/web_src/js/features/common-form.ts",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/web_src/js/features/comp/QuickSubmit.ts",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/repo/issue/milestone_new.tmpl"
+      ]
+    },
+    {
+      "id": "milestones-2",
+      "title": "Milestone lists (repo list and global /milestones): a page number past the last page shows a blank list with no message while the pager marks the last page as current",
+      "findings": [
+        "run1-14",
+        "run2-11",
+        "run3-14"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "Both milestone handlers query the database with the raw ?page value but build the pager afterwards, and the paginator clamps 'current' to the last page, so the page lists zero rows while the pager highlights page 2/3 and the tab still says 26/42/53 Open; neither template has an empty-state message. Gitea's own issue list avoids this by querying with pager.Paginater.Current() (issue_list.go:611-622), so the mismatch is not deliberate; it is also reachable without editing the URL (close the only milestone on the last page and the reload lands on the blank page). Same failure in two handlers (repo list: run2-11; global dashboard: run1-14, run3-14) - split into two bugs if the benchmark counts per page.",
+      "evidence": [
+        "run1-14/shot-2.png",
+        "run2-11/shot-2.png",
+        "run3-14/shot-2.png",
+        "run3-14/shot-4.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/repo/milestone.go#L41-L95",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/user/home.go#L186-L334",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/modules/paginator/paginator.go#L45-L60",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/repo/issue_list.go#L606-L624",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/repo/issue/milestones.tmpl",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/user/dashboard/milestones.tmpl"
+      ]
+    },
+    {
+      "id": "milestones-3",
+      "title": "Saving a stale milestone edit form in a second tab overwrites the title and due date saved in the first tab (last write wins)",
+      "findings": [
+        "run1-15"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "The second tab's form showed the old title and date and the app saved exactly what that form displayed: EditMilestonePost assigns Name, Content and DeadlineUnix from the posted form with no version field. Gitea only does edit-conflict detection for issue/comment content (content_version / ErrIssueAlreadyChanged in routers/web/repo/issue.go) and promises none for milestones, so this is the absence of an optional concurrency feature, not a broken behaviour.",
+      "evidence": [
+        "run1-15/shot-1.png",
+        "run1-15/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/repo/milestone.go#L165-L200",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/repo/issue.go#L344-L347",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/services/forms/repo_form.go#L491-L495"
+      ]
+    },
+    {
+      "id": "milestones-4",
+      "title": "Issue list bulk-action toolbar: the Milestone dropdown button loses its label (blank button with only a caret) when a milestone with an empty name exists",
+      "findings": [
+        "run3-04"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "The template gives this button the text 'Milestone' (filter_actions.tmpl:41-44) but the screenshots show it blank next to labelled Label/Projects/Assignee. Trigger confirmed with Gitea's bundled dropdown.js: on init it selects the menu item whose value is '' and copies its (empty) text into the label, and the same run shows two blank-named milestones in the repo (run3-06/shot-4.png) - a spaces-only title passes 'Required' and is trimmed to '' in models/issues/milestone.go:114; the filter-bar dropdown is spared only because its items contain an SVG. Cosmetic/label defect; it is a downstream symptom of empty milestone names, so merge it there if that bug is already counted.",
+      "evidence": [
+        "run3-04/shot-1.png",
+        "run3-04/shot-3.png",
+        "run3-06/shot-4.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/repo/issue/filter_actions.tmpl#L40-L67",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/web_src/fomantic/build/components/dropdown.js#L2082-L2140",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/repo/issue/filter_list.tmpl#L5-L41",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/models/issues/milestone.go#L114",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/services/forms/repo_form.go#L491-L495"
+      ]
+    }
+  ]
+}

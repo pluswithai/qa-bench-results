@@ -1,0 +1,294 @@
+{
+  "area": "repository-settings",
+  "bugs": [
+    {
+      "id": "repository-settings-1",
+      "title": "The same tag pattern can be protected twice, leaving two identical rule rows",
+      "findings": [
+        "run1-03"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "Submitting the pattern agent10-v* a second time answers 'The repository settings have been updated.' and the table then lists two identical 'agent10-v* / No One' rows that survive a reload. NewProtectedTagPost inserts the rule with no duplicate check and nothing in the source or docs says duplicates are wanted (the sibling branch-protection code treats a duplicate rule name as an error).",
+      "evidence": [
+        "run1-03/frame-1.jpg",
+        "run1-03/frame-2.jpg",
+        "run1-03/shot-3.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/repo/setting/protected_tag.go (NewProtectedTagPost)",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/repo/setting/protected_branch.go (FIXME on duplicate RuleName, settings.protected_branch_duplicate_rule_name)"
+      ]
+    },
+    {
+      "id": "repository-settings-2",
+      "title": "A long tag pattern widens the protected-tags table past the page and pushes Allowed/Edit/Remove off screen",
+      "findings": [
+        "run1-06",
+        "run3-05"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "With a 200+ character pattern the table runs out of its panel and past the 1280 px window, so the Allowed column and every row's Edit/Remove buttons are no longer visible without sideways scrolling. Pure layout defect: the pattern cell neither wraps nor truncates.",
+      "evidence": [
+        "run1-06/frame-6.jpg",
+        "run1-06/frame-5.jpg",
+        "run3-05/frame-6.jpg",
+        "run3-05/frame-1.jpg"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/repo/settings/tags.tmpl"
+      ]
+    },
+    {
+      "id": "repository-settings-3",
+      "title": "A private repository keeps 'Anonymous Read' and shows both 'Private' and 'Public Access' badges",
+      "findings": [
+        "run1-08"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Deliberate 1.24 feature: public-access overrides are meant to apply on top of the repository visibility ('Configure public visitor's access permissions to override the defaults of this repository'). The header template prints the orange 'Public Access' label independently of the Private label, and the permission code applies the anonymous unit modes even after the 'anonymous user visit private repo' branch.",
+      "evidence": [
+        "run1-08/shot-1.png",
+        "run1-08/shot-5.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/repo/header.tmpl (lines 19-30)",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/models/perm/access/repo_permission.go (GetUserRepoPermission + finalProcessRepoUnitPermission)",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/options/locale/locale_en-US.ini (settings.public_access_desc)"
+      ]
+    },
+    {
+      "id": "repository-settings-4",
+      "title": "'Delete Wiki Data' succeeds on an archived repository",
+      "findings": [
+        "run1-09"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "On the repo carrying the 'Archived' badge the purge answers 'The repository wiki data has been deleted.' and the Wiki tab is gone, although archiving promises the repo is 'entirely read-only'. Wiki page writes are guarded with RepoMustNotBeArchived in the router, but handleSettingsPostDeleteWiki has no archived check, so the guard is simply missing. Related to repository-settings-5 (same unguarded settings handler) but a different, destructive action.",
+      "evidence": [
+        "run1-09/shot-4.png",
+        "run1-09/shot-5.png",
+        "run1-09/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/repo/setting/setting.go (handleSettingsPostDeleteWiki)",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/web.go (wiki POST routes use context.RepoMustNotBeArchived())",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/options/locale/locale_en-US.ini (settings.archive.text)"
+      ]
+    },
+    {
+      "id": "repository-settings-5",
+      "title": "Repository settings of an archived repository can still be saved (description, issue tracker unit)",
+      "findings": [
+        "run2-05",
+        "run3-16"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "On a repo showing the 'Archived' badge a new description and unticking the issue tracker are both saved with 'The repository settings have been updated.', while the archive dialog says the repo becomes 'entirely read-only' and the sibling Branches/Tags settings pages refuse with '... not available if the repo is archived'. The settings handler only checks IsArchived for the mirror actions; upstream later fixed the same gap for topics as 'metadata that should be read-only' (go-gitea/gitea#39260), so it is not a stated design choice.",
+      "evidence": [
+        "run2-05/frame-3.jpg",
+        "run2-05/frame-6.jpg",
+        "run3-16/frame-6.jpg",
+        "run3-16/frame-1.jpg"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/repo/setting/setting.go (SettingsPost: IsArchived only checked in mirror handlers)",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/repo/settings/branches.tmpl (archive.branchsettings_unavailable)",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/options/locale/locale_en-US.ini (settings.archive.text)",
+        "https://github.com/go-gitea/gitea/pull/39260"
+      ]
+    },
+    {
+      "id": "repository-settings-6",
+      "title": "Escape does not close the 'Delete Branch Protection' confirm dialog",
+      "findings": [
+        "run1-10"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Deliberate: the generic delete-button confirm dialog is opened with closable: false, which in Fomantic disables both outside-click and Escape dismissal, so the user must answer No or Yes. The Danger Zone dialogs use a different helper (show-modal) without that option, which explains the difference.",
+      "evidence": [
+        "run1-10/shot-1.png",
+        "run1-10/frame-6.jpg"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/web_src/js/features/common-button.ts (modal({closable: false, ...}) for .delete-button)",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/repo/settings/branches.tmpl (line 53, delete-button)"
+      ]
+    },
+    {
+      "id": "repository-settings-7",
+      "title": "After sign-out the browser Back button re-displays the cached repository Settings page",
+      "findings": [
+        "run1-15"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "The page comes from the browser's own history cache with no server request, and a reload goes to Sign In, so no session survives. Gitea chooses this on purpose: the source comments that 'max-age=0 + must-revalidate' is preferred instead of 'no-store' because browsers may restore input fields after navigate-back.",
+      "evidence": [
+        "run1-15/shot-4.png",
+        "run1-15/frame-6.jpg"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/modules/httpcache/httpcache.go (SetCacheControlInHeader comment)",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/services/context/context.go (line 194)"
+      ]
+    },
+    {
+      "id": "repository-settings-8",
+      "title": "Collaborator user search treats _ and % as wildcards and suggests every user",
+      "findings": [
+        "run1-17"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "Typing '__' or '%%' in 'Search users...' lists alex, eval and maya although none of those names contains an underscore or a percent sign. The search keyword is passed straight into SQL LIKE (builder.Like on lower_name / full_name) without escaping the wildcard characters.",
+      "evidence": [
+        "run1-17/shot-1.png",
+        "run1-17/frame-2.jpg",
+        "run1-17/frame-4.jpg"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/models/user/search.go (lines 60-68, builder.Like with the raw keyword)",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/web_src/js/features/comp/SearchUserBox.ts"
+      ]
+    },
+    {
+      "id": "repository-settings-9",
+      "title": "Creating a branch protection rule reports 'Branch protection for rule ... has been updated'",
+      "findings": [
+        "run1-18"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Wording preference: the Save Rule form is a single create-or-update handler with one success string, and 'branch protection for rule X has been updated' still tells the user correctly that the protection was saved. The rule is created as requested and nothing is misreported about the data.",
+      "evidence": [
+        "run1-18/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/repo/setting/protected_branch.go (SettingsProtectedBranchPost, line 280)",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/options/locale/locale_en-US.ini (settings.update_protect_branch_success)"
+      ]
+    },
+    {
+      "id": "repository-settings-10",
+      "title": "Push-mirror address without a scheme answers 'You are not allowed to import local repositories.'",
+      "findings": [
+        "run1-19"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Deliberate: a remote address with no scheme is treated as a local filesystem path ('Remote address can be HTTP/HTTPS/Git URL or local path'), and local paths are refused for users who may not import local repositories, with exactly this message. 'not a url' is therefore handled as a local path, not as a malformed URL.",
+      "evidence": [
+        "run1-19/shot-1.png",
+        "run1-19/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/services/migrations/migrate.go (IsMigrateURLAllowed, lines 43-68)",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/repo/setting/setting.go (handleSettingRemoteAddrError)"
+      ]
+    },
+    {
+      "id": "repository-settings-11",
+      "title": "Tag protection 'Allowed users' picker does not offer the Write collaborator alex",
+      "findings": [
+        "run1-20"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "The picker's full list holds only maya and eval and typing 'alex' gives 'No results found.', while the Collaborators page of the same repo in the same run lists alex (Alex Rivera) with Write next to maya (run1-17/shot-1.png). The picker is filled from the access table (GetRepoReaders), and ChangeCollaborationAccessMode only UPDATEs an existing access row, so a collaborator can be shown as Write yet have no row; nothing marks this as intended. Residual doubt for the approver: the two screenshots come from different moments of a shared run, so alex's role at the exact time of the picker shot is not shown in this folder.",
+      "evidence": [
+        "run1-20/frame-4.jpg",
+        "run1-20/shot-1.png",
+        "run1-20/shot-2.png",
+        "run1-17/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/repo/setting/protected_tag.go (setTagsContext -> GetRepoReaders)",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/models/perm/access/repo_permission.go (getUsersWithAccessMode)",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/models/repo/collaboration.go (ChangeCollaborationAccessMode: UPDATE access SET mode ...)",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/models/perm/access/access.go (refreshAccesses / RecalculateUserAccess minMode)"
+      ]
+    },
+    {
+      "id": "repository-settings-12",
+      "title": "Default Merge Style can be saved as a merge style that is disabled",
+      "findings": [
+        "run3-04"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "With 'Create merge commit' unticked under Merge Styles, choosing it as Default Merge Style is saved with 'The repository settings have been updated.' and the contradictory pair is still shown after a reload. The server stores form.PullsDefaultMergeStyle without checking it against the allowed styles; upstream tracks this as an open defect (go-gitea/gitea#20696).",
+      "evidence": [
+        "run3-04/shot-1.png",
+        "run3-04/shot-4.png",
+        "run3-04/shot-3.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/repo/setting/setting.go (line 634, DefaultMergeStyle taken from the form unchecked)",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/repo/settings/options.tmpl (lines 584-589)",
+        "https://github.com/go-gitea/gitea/issues/20696"
+      ]
+    },
+    {
+      "id": "repository-settings-13",
+      "title": "Whitespace-only description is saved and leaves an empty Description block and a dangling colon in the page title",
+      "findings": [
+        "run3-14"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "After saving a description of only spaces the repository home shows the 'Description' heading with nothing under it, whereas a truly empty description shows 'No description provided'. The description is stored untrimmed (repo.Description = form.Description) and the title code appends ': ' + description whenever the string is non-empty.",
+      "evidence": [
+        "run3-14/shot-1.png",
+        "run3-14/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/repo/setting/setting.go (line 206)",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/repo/view_home.go (lines 412-413)",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/repo/home_sidebar_top.tmpl (lines 14-16)"
+      ]
+    },
+    {
+      "id": "repository-settings-14",
+      "title": "A long branch protection pattern overflows the Branch Protection card at phone width",
+      "findings": [
+        "run3-15"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "At 390 px the rule label with the ~95 character pattern runs past the right border of the Branch Protection card and off screen, while at 1280 px it stays inside. Layout defect on a different page and element than the tag-table overflow (repository-settings-2).",
+      "evidence": [
+        "run3-15/shot-1.png",
+        "run3-15/shot-3.png",
+        "run3-15/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/repo/settings/branches.tmpl"
+      ]
+    },
+    {
+      "id": "repository-settings-15",
+      "title": "Saving a stale branch-protection edit form re-creates a rule that was deleted meanwhile",
+      "findings": [
+        "run3-17"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "After rule dev2 is deleted in one tab, 'Save Rule' in the stale edit tab answers 'Branch protection for rule \"dev2\" has been updated.' and dev2 is back in the list. The handler says a non-zero rule id 'must be an edit operation', yet when that id no longer exists it silently falls through to creating a new rule instead of reporting it missing (the tag-protection edit returns 404 in the same situation).",
+      "evidence": [
+        "run3-17/shot-2.png",
+        "run3-17/shot-4.png",
+        "run3-17/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/repo/setting/protected_branch.go (SettingsProtectedBranchPost, lines 120-157)",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/repo/setting/protected_tag.go (selectProtectedTagByContext -> NotFound)"
+      ]
+    }
+  ]
+}

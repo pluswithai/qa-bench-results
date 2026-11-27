@@ -1,0 +1,49 @@
+{
+  "fixture": "metabase/areas/querying",
+  "run": 2,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 800,
+      "name": "Renaming a question to only spaces blanks the question title and fails silently",
+      "summary": "The header title area goes completely blank (the question has no visible name any more), no error or validation message appears on screen, and only the console shows a failed request PUT /api/card/40 → 400. After reloading the page the old name 'agent6-renamed-1' comes back, so the rename silently failed while the UI had already dropped the name. (on /question/40-agent6-renamed-1)",
+      "expected": "Either the rename is refused with a visible message next to the title and the old name stays, or the title is trimmed/validated so a question always keeps a visible name.",
+      "actual": "The header title area goes completely blank (the question has no visible name any more), no error or validation message appears on screen, and only the console shows a failed request PUT /api/card/40 → 400. After reloading the page the old name 'agent6-renamed-1' comes back, so the rename silently failed while the UI had already dropped the name.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1 and open a saved question, e.g. https://5501-i50b8xmjnfdqmiige5l4r.e2b.app/question/40-agent6-renamed-1 (name 'agent6-renamed-1')",
+        "Click the question title in the page header (the editable title field showing 'agent6-renamed-1')",
+        "Clear the title completely, type two spaces, and press Enter"
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 1340,
+      "name": "A query with two statements separated by ';' silently runs only the first, with no warning",
+      "summary": "The query runs and shows only the first statement's result (\"1\" with \"Showing 1 row\"; on the rerun \"111\" with \"Showing 1 row\"). The second statement is discarded without any message, warning or indication, and the footer reports a normal, successful run. The same happens with a full-width two-column first statement: only the first column's value is shown as a big number. (on /question (native SQL editor))",
+      "expected": "Either an error saying that only one statement can be run at a time, or both statements handled with the incomplete run made explicit. Silently running only the first statement and reporting a normal result misleads the person into thinking the whole query ran.",
+      "actual": "The query runs and shows only the first statement's result (\"1\" with \"Showing 1 row\"; on the rerun \"111\" with \"Showing 1 row\"). The second statement is discarded without any message, warning or indication, and the footer reports a normal, successful run. The same happens with a full-width two-column first statement: only the first column's value is shown as a big number.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1, click New > SQL query (Sample Database is selected).",
+        "Type into the SQL editor: SELECT 1 AS a; SELECT 2 AS b",
+        "Click the Run (Get Answer) button, or press Ctrl+Enter in the editor.",
+        "Read the result area and the footer row count.",
+        "Repeat with SELECT 111 AS first_stmt, 'a' AS tag; SELECT 222 AS second_stmt, 'b' AS tag and run again."
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 1366,
+      "name": "The starting-data search box treats \"%\" as a wildcard and lists every table and question",
+      "summary": "Typing a single \"%\" into the box replaces the list with every table, saved question and model in the app (agent6-renamed-1, agent6-copy-1, agent4-count-by-size, Release requests by region and category, People, Orders, Products, agent2-sql-lifecycle, Release requests, Number of Orders, Revenue …), the same as an empty search. The typed text is not matched literally. (on /question/notebook)",
+      "expected": "The picker should filter on the literal text, or say \"No search results\" for a character that appears in no name, as it does for \"zzzznothing\".",
+      "actual": "Typing a single \"%\" into the box replaces the list with every table, saved question and model in the app (agent6-renamed-1, agent6-copy-1, agent4-count-by-size, Release requests by region and category, People, Orders, Products, agent2-sql-lifecycle, Release requests, Number of Orders, Revenue …), the same as an empty search. The typed text is not matched literally.",
+      "reproSteps": [
+        "Go to /question/notebook (signed in as eval@momentic.ai).",
+        "In the 'Pick your starting data' panel, click the search box 'Search for tables and more...'.",
+        "Type a single percent sign '%' and wait for the list to update.",
+        "Compare with typing 'zzzznothing' in the same box, which correctly shows 'No search results'."
+      ]
+    }
+  ]
+}

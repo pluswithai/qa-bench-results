@@ -1,0 +1,214 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "twenty/areas/records-views",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "f6bf34cc9c5ffb213b1c7c92570fb31c53105c9358a226b68015b5e593d9f56a",
+    "known_invalid_sha256": "fa129877140c0372d6209562491a9238c58edae2cab556edfc320b14972bccab",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "83",
+    "bugs": "14",
+    "flags": "0",
+    "known_hits": "3",
+    "extra_known_hits": "1",
+    "unverified": "8",
+    "outside_area_known_hits": "1",
+    "outside_area_known_invalid": "0",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "1",
+    "outside_area_ground_truth_sha256": "f3456299419b269b88f0ddc32ec53ab80fbf3ec14a32ac6ae1366aa22bd3a43a",
+    "outside_area_known_invalid_sha256": "e51afd4a5be9203d46a29a1087513447454829f8cacf9feb7379d606574f27e1",
+    "duplicates": "0",
+    "duplicate_known_hits": "0",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "1",
+    "known_misses": "1",
+    "precision": "0.8",
+    "recall": "0.03614457831325301",
+    "findings_per_minute": "0.46666044452740635",
+    "correct_findings_per_minute": "0.09999866668444421",
+    "severity_1": "0",
+    "severity_3": "3",
+    "severity_5": "0",
+    "severity_sum": "9",
+    "score": "8",
+    "duration_seconds": "1800.024",
+    "partial": "true",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 18,
+        "reproStepsIndex": 0,
+        "findingIndex": 6,
+        "reason": "Matches the five-task Month display cap without overflow access. Different dates, record counts and the absence of an isolating title filter do not change that failure or route."
+      },
+      {
+        "groundTruthIndex": 77,
+        "reproStepsIndex": 0,
+        "findingIndex": 11,
+        "reason": "Matches the built-in By Stage board reopening blank despite a nonzero count, with Stage reselection restoring its columns. Reload is the same failure route; prior grouping changes are setup context."
+      },
+      {
+        "groundTruthIndex": 80,
+        "reproStepsIndex": null,
+        "findingIndex": 5,
+        "reason": "The persistent empty built-in Tasks By Status view after restoring Status matches the saved-view record-area failure. The Assignee omission alone is intended; the grouping round trip differs from the reference's Calendar route."
+      },
+      {
+        "groundTruthIndex": 77,
+        "reproStepsIndex": null,
+        "findingIndex": 8,
+        "reason": "Matches the persistent blank built-in By Stage board with a nonzero count and recovery through reselecting Stage. Changing the aggregate reaches that state differently from the reference grouping round trip."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 18,
+        "reproStepsIndex": 0,
+        "findingIndex": 2,
+        "reason": "Matches the rejected mobile bulk-action dead-end claim. Review confirmed that the count is hidden but selection-specific commands remain available in the command menu."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 0,
+        "reason": "No entry describes the Table Sort panel ignoring Descending and reverting to Ascending. Calendar ordering and saved-sort errors are different failures."
+      },
+      {
+        "findingIndex": 1,
+        "reason": "Selection loss from sorting or opening Filter/Options is not the unrelated-view rename failure or the rejected Command Menu trigger."
+      },
+      {
+        "findingIndex": 3,
+        "reason": "Overlapping concurrent Week cards are distinct from the referenced event-display cap and rejected missing Week grid."
+      },
+      {
+        "findingIndex": 4,
+        "reason": "No entry describes Reset merely closing the advanced-filter editor on its first click while retaining the filter."
+      },
+      {
+        "findingIndex": 7,
+        "reason": "No reference entry covers the incorrect article in the Opportunities empty-state button."
+      },
+      {
+        "findingIndex": 9,
+        "reason": "Reselecting Stage and obtaining alphabetical columns while Manual remains selected differs from alphabetical sorting resetting to Manual on reload or a confirmed drag moving the wrong group."
+      },
+      {
+        "findingIndex": 10,
+        "reason": "No entry describes dash placeholders replacing Task column counts. The rejected missing-stage-header claim concerns a different failure."
+      },
+      {
+        "findingIndex": 12,
+        "reason": "Clearing a partial selection through the header checkbox is distinct from the rejected row-checkbox inversion and the other referenced selection defects."
+      },
+      {
+        "findingIndex": 13,
+        "reason": "The claimed filter loss occurs when changing Group by, not when switching layout or changing an aggregate as in the references. Intended omission of unconfigured relation groups does not explain the disappearing filter."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 3,
+        "reason": "The sort control fails to apply the requested direction."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 3,
+        "reason": "Selected records and their bulk-action context are unexpectedly cleared."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "As described, mobile users cannot execute bulk actions, which would be functional misbehavior."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 1,
+        "reason": "The described failure concerns overlapping presentation and unreadable labels, not missing records or broken actions."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 3,
+        "reason": "Reset does not perform its requested filtering action on the first click."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 1,
+        "reason": "This is a copy and grammar defect."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 3,
+        "reason": "The board applies an unintended column order inconsistent with its selected ordering mode."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 1,
+        "reason": "Only missing header information is described; cards and board interactions remain usable."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 3,
+        "reason": "Select all clears the existing selection instead of selecting the result set."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 3,
+        "reason": "An unrelated grouping change silently removes an active filter and changes the result scope."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [
+      {
+        "findingIndex": 13,
+        "reference": {
+          "name": "Changing Workflow Runs grouping silently restores saved filters over pending edits",
+          "summary": "Choosing Group by in a saved Workflow Runs view replaces its active unsaved filters with saved filters, silently changing which runs are shown.",
+          "expected": "Changing grouping in the same view should retain its valid active filters and pending changes, or warn before discarding them.",
+          "actual": "Removing a saved Failed status chip shows three mixed-status runs and Reset/Update view. Selecting Workflow run status grouping restores the Failed chip, hides pending-change controls and leaves only the failed run. Unsaved added filters are also discarded. Saving the filter edit before grouping preserves results.",
+          "reproSteps": [
+            [
+              "Create harmless workflow runs with Failed, Completed and Stopped statuses and a disposable Workflow Runs Table view.",
+              "Save a Name filter isolating those runs together with Workflow run status = Failed.",
+              "Remove only the Failed chip without saving. Confirm all three runs and Reset/Update view are visible.",
+              "Choose Options > Group > Workflow run status. Observe the Failed filter return, the count drop to one and pending-change controls disappear.",
+              "Compare saving the filter removal before grouping, and opening/dismissing Options without selecting grouping; these preserve the intended mixed-status results."
+            ]
+          ],
+          "severity": 3
+        },
+        "reason": "Matches changing grouping discarding unsaved filters and changing the displayed results. Adding an Amount filter on an Opportunities Kanban differs from the listed case of removing a saved Workflow Runs filter."
+      }
+    ],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

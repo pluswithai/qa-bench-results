@@ -1,0 +1,180 @@
+{
+  "fixture": "twenty/areas/records-views",
+  "run": 1,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 695,
+      "name": "Filter \"Name contains %\" returns all 599 companies instead of none",
+      "summary": "All 599 companies are listed and the view header reads \"All Companies · 599\": the % is treated as a SQL wildcard instead of a literal character. Typing a single quote ' in the same box correctly returns \"No Company found\", so only the SQL wildcards are interpreted. (on /objects/companies)",
+      "expected": "The list shows only companies whose Name literally contains a percent sign (there are none), and the count next to the view name reflects that (0, or an empty state like the one shown for other no-match values).",
+      "actual": "All 599 companies are listed and the view header reads \"All Companies · 599\": the % is treated as a SQL wildcard instead of a literal character. Typing a single quote ' in the same box correctly returns \"No Company found\", so only the SQL wildcards are interpreted.",
+      "reproSteps": [
+        "Open https://5500-id2u1yqyeed69abiadw0w.e2b.app/objects/companies (All Companies, 599 records)",
+        "Click the Filter button above the table",
+        "In the field list choose Name, leave the operator as Contains",
+        "Type % into the value box and close the popover"
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 783,
+      "name": "Sort panel's direction dropdown does not change the sort order",
+      "summary": "The list stays A to Z (Aaron Griffin first, Andrew King last) and the chip keeps the up arrow '↑ Name · First name'. Only the dropdown inside the panel displays 'Descending'; after closing the panel and reopening it, the dropdown is back to 'Ascending'. The choice never reaches the list. (on /objects/people)",
+      "expected": "The list should be re-sorted Z to A, the sort chip should show a down arrow, and reopening the Sort panel should show 'Descending' as the current direction.",
+      "actual": "The list stays A to Z (Aaron Griffin first, Andrew King last) and the chip keeps the up arrow '↑ Name · First name'. Only the dropdown inside the panel displays 'Descending'; after closing the panel and reopening it, the dropdown is back to 'Ascending'. The choice never reaches the list.",
+      "reproSteps": [
+        "Open /objects/people (People in the sidebar).",
+        "Click the Name column header, then 'Sort' in the small menu, so the list is sorted by Name ascending (rows start Aaron Griffin, Aaron Mccarty…, chip shows an up arrow '↑ Name · First name').",
+        "Click the 'Sort' button at the top right to open the Sort panel.",
+        "Open the direction dropdown at the top of the panel (it shows 'Ascending') and choose 'Descending'.",
+        "Close the panel with Escape and look at the list and the sort chip."
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 843,
+      "name": "Kanban \"By Stage\" view shows no cards and 0 records after changing Group by to Owner",
+      "summary": "The board renders a single column \\\"No Value\\\" with count 0 and no cards at all; the view header still says \\\"By Stage · 150\\\". After reloading the page the header itself says \\\"By Stage · 0\\\", while the \\\"All Opportunities\\\" table view still lists 150 records. The Opportunity records are effectively gone from the grouped board. (on /objects/opportunities (By Stage kanban view))",
+      "expected": "The board regroups by owner: the groups holding opportunities (e.g. Tim Apple, Jony Ive, Phil Schiler) should show their cards and record counts, and if all 150 opportunities have no owner they should all be inside the \\\"No Value\\\" group. The view header should keep saying 150 (or a sum of the group counts that adds up to 150).",
+      "actual": "The board renders a single column \\\"No Value\\\" with count 0 and no cards at all; the view header still says \\\"By Stage · 150\\\". After reloading the page the header itself says \\\"By Stage · 0\\\", while the \\\"All Opportunities\\\" table view still lists 150 records. The Opportunity records are effectively gone from the grouped board.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open /objects/opportunities.",
+        "In the view name dropdown pick the kanban view \"By Stage\" (5 stage columns: New 16.4m, Screening 13.1m, Meeting 37.8m, Proposal 31.1m, Customer 7.7m).",
+        "Click \"Options\" (top right of the view bar) → click the \"Group\" row (shows Stage) → click \"Group by Stage\" → choose \"Owner\".",
+        "Look at the board and at the view name/count."
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 986,
+      "name": "Ticking a second or third row in the People list clears the rows already ticked",
+      "summary": "Ticking a second row often clears the first one: after clicking Mark Faulkner only Faulkner is ticked and the header still says \"1 selected\" (screenshot 1). In another run, after two rows were ticked, ticking a third one cleared the whole selection: header reverts to \"People\" with no count, no row ticked and the bulk bar (Send Email / Update) disappears. Only sometimes does it reach \"2 selected\". (on /objects/people)",
+      "expected": "Each tick adds a row: the header reads \"2 selected\" (then \"3 selected\") and every ticked row keeps its check, so several records can be acted on at once.",
+      "actual": "Ticking a second row often clears the first one: after clicking Mark Faulkner only Faulkner is ticked and the header still says \"1 selected\" (screenshot 1). In another run, after two rows were ticked, ticking a third one cleared the whole selection: header reverts to \"People\" with no count, no row ticked and the bulk bar (Send Email / Update) disappears. Only sometimes does it reach \"2 selected\".",
+      "reproSteps": [
+        "Go to /objects/people (signed in as tim@apple.dev), open the list.",
+        "Click the checkbox at the left of the first row (Mark Young). The header shows \"1 selected\" and the row is ticked.",
+        "Click the checkbox at the left of the second row (Mark Faulkner).",
+        "Observe the header count and which rows stay ticked. Repeat with a third row (Mark Williams, Mark Stevens, Mark Gonzalez all tried)."
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 991,
+      "name": "Selected rows are silently deselected by the list's own background refresh",
+      "summary": "A moment later, with no click at all, the selection is gone: the header no longer shows \"N selected\", the row checkboxes are empty again and the bulk bar (Send Email / Update) disappears. It happened once after ~12 s of standing still on the page, and several other times right after a click, so a bulk action cannot be completed on the rows that were picked. (on /objects/people)",
+      "expected": "The ticks and the \"1 selected\" count stay until the user changes them (or clicks elsewhere), so the user can go on to a bulk action.",
+      "actual": "A moment later, with no click at all, the selection is gone: the header no longer shows \"N selected\", the row checkboxes are empty again and the bulk bar (Send Email / Update) disappears. It happened once after ~12 s of standing still on the page, and several other times right after a click, so a bulk action cannot be completed on the rows that were picked.",
+      "reproSteps": [
+        "Go to /objects/people (signed in as tim@apple.dev).",
+        "Tick the checkbox of one row, e.g. Mark Stevens. The header shows \"1 selected\" and the bulk bar appears.",
+        "Do nothing for 10-15 seconds and look at the list again (the relative \"N minutes ago\" values refresh in the meantime).",
+        "The tick, the \"1 selected\" count and the bulk bar have all disappeared."
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 996,
+      "name": "Creating a view with an empty name is accepted and gives a nameless view (blank row in the view dropdown)",
+      "summary": "The view is created with no name. The toolbar title shows only the separator and the count (\"· 599\"), the browser tab title becomes just \"Companies\", and in the view dropdown the new view appears as a row with only the icon and no text. Creating it twice gives two identical blank rows that cannot be told apart. No validation message is shown next to the Name field. (on /objects/companies)",
+      "expected": "The Create button is disabled or a validation message asks for a name, so a view always has a name (or gets a default like \"Untitled view\") and stays identifiable in the view dropdown.",
+      "actual": "The view is created with no name. The toolbar title shows only the separator and the count (\"· 599\"), the browser tab title becomes just \"Companies\", and in the view dropdown the new view appears as a row with only the icon and no text. Creating it twice gives two identical blank rows that cannot be told apart. No validation message is shown next to the Name field.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev and open /objects/companies",
+        "Click the view dropdown button next to the view title (it reads e.g. 'All Companies · 599')",
+        "Click 'Add view' at the bottom of the dropdown",
+        "In the 'Create view' panel, clear the Name field completely (it comes pre-filled with the current view's name)",
+        "Click the 'Create new view' (Create) button",
+        "Look at the view title in the toolbar and open the view dropdown again"
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 1029,
+      "name": "Account Owner filter picker finds no one for a two-word search (\"Phil S\", \"Tim A\")",
+      "summary": "The picker answers \"No results\" for \"Phil S\" and for \"Tim A\", although both people exist and are shown in the Account Owner column of the list. A single-token search does find them (\"Schiler\" lists Phil Schiler, \"Phil\" lists the Phillips people), so only multi-word searches fail. A two-word name can therefore never be picked, and the \"Is\" condition cannot be set from the list. (on /objects/companies)",
+      "expected": "The picker lists the people whose first and last name match the typed words, so \"Tim A\" offers \"Tim Apple\" and \"Phil S\" offers \"Phil Schiler\", the same way \"Phil\" and \"Schiler\" do.",
+      "actual": "The picker answers \"No results\" for \"Phil S\" and for \"Tim A\", although both people exist and are shown in the Account Owner column of the list. A single-token search does find them (\"Schiler\" lists Phil Schiler, \"Phil\" lists the Phillips people), so only multi-word searches fail. A two-word name can therefore never be picked, and the \"Is\" condition cannot be set from the list.",
+      "reproSteps": [
+        "Open https://5500-id2u1yqyeed69abiadw0w.e2b.app/objects/companies",
+        "Click the Filter button above the table",
+        "Choose Account Owner in the field list (operator stays \"Is\")",
+        "Click the Account Owner value box and type Phil S (or Tim A)",
+        "Read the suggestion list under the box"
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 1030,
+      "name": "By Stage kanban board is blank (no columns at all) after a reload, header still says 150",
+      "summary": "The whole board area under the view bar is blank: no columns, no cards and no empty-state message, while the view bar still says \\\"By Stage · 150\\\". The Group submenu in Options no longer lists any \\\"Visible groups\\\" (before the change it listed New, Screening, Meeting, Proposal, Customer), so the board has zero groups to draw. The same blank board comes back on every reload of this view. (on /objects/opportunities (By Stage kanban view))",
+      "expected": "After reloading, the By Stage kanban should draw its 5 stage columns with their cards (150 records in total) exactly as before, and the Group menu should still list the visible groups.",
+      "actual": "The whole board area under the view bar is blank: no columns, no cards and no empty-state message, while the view bar still says \\\"By Stage · 150\\\". The Group submenu in Options no longer lists any \\\"Visible groups\\\" (before the change it listed New, Screening, Meeting, Proposal, Customer), so the board has zero groups to draw. The same blank board comes back on every reload of this view.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev, open /objects/opportunities and select the kanban view \"By Stage\" (5 stage columns with cards).",
+        "Click \"Options\" → \"Group\" → \"Group by Stage\" → choose \"Owner\" (the board collapses to an empty \"No Value 0\" column).",
+        "Click \"Options\" → \"Group\" → \"Group by Owner\" → choose \"Stage\" again: the 5 columns come back but in alphabetical order (Customer, Meeting, New, Proposal, Screening).",
+        "Reload the page (F5)."
+      ]
+    },
+    {
+      "index": 8,
+      "reported_at_seconds": 1035,
+      "name": "Filtering by \"Created by\" always returns 0 records although the column shows Tim Apple",
+      "summary": "The Created by condition offers only the operator \"Contains\" and a plain text box; no people are suggested and whatever is typed is applied as-is. \"Tim Apple\" gives \"All Companies · 0\" and \"No Company found\", exactly as \"Jony\" and \"J\" do, although the Created by column of the unfiltered list reads \"Tim Apple\" or \"Jony Ive\" on every row. (on /objects/companies)",
+      "expected": "Filtering Created by by a person's name returns the companies created by that person (most of the 599 list reads \"Tim Apple\"), or the condition offers a picker of people like the Account Owner condition does.",
+      "actual": "The Created by condition offers only the operator \"Contains\" and a plain text box; no people are suggested and whatever is typed is applied as-is. \"Tim Apple\" gives \"All Companies · 0\" and \"No Company found\", exactly as \"Jony\" and \"J\" do, although the Created by column of the unfiltered list reads \"Tim Apple\" or \"Jony Ive\" on every row.",
+      "reproSteps": [
+        "Open https://5500-id2u1yqyeed69abiadw0w.e2b.app/objects/companies (All Companies, 599 records, Created by column reads Tim Apple / Jony Ive)",
+        "Click the Filter button above the table",
+        "Choose Created by in the field list",
+        "Type Tim Apple into the Created by value box (operator is Contains)",
+        "Notice there is no suggestion list, then press Enter to apply and read the result"
+      ]
+    },
+    {
+      "index": 9,
+      "reported_at_seconds": 1087,
+      "name": "Kanban columns fall back to alphabetical order after switching the Group by field",
+      "summary": "The five columns are back but in alphabetical order: Customer, Meeting, New, Proposal, Screening. The stage pipeline order (New → Screening → Meeting → Proposal → Customer) that the view had before is not restored, and it does not come back by reselecting Stage; only the cards and the per-column totals (Customer 7.7m, Meeting 37.8m, New 16.4m, Proposal 31.1m, Screening 13.1m) are unchanged. (on /objects/opportunities (By Stage kanban view))",
+      "expected": "Regrouping the same field should keep the view's own column order (New, Screening, Meeting, Proposal, Customer), as it was before the group field was changed.",
+      "actual": "The five columns are back but in alphabetical order: Customer, Meeting, New, Proposal, Screening. The stage pipeline order (New → Screening → Meeting → Proposal → Customer) that the view had before is not restored, and it does not come back by reselecting Stage; only the cards and the per-column totals (Customer 7.7m, Meeting 37.8m, New 16.4m, Proposal 31.1m, Screening 13.1m) are unchanged.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev, open /objects/opportunities, select the kanban view \"By Stage\": the columns are New, Screening, Meeting, Proposal, Customer.",
+        "Click \"Options\" → \"Group\" → \"Group by Stage\" → choose \"Owner\".",
+        "Click \"Options\" → \"Group\" → \"Group by Owner\" → choose \"Stage\" again.",
+        "Look at the order of the columns on the board."
+      ]
+    },
+    {
+      "index": 10,
+      "reported_at_seconds": 1364,
+      "name": "Companies list opens blank when the address carries another object's view id; header still claims 599",
+      "summary": "The Companies page opens with the header \\\"By Status · 599\\\" but the list area below it is completely blank: no columns, no table rows, no kanban columns, no cards and no error or empty-state message. Reloading the same address keeps the blank page. The address is left as is (no fallback to /objects/companies and no 404 page). (on /objects/companies)",
+      "expected": "Either the app rejects the foreign view id and shows the default \\\"All Companies\\\" table (or the 404 page), or it renders the view it accepted. A page whose header claims 599 records must show them, and a list must never be silently blank.",
+      "actual": "The Companies page opens with the header \\\"By Status · 599\\\" but the list area below it is completely blank: no columns, no table rows, no kanban columns, no cards and no error or empty-state message. Reloading the same address keeps the blank page. The address is left as is (no fallback to /objects/companies and no 404 page).",
+      "reproSteps": [
+        "In the address bar open https://5500-id2u1yqyeed69abiadw0w.e2b.app/objects/tasks and select the saved Kanban view \"By Status\" (address becomes /objects/tasks?viewId=6a13dcfa-71e4-4036-b9cc-5edc84561a38).",
+        "Copy that viewId and open the same view id on another object: https://5500-id2u1yqyeed69abiadw0w.e2b.app/objects/companies?viewId=6a13dcfa-71e4-4036-b9cc-5edc84561a38",
+        "Wait for the page to finish loading (about 20 seconds).",
+        "Reload the page (F5) and wait again."
+      ]
+    },
+    {
+      "index": 11,
+      "reported_at_seconds": 1394,
+      "name": "At 390 px, selecting rows gives no bulk action bar (no \"1 selected\", no Send Email/Delete/Export)",
+      "summary": "At 390 px the row is ticked and the select-all box goes indeterminate, but the header stays empty (only the navigation toggle and the \"...\" button) - no \"1 selected\" label and no bulk action buttons at all, so a selected record cannot be acted on. At 1440 px the same click shows \"Companies -> 1 selected\" with the Send Email button and the other bulk actions in the header. (on /objects/companies)",
+      "expected": "After ticking a row, the header should switch to the selection state (\"Companies -> 1 selected\") and offer the bulk actions (Send Email, Delete, Export, clear selection), usable at any width.",
+      "actual": "At 390 px the row is ticked and the select-all box goes indeterminate, but the header stays empty (only the navigation toggle and the \"...\" button) - no \"1 selected\" label and no bulk action buttons at all, so a selected record cannot be acted on. At 1440 px the same click shows \"Companies -> 1 selected\" with the Send Email button and the other bulk actions in the header.",
+      "reproSteps": [
+        "Set the browser viewport to 390 x 844 and open https://5500-id2u1yqyeed69abiadw0w.e2b.app/objects/companies",
+        "Wait for the table to load and click the checkbox in the first row (Google)",
+        "Look at the page header at the top of the screen",
+        "Repeat at 1440 x 900 width: tick the same row and look at the header"
+      ]
+    }
+  ]
+}

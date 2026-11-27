@@ -1,0 +1,248 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "gitea/areas/issues",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "355ea9e1b77d4da75647526b5c7235749e72e41afe08c90f9205eb2ca4116132",
+    "known_invalid_sha256": "454d98686051f1d8785500405c256fcd4c68464de1dbd683223ba7df001e90de",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "73",
+    "bugs": "19",
+    "flags": "0",
+    "known_hits": "9",
+    "extra_known_hits": "0",
+    "unverified": "9",
+    "outside_area_known_hits": "0",
+    "outside_area_known_invalid": "0",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "",
+    "outside_area_ground_truth_sha256": "47db07b83af13b7c7dd75acd1b523ed86e8107b60e6f33878e8fb5b68a2acbe2",
+    "outside_area_known_invalid_sha256": "72e79c4023c85c9101fbf2b7613d3daf78b07fded510d117ab5b26f6ac3103f9",
+    "duplicates": "0",
+    "duplicate_known_hits": "0",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "1",
+    "known_misses": "1",
+    "precision": "0.9",
+    "recall": "0.1232876712328767",
+    "findings_per_minute": "0.696069709549649",
+    "correct_findings_per_minute": "0.32971723083930743",
+    "severity_1": "3",
+    "severity_3": "6",
+    "severity_5": "0",
+    "severity_sum": "21",
+    "score": "20",
+    "duration_seconds": "1637.767",
+    "partial": "false",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 2,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Matches the global Issues Open/Closed switch dropping Assignee or Author filters and broadening results."
+      },
+      {
+        "groundTruthIndex": 17,
+        "reproStepsIndex": 0,
+        "findingIndex": 1,
+        "reason": "Matches negative manual time being rejected with untranslated RangeError feedback."
+      },
+      {
+        "groundTruthIndex": 0,
+        "reproStepsIndex": 0,
+        "findingIndex": 3,
+        "reason": "Matches a canceled title draft reappearing when the title editor is reopened."
+      },
+      {
+        "groundTruthIndex": 1,
+        "reproStepsIndex": 0,
+        "findingIndex": 4,
+        "reason": "Matches tag selection leaving the issue reference unchanged; the selector itself remains visible."
+      },
+      {
+        "groundTruthIndex": 5,
+        "reproStepsIndex": 0,
+        "findingIndex": 6,
+        "reason": "Matches the sidebar using the plural Participants label for one participant."
+      },
+      {
+        "groundTruthIndex": 4,
+        "reproStepsIndex": 0,
+        "findingIndex": 8,
+        "reason": "Matches January 1, 0001 displaying correctly in the sidebar but becoming a dash in added-date and previous-date history."
+      },
+      {
+        "groundTruthIndex": 11,
+        "reproStepsIndex": 0,
+        "findingIndex": 9,
+        "reason": "Matches a matching assigned issue disappearing from global Assigned to you search while another ownership scope finds it."
+      },
+      {
+        "groundTruthIndex": 38,
+        "reproStepsIndex": 0,
+        "findingIndex": 10,
+        "reason": "Matches the farthest-dated issue falling below earlier and undated issues while Nearest due date remains correct."
+      },
+      {
+        "groundTruthIndex": 8,
+        "reproStepsIndex": 0,
+        "findingIndex": 11,
+        "reason": "Matches clicking Open from the initial repository list navigating to state=all and including closed issues."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 4,
+        "reproStepsIndex": 0,
+        "findingIndex": 13,
+        "reason": "Matches the rejected expectation that default Fuzzy search should tolerate truncated words; fuzziness is disabled by configuration."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 2,
+        "reason": "No reviewed entry describes dependency search mishandling hash-prefixed issue numbers."
+      },
+      {
+        "findingIndex": 5,
+        "reason": "No reviewed entry covers sidebar assignment failing to save. Reloading while the picker remains open leaves the completion step ambiguous."
+      },
+      {
+        "findingIndex": 7,
+        "reason": "No reviewed entry describes bidirectional title text displacing or reversing the issue-number suffix."
+      },
+      {
+        "findingIndex": 12,
+        "reason": "No reviewed entry describes fenced code being clipped or causing whole-page horizontal overflow."
+      },
+      {
+        "findingIndex": 14,
+        "reason": "No reviewed entry covers label or assignee URL parameters failing to prefill a new issue; submission was not tested."
+      },
+      {
+        "findingIndex": 15,
+        "reason": "No reviewed entry covers intermittent duplicate bulk-Close requests producing a server failure."
+      },
+      {
+        "findingIndex": 16,
+        "reason": "No reviewed entry covers search-mode persistence. The steps change mode without submitting, so loss of an applied mode is not fully established."
+      },
+      {
+        "findingIndex": 17,
+        "reason": "No reviewed entry describes keyboard focus opening and stacking multiple issue-filter menus."
+      },
+      {
+        "findingIndex": 18,
+        "reason": "No reviewed entry describes sidebar assignee links pointing to a fragment instead of the user's profile."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "The search omits the requested issue and returns an unrelated result."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 3,
+        "reason": "The described impact is an assignment change failing to persist."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 1,
+        "reason": "The described failure affects heading layout and readability."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 1,
+        "reason": "This is a content-layout and readability defect; no page action is described as broken."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 3,
+        "reason": "As claimed, the impact is search failing to return expected near matches, despite that behavior being configured intentionally."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 3,
+        "reason": "The claimed prefill operation leaves requested issue metadata unset."
+      },
+      {
+        "findingIndex": 15,
+        "severity": 3,
+        "reason": "A repeated submission intermittently fails on the server; the error is console-only, not a user-visible raw dump."
+      },
+      {
+        "findingIndex": 16,
+        "severity": 3,
+        "reason": "The described impact is losing the selected search behavior during navigation."
+      },
+      {
+        "findingIndex": 17,
+        "severity": 1,
+        "reason": "The described impact is overlapping menus and keyboard-navigation usability, without a demonstrated failed action."
+      },
+      {
+        "findingIndex": 18,
+        "severity": 3,
+        "reason": "Clicking the purported profile link fails to navigate to its intended destination."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

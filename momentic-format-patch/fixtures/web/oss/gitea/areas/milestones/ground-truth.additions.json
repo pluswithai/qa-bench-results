@@ -1,0 +1,28 @@
+{
+  "bugs": [
+    {
+      "name": "Milestone lists (repo list and global /milestones): a page number past the last page shows a blank list with no message while the pager marks the last page as current",
+      "summary": "The page shows the counters (e.g. \\\"42 Open\\\" / \\\"12 Closed\\\"), a pager with page 3 highlighted as the current page, and a completely blank list area: no milestone rows and no message such as \\\"no milestones found\\\". Nothing tells the person that the requested page does not exist. (on /milestones)",
+      "expected": "Either the list falls back to the last/valid page, or the page says in words that this page has no results and offers a way back to page 1; the pager should not claim page 3 is the current page while a page=9999 address is shown.",
+      "actual": "The page shows the counters (e.g. \\\"42 Open\\\" / \\\"12 Closed\\\"), a pager with page 3 highlighted as the current page, and a completely blank list area: no milestone rows and no message such as \\\"no milestones found\\\". Nothing tells the person that the requested page does not exist.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-iohkuh32xzq8xr64ijdg1.e2b.app/milestones?state=open&sort=name (the Open tab, sorted by name, shows 3 pages of milestones)",
+        "Change the address to https://5503-iohkuh32xzq8xr64ijdg1.e2b.app/milestones?page=9999&state=open&sort=name and load it",
+        "Look at the list area and the pager"
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Issue list bulk-action toolbar: the Milestone dropdown button loses its label (blank button with only a caret) when a milestone with an empty name exists",
+      "summary": "The Milestone dropdown in the bulk toolbar is rendered with an empty label: the button shows only the caret, the word \\\"Milestone\\\" is not on the page at all in this state (its inner span is <span class=\\\"text\\\"></span>), while the same dropdown in the filter toolbar above does read \\\"Milestone\\\". The dropdown itself still opens the milestone list, so the control is usable only by guessing. (on /eval/harbor-handbook/issues?state=all)",
+      "expected": "The bulk-action Milestone dropdown should show its name (\\\"Milestone\\\") like the Label, Projects and Assignee dropdowns next to it, so the person knows what the control does and screen readers can announce it.",
+      "actual": "The Milestone dropdown in the bulk toolbar is rendered with an empty label: the button shows only the caret, the word \\\"Milestone\\\" is not on the page at all in this state (its inner span is <span class=\\\"text\\\"></span>), while the same dropdown in the filter toolbar above does read \\\"Milestone\\\". The dropdown itself still opens the milestone list, so the control is usable only by guessing.",
+      "reproSteps": [
+        "Signed in as eval, open https://5503-i63ver939iyt829xccz92.e2b.app/eval/harbor-handbook/issues?state=all",
+        "Tick the checkbox of any issue row (e.g. \"Clarify release ownership\" #2) so the bulk-action toolbar appears",
+        "Look at the toolbar row next to the \"Delete\" button and the \"Label\" dropdown: the Milestone dropdown renders as an empty bordered button showing only a small caret"
+      ],
+      "severity": 1
+    }
+  ]
+}

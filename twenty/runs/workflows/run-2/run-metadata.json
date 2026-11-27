@@ -1,0 +1,15 @@
+{
+  "fixture": "twenty/areas/workflows",
+  "run": 2,
+  "started_at": "2026-11-24T05:34:38.431Z",
+  "duration_seconds": 1800.122,
+  "time_limit_seconds": 1800,
+  "stop_reason": "time_limit",
+  "credits": {
+    "total": 1308,
+    "testing_team": 1074,
+    "verification": 234,
+    "findings_verified": 39
+  },
+  "team_container_errors": 0
+}

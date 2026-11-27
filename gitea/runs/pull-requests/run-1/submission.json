@@ -1,0 +1,226 @@
+{
+  "fixture": "gitea/areas/pull-requests",
+  "run": 1,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 248,
+      "name": "Files tab: clicking \"Split View\" returns a raw 400 error page \"after commit not found in PR commits\"",
+      "summary": "The page is replaced by a raw error page containing only \"after commit not found in PR commits\"; the request returns HTTP 400 and the whole pull request view is gone. (on /eval/harbor-handbook/pulls/5/files)",
+      "expected": "The Files tab re-renders the diff in split (side-by-side) view with the same file and lines, as the \"Split View\" control promises.",
+      "actual": "The page is replaced by a raw error page containing only \"after commit not found in PR commits\"; the request returns HTTP 400 and the whole pull request view is gone.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Open the pull request /eval/harbor-handbook/pulls/5/files (agent6-inline-comments-test, docs/release-owners → main, 1 changed file docs/releases.md).",
+        "In the toolbar above the diff, click the \"Split View\" link (the small icon/link next to the \"Whitespace\" dropdown).",
+        "Observe the page that loads: it goes to /eval/harbor-handbook/pulls/5/files?style=split&whitespace=show-all&show-outdated=true and shows only the text \"after commit not found in PR commits\" on a blank page. The browser console logs \"Failed to load resource: 400 (Bad Request)\"."
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 282,
+      "name": "Pull request list: \"Open\" filter shows closed and merged pull requests",
+      "summary": "The \"Open\" button links to ?type=all&state=all, so the list shows every pull request regardless of state: 8 rows including the merged PR #7 (struck-through title, purple merged icon) and the closed PR #6 (red closed icon). The list therefore contradicts its own \"7 Open\" count. (on /eval/harbor-handbook/pulls)",
+      "expected": "The Open filter lists only the open pull requests (the number shown on the button, 7) and its address carries state=open.",
+      "actual": "The \"Open\" button links to ?type=all&state=all, so the list shows every pull request regardless of state: 8 rows including the merged PR #7 (struck-through title, purple merged icon) and the closed PR #6 (red closed icon). The list therefore contradicts its own \"7 Open\" count.",
+      "reproSteps": [
+        "Sign in as eval and open /eval/harbor-handbook/pulls",
+        "Note the tabs above the list: \"7 Open\" and \"2 Closed\" (at least one closed and one merged PR exist, e.g. #6 closed, #7 merged)",
+        "Click the \"7 Open\" button on the left above the list",
+        "Look at the address bar and read the resulting rows"
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 377,
+      "name": "Reviewers dropdown in the PR sidebar does not close on Escape after a user is picked",
+      "summary": "The dropdown stays open with maya checkmarked; Escape does nothing. It only closes when the \\\"Reviewers\\\" header itself is clicked. Happened 2 of 2 times after picking a user (and 0 of 1 when nothing was picked). (on /eval/harbor-handbook/pulls/14)",
+      "expected": "Escape closes the Reviewers dropdown, as it does when the dropdown is opened and Escape is pressed without picking anyone (the selection is only saved when the dropdown closes).",
+      "actual": "The dropdown stays open with maya checkmarked; Escape does nothing. It only closes when the \\\"Reviewers\\\" header itself is clicked. Happened 2 of 2 times after picking a user (and 0 of 1 when nothing was picked).",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-iotjkrbhq2ztebrw6o97y.e2b.app/eval/harbor-handbook/pulls/14 (PR \"agent14-sidebar: review and assignee test PR\")",
+        "In the right sidebar click the \"Reviewers\" header — a dropdown with a \"Filter Reviewer\" field and the users alex and maya opens",
+        "Click \"maya\" in the dropdown list so a checkmark appears next to her",
+        "Press the Escape key"
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 494,
+      "name": "Sort \"Newest\" does not order by creation time — it lists older pull requests above newer ones",
+      "summary": "With Sort = Newest the rows are not in creation order: in the screenshot 'agent2: add compare notes file' (opened 2 minutes ago) is listed above 'Add agent3-rebase-notes.md' (opened 1 minute ago). Verified against the exact timestamps in the page: order was 15:33:27, 15:31:29, 15:33:02, 15:30:40, 15:30:20, 15:30:30, 15:30:17, 15:28:38, 15:29:51, 15:28:36, 15:28:22 — not descending. The same data under Sort = Oldest is perfectly ascending (15:28:22 … 15:33:27), and the Newest order is identical to Sort = Recently updated, so Newest appears to ignore creation time and sort by last update. (on /pulls)",
+      "expected": "Sort > Newest should list pull requests by creation time, most recently opened first (the exact reverse of Sort > Oldest, which is correctly ordered by creation time ascending).",
+      "actual": "With Sort = Newest the rows are not in creation order: in the screenshot 'agent2: add compare notes file' (opened 2 minutes ago) is listed above 'Add agent3-rebase-notes.md' (opened 1 minute ago). Verified against the exact timestamps in the page: order was 15:33:27, 15:31:29, 15:33:02, 15:30:40, 15:30:20, 15:30:30, 15:30:17, 15:28:38, 15:29:51, 15:28:36, 15:28:22 — not descending. The same data under Sort = Oldest is perfectly ascending (15:28:22 … 15:33:27), and the Newest order is identical to Sort = Recently updated, so Newest appears to ignore creation time and sort by last update.",
+      "reproSteps": [
+        "Sign in as eval (password momentic-eval-1) and open https://5503-iotjkrbhq2ztebrw6o97y.e2b.app/pulls?type=your_repositories&sort=newest&state=open (or open /pulls, click 'Pull Requests' in the global navigation and choose Sort > Newest)",
+        "Read the 'opened … ago' line under each pull request title down the list",
+        "Compare with the same list opened as https://5503-iotjkrbhq2ztebrw6o97y.e2b.app/pulls?type=your_repositories&sort=oldest&state=open"
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 569,
+      "name": "PR Files Changed lists a file from main that the pull request does not contain",
+      "summary": "Files Changed says \\\"2 changed files with 2 additions and 0 deletions\\\" and lists agent13-counts-a.md as a new file added by this pull request (+1, whole file \\\"a\\\"), next to agent3-rebase-notes.md. The header still says \\\"Commits 1\\\", and /eval/harbor-handbook/commits/branch/agent3-merge-b contains no commit for agent13-counts-a.md. The wrong extra file is still listed after the pull request was merged (rebase then fast-forward). (on /eval/harbor-handbook/pulls/19/files)",
+      "expected": "The Files Changed tab shows only the file the pull request adds (agent3-rebase-notes.md), matching its Commits tab (1 commit) and the branch agent3-merge-b, which has no commit touching agent13-counts-a.md. A file that already exists on main and was never touched by the branch must not be listed as changed by the pull request.",
+      "actual": "Files Changed says \\\"2 changed files with 2 additions and 0 deletions\\\" and lists agent13-counts-a.md as a new file added by this pull request (+1, whole file \\\"a\\\"), next to agent3-rebase-notes.md. The header still says \\\"Commits 1\\\", and /eval/harbor-handbook/commits/branch/agent3-merge-b contains no commit for agent13-counts-a.md. The wrong extra file is still listed after the pull request was merged (rebase then fast-forward).",
+      "reproSteps": [
+        "Open https://5503-iotjkrbhq2ztebrw6o97y.e2b.app/eval/harbor-handbook/compare/main...agent3-merge-b and click \"New Pull Request\", then \"Create Pull Request\" (pull request #19 \"Add agent3-rebase-notes.md\", one commit adding only the file agent3-rebase-notes.md).",
+        "While the pull request is open, another commit lands on main that adds the file agent13-counts-a.md (main's commit 66fbc667db \"Add agent13-counts-a.md\", visible on /eval/harbor-handbook/commits/branch/main).",
+        "Open the pull request's \"Files Changed\" tab (address above) and read the file list."
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 581,
+      "name": "New-file commit message field shows the unsubstituted placeholder \\\"Add '{filename}'\\\"",
+      "summary": "The commit message field shows the raw, unsubstituted template text 'Add '{filename}'' even though the file is named agent1-b.md (first test file: agent1-notes.md). The placeholder is never replaced with the real file name; the message only becomes 'Add agent1-b.md' when the change is committed. (on /eval/harbor-handbook/_new/main)",
+      "expected": "The commit message field names the file being added, e.g. 'Add 'agent1-b.md''.",
+      "actual": "The commit message field shows the raw, unsubstituted template text 'Add '{filename}'' even though the file is named agent1-b.md (first test file: agent1-notes.md). The placeholder is never replaced with the real file name; the message only becomes 'Add agent1-b.md' when the change is committed.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-iotjkrbhq2ztebrw6o97y.e2b.app/eval/harbor-handbook/_new/main",
+        "Type 'agent1-b.md' in the 'Name your file...' field and some text in the New File editor",
+        "Scroll down to the 'Commit Changes' box and read the commit message field above the description box"
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 667,
+      "name": "Bulk \"Open\" on the pull request list reopens a PR that the PR page itself refuses to reopen (duplicate pull request guard bypassed)",
+      "summary": "The row vanishes from the Closed tab with no message and PR #6 is reopened: /pulls/6 shows the green \"Open\" pill and an \"eval reopened this pull request now\" timeline entry, while PR #5 is still Open — so two open pull requests (#5 and #6) from docs/release-owners into main exist at once, the exact state the PR page's own guard refuses with \"You cannot perform a reopen operation because there is a pending pull request (#5) with identical properties.\" (on /eval/harbor-handbook/pulls?state=closed)",
+      "expected": "The reopen from the list should be refused as it is on the pull request page, because a pull request (#5) with identical properties is still pending, or at least show an error saying so.",
+      "actual": "The row vanishes from the Closed tab with no message and PR #6 is reopened: /pulls/6 shows the green \"Open\" pill and an \"eval reopened this pull request now\" timeline entry, while PR #5 is still Open — so two open pull requests (#5 and #6) from docs/release-owners into main exist at once, the exact state the PR page's own guard refuses with \"You cannot perform a reopen operation because there is a pending pull request (#5) with identical properties.\"",
+      "reproSteps": [
+        "Sign in as eval, open https://5503-iotjkrbhq2ztebrw6o97y.e2b.app/eval/harbor-handbook/pulls/6 (agent4-close-reopen test PR, docs/release-owners -> main) while PR #5 (agent6-inline-comments-test, same head branch into main) is open.",
+        "Press \"Close Pull Request\" at the bottom of the conversation: the PR becomes Closed and moves to the Closed tab.",
+        "Press the \"Reopen\" button at the bottom of that closed PR: a banner at the top of the page reads \"You cannot perform a reopen operation because there is a pending pull request (#5) with identical properties.\" and the PR stays Closed.",
+        "Open https://5503-iotjkrbhq2ztebrw6o97y.e2b.app/eval/harbor-handbook/pulls?state=closed and tick the checkbox of the row \"agent4-close-reopen test PR #6\" so the bulk action bar with the \"Open\" button appears.",
+        "Click \"Open\" in that bulk action bar."
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 713,
+      "name": "Assignee filter combined with a search query returns no results although a pull request matches both",
+      "summary": "The list shows \"No results\" and the tabs read \"0 Open 0 Closed\", while the same page's sidebar still counts 1 for \"In your repositories\" — one and the same pull request (#14) is counted by the sidebar and hidden by the list. Removing either condition returns the row: with only assignee=Alex the list shows PR #14, and with only q=agent14 the list shows PR #14. So the two filters together are treated as mutually exclusive instead of intersecting. (on /pulls)",
+      "expected": "PR #14 \"agent14-sidebar: review and assignee test PR\" is assigned to Alex and contains \"agent14\" in its title, so the assignee filter and the search together should list that one pull request (as each filter does on its own).",
+      "actual": "The list shows \"No results\" and the tabs read \"0 Open 0 Closed\", while the same page's sidebar still counts 1 for \"In your repositories\" — one and the same pull request (#14) is counted by the sidebar and hidden by the list. Removing either condition returns the row: with only assignee=Alex the list shows PR #14, and with only q=agent14 the list shows PR #14. So the two filters together are treated as mutually exclusive instead of intersecting.",
+      "reproSteps": [
+        "Sign in as eval (password momentic-eval-1) and open https://5503-iotjkrbhq2ztebrw6o97y.e2b.app/pulls?type=your_repositories&sort=recentupdate&state=open (Pull Requests in the global navigation)",
+        "Open the Assignee dropdown, type Alex, choose the option Alex — the list now shows exactly one pull request: eval/harbor-handbook#14 'agent14-sidebar: review and assignee test PR'",
+        "Now open https://5503-iotjkrbhq2ztebrw6o97y.e2b.app/pulls?type=your_repositories&sort=recentupdate&state=open&assignee=Alex&q=agent14&search_mode=exact — i.e. the same page with the search box holding agent14 (search type Exact) and the assignee still selected"
+      ]
+    },
+    {
+      "index": 8,
+      "reported_at_seconds": 745,
+      "name": "Pull request header shows a \"+5\" diffstat while the same header says 0 commits and the Commits/Files Changed tabs are empty",
+      "summary": "Both pages show \"wants to merge 0 commits\", an empty \"Commits\" tab badge and an empty \"Files Changed\" badge (only a \"-\"), yet the top-right of the same header block still shows a green diffstat of \"+5\" — the page contradicts itself about how much the pull request changes. (on /eval/harbor-handbook/pulls/6)",
+      "expected": "A pull request with 0 commits and no changed files should not show a nonzero diffstat (\"+5\") in its header; the diffstat should be 0 or hidden, as the Commits and Files Changed counters are.",
+      "actual": "Both pages show \"wants to merge 0 commits\", an empty \"Commits\" tab badge and an empty \"Files Changed\" badge (only a \"-\"), yet the top-right of the same header block still shows a green diffstat of \"+5\" — the page contradicts itself about how much the pull request changes.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-iotjkrbhq2ztebrw6o97y.e2b.app/eval/harbor-handbook/pulls/6 (agent4-close-reopen test PR, head docs/release-owners -> main; its commit is already in main after PR #7 was merged).",
+        "Read the header line and the tab counters, then the diffstat in the top-right corner of the same header block.",
+        "Repeat on https://5503-iotjkrbhq2ztebrw6o97y.e2b.app/eval/harbor-handbook/pulls/5 (agent6-inline-comments-test, same head branch): same contradiction."
+      ]
+    },
+    {
+      "index": 9,
+      "reported_at_seconds": 749,
+      "name": "Running a search drops the Author and Assignee filters that were applied",
+      "summary": "Both filters vanish: the page reloads to /pulls?type=your_repositories&sort=recentupdate&state=open&q=agent5&search_mode=exact — no poster= and no assignee= — and the Author/Assignee buttons read \"Author\" / \"Assignee\" again. The pull request list therefore grows back to every open pull request matching the word, so a user who narrowed to one author now silently sees other authors' pull requests as well (with Author=eval: 2 rows for \"agent5\" instead of the filtered subset). The type, state and sort choices do survive the same search, so only these two filters are dropped. (on /pulls)",
+      "expected": "The search should keep the active filters, as it keeps the state, sort and type — the address should read ...&q=agent5&search_mode=exact&poster=eval and the list should stay limited to the selected author.",
+      "actual": "Both filters vanish: the page reloads to /pulls?type=your_repositories&sort=recentupdate&state=open&q=agent5&search_mode=exact — no poster= and no assignee= — and the Author/Assignee buttons read \"Author\" / \"Assignee\" again. The pull request list therefore grows back to every open pull request matching the word, so a user who narrowed to one author now silently sees other authors' pull requests as well (with Author=eval: 2 rows for \"agent5\" instead of the filtered subset). The type, state and sort choices do survive the same search, so only these two filters are dropped.",
+      "reproSteps": [
+        "Sign in as eval (password momentic-eval-1) and open https://5503-iotjkrbhq2ztebrw6o97y.e2b.app/pulls?type=your_repositories&sort=recentupdate&state=open&poster=eval (or pick Author > eval from the Author dropdown on /pulls)",
+        "In the 'Search pulls...' box type agent5 and click the magnifier button 'Search...'",
+        "Look at the address bar and at the Author/Assignee buttons on the reloaded page"
+      ]
+    },
+    {
+      "index": 10,
+      "reported_at_seconds": 788,
+      "name": "With \\\"Ignore changes in whitespace at EOL\\\" on, the Files Changed summary still shows the unfiltered +17 -1 while the file list and diffs show 16 additions and 0 deletions",
+      "summary": "The summary line stays \"5 changed files with 17 additions and 1 deletions\" and the tab strip still shows \"+17 −1\", while the docs/releases.md file header decreases to 8 and its diff has no deletions at all — the five file badges add up to 16 additions and 0 deletions. Line 4's trailing-whitespace change disappears from the diff, but the totals above the list still count it. The mismatch persists after a reload, and with the whitespace choice remembered the tab's \"+17 −1\" and the sum of the per-file badges never agree. (on /eval/harbor-handbook/pulls/25/files)",
+      "expected": "The \"N changed files with X additions and Y deletions\" line and the \"+X −Y\" beside the Files Changed tab describe the diff actually listed, so they match the per-file counts (16 additions, 0 deletions with whitespace at EOL ignored)",
+      "actual": "The summary line stays \"5 changed files with 17 additions and 1 deletions\" and the tab strip still shows \"+17 −1\", while the docs/releases.md file header decreases to 8 and its diff has no deletions at all — the five file badges add up to 16 additions and 0 deletions. Line 4's trailing-whitespace change disappears from the diff, but the totals above the list still count it. The mismatch persists after a reload, and with the whitespace choice remembered the tab's \"+17 −1\" and the sum of the per-file badges never agree.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /eval/harbor-handbook/pulls/25/files (PR \"agent7 files tab checks\", branch agent7-files-test; it changes docs/releases.md and adds four files)",
+        "Note the summary above the list: \"5 changed files with 17 additions and 1 deletions\", the tab strip value \"+17 -1\", and the \"10\" badge on the docs/releases.md file header (a trailing-whitespace change on line 4 counts as one addition and one deletion)",
+        "Click the whitespace (eye) button in the toolbar and choose \"Ignore changes in whitespace at EOL\"",
+        "Reload the page and read the summary, the tab strip and the docs/releases.md file header again"
+      ]
+    },
+    {
+      "index": 11,
+      "reported_at_seconds": 829,
+      "name": "Commit page claims \"2 additions and 1 deletions\" for commits that only add one line",
+      "summary": "The summary says \"1 changed files with 2 additions and 1 deletions\" while the diff shows one added line and no deleted line. The count of additions is one too high and it reports a deletion that never happened (the diff contains 1 added row and 0 deleted rows). Commit 481b1093e2 on the same branch, which also adds a single line, correctly says \"1 additions and 0 deletions\", so the number is not consistent across commits. (on /eval/harbor-handbook/commit/9bce99e386)",
+      "expected": "The commit summary should match the diff it displays: for each of these commits, 1 changed file with 1 addition and 0 deletions.",
+      "actual": "The summary says \"1 changed files with 2 additions and 1 deletions\" while the diff shows one added line and no deleted line. The count of additions is one too high and it reports a deletion that never happened (the diff contains 1 added row and 0 deleted rows). Commit 481b1093e2 on the same branch, which also adds a single line, correctly says \"1 additions and 0 deletions\", so the number is not consistent across commits.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-iotjkrbhq2ztebrw6o97y.e2b.app/eval/harbor-handbook/commit/9bce99e386 (branch agent8-commits-branch, commits visible on PR #21 /eval/harbor-handbook/pulls/21/commits).",
+        "Read the summary line above the diff: \"1 changed files with 2 additions and 1 deletions\".",
+        "Read the file diff below it: a single hunk \"@@ -1,2 +1,3 @@\" with two context lines (agent8 commit one, aagent8 commit two) and exactly one green added line (agent8 commit three); there is no red/deleted line anywhere.",
+        "Repeat with the two later commits of the same branch: /eval/harbor-handbook/commit/c3292a6553 (hunk \"@@ -1,3 +1,4 @@\", one added line \"agent8 commit four\") and /eval/harbor-handbook/commit/0a020f23c0 (hunk \"@@ -2,3 +2,4 @@\", one added line \"agent8 commit five\"): both also say \"2 additions and 1 deletions\"."
+      ]
+    },
+    {
+      "index": 12,
+      "reported_at_seconds": 949,
+      "name": "Counts of one are shown as \\\"1 commits\\\" / \\\"1 Commits\\\" / \\\"1 Participants\\\"",
+      "summary": "The noun stays plural with a count of one: the header reads \"eval wants to merge 1 commits from agent14-sidebar-branch into main\", the Commits tab panel header reads \"1 Commits\", and on /eval/harbor-handbook/pulls/21 the sidebar box reads \"1 Participants\". With larger counts the wording is correct (\"5 commits\", \"3 Participants\"), so only the singular case is wrong. (on /eval/harbor-handbook/pulls/14)",
+      "expected": "A count of one should use the singular noun: \"wants to merge 1 commit\", \"1 Commit\", \"1 Participant\".",
+      "actual": "The noun stays plural with a count of one: the header reads \"eval wants to merge 1 commits from agent14-sidebar-branch into main\", the Commits tab panel header reads \"1 Commits\", and on /eval/harbor-handbook/pulls/21 the sidebar box reads \"1 Participants\". With larger counts the wording is correct (\"5 commits\", \"3 Participants\"), so only the singular case is wrong.",
+      "reproSteps": [
+        "Sign in as eval (password momentic-eval-1) and open https://5503-iotjkrbhq2ztebrw6o97y.e2b.app/eval/harbor-handbook/pulls/14 (a pull request with exactly one commit)",
+        "Read the green sentence under the pull request title",
+        "Click the 'Commits' tab and read the panel header 'N Commits'",
+        "For the third instance open https://5503-iotjkrbhq2ztebrw6o97y.e2b.app/eval/harbor-handbook/pulls/21 and read the sidebar entry above 'Notifications'"
+      ]
+    },
+    {
+      "index": 13,
+      "reported_at_seconds": 1045,
+      "name": "Conversation tab says 0 comments while its timeline shows three \\\"left a comment\\\" cards",
+      "summary": "The 'Conversation' tab badge reads 0 although the same tab shows three comment cards in the timeline: \"alex left a comment / agent5 review: approved with a comment\", a second \"alex left a comment / agent5 review: please split this note into two files\" and \"maya left a comment / maya approval: looks good to me\". The pull request list shows no comment count for it either. On pull requests without any comment cards (#14, #16, #10) the badge also reads 0, so the badge never reflects review comments while the tab displays them as comments. (on /eval/harbor-handbook/pulls/24)",
+      "expected": "The Conversation tab badge should count the comments shown in that tab — 3 here — so a reader can tell from the tab label how much discussion the pull request holds.",
+      "actual": "The 'Conversation' tab badge reads 0 although the same tab shows three comment cards in the timeline: \"alex left a comment / agent5 review: approved with a comment\", a second \"alex left a comment / agent5 review: please split this note into two files\" and \"maya left a comment / maya approval: looks good to me\". The pull request list shows no comment count for it either. On pull requests without any comment cards (#14, #16, #10) the badge also reads 0, so the badge never reflects review comments while the tab displays them as comments.",
+      "reproSteps": [
+        "Sign in as eval (password momentic-eval-1) and open https://5503-iotjkrbhq2ztebrw6o97y.e2b.app/eval/harbor-handbook/pulls/24",
+        "Read the badge on the 'Conversation' tab: it shows 0",
+        "Scroll the timeline of the same tab: three cards 'alex left a comment' (twice) and 'maya left a comment' with their texts are displayed"
+      ]
+    },
+    {
+      "index": 14,
+      "reported_at_seconds": 1074,
+      "name": "Sort dropdown contains a stray \\\"Label\\\" entry that does nothing",
+      "summary": "The open Sort menu lists its eight sort orders and then one more entry, \"Label\", placed under \"Farthest due date\". It is not a sort order, it is styled like the other options, and clicking it does nothing: the menu stays open and neither the list nor the sort changes. (on /eval/harbor-handbook/pulls)",
+      "expected": "The Sort menu contains only the sort orders (Newest, Oldest, Recently updated, Least recently updated, Most commented, Least commented, Nearest due date, Farthest due date).",
+      "actual": "The open Sort menu lists its eight sort orders and then one more entry, \"Label\", placed under \"Farthest due date\". It is not a sort order, it is styled like the other options, and clicking it does nothing: the menu stays open and neither the list nor the sort changes.",
+      "reproSteps": [
+        "Sign in as eval and open /eval/harbor-handbook/pulls",
+        "In the filter row above the list (Label, Milestone, Project, Author, Assignee, Type, Sort) click \"Sort\"",
+        "Read the bottom of the opened menu, below \"Farthest due date\"",
+        "Click that \"Label\" entry: nothing happens and the menu stays open"
+      ]
+    },
+    {
+      "index": 15,
+      "reported_at_seconds": 1412,
+      "name": "Changing a pull request's base branch moves the \\\"added 1 commit\\\" timeline event to the end and re-stamps it \\\"now\\\"",
+      "summary": "After the two base-branch changes the timeline ends with \"eval changed target branch from main to agent4-base-branch 1 minute ago\", \"eval changed target branch from agent4-base-branch to main now\" and then \"eval added 1 commit now / agent4: reopen test file ab6a366877\", while \"eval commented 15 minutes ago\" stays at the top — the commit that was pushed 16 minutes earlier is re-stamped \"now\" and pulled out of its chronological place in the timeline. (on /eval/harbor-handbook/pulls/18)",
+      "expected": "Changing the target branch should only add a \"changed target branch\" event; the existing \"added 1 commit\" event keeps its original position in the timeline (right after the description, before the close/reopen and branch-change events) and its original time.",
+      "actual": "After the two base-branch changes the timeline ends with \"eval changed target branch from main to agent4-base-branch 1 minute ago\", \"eval changed target branch from agent4-base-branch to main now\" and then \"eval added 1 commit now / agent4: reopen test file ab6a366877\", while \"eval commented 15 minutes ago\" stays at the top — the commit that was pushed 16 minutes earlier is re-stamped \"now\" and pulled out of its chronological place in the timeline.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-iotjkrbhq2ztebrw6o97y.e2b.app/eval/harbor-handbook/pulls/18 (agent4-reopen-flow PR) and note the timeline order: the \"added 1 commit\" event sits directly under the description, before the close/reopen events.",
+        "Press the \"Edit\" button at the top right of the pull request.",
+        "In the edit bar open the \"merge into: eval:main\" dropdown and choose \"eval:agent4-base-branch\" (a branch created from main with one extra file), then press \"Save\".",
+        "Press \"Edit\" again, open the \"merge into\" dropdown, choose \"eval:main\", press \"Save\".",
+        "Scroll through the Conversation timeline and read the last three events."
+      ]
+    }
+  ]
+}

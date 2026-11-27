@@ -1,0 +1,15 @@
+{
+  "fixture": "gitea/areas/issues",
+  "run": 1,
+  "started_at": "2026-11-23T14:53:44.260Z",
+  "duration_seconds": 1649.282,
+  "time_limit_seconds": 1800,
+  "stop_reason": "completed",
+  "credits": {
+    "total": 1337,
+    "testing_team": 1157,
+    "verification": 180,
+    "findings_verified": 30
+  },
+  "team_container_errors": 0
+}

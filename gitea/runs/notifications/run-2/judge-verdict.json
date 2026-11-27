@@ -1,0 +1,136 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "gitea/areas/notifications",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "7c2564e8e895f8ee6014bbf4afbc7a12307dd23d3088098598bbe12e6bd16cc4",
+    "known_invalid_sha256": "995af98e3ec66dc6ca50c42ed5d5c7c33d90931c9854bf7444b7d8b2a214c230",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "16",
+    "bugs": "8",
+    "flags": "0",
+    "known_hits": "4",
+    "extra_known_hits": "0",
+    "unverified": "4",
+    "outside_area_known_hits": "0",
+    "outside_area_known_invalid": "0",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "",
+    "outside_area_ground_truth_sha256": "47db07b83af13b7c7dd75acd1b523ed86e8107b60e6f33878e8fb5b68a2acbe2",
+    "outside_area_known_invalid_sha256": "72e79c4023c85c9101fbf2b7613d3daf78b07fded510d117ab5b26f6ac3103f9",
+    "duplicates": "0",
+    "duplicate_known_hits": "0",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "0",
+    "known_misses": "0",
+    "precision": "1",
+    "recall": "0.25",
+    "findings_per_minute": "0.30526195291334374",
+    "correct_findings_per_minute": "0.15263097645667187",
+    "severity_1": "0",
+    "severity_3": "4",
+    "severity_5": "0",
+    "severity_sum": "12",
+    "score": "12",
+    "duration_seconds": "1572.42",
+    "partial": "false",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 5,
+        "reproStepsIndex": 0,
+        "findingIndex": 2,
+        "reason": "Matches the Read-view action dropping q=read and redirecting to Unread, using the same Mark as unread flow."
+      },
+      {
+        "groundTruthIndex": 15,
+        "reproStepsIndex": null,
+        "findingIndex": 4,
+        "reason": "Matches the explicitly documented omission of subscribed issues from Subscriptions. The provided reproduction case instead demonstrates inclusion of an unsubscribed issue."
+      },
+      {
+        "groundTruthIndex": 7,
+        "reproStepsIndex": null,
+        "findingIndex": 5,
+        "reason": "Matches the failed background notification refresh, including the same JSON parsing error and reload workaround. It reproduces through cross-tab status changes rather than another user's new mention."
+      },
+      {
+        "groundTruthIndex": 9,
+        "reproStepsIndex": 0,
+        "findingIndex": 7,
+        "reason": "The main failure matches both Watching size sorts retaining Recently updated order, reproduced by comparing differently sized repositories under both options. The incorrect menu highlight is an additional symptom."
+      }
+    ],
+    "invalidMatches": [],
+    "unverified": [
+      {
+        "findingIndex": 0,
+        "reason": "No provided entry describes repository search interpreting literal percent and underscore characters as wildcards."
+      },
+      {
+        "findingIndex": 1,
+        "reason": "This claims pinning an unread notification marks that same row read and removes it from Unread. Neither the read-to-unread pinning bug nor the rejected claims about other notifications describe this behavior."
+      },
+      {
+        "findingIndex": 3,
+        "reason": "Stale notification state after browser Back is distinct from the listed failure to update an already-open page when new notifications arrive."
+      },
+      {
+        "findingIndex": 6,
+        "reason": "No provided entry describes notification rows appearing out of timestamp order."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 3,
+        "reason": "Search returns incorrect repository matches for the entered text."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 3,
+        "reason": "The report describes an unintended notification status change and disappearance from the active list."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 3,
+        "reason": "The restored page incorrectly displays a read notification as unread until reloaded."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 3,
+        "reason": "The report describes incorrect chronological ordering of notification results."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

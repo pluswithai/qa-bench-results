@@ -1,0 +1,308 @@
+{
+  "fixture": "twenty/areas/workflows",
+  "run": 2,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 490,
+      "name": "Duplicate Workflow loses node positions: all steps stack on one point in the copy's editor",
+      "summary": "In the copy, every step sits at the same canvas position: the nodes are all drawn at x=0,y=0, so the trigger and the first two actions are painted underneath the last one. The canvas shows a single \\\"Create Person\\\" node (with the tail of \\\"Create Company\\\"'s label sticking out as a stray \\\"y\\\") and connect lines that lead nowhere. After a reload the same stacked layout persists. The original Quick Lead, by contrast, has its nodes at y=0/150/300/450. The copy's steps cannot be seen or opened without manually dragging the hidden nodes out. (on /objects/workflows → opened workflow editor (copy: /object/workflow/13c458a7-abc2-4f01-b492-7ba1a183488a))",
+      "expected": "The duplicated workflow's editor should show all four steps laid out vertically like the original (Trigger \\\"Launch manually\\\", \\\"Quick Lead Form\\\", \\\"Create Company\\\", \\\"Create Person\\\"), each at its own position, ready to be read and edited.",
+      "actual": "In the copy, every step sits at the same canvas position: the nodes are all drawn at x=0,y=0, so the trigger and the first two actions are painted underneath the last one. The canvas shows a single \\\"Create Person\\\" node (with the tail of \\\"Create Company\\\"'s label sticking out as a stray \\\"y\\\") and connect lines that lead nowhere. After a reload the same stacked layout persists. The original Quick Lead, by contrast, has its nodes at y=0/150/300/450. The copy's steps cannot be seen or opened without manually dragging the hidden nodes out.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open /objects/workflows.",
+        "In the table, right-click the row \"Quick Lead\" and choose \"Duplicate Workflow\" from the context menu.",
+        "The app opens the new workflow \"Quick Lead (Duplicate)\" in the workflow editor (URL /object/workflow/13c458a7-abc2-4f01-b492-7ba1a183488a).",
+        "Look at the canvas: only one node (\"Create Person\") is visible, with a stray letter \"y\" at its right edge and connector lines running off above and below it.",
+        "Reload the page and look at the canvas again."
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 511,
+      "name": "Failed workflow run shows the field's own label as its start time and the workflow name as \"Executed by\"",
+      "summary": "On the failed run, \\\"Workflow run started at\\\" shows the literal field label \\\"Workflow run started at\\\" instead of a date, and \\\"Executed by\\\" shows the workflow name \\\"Create company when adding a…\\\" instead of a person. The same fields are correct on the Completed run \\\"#1 - Quick Lead\\\" (Nov 24, 2026 5:40 AM / Tim Apple). (on /objects/workflowRuns and /object/workflowRun/c347a4ec-35f3-4d0c-b25e-f81152a4c808)",
+      "expected": "\\\"Workflow run started at\\\" shows the run's start date/time, and \\\"Executed by\\\" names the person (Tim Apple), like the Completed run \\\"#1 - Quick Lead\\\" does.",
+      "actual": "On the failed run, \\\"Workflow run started at\\\" shows the literal field label \\\"Workflow run started at\\\" instead of a date, and \\\"Executed by\\\" shows the workflow name \\\"Create company when adding a…\\\" instead of a person. The same fields are correct on the Completed run \\\"#1 - Quick Lead\\\" (Nov 24, 2026 5:40 AM / Tim Apple).",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open /objects/workflowRuns",
+        "In the list, click the row \"#1 - Create company when adding a new person\" with status Failed (it opens in the right side panel)",
+        "Read the record fields on the Home tab of the panel",
+        "Click \"Open\" at the bottom right of the panel to see the same record as a full page and read the Fields column"
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 658,
+      "name": "Resizing to a mobile width leaves the workflow canvas empty — nodes are drawn outside the canvas",
+      "summary": "The canvas area (x 12–378) is completely empty; the node layer is drawn at x≈712 with the nodes at x 761–866, i.e. entirely to the right of the visible canvas, so the page looks like an empty white workflow. Only a full page reload brings the nodes back. (on /object/workflow/c95c78b4-48d2-56f6-8e15-36ff8572f1d8)",
+      "expected": "The workflow graph is re-fitted or at least stays inside the canvas at the new width, so the nodes remain visible (as they are when the editor is loaded directly at 390 px).",
+      "actual": "The canvas area (x 12–378) is completely empty; the node layer is drawn at x≈712 with the nodes at x 761–866, i.e. entirely to the right of the visible canvas, so the page looks like an empty white workflow. Only a full page reload brings the nodes back.",
+      "reproSteps": [
+        "Open the workflow editor at /object/workflow/c95c78b4-48d2-56f6-8e15-36ff8572f1d8 with a desktop window (1440x900): the four nodes (Launch manually, Quick Lead Form, Create Company, Create Person) are visible in the canvas.",
+        "Resize the browser window to a phone size (390x844) without reloading.",
+        "Look at the canvas and wait a few seconds."
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 659,
+      "name": "A workflow address that does not exist opens an empty \"Untitled (0/0)\" editor instead of a not-found message",
+      "summary": "No error and no not-found message: the header shows the breadcrumb \\\"Workflows / Untitled (0/0)\\\" as if a real record were open, the canvas is an empty grid with no nodes and no controls, and the toolbar only shows the navigation chevrons. The page looks like a broken/blank workflow named \\\"Untitled\\\" with position 0 of 0. (on /object/workflow/11111111-1111-4111-8111-111111111111)",
+      "expected": "The editor says the workflow was not found (a 404 / \\\"Record not found\\\" state) and offers a way back to the Workflows list, like other missing records do.",
+      "actual": "No error and no not-found message: the header shows the breadcrumb \\\"Workflows / Untitled (0/0)\\\" as if a real record were open, the canvas is an empty grid with no nodes and no controls, and the toolbar only shows the navigation chevrons. The page looks like a broken/blank workflow named \\\"Untitled\\\" with position 0 of 0.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev.",
+        "In the address bar open https://5500-inb17rqkl0j8zj8qvdtvb.e2b.app/object/workflow/11111111-1111-4111-8111-111111111111 (a well-formed workflow id that does not exist).",
+        "Wait for the page to finish loading."
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 660,
+      "name": "Changing sort direction to Descending does not reorder the list (chip stays ascending)",
+      "summary": "The direction dropdown shows \\\"Descending\\\" but the chip still shows the upward arrow (\\\"↑ Last update\\\") and the order stays exactly as in ascending mode: Create company when adding a new person (10 minutes ago) first, agent11-restore-test (less than a minute ago) second. Closing the panel or reselecting the field does not flip the order either. The same happened earlier with a Name sort: switching to Descending left the rows in the ascending order. (on /objects/workflows)",
+      "expected": "The dropdown reads Descending, the sort arrow should point down, and the list should be re-sorted descending — the most recently updated record (agent11-restore-test, less than a minute ago) first, then Create company when adding a new person (10 minutes ago).",
+      "actual": "The direction dropdown shows \\\"Descending\\\" but the chip still shows the upward arrow (\\\"↑ Last update\\\") and the order stays exactly as in ascending mode: Create company when adding a new person (10 minutes ago) first, agent11-restore-test (less than a minute ago) second. Closing the panel or reselecting the field does not flip the order either. The same happened earlier with a Name sort: switching to Descending left the rows in the ascending order.",
+      "reproSteps": [
+        "Go to /objects/workflows and sign in with tim@apple.dev.",
+        "Click Filter, choose Statuses, tick only Active, close the panel (two records remain, so the order is easy to read).",
+        "Click Sort, choose the field \"Last update\" — the chip appears as \"↑ Last update\" and the rows are Create company when adding a new person (10 minutes ago) first, then agent11-restore-test (less than a minute ago), i.e. ascending.",
+        "Click Sort again and change the direction dropdown from \"Ascending\" to \"Descending\"."
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 660,
+      "name": "After restoring a deleted workflow the editor canvas stays blank until a reload",
+      "summary": "The record page header updates to the workflow name but the whole editor area below the banner is blank white: no \\\"Draft\\\" badge, no \\\"Trigger / Add a Trigger\\\" node, no canvas dotted background. The content only appears after reloading the page (F5), after which the Draft badge and the Trigger node are shown. (on /object/workflow/2e48b77e-4907-4f46-9968-327e9a22aa85)",
+      "expected": "The workflow editor renders the restored workflow immediately: canvas, the \\\"Draft\\\" badge and the Trigger/Add a Trigger node.\\n\\nAfter restoring a soft-deleted workflow from the record page, the workflow editor is empty until the page is reloaded.",
+      "actual": "The record page header updates to the workflow name but the whole editor area below the banner is blank white: no \\\"Draft\\\" badge, no \\\"Trigger / Add a Trigger\\\" node, no canvas dotted background. The content only appears after reloading the page (F5), after which the Draft badge and the Trigger node are shown.",
+      "reproSteps": [
+        "Sign in at /welcome with tim@apple.dev / tim@apple.dev.",
+        "Open /objects/workflows, click \"+ New Workflow\", name it agent6-delete-test and press Enter.",
+        "Right-click the agent6-delete-test row in the list and choose \"Delete Workflow\".",
+        "Open /object/workflow/2e48b77e-4907-4f46-9968-327e9a22aa85 and click \"Restore\" in the red \"This record has been deleted\" banner.",
+        "Look at the editor area under the banner, then reload the page with the browser reload button and look again."
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 704,
+      "name": "Reloading the workflow editor empties the workflow title, and the next click on the canvas renames it to \"Untitled\"",
+      "summary": "After the reload the title field is empty (only the placeholder \\\"Name\\\" is shown), and the first click on the canvas overwrites the saved name with \\\"Untitled\\\" (the workflow list then shows it as \\\"Untitled\\\"). The action node's configured values survived the reload, only the workflow name is lost. (on /object/workflow/e4a60cf4-0dfa-4729-890f-cb25936af600)",
+      "expected": "After a reload the header should show the saved workflow name (\\\"agent3-editor\\\"), and a click on the canvas should not change the name.",
+      "actual": "After the reload the title field is empty (only the placeholder \\\"Name\\\" is shown), and the first click on the canvas overwrites the saved name with \\\"Untitled\\\" (the workflow list then shows it as \\\"Untitled\\\"). The action node's configured values survived the reload, only the workflow name is lost.",
+      "reproSteps": [
+        "Go to /objects/workflows and click \"+ New Workflow\" (a new workflow opens in the editor, address /object/workflow/e4a60cf4-0dfa-4729-890f-cb25936af600).",
+        "Type \"agent3-editor\" in the title text field in the header breadcrumb and press Enter. The header then reads \"Workflows / agent3-editor (1/10)\".",
+        "Add a trigger (\"Add a Trigger\" > Launch manually) and one action node, then reload the browser page.",
+        "After the reload the header breadcrumb reads \"Workflows / \" followed by an empty, focused text field with the grey placeholder \"Name\" (the saved name is not loaded).",
+        "Click anywhere on the canvas: the title becomes \"Untitled\" and a save request fires."
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 748,
+      "name": "Changing a form field's Type wipes the custom Label and Placeholder the user typed",
+      "summary": "Switching Type immediately replaces the user's Label and Placeholder with the new type's defaults without any warning: 'agent4 First Name'/'Enter first name' became 'Number'/'1000' when switching to Number, and 'agent4 pick stage' became 'Text'/'Enter your text' when switching back to Text. The typed text is lost. (on /object/workflow/2aedbf10-cc03-4437-acbf-112d63d200fc (Form action editor))",
+      "expected": "The field keeps the Label and Placeholder the user typed when the Type is changed (only type-specific settings change), or at least asks before overwriting them.",
+      "actual": "Switching Type immediately replaces the user's Label and Placeholder with the new type's defaults without any warning: 'agent4 First Name'/'Enter first name' became 'Number'/'1000' when switching to Number, and 'agent4 pick stage' became 'Text'/'Enter your text' when switching back to Text. The typed text is lost.",
+      "reproSteps": [
+        "Open Workflows > + New Workflow, name it agent4-form-test, add a Launch manually trigger, click the + under the trigger, choose Form (Human Input) in Select Action.",
+        "In the form panel click + Add Field: a Text field is added and its Input settings open.",
+        "Type a custom Label 'agent4 First Name' and Placeholder 'Enter first name' in the Input settings.",
+        "Open the Type dropdown and pick 'Number'.",
+        "Observe the Label and Placeholder in the Input settings and the field card.",
+        "Repeat with the same field: set Label 'agent4 pick stage', then switch Type from Select back to Text."
+      ]
+    },
+    {
+      "index": 8,
+      "reported_at_seconds": 768,
+      "name": "Job title typed in the Quick Lead form is lost — the created Person has an empty Job Title",
+      "summary": "The Person is created with the right first/last name, email and company link, but its Job Title field is empty (\"Job Title\" placeholder) — the value typed in the form is silently dropped. Reproduced on both test runs (agent5job → Person \"agent5first agent5last\"; agent5b-jobtitle → Person \"agent5b-first agent5b-last\"). (on /object/workflow/c95c78b4-48d2-56f6-8e15-36ff8572f1d8 (Quick Lead Test form) → /objects/people)",
+      "expected": "The Person record created by the workflow carries the Job title value typed in the Quick Lead Form, as it does the first name, last name, email and company.",
+      "actual": "The Person is created with the right first/last name, email and company link, but its Job Title field is empty (\"Job Title\" placeholder) — the value typed in the form is silently dropped. Reproduced on both test runs (agent5job → Person \"agent5first agent5last\"; agent5b-jobtitle → Person \"agent5b-first agent5b-last\").",
+      "reproSteps": [
+        "Open /object/workflow/c95c78b4-48d2-56f6-8e15-36ff8572f1d8 (Quick Lead) and click Test in the toolbar.",
+        "Fill the form: First name \"agent5b-first\", Last Name \"agent5b-last\", Email \"agent5b@example.com\", Job title \"agent5b-jobtitle\", Company name \"agent5b-co\", Company domain \"agent5b-domain.example\".",
+        "Click Submit and wait for the run to show Completed.",
+        "Open People (/objects/people) and open the Person row \"agent5b-first agent5b-last\".",
+        "Read the Work section of the record: Company is \"agent5b-co\" but Job Title is empty."
+      ]
+    },
+    {
+      "index": 9,
+      "reported_at_seconds": 871,
+      "name": "Two form fields with the same label collapse into one output key: the first field's submitted value is lost",
+      "summary": "Both fields render with the same label \"agent4 first\", the form accepts both values, but the run's Output shows result (1) with a single key agent4First = \"value-two\": the value typed in the first field (\"value-one\") is silently dropped. The editor also accepts the duplicate label without any warning. (on /object/workflow/2aedbf10-cc03-4437-acbf-112d63d200fc (Form action test run))",
+      "expected": "Either the duplicate label is refused in the editor with a message, or both submitted values are kept in the run output under distinct keys — no submitted value is lost.",
+      "actual": "Both fields render with the same label \"agent4 first\", the form accepts both values, but the run's Output shows result (1) with a single key agent4First = \"value-two\": the value typed in the first field (\"value-one\") is silently dropped. The editor also accepts the duplicate label without any warning.",
+      "reproSteps": [
+        "Open Workflows > agent4-form-test (a workflow with a Launch manually trigger and a Form action that has two Text fields).",
+        "Click the Form node, open the second field's Input settings and set its Label to 'agent4 first', the same Label as the first field. No warning appears; the panel lists two fields both labelled 'agent4 first'.",
+        "Click Test in the toolbar: the test form shows two fields both labelled 'agent4 first'.",
+        "Type 'value-one' in the first field and 'value-two' in the second, click Submit.",
+        "In the run panel click the 'Action 1 Form' node and read the Output tab."
+      ]
+    },
+    {
+      "index": 10,
+      "reported_at_seconds": 886,
+      "name": "Row context menu opens off-screen for rows near the bottom: \\\"Duplicate Workflow\\\" cannot be reached",
+      "summary": "The context menu opens downward from the clicked row without flipping up, so its lower part falls outside the window: only the first two entries (\\\"Delete Workflow\\\", \\\"Remove from Favorites\\\") are visible, clipped at the bottom edge. The remaining entries — Export Workflow, Deactivate Workflow, Test Workflow, See Runs, See Versions History, Duplicate Workflow, More actions — stay below the window (measured at y≈943 with a 720px-high window) and cannot be reached: pressing End / scrolling does not bring them into view. Duplicating a workflow from the row context menu is therefore impossible for rows in the lower part of the list. (on /objects/workflows)",
+      "expected": "The context menu should stay inside the window (flipping upward when there is no room below) so every entry, including \\\"Duplicate Workflow\\\", can be read and clicked.",
+      "actual": "The context menu opens downward from the clicked row without flipping up, so its lower part falls outside the window: only the first two entries (\\\"Delete Workflow\\\", \\\"Remove from Favorites\\\") are visible, clipped at the bottom edge. The remaining entries — Export Workflow, Deactivate Workflow, Test Workflow, See Runs, See Versions History, Duplicate Workflow, More actions — stay below the window (measured at y≈943 with a 720px-high window) and cannot be reached: pressing End / scrolling does not bring them into view. Duplicating a workflow from the row context menu is therefore impossible for rows in the lower part of the list.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open /objects/workflows (the list holds enough rows to fill the window — 17-18 workflows).",
+        "Scroll so that the last visible row, \"Quick Lead\", sits near the bottom of the window (in my run: \"Quick Lead\" at y≈640).",
+        "Right-click that \"Quick Lead\" row.",
+        "Look at the menu that opens: only \"Delete Workflow\" and \"Remove from Favorites\" are shown, cut off at the bottom of the window.",
+        "Try to reach the rest of the menu (press End to scroll, scroll the page) — the lower entries, \"Duplicate Workflow\" among them, never become visible."
+      ]
+    },
+    {
+      "index": 11,
+      "reported_at_seconds": 971,
+      "name": "\\\"Discard Draft\\\" on a never-activated workflow fails with \\\"The initial version of a workflow can not be deleted\\\"",
+      "summary": "An error toast appears bottom right: \\\"The initial version of a workflow can not be deleted\\\", the console logs the same error and the DELETE request fails. Nothing is discarded: the workflow keeps its \\\"Draft\\\" badge and the \\\"Discard Draft\\\" button stays in the toolbar, so the toolbar offers an action that can never succeed on a newly created workflow. (on /object/workflow/adbfc0d5-eaac-4b06-a062-eabcc087ef2e)",
+      "expected": "Either the draft of a never-activated workflow is discarded (and the button disappears once there is nothing to discard), or the button is not offered at all for a workflow whose only version is the initial one — no error is shown for an ordinary toolbar action.",
+      "actual": "An error toast appears bottom right: \\\"The initial version of a workflow can not be deleted\\\", the console logs the same error and the DELETE request fails. Nothing is discarded: the workflow keeps its \\\"Draft\\\" badge and the \\\"Discard Draft\\\" button stays in the toolbar, so the toolbar offers an action that can never succeed on a newly created workflow.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open /objects/workflows.",
+        "Click \"New Workflow\": a new workflow opens in the editor with the name field active.",
+        "Type agent13-nav and press Enter, then click the \"Add a Trigger\" node and choose \"Launch manually\" in the Trigger Type panel.",
+        "Click the \"Discard Draft\" button in the editor toolbar."
+      ]
+    },
+    {
+      "index": 12,
+      "reported_at_seconds": 1037,
+      "name": "Version detail shows the trigger as raw truncated JSON in the \\\"Version trigger\\\" field",
+      "summary": "The \"Version trigger\" field shows a raw JSON blob, cut off at the field edge: {\\\"name\\\":\\\"Record is created\\\",\\\"typ — with no readable trigger name and no way to see the rest of the text. (on /object/workflowVersion/2c5e2c79-870a-49c5-bec4-8f37afe102c3)",
+      "expected": "A readable value (e.g. the trigger \"Record is created\" on Opportunities, as shown on the graph behind it), or the field left empty.",
+      "actual": "The \"Version trigger\" field shows a raw JSON blob, cut off at the field edge: {\\\"name\\\":\\\"Record is created\\\",\\\"typ — with no readable trigger name and no way to see the rest of the text.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev.",
+        "Open the workflow version record of any version of a workflow that has a trigger, e.g. /object/workflowVersion/2c5e2c79-870a-49c5-bec4-8f37afe102c3 (version v2 of the workflow \"agent11-restore-test\").",
+        "Read the \"Version trigger\" field under Fields > General."
+      ]
+    },
+    {
+      "index": 13,
+      "reported_at_seconds": 1070,
+      "name": "Clearing the schedule trigger's cron expression is saved silently — \"On a schedule\" trigger left with no schedule and no error",
+      "summary": "Clearing the field saves it immediately (the trigger update request returns 200), no validation message appears, and the 'at … UTC' description and 'Upcoming execution time (UTC)' list simply disappear. After a reload the expression is still empty (grey placeholder only), so an 'On a schedule' trigger is stored with no cron at all; the panel still says 'Cron will be triggered at UTC time'. (on /object/workflow/0cf3e241-eb48-4c94-9dde-7c1b15fd370b)",
+      "expected": "An empty cron expression should be refused with an error message next to the field (as an invalid pattern like 99 99 * * * is), and the previously saved schedule should stay; the trigger should never be saved with no schedule.",
+      "actual": "Clearing the field saves it immediately (the trigger update request returns 200), no validation message appears, and the 'at … UTC' description and 'Upcoming execution time (UTC)' list simply disappear. After a reload the expression is still empty (grey placeholder only), so an 'On a schedule' trigger is stored with no cron at all; the panel still says 'Cron will be triggered at UTC time'.",
+      "reproSteps": [
+        "Open https://5500-inb17rqkl0j8zj8qvdtvb.e2b.app/objects/workflows and click '+ New Workflow' (a new editor opens).",
+        "Click the 'Trigger / Add a Trigger' node and choose 'On a schedule' in the right-hand Trigger Type panel.",
+        "Set Trigger interval to 'Cron (Custom)' and type 30 2 * * * in Expression — the panel shows 'at 02:30 UTC' and an 'Upcoming execution time (UTC)' list.",
+        "Select the whole Expression and clear it (empty field), then click the 'Expression' label to leave the field.",
+        "Reload the page and click the trigger node again to reopen the panel."
+      ]
+    },
+    {
+      "index": 14,
+      "reported_at_seconds": 1072,
+      "name": "Delay action accepts a negative number of hours and saves it with no validation",
+      "summary": "The Hours field accepts \\\"-5\\\", shows no error, saves it silently (a step update request fires when the field is left) and after a page reload the Delay node still holds Hours = -5, with Days/Minutes/Seconds = 0, so the delay resolves to a negative duration. (on /object/workflow/e4a60cf4-0dfa-4729-890f-cb25936af600)",
+      "expected": "A duration field should refuse a negative number with a visible message (or clamp it to 0) and not store a negative delay on the node.",
+      "actual": "The Hours field accepts \\\"-5\\\", shows no error, saves it silently (a step update request fires when the field is left) and after a page reload the Delay node still holds Hours = -5, with Days/Minutes/Seconds = 0, so the delay resolves to a negative duration.",
+      "reproSteps": [
+        "Open the workflow at /object/workflow/e4a60cf4-0dfa-4729-890f-cb25936af600 (canvas: Launch manually > Create Record > Delay).",
+        "Click the \"Delay\" action node to open its configuration panel (Resume = \"After a set amount of time\", Days/Hours/Minutes/Seconds = 0).",
+        "Type \"-5\" into the Hours field and click on the canvas to leave the field (a step update request is sent).",
+        "Reload the page and click the Delay node again: the Hours field still shows \"-5\"."
+      ]
+    },
+    {
+      "index": 15,
+      "reported_at_seconds": 1109,
+      "name": "The banner's \\\"Reconnect\\\" button leads to a blank page with no message, only a raw error in the URL",
+      "summary": "The browser goes to /verify?errorMessage=Google+apis+auth+is+not+enabled and shows a completely blank white page: no message, no navigation, no way back except the browser's Back button. The only trace of the reason is the raw text in the address bar (\"Google apis auth is not enabled\"). (on /object/workflow/2aedbf10-cc03-4437-acbf-112d63d200fc → /verify)",
+      "expected": "Reconnect either opens the account/mailbox connection screen, or the page says in words why the reconnect cannot happen (e.g. \"Google API auth is not enabled\") with a way back to the workflows.",
+      "actual": "The browser goes to /verify?errorMessage=Google+apis+auth+is+not+enabled and shows a completely blank white page: no message, no navigation, no way back except the browser's Back button. The only trace of the reason is the raw text in the address bar (\"Google apis auth is not enabled\").",
+      "reproSteps": [
+        "Open any page of the Workflows area, e.g. /objects/workflows or a workflow editor page such as /object/workflow/2aedbf10-cc03-4437-acbf-112d63d200fc, signed in as tim@apple.dev.",
+        "In the banner 'Sync lost with mailbox tim@apple.dev. Please reconnect for updates:' click the 'Reconnect' button.",
+        "Observe the page that opens: it is blank white."
+      ]
+    },
+    {
+      "index": 16,
+      "reported_at_seconds": 1149,
+      "name": "Double-clicking \"Test\" runs the workflow twice and creates duplicate records",
+      "summary": "Both clicks go through: two runs are created for the same workflow (\"#2 - agent12-run-test\" and \"#3 - agent12-run-test\", both Completed) and the workflow's Create Record action runs twice, leaving two extra duplicate notes \"agent12-note\" with the body \"agent12 body text\". Nothing disables the Test button or asks to confirm. (on /object/workflow/d000a9ab-3535-4d6f-bdf1-0ac58a816a4f (workflow \"agent12-run-test\"), effect in /objects/workflowRuns and /objects/notes)",
+      "expected": "One test run: the Test button is disabled or ignored while the first test is starting, so a quick double-click does not run the workflow twice and does not create duplicate records.",
+      "actual": "Both clicks go through: two runs are created for the same workflow (\"#2 - agent12-run-test\" and \"#3 - agent12-run-test\", both Completed) and the workflow's Create Record action runs twice, leaving two extra duplicate notes \"agent12-note\" with the body \"agent12 body text\". Nothing disables the Test button or asks to confirm.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open the workflow \"agent12-run-test\" (/object/workflow/d000a9ab-3535-4d6f-bdf1-0ac58a816a4f); it has the trigger \"Launch manually\" and one \"Create Record\" action that creates a Note titled \"agent12-note\" with body \"agent12 body text\"",
+        "Double-click the \"Test\" button in the workflow toolbar quickly",
+        "Open /objects/workflowRuns and look at the runs of workflow \"agent12-run-test\"",
+        "Open /objects/notes and look at the notes titled \"agent12-note\""
+      ]
+    },
+    {
+      "index": 17,
+      "reported_at_seconds": 1322,
+      "name": "Command menu search finds no results for existing (recently created) workflows",
+      "summary": "The command menu answers \\\"Fallback → Search → No results found\\\" for each of these names, although every one of them exists in the workflows list behind the panel (visible at /objects/workflows): \\\"agent10-list-test\\\", \\\"agent13\\\", \\\"repro-form-test\\\". Only older records are found — typing \\\"agent7\\\" returns \\\"agent7-status\\\" and \\\"Quick Lead\\\" returns Quick Lead, so the record search itself works, it is the recently created/renamed workflows that are missing. (on /objects/workflows)",
+      "expected": "Typing the name (or a prefix) of an existing workflow should list that workflow as a record result and let the person open it.",
+      "actual": "The command menu answers \\\"Fallback → Search → No results found\\\" for each of these names, although every one of them exists in the workflows list behind the panel (visible at /objects/workflows): \\\"agent10-list-test\\\", \\\"agent13\\\", \\\"repro-form-test\\\". Only older records are found — typing \\\"agent7\\\" returns \\\"agent7-status\\\" and \\\"Quick Lead\\\" returns Quick Lead, so the record search itself works, it is the recently created/renamed workflows that are missing.",
+      "reproSteps": [
+        "Go to /objects/workflows (signed in as tim@apple.dev).",
+        "Open the command menu with the \"...\" button at the top right of the page.",
+        "Type the exact name of a workflow that exists in the list, e.g. \"agent10-list-test\" (a workflow created a couple of minutes earlier), or \"agent13\" (the row \"agent13-nav\" is in the list), or \"repro-form-test\".",
+        "Read the results area on the right."
+      ]
+    },
+    {
+      "index": 18,
+      "reported_at_seconds": 1324,
+      "name": "\"Add a Node\" adds a step detached from the flow, and Activate publishes it without warning",
+      "summary": "The \\\"Delay\\\" node is added as an isolated node on the canvas — the only edge in the graph still joins Trigger to \\\"Create Record\\\" — and the status chip goes from Draft to Active after \\\"Activate\\\" with no warning. The workflow is now published with a step that is not reachable from the trigger, so it never runs. (on /object/workflow/179e33c9-9502-40a8-8eca-a5aaf3bb94ee)",
+      "expected": "The step added from the toolbar should become part of the workflow (connected to the previous step, or the user should be told to connect it), and activation should refuse or warn about a step that is not reachable from the trigger.",
+      "actual": "The \\\"Delay\\\" node is added as an isolated node on the canvas — the only edge in the graph still joins Trigger to \\\"Create Record\\\" — and the status chip goes from Draft to Active after \\\"Activate\\\" with no warning. The workflow is now published with a step that is not reachable from the trigger, so it never runs.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev, open /objects/workflows and open the workflow \"agent2-name-test\" (Active, trigger \"Record is created\" + action \"Create Record\").",
+        "In the editor toolbar click \"Add a Node\" (top right of the canvas).",
+        "In the \"Select Action\" side panel click \"Delay\" (Flow section).",
+        "Look at the canvas: the new \"Action Delay\" node is drawn at the bottom left with no line joining it to the previous \"Create Record\" node.",
+        "Click \"Activate\" in the toolbar, then look at the canvas again."
+      ]
+    },
+    {
+      "index": 19,
+      "reported_at_seconds": 1435,
+      "name": "\\\"See Runs\\\" on a Workflow Version shows every run of the workspace / of the whole workflow instead of that version's runs",
+      "summary": "The Runs list is not limited to that version. For version v3 of \\\"agent11-restore-test\\\" (/object/workflowVersion/6812e028-9df0-428c-80d1-bb9258e63624, whose workflow has no runs) it opened /objects/workflowRuns?filter[recordStore]...[0]=6812e028... with no filter chip at all and listed all 37 runs of the workspace, from other workflows (agent12-run-test, agent2-name-test, Create company...). For version v1 of \\\"Create company when adding a new person\\\" the generated URL carried both a workflow filter and a recordStore (version) filter, but only the \\\"Workflow: Create company when adding a new person\\\" chip was applied: 7 runs of the workflow were listed instead of that version's runs. (on /object/workflowVersion/6812e028-9df0-428c-80d1-bb9258e63624)",
+      "expected": "The Workflow Runs list opens filtered to the runs of the version whose record the button belongs to (a version with no runs shows an empty list with an empty-state message).",
+      "actual": "The Runs list is not limited to that version. For version v3 of \\\"agent11-restore-test\\\" (/object/workflowVersion/6812e028-9df0-428c-80d1-bb9258e63624, whose workflow has no runs) it opened /objects/workflowRuns?filter[recordStore]...[0]=6812e028... with no filter chip at all and listed all 37 runs of the workspace, from other workflows (agent12-run-test, agent2-name-test, Create company...). For version v1 of \\\"Create company when adding a new person\\\" the generated URL carried both a workflow filter and a recordStore (version) filter, but only the \\\"Workflow: Create company when adding a new person\\\" chip was applied: 7 runs of the workflow were listed instead of that version's runs.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev.",
+        "Open a workflow version record, e.g. /object/workflowVersion/6812e028-9df0-428c-80d1-bb9258e63624 (v3 of \"agent11-restore-test\", which has no runs).",
+        "Click \"See Runs\" in the record header.",
+        "Read the Workflow Runs list: it shows 37 runs of other workflows and no filter chip.",
+        "Repeat on /object/workflowVersion/6766a511-cf95-5255-866c-e23c1a8cc5f9 (v1 of \"Create company when adding a new person\", Active) and click \"See Runs\": only the workflow filter is applied and the list shows all 7 runs of that workflow, not the runs of this version."
+      ]
+    },
+    {
+      "index": 20,
+      "reported_at_seconds": 1556,
+      "name": "\\\"Duplicate Workflow\\\" creates nothing and shows the internal message \\\"Workflow version does not contain trigger\\\"",
+      "summary": "Nothing is created: the row count stays the same, and a toast at the bottom right says \\\"Workflow version does not contain trigger\\\". No confirmation dialog and no explanation of what is missing. The same happens on a workflow that has never had a trigger configured (the state every workflow created with \\\"Add New\\\" starts in). (on /objects/workflows)",
+      "expected": "A copy of the workflow should be created and appear in the list (named e.g. \\\"agent10-list-test (Duplicate)\\\"), or the app should say in the person's words why a draft without a trigger cannot be duplicated.",
+      "actual": "Nothing is created: the row count stays the same, and a toast at the bottom right says \\\"Workflow version does not contain trigger\\\". No confirmation dialog and no explanation of what is missing. The same happens on a workflow that has never had a trigger configured (the state every workflow created with \\\"Add New\\\" starts in).",
+      "reproSteps": [
+        "Go to /objects/workflows and filter the list: Filter > Name > Contains > agent10-list-test, so only the workflow \"agent10-list-test\" (a draft created with the \"Add New\" row, never given a trigger) is shown.",
+        "Right-click the \"agent10-list-test\" row.",
+        "Choose \"Duplicate Workflow\" in the row context menu.",
+        "Look at the list count and at the bottom-right of the window."
+      ]
+    }
+  ]
+}

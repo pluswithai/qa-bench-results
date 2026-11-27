@@ -1,0 +1,137 @@
+{
+  "bugs": [
+    {
+      "name": "The same tag pattern can be protected twice, leaving two identical rule rows",
+      "summary": "A second identical rule is created and the success banner \"The repository settings have been updated.\" appears; the table then lists two identical rows \"agent10-v* — No One\" with identical Edit/Remove buttons, and both persist after a reload. Removing one of them still leaves the other rule protecting the same tags, so the owner cannot tell which row protects what. (on /eval/harbor-handbook/settings/tags)",
+      "expected": "The duplicate pattern is refused with an error next to the field (as an invalid pattern is), and only one protection rule per pattern exists.",
+      "actual": "A second identical rule is created and the success banner \"The repository settings have been updated.\" appears; the table then lists two identical rows \"agent10-v* — No One\" with identical Edit/Remove buttons, and both persist after a reload. Removing one of them still leaves the other rule protecting the same tags, so the owner cannot tell which row protects what.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-imv8yr62nz49o7qx2vsk0.e2b.app/eval/harbor-handbook/settings/tags",
+        "In the 'Tag Pattern' field type agent10-v* and click 'Protect Tag' → one row appears in the Tag Pattern table",
+        "Type the same pattern agent10-v* in the 'Tag Pattern' field again and click 'Protect Tag'",
+        "Read the banner and the Tag Pattern table, then reload the page"
+      ],
+      "severity": 3
+    },
+    {
+      "name": "A long tag pattern widens the protected-tags table past the page and pushes Allowed/Edit/Remove off screen",
+      "summary": "The rule is created and the long pattern is printed on one unwrapped line, so the table grows to ~1494 px inside the 1280 px window: the page gains a horizontal scrollbar (document scrollWidth 1502 vs 1280) and the Allowed value plus the Edit and Remove buttons of the other rows are pushed off the right edge — the long row's own Allowed/Edit/Remove controls cannot be seen without scrolling sideways. (on /eval/harbor-handbook/settings/tags)",
+      "expected": "The pattern is either refused for length or wraps inside the Tag Pattern cell, so the table keeps the page width and every row's Allowed value and Edit/Remove buttons stay visible.",
+      "actual": "The rule is created and the long pattern is printed on one unwrapped line, so the table grows to ~1494 px inside the 1280 px window: the page gains a horizontal scrollbar (document scrollWidth 1502 vs 1280) and the Allowed value plus the Edit and Remove buttons of the other rows are pushed off the right edge — the long row's own Allowed/Edit/Remove controls cannot be seen without scrolling sideways.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-imv8yr62nz49o7qx2vsk0.e2b.app/eval/harbor-handbook/settings/tags",
+        "In the 'Tag Pattern' field paste a long pattern: agent10- followed by about 200 'a' characters and then *",
+        "Click 'Protect Tag'",
+        "Scroll down to the Tag Pattern table and look at the page width and the row"
+      ],
+      "severity": 1
+    },
+    {
+      "name": "'Delete Wiki Data' succeeds on an archived repository",
+      "summary": "The purge runs on the archived repository: the page answers \\\"The repository wiki data has been deleted.\\\", the repository's wiki data is deleted, and the Wiki tab disappears from the repo navigation (the wiki is switched off) — a destructive data operation and a settings change on a repository the app calls read-only. Only the wiki editor itself (POST of a new wiki page) is blocked, with a bare 404. (on /eval/agent12-renamed/settings)",
+      "expected": "Archiving promises the repo is \\\"entirely read-only\\\" (\\\"Nobody (not even you!) will be able to make new commits, or open any issues or pull requests\\\"), so a destructive wiki purge should be refused with a message saying the repository is archived and read-only.",
+      "actual": "The purge runs on the archived repository: the page answers \\\"The repository wiki data has been deleted.\\\", the repository's wiki data is deleted, and the Wiki tab disappears from the repo navigation (the wiki is switched off) — a destructive data operation and a settings change on a repository the app calls read-only. Only the wiki editor itself (POST of a new wiki page) is blocked, with a bare 404.",
+      "reproSteps": [
+        "Sign in as eval, create a repository with a wiki page, then in its Settings > Danger Zone click \"Archive Repo\" and confirm \"Yes\" (header now shows the Archived label).",
+        "On the same archived repository open Settings and scroll to Danger Zone.",
+        "Click \"Delete Wiki Data\", type the repository name (agent12-renamed) in the confirmation field and click \"Delete Wiki Data\".",
+        "Repeat steps 2-3 to check it is repeatable."
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Repository settings of an archived repository can still be saved (description, issue tracker unit)",
+      "summary": "The settings form stays fully editable and the save is accepted: a green flash 'The repository settings have been updated.' appears, and after a reload the Description field holds the new value 'agent3 archived write test'. No read-only warning or disabled field is shown on the settings page of the archived repo. (on /eval/agent3-from-tpl-defaults/settings)",
+      "expected": "An archived repository should behave as the app says ('entirely read-only'): saving a setting should be refused with a message, as commits and issues are.",
+      "actual": "The settings form stays fully editable and the save is accepted: a green flash 'The repository settings have been updated.' appears, and after a reload the Description field holds the new value 'agent3 archived write test'. No read-only warning or disabled field is shown on the settings page of the archived repo.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Archive a disposable repository: /eval/agent3-from-tpl-defaults/settings > Danger Zone > 'Archive Repo' > 'Yes' (the page answers 'The repo was successfully archived.' and the header gets the 'Archived' badge).",
+        "Go back to /eval/agent3-from-tpl-defaults/settings (Settings > Repository).",
+        "Type a new value into the Description field (e.g. 'agent3 archived write test') and click 'Update Settings'.",
+        "Reload the settings page and read the Description field."
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Collaborator user search treats _ and % as wildcards and suggests every user",
+      "summary": "Typing \\\"__\\\" (and \\\"%%\\\") lists all three matching-anything users, alex, eval and maya, as if the search term matched them. The underline/percent signs are treated as SQL wildcards, so the search does not filter at all, while a genuine term like \\\"ale\\\" correctly shows only alex. (on /eval/harbor-handbook/settings/collaboration)",
+      "expected": "No user is suggested, because no username or full name contains \\\"__\\\" (or \\\"%%\\\"); the list should stay empty, as it does for other non-matching input such as '' .",
+      "actual": "Typing \\\"__\\\" (and \\\"%%\\\") lists all three matching-anything users, alex, eval and maya, as if the search term matched them. The underline/percent signs are treated as SQL wildcards, so the search does not filter at all, while a genuine term like \\\"ale\\\" correctly shows only alex.",
+      "reproSteps": [
+        "Sign in as eval and open /eval/harbor-handbook/settings/collaboration.",
+        "Click the \"Search users...\" box and type \"__\" (two underscores).",
+        "Watch the suggestion list that opens under the box.",
+        "Repeat with \"%%\" (two percent signs) in the same box."
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Tag protection 'Allowed users' picker does not offer the Write collaborator alex",
+      "summary": "For \\\"alex\\\" (and \\\"ale\\\") the dropdown answers \\\"No results found.\\\", so the user alex can never be added to a tag rule's Allowed users. The same box does find \\\"maya\\\" when that is typed, so the picker works for some users but not for alex, who is an existing collaborator of this repository (shown on /eval/harbor-handbook/settings/collaboration as alex (Alex Rivera) — Write). No request is sent; the candidate list is simply missing alex. (on /eval/harbor-handbook/settings/tags)",
+      "expected": "Typing \\\"alex\\\" (or the prefix \\\"ale\\\") lists the existing user alex in the dropdown, as typing \\\"maya\\\" lists maya, so alex can be picked as an allowed user of the tag rule.",
+      "actual": "For \\\"alex\\\" (and \\\"ale\\\") the dropdown answers \\\"No results found.\\\", so the user alex can never be added to a tag rule's Allowed users. The same box does find \\\"maya\\\" when that is typed, so the picker works for some users but not for alex, who is an existing collaborator of this repository (shown on /eval/harbor-handbook/settings/collaboration as alex (Alex Rivera) — Write). No request is sent; the candidate list is simply missing alex.",
+      "reproSteps": [
+        "Sign in as eval and open /eval/harbor-handbook/settings/tags (Tag Protection form; the repo's collaborators are alex and maya — visible on /eval/harbor-handbook/settings/collaboration).",
+        "Click into the \"Search users...\" box under \"Allowed users\".",
+        "Type alex (or just ale) and look at the dropdown that opens.",
+        "For comparison, retype maya in the same box: the dropdown then lists maya."
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Default Merge Style can be saved as a merge style that is disabled",
+      "summary": "\\\"The repository settings have been updated.\\\" and the stored default merge style is Create merge commit while the Create merge commit style stays unticked (after a reload the form still shows Merge Styles / Create merge commit unticked and Default Merge Style / Create merge commit). The form itself enforces the rule when unticking the current default (it silently switches the dropdown to another style), but the server accepts the invalid combination, so the repository keeps a default merge style it does not allow. (on /eval/agent4-units/settings)",
+      "expected": "The default merge style must be one of the enabled merge styles: either the save is refused with a message next to the field, or choosing it turns the Create merge commit style on. The repository must not end up with a default merge style that is disabled.",
+      "actual": "\\\"The repository settings have been updated.\\\" and the stored default merge style is Create merge commit while the Create merge commit style stays unticked (after a reload the form still shows Merge Styles / Create merge commit unticked and Default Merge Style / Create merge commit). The form itself enforces the rule when unticking the current default (it silently switches the dropdown to another style), but the server accepts the invalid combination, so the repository keeps a default merge style it does not allow.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-ie6qt03l9ux7kxa41h7z4.e2b.app/eval/agent4-units/settings",
+        "In Advanced Settings under Pull Requests untick the merge style \"Create merge commit\" (leave the other styles ticked)",
+        "Open the Default Merge Style dropdown and choose \"Create merge commit\" (it is still offered although its style is unticked)",
+        "Click the Update Settings button of the Advanced Settings section",
+        "Reload the page and read Merge Styles and Default Merge Style"
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Whitespace-only description is saved and leaves an empty Description block and a dangling colon in the page title",
+      "summary": "The whitespace-only description is saved as-is and the repository home page then shows the \"Description\" heading in the sidebar with nothing under it (no \"No description provided\"), and the browser tab title becomes \"eval/agent3-settings:  - agent3-settings - Gitea: Git with a cup of tea.\" with a dangling colon. Saving a truly empty description on the same page correctly shows \"No description provided\", so the same \"no description\" state renders two different ways. (on /eval/agent3-settings/settings)",
+      "expected": "A description of only spaces is trimmed to empty (or refused), and the repository page treats it like an empty description: sidebar shows \"No description provided\" and the page title has no dangling \": \".",
+      "actual": "The whitespace-only description is saved as-is and the repository home page then shows the \"Description\" heading in the sidebar with nothing under it (no \"No description provided\"), and the browser tab title becomes \"eval/agent3-settings:  - agent3-settings - Gitea: Git with a cup of tea.\" with a dangling colon. Saving a truly empty description on the same page correctly shows \"No description provided\", so the same \"no description\" state renders two different ways.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-ie6qt03l9ux7kxa41h7z4.e2b.app/eval/agent3-settings/settings.",
+        "Delete the current text in the Description box and type only spaces (first tried three spaces, second tried a single Tab character).",
+        "Click \"Update Settings\" and wait for \"The repository settings have been updated.\".",
+        "Open https://5503-ie6qt03l9ux7kxa41h7z4.e2b.app/eval/agent3-settings and look at the Description block in the right sidebar, and at the browser tab title."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "A long branch protection pattern overflows the Branch Protection card at phone width",
+      "summary": "At a phone-sized window (390×844) the rule with the long pattern is drawn with its pattern badge running past the right edge of the Branch Protection panel and off the screen, so the end of the pattern cannot be read; the 'Edit'/'Delete Rule' buttons are pushed down and the row no longer fits its card. At 1280px the same badge stays inside the card. (A static layout problem: it is there whenever a long pattern is listed.) (on /eval/agent5-branchtest/settings/branches)",
+      "expected": "The long pattern is wrapped or truncated with an ellipsis inside the Branch Protection card, at any window width, so the row and its buttons stay inside the panel.",
+      "actual": "At a phone-sized window (390×844) the rule with the long pattern is drawn with its pattern badge running past the right edge of the Branch Protection panel and off the screen, so the end of the pattern cannot be read; the 'Edit'/'Delete Rule' buttons are pushed down and the row no longer fits its card. At 1280px the same badge stays inside the card. (A static layout problem: it is there whenever a long pattern is listed.)",
+      "reproSteps": [
+        "Sign in as eval and open /eval/agent5-branchtest/settings/branches.",
+        "Click 'Add New Rule', type the long pattern 'agent5-verylongpattern-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-*' in 'Protected Branch Name Pattern' and click 'Save Rule'.",
+        "Set the browser window to a phone size (390 × 844) and scroll down to the 'Branch Protection' panel."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Saving a stale branch-protection edit form re-creates a rule that was deleted meanwhile",
+      "summary": "The stale tab accepted the save, showed \"Branch protection for rule \"dev2\" has been updated.\" and the rule \"dev2\" is back in the Branch Protection list — the deleted rule was silently re-created (same for a rule named \"dev\" in a first attempt). No message about the rule having been deleted. (on /eval/agent9-secret/settings/branches/edit?rule_name=dev2)",
+      "expected": "The save is refused with a message that the rule no longer exists (the app should notice the stale form), and no protected-branch rule is created again.",
+      "actual": "The stale tab accepted the save, showed \"Branch protection for rule \"dev2\" has been updated.\" and the rule \"dev2\" is back in the Branch Protection list — the deleted rule was silently re-created (same for a rule named \"dev\" in a first attempt). No message about the rule having been deleted.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-ie6qt03l9ux7kxa41h7z4.e2b.app/eval/agent9-secret/settings/branches",
+        "Click 'Add New Rule', type dev2 in 'Protected Branch Name Pattern', click 'Save Rule'",
+        "Open the rule's edit form in a second browser tab: https://5503-ie6qt03l9ux7kxa41h7z4.e2b.app/eval/agent9-secret/settings/branches/edit?rule_name=dev2",
+        "Back in the first tab click 'Delete Rule' next to dev2 and answer 'Yes' in the 'Delete Branch Protection' dialog - the list now says 'Branch protection for rule \"dev2\" has been removed.'",
+        "In the second (stale) tab click 'Save Rule'",
+        "Look at the Branch Protection list"
+      ],
+      "severity": 3
+    }
+  ]
+}

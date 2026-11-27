@@ -1,0 +1,70 @@
+{
+  "bugs": [
+    {
+      "name": "\"Clear filters\" also clears the list search term",
+      "summary": "The search term is silently deleted: the search box becomes empty, query=free disappears from the address, and the whole voucher list is shown again. The person loses a search they typed although there was no filter condition to clear. (on /discounts/vouchers)",
+      "expected": "Only the (empty) filter conditions are cleared; the search term \\\"free\\\" stays in the search box and the list stays filtered to \\\"Free shipping\\\", since the search box is outside the Filters panel.",
+      "actual": "The search term is silently deleted: the search box becomes empty, query=free disappears from the address, and the whole voucher list is shown again. The person loses a search they typed although there was no filter condition to clear.",
+      "reproSteps": [
+        "Sign in and open /discounts/vouchers.",
+        "Type \"free\" into the \"Search vouchers...\" box and wait: the list narrows to the single voucher \"Free shipping\" and the address gains query=free.",
+        "Click \"Filters\" to open the filter panel (no filter condition is set, \"Where\" row is empty).",
+        "Click \"Clear filters\" in the panel."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Filter field picker: typing a field name and pressing Enter selects nothing but leaves the typed text looking like a chosen field",
+      "summary": "The field keeps the text \\\"Started\\\" as if it were selected, but the operator box stays empty, the value box stays empty and disabled, and \\\"Apply\\\" stays disabled. Clicking the operator box opens nothing (no options), so the condition can never be completed; the user has to remove the row or choose another field. Typing a field name and clicking its option in the dropdown works normally. (on /discounts/vouchers)",
+      "expected": "Enter behaves like choosing the option in the dropdown: the condition gets its operator (and value picker), so it can be filled and applied — or Enter does nothing at all instead of leaving a half-configured row.",
+      "actual": "The field keeps the text \\\"Started\\\" as if it were selected, but the operator box stays empty, the value box stays empty and disabled, and \\\"Apply\\\" stays disabled. Clicking the operator box opens nothing (no options), so the condition can never be completed; the user has to remove the row or choose another field. Typing a field name and clicking its option in the dropdown works normally.",
+      "reproSteps": [
+        "Sign in and open /discounts/vouchers.",
+        "Click \"Filters\", then \"Add condition\" to get an empty \"Where\" row.",
+        "Type a field name into the \"Where\" combobox, e.g. \"Started\" (or \"Discount type\"), and press Enter.",
+        "Click the operator dropdown next to it (the empty box between the field and the wide value box)."
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Voucher codes table says \"Selected 1 items\" for a single selected code",
+      "summary": "The table header read \"Selected 1 items\" — plural for a single selected row — and the delete-confirmation dialog said \"Delete voucher codes / These codes will be removed when you save the voucher\" in the plural for that one code. (on /discounts/vouchers/Vm91Y2hlcjoz)",
+      "expected": "With exactly one row selected the counter should read \"Selected 1 item\", and the confirmation dialog should refer to one code.",
+      "actual": "The table header read \"Selected 1 items\" — plural for a single selected row — and the delete-confirmation dialog said \"Delete voucher codes / These codes will be removed when you save the voucher\" in the plural for that one code.",
+      "reproSteps": [
+        "Sign in as admin@example.com and open Discounts > Vouchers.",
+        "Open the voucher 'Single Use Vouchers' (50 codes) from the list.",
+        "Click the Codes section if needed so the voucher codes table is on screen.",
+        "Tick the checkbox of the first code row (SINGLE-USE-050).",
+        "Read the table header where the header checkbox was: it says 'Selected 1 items'."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Ended voucher is labelled \"Inactive\" in the detail header but \"Ended\" in the Schedule card and the list",
+      "summary": "The Schedule card and the vouchers list call the state \\\"Ended\\\" (list row: \\\"Ended · 20,780 days ago\\\"), while the voucher header chip for the very same voucher calls it \\\"Inactive\\\" (\\\"Inactive · 20,780 days ago\\\"). (on /discounts/vouchers/<voucher>)",
+      "expected": "One name for one state: the header chip uses the same wording as the Schedule card and the list.",
+      "actual": "The Schedule card and the vouchers list call the state \\\"Ended\\\" (list row: \\\"Ended · 20,780 days ago\\\"), while the voucher header chip for the very same voucher calls it \\\"Inactive\\\" (\\\"Inactive · 20,780 days ago\\\").",
+      "reproSteps": [
+        "Sign in as admin@example.com / admin and open the voucher 'agent7-sched' (/discounts/vouchers/Vm91Y2hlcjoxMg%3D%3D).",
+        "In the Schedule card set Start Date 01/01/1970 12:00 AM, tick 'Set end date', set End Date 01/02/1970 12:00 AM and click 'Save'.",
+        "Look at the Schedule card: its badge reads 'Ended'. Look at the header chip next to the voucher name in the same screen: it reads 'Inactive · 20,780 days ago'.",
+        "Open /discounts/vouchers and search 'agent7-sched': the Status column of the same voucher reads 'Ended · 20,780 days ago'."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Vouchers list shows the error page for a hand-typed sort value (?sort=name, ?sort=status)",
+      "summary": "The whole page shows \\\"We've encountered an unexpected error — Try to refresh the page or go navigate to a different page and back.\\\" instead of the voucher list, and the console throws \\\"Error: Value name not found in enum\\\". The same happens with ?asc=false&sort=status. Reloading does not help; only removing the sort parameter or using sort=code brings the list back. (on /discounts/vouchers)",
+      "expected": "The vouchers list loads with the default sort (or ignores an unknown sort value) and shows the vouchers table.",
+      "actual": "The whole page shows \\\"We've encountered an unexpected error — Try to refresh the page or go navigate to a different page and back.\\\" instead of the voucher list, and the console throws \\\"Error: Value name not found in enum\\\". The same happens with ?asc=false&sort=status. Reloading does not help; only removing the sort parameter or using sort=code brings the list back.",
+      "reproSteps": [
+        "Go to https://5503-iczexfc5c5jr1740fp5kf.e2b.app/discounts/vouchers?asc=false&sort=name (a fresh navigation, e.g. pasting the address).",
+        "Observe that the content area shows the illustration and the text \"We've encountered an unexpected error\".",
+        "Reload the page: the same error page appears again.",
+        "Repeat with https://5503-iczexfc5c5jr1740fp5kf.e2b.app/discounts/vouchers?asc=false&sort=status — same error page."
+      ],
+      "severity": 5
+    }
+  ]
+}

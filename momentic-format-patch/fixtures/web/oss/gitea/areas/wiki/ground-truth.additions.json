@@ -1,0 +1,110 @@
+{
+  "bugs": [
+    {
+      "name": "ArrowDown in the wiki \"Filter page...\" box empties the box but the page list stays filtered",
+      "summary": "The filter box empties and shows its 'Filter page...' placeholder again, but the list stays filtered to the two 'beta' matches, so ~20 pages are hidden with no visible filter. After Escape and reopening the dropdown the box is still empty while the list is still filtered; only typing a character and deleting it brings all pages back. (on /eval/harbor-handbook/wiki/Filt-alpha.-)",
+      "expected": "The typed query stays visible in the filter box while the list is filtered by it (or the box and the list always agree), so the user can see which filter is applied and clear it.",
+      "actual": "The filter box empties and shows its 'Filter page...' placeholder again, but the list stays filtered to the two 'beta' matches, so ~20 pages are hidden with no visible filter. After Escape and reopening the dropdown the box is still empty while the list is still filtered; only typing a character and deleting it brings all pages back.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /eval/harbor-handbook/wiki/Filt-alpha.-",
+        "Click the 'Page: Filt-alpha' dropdown button at the top left of the wiki page",
+        "Type 'beta' into the 'Filter page...' box: the list correctly narrows to 'Filt-beta' and 'RenBeta'",
+        "Press the Down arrow key once",
+        "Look at the filter box and at the list",
+        "Also press Escape, then click 'Page: ...' again to reopen the dropdown"
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Commit diff summary counts ignore the whitespace option, so they contradict the diff shown",
+      "summary": "The summary still says \\\"1 changed files with 6 additions and 3 deletions\\\" while the diff below shows 5 added lines (# Version four, Delta line two., Epsilon line three., Zeta line four., Omega line six.) and 2 deleted lines (# Version three, Gamma line two.). The file header badge, by contrast, changes from 9 to 7 changed blocks for the same option, so the page contradicts itself. (on /eval/harbor-handbook/wiki/commit/39931523d080ed6d7e89c17bcdd10c580884e5a7)",
+      "expected": "The summary counts describe the diff that is displayed: with the whitespace-at-EOL change ignored, \\\"Common line here.\\\" is shown as unchanged context, so the summary should read 5 additions and 2 deletions.",
+      "actual": "The summary still says \\\"1 changed files with 6 additions and 3 deletions\\\" while the diff below shows 5 added lines (# Version four, Delta line two., Epsilon line three., Zeta line four., Omega line six.) and 2 deleted lines (# Version three, Gamma line two.). The file header badge, by contrast, changes from 9 to 7 changed blocks for the same option, so the page contradicts itself.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open the wiki page /eval/harbor-handbook/wiki/Agent2-Rev-1.-",
+        "Open its revision history and the newest commit \"agent2: <b>x</b> & \"quotes\" 🎯 ünïcode\" (SHA 39931523d0)",
+        "In the diff options menu (the \"...\" next to Split View) choose \"Ignore changes in whitespace at EOL\" — the address becomes ?style=unified&whitespace=ignore-eol",
+        "Read the summary line above the file and compare it with the + and - lines shown in Agent2-Rev-1.-.md"
+      ],
+      "severity": 3
+    },
+    {
+      "name": "A long unbroken page name stretches the wiki Pages list past the viewport and pushes \"Last updated\" off-screen",
+      "summary": "The name is rendered on one 1775 px wide line that runs past the list panel's right border and off the screen (it is cut at the viewport edge); the document becomes 1844 px wide at a 1280 px viewport, so the whole Pages page scrolls horizontally. (on /eval/harbor-handbook/wiki/_pages)",
+      "expected": "The page name wraps or is truncated inside the list panel, and the page never scrolls sideways.",
+      "actual": "The name is rendered on one 1775 px wide line that runs past the list panel's right border and off the screen (it is cut at the viewport edge); the document becomes 1844 px wide at a 1280 px viewport, so the whole Pages page scrolls horizontally.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-ipj8k3in3f2cenwjnb2vr.e2b.app/eval/harbor-handbook/wiki?action=_new",
+        "Type a long page title of one unbroken word, e.g. \"agent4 long title aaaa…\" (about 215 characters) and click \"Save Page\". The page is created at /wiki/agent4-long-title-aaaa…",
+        "Go to the Pages list: https://5503-ipj8k3in3f2cenwjnb2vr.e2b.app/eval/harbor-handbook/wiki/_pages and look at the row of that page (scroll down until it is visible)."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Table of Contents shows raw HTML tags of a heading (<b>bold heading</b>) instead of its text",
+      "summary": "The heading body renders \\\"bold heading\\\" in bold, but the Table of Contents entry shows the markup literally: <b>bold heading</b> (the tags are escaped and displayed to the reader). (on /eval/harbor-handbook/wiki/Md-agent6.-)",
+      "expected": "The Table of Contents entry shows the heading's readable text (\\\"bold heading\\\"), the same text the heading itself renders.",
+      "actual": "The heading body renders \\\"bold heading\\\" in bold, but the Table of Contents entry shows the markup literally: <b>bold heading</b> (the tags are escaped and displayed to the reader).",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-ipj8k3in3f2cenwjnb2vr.e2b.app/eval/harbor-handbook/wiki",
+        "Click \"New Page\", type the page title \"Md-agent6\", and switch the editor to the plain Markdown one with the \"Use the legacy editor instead\" button (or press the \"Revert to simple textarea\" button if the toolbar editor opens)",
+        "In the page content type a heading that contains inline HTML: ## <b>bold heading</b>",
+        "Click \"Save Page\" and look at the \"Table of Contents\" panel on the right of the rendered page"
+      ],
+      "severity": 1
+    },
+    {
+      "name": "_Sidebar box drops out of the right column when the page body is shorter than the Table of Contents (seen at 768 px)",
+      "summary": "At 768px on this short page the \"Navigation\" (_Sidebar) box is not in the right column: it is drawn at x≈452–600, indented into/below the page-content column and left of the right-hand column, so it is not aligned with the \"Table of Contents\" box above it (which sits at x≈617–737) and it hangs half under the content card. The footer box below it starts again at the left edge (x=16) and spans the full width. The same wiki at the same width, on the longer Home page, places the sidebar correctly under the Table of Contents in the right column — so the sidebar/footer layout depends on the page's content length and breaks on short pages. (on /eval/harbor-handbook/wiki/agent14-renamed-short.-)",
+      "expected": "The _Sidebar box should stay in the right-hand column, aligned under the Table of Contents box, on every wiki page at 768px width, as it does on the Home page.",
+      "actual": "At 768px on this short page the \"Navigation\" (_Sidebar) box is not in the right column: it is drawn at x≈452–600, indented into/below the page-content column and left of the right-hand column, so it is not aligned with the \"Table of Contents\" box above it (which sits at x≈617–737) and it hangs half under the content card. The footer box below it starts again at the left edge (x=16) and spans the full width. The same wiki at the same width, on the longer Home page, places the sidebar correctly under the Table of Contents in the right column — so the sidebar/footer layout depends on the page's content length and breaks on short pages.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and set the window to about 768 × 1024 (tablet width).",
+        "Open the wiki page /eval/harbor-handbook/wiki/agent14-renamed-short.- (a page with a short body — mine has one heading and one line of text; the wiki has a _Sidebar page, so the \"Navigation\" box is shown).",
+        "Compare the position of the \"Navigation\" (_Sidebar) box with the \"Table of Contents\" box above it and with the footer box below.",
+        "Reload the page and look again.",
+        "For comparison, open /eval/harbor-handbook/wiki (Home, longer body) at the same width."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "RSS feed item titles carry escaped HTML link markup instead of plain text",
+      "summary": "Every item title contains escaped HTML anchor markup: for example <title>eval commented on issue &lt;a href=&#34;https://…/issues/4&#34;&gt;eval/harbor-handbook#4&lt;/a&gt;</title> and <title>eval pushed to &lt;a href=&#34;…&#34;&gt;docs/release-owners&lt;/a&gt; at &lt;a href=&#34;…&#34;&gt;eval/harbor-handbook&lt;/a&gt;</title>. A feed reader therefore shows the title as literal text: eval commented on issue <a href=\"https://…/issues/4\">eval/harbor-handbook#4</a>. The description text is properly HTML and CDATA encoded; only the titles carry the markup. (on /eval/harbor-handbook.rss)",
+      "expected": "Feed item titles should be plain text, e.g. \"eval commented on issue eval/harbor-handbook#4\", with the link in <link>, so a feed reader displays a readable title.",
+      "actual": "Every item title contains escaped HTML anchor markup: for example <title>eval commented on issue &lt;a href=&#34;https://…/issues/4&#34;&gt;eval/harbor-handbook#4&lt;/a&gt;</title> and <title>eval pushed to &lt;a href=&#34;…&#34;&gt;docs/release-owners&lt;/a&gt; at &lt;a href=&#34;…&#34;&gt;eval/harbor-handbook&lt;/a&gt;</title>. A feed reader therefore shows the title as literal text: eval commented on issue <a href=\"https://…/issues/4\">eval/harbor-handbook#4</a>. The description text is properly HTML and CDATA encoded; only the titles carry the markup.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1",
+        "Open https://5503-ixlrdcr4kwxgn019fmdah.e2b.app/eval/harbor-handbook/wiki and click the \"RSS Feed\" button in the repository header (its address is /eval/harbor-handbook.rss)",
+        "Read the <title> elements of the first feed items"
+      ],
+      "severity": 1
+    },
+    {
+      "name": "A note made only of spaces saves a wiki revision with a blank commit message",
+      "summary": "The commit is created with an empty Message: the newest row of 'Wiki Page Revisions' shows a blank Message cell, while a save with an untouched (empty) note gets the automatic message 'Update agent6-mobile-renamed'. The history ends up with a revision whose message is whitespace only, so the page's history no longer says anything about that change. (on /eval/harbor-handbook/wiki/agent6-mobile-renamed.-?action=_revision)",
+      "expected": "A note made only of spaces is treated like an empty note: the commit gets the automatic message (e.g. 'Update agent6-mobile-renamed') instead of a blank one.",
+      "actual": "The commit is created with an empty Message: the newest row of 'Wiki Page Revisions' shows a blank Message cell, while a save with an untouched (empty) note gets the automatic message 'Update agent6-mobile-renamed'. The history ends up with a revision whose message is whitespace only, so the page's history no longer says anything about that change.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-ixlrdcr4kwxgn019fmdah.e2b.app/eval/harbor-handbook/wiki/agent6-mobile-renamed.-?action=_edit (any page you own)",
+        "Change the content to 'h1 rev three (spaces-only note)'",
+        "Type five spaces into the 'Write a note about this page update (optional).' field",
+        "Click 'Save Page'",
+        "Open https://5503-ixlrdcr4kwxgn019fmdah.e2b.app/eval/harbor-handbook/wiki/agent6-mobile-renamed.-?action=_revision and read the Message column of the newest commit"
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Deleting a wiki page that was already deleted in another tab answers 500 and gives the user no message",
+      "summary": "The request POST /eval/harbor-handbook/wiki/agent8-stale.-?action=_delete answers 500 Internal Server Error (console: \"Failed to load resource: the server responded with a status of 500\"), the dialog just closes, and the stale page view stays exactly as it was — the page body \"stale tab test content\" and the Delete Page button are still shown with no error message, although the page no longer exists. Clicking Delete Page → Yes again in the same tab gives the same 500 and the same silent result. (on /eval/harbor-handbook/wiki/agent8-stale.-)",
+      "expected": "Either the delete is detected as already done and the tab tells the user the page was deleted (e.g. \"page does not exist\" and a way back to the wiki), or at worst it reports that the deletion failed. It must not fail with a server error and no message.",
+      "actual": "The request POST /eval/harbor-handbook/wiki/agent8-stale.-?action=_delete answers 500 Internal Server Error (console: \"Failed to load resource: the server responded with a status of 500\"), the dialog just closes, and the stale page view stays exactly as it was — the page body \"stale tab test content\" and the Delete Page button are still shown with no error message, although the page no longer exists. Clicking Delete Page → Yes again in the same tab gives the same 500 and the same silent result.",
+      "reproSteps": [
+        "Sign in as eval and create a wiki page named \"agent8-stale\" with the body \"stale tab test content\" (New Page on /eval/harbor-handbook/wiki).",
+        "Open /eval/harbor-handbook/wiki/agent8-stale.- in two browser tabs (tab A and tab B).",
+        "In tab A click the red \"Delete Page\" button and \"Yes\" in the dialog; the page is deleted and tab A goes back to the wiki Home page.",
+        "Switch to tab B, which still shows the page, click its red \"Delete Page\" button and \"Yes\" in the dialog."
+      ],
+      "severity": 3
+    }
+  ]
+}

@@ -1,0 +1,204 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "metabase/areas/querying",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "b0bba52944c876018da80109a6e1289563723ba2bd75f22353c6dea0f14371fd",
+    "known_invalid_sha256": "55d68abd02f312dcda01a1ada8e1f4954936eb0986a754fa64802e47bcad7e97",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "131",
+    "bugs": "13",
+    "flags": "0",
+    "known_hits": "2",
+    "extra_known_hits": "0",
+    "unverified": "7",
+    "outside_area_known_hits": "1",
+    "outside_area_known_invalid": "0",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "1",
+    "outside_area_ground_truth_sha256": "18765609374b28bc9ff8c4d574f183a1cec470472e42a7e8bae343da32e17da8",
+    "outside_area_known_invalid_sha256": "bda5fa1dae2abd3dbc884c784d0bd82ccd854fe93bc63cc4126be5e14c0b4c18",
+    "duplicates": "0",
+    "duplicate_known_hits": "0",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "3",
+    "known_misses": "3",
+    "precision": "0.4",
+    "recall": "0.015267175572519083",
+    "findings_per_minute": "0.44079152595244875",
+    "correct_findings_per_minute": "0.06781408091576134",
+    "severity_1": "1",
+    "severity_3": "1",
+    "severity_5": "0",
+    "severity_sum": "4",
+    "score": "1",
+    "duration_seconds": "1769.544",
+    "partial": "false",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 25,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Same whitespace-only inline rename: the title becomes blank without feedback, and reloading restores the saved name."
+      },
+      {
+        "groundTruthIndex": 9,
+        "reproStepsIndex": 0,
+        "findingIndex": 5,
+        "reason": "Same Contains filter treating a literal wildcard character as a wildcard and matching every row. The character, text field, and table are test-data differences."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 0,
+        "reproStepsIndex": 0,
+        "findingIndex": 1,
+        "reason": "Same invalid row-limit handling: a value below 1 is ignored and the previous limit executes. Using -1 instead of 0 is insignificant."
+      },
+      {
+        "knownInvalidIndex": 6,
+        "reproStepsIndex": 0,
+        "findingIndex": 2,
+        "reason": "Same stale-tab save overwriting a newer saved change without conflict feedback; the overwritten change is a filter rather than a title."
+      },
+      {
+        "knownInvalidIndex": 32,
+        "reproStepsIndex": null,
+        "findingIndex": 9,
+        "reason": "Same nonnumeric SQL Number value being accepted and then rejected during execution with a For input string error. Direct typing differs from the listed custom-dropdown reproduction."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 3,
+        "reason": "No entry describes stale result rows after switching databases. The rejected Data Reference claim concerns sidebar contents, not retained results."
+      },
+      {
+        "findingIndex": 4,
+        "reason": "No entry covers whitespace validation in the new-question Save dialog. The inline-rename bug instead blanks an existing title without feedback."
+      },
+      {
+        "findingIndex": 6,
+        "reason": "No entry describes an oversized row limit causing query validation failure. Ground truth 59 describes scientific-notation conversion, not failed execution."
+      },
+      {
+        "findingIndex": 7,
+        "reason": "No entry covers wildcard handling in source-picker search. Query text-filter wildcard bugs concern a different operation and result."
+      },
+      {
+        "findingIndex": 8,
+        "reason": "No entry describes the field-mapping picker closing on a no-match search. The source-picker click-dismissal and initial mapping-toggle claims describe different failures."
+      },
+      {
+        "findingIndex": 10,
+        "reason": "No entry describes Back from a newly run SQL query producing an empty editor and an Only SELECT statements error. The listed Back bugs have different outcomes."
+      },
+      {
+        "findingIndex": 11,
+        "reason": "No entry covers an invisible Save focus target with a false permission tooltip; the rejected keyboard claims concern other controls and behaviors."
+      },
+      {
+        "findingIndex": 12,
+        "reason": "No entry describes same-tab query-hash navigation retaining the previous query until reload. The Forward-navigation bug has a different trigger and unchanged URL."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 3,
+        "reason": "The described execution uses a different limit from the value displayed."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "Saving silently removes another tab's persisted query changes."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 3,
+        "reason": "Results from the previous database remain displayed under the newly selected database."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 1,
+        "reason": "The invalid name is rejected with inline feedback; the described defect concerns validation timing and wording."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 3,
+        "reason": "The accepted limit makes the query fail; the internal details appear within a labeled, recoverable query error."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 3,
+        "reason": "Source search returns unrelated items instead of matching the entered literal text."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 3,
+        "reason": "Searching unexpectedly dismisses the picker and interrupts field selection."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 3,
+        "reason": "The Number control accepts an invalid value that leads to query execution failure."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 3,
+        "reason": "Navigation loses the entered SQL and replaces successful results with an erroneous query state."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 1,
+        "reason": "The described impact is keyboard-focus accessibility and misleading tooltip copy, without a demonstrated saving failure."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 3,
+        "reason": "The displayed query and results disagree with the query encoded in the current address."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [
+      {
+        "findingIndex": 12,
+        "reference": {
+          "name": "Opening a generated Created At distinct-values URL from raw table retains the wrong table result",
+          "summary": "Opening a generated Created At distinct-values URL from raw table retains the wrong table result.",
+          "expected": "The page shows the single-column \"Created At: Day\" distinct-values result that this URL showed when opened from the reference page.",
+          "actual": "The address bar shows the distinct-values URL, but the page still shows the \"Release Requests\" title, the six columns (ID, Region, Category, Approved, Amount, Created At) and the full timestamps. This was still true after waiting 8 seconds.",
+          "reproSteps": [
+            [
+              "Click Release operations > Tables in Release operations > Release Requests > Fields in this table > Created At > All distinct values of Created At. A single 'Created At: Day' column with 6 dates appears. Copy the URL (/question#eyJkYXRhc2V0X3F1ZXJ5...).",
+              "Open /reference/databases/2/tables/9 and click 'See this table'. The raw table with 6 columns appears.",
+              "In the same tab, enter the copied distinct-values URL in the address bar and wait.",
+              "Result: the address changes, but the raw six-column Release Requests table is still shown."
+            ]
+          ],
+          "severity": 3
+        },
+        "reason": "Both describe same-tab navigation to a different serialized /question# URL leaving the previous query and results displayed. The address-bar navigation matches the reference case; the source and destination queries differ only in test content."
+      }
+    ],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

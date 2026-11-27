@@ -1,0 +1,122 @@
+{
+  "fixture": "gitea/areas/notifications",
+  "run": 2,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 299,
+      "name": "Repo search treats % and _ as SQL wildcards instead of literal characters",
+      "summary": "'%' returns the whole watched list (all three repositories) and 'h_rbor' returns harbor-handbook, because '%' and '_' are passed to the database LIKE pattern as wildcards. The same happens with a single '_' (all repositories listed). (on /notifications/watching)",
+      "expected": "The search box searches for the text as typed: '%' and 'h_rbor' match no watched repository, so the page shows 'No matching results found.'",
+      "actual": "'%' returns the whole watched list (all three repositories) and 'h_rbor' returns harbor-handbook, because '%' and '_' are passed to the database LIKE pattern as wildcards. The same happens with a single '_' (all repositories listed).",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-iousaqru19me2ux8s0kmc.e2b.app/notifications/watching (the watched list holds harbor-handbook plus repos named agent10-alpha and agent10-mike).",
+        "Type % into the 'Search repos...' box and press Enter (or click the magnifier button).",
+        "Observe that every watched repository is listed instead of 'No matching results found.'",
+        "Now type h_rbor into the box and press Enter.",
+        "Observe that harbor-handbook is returned even though no watched repository contains the literal text 'h_rbor'."
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 644,
+      "name": "Pinning a notification from its row also marks it as read (unread badge drops, row leaves the Unread tab)",
+      "summary": "The pin also marks the notification as read: right after the click the bell badge and the \\\"Unread\\\" tab count both disappear (1 → none), the row is gone from /notifications?q=unread (\\\"No unread notifications.\\\") and appears under /notifications?q=read. The unread state is silently lost and unpinning does not bring it back. Seen on the row of eval/harbor-handbook #4 and of eval/harbor-handbook #1. (on /notifications)",
+      "expected": "Pinning only pins: the notification keeps its unread state, the bell and \\\"Unread\\\" tab count stay 1 and the row stays in the Unread tab, with a pinned marker.",
+      "actual": "The pin also marks the notification as read: right after the click the bell badge and the \\\"Unread\\\" tab count both disappear (1 → none), the row is gone from /notifications?q=unread (\\\"No unread notifications.\\\") and appears under /notifications?q=read. The unread state is silently lost and unpinning does not bring it back. Seen on the row of eval/harbor-handbook #4 and of eval/harbor-handbook #1.",
+      "reproSteps": [
+        "Sign in as alex / momentic-contributor-1 (the same happens on eval).",
+        "Open https://5503-iousaqru19me2ux8s0kmc.e2b.app/notifications?q=unread — there is 1 unread notification (eval/harbor-handbook #4 \"Review the release ownership proposal\"); the bell badge and the \"Unread\" tab both show 1.",
+        "Hover that row so its two icons appear and click the pin icon (\"Pin notification\").",
+        "Look at the bell and the \"Unread\" tab badge, then open /notifications?q=read and /notifications?q=unread.",
+        "Repeat with a second notification: on /notifications?q=read hover eval/harbor-handbook #1 and click \"Mark as unread\" (badge goes back to 1), then on the list hover it and click \"Pin notification\"."
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 660,
+      "name": "Marking a notification read/unread drops the active Unread/Read filter and jumps to the Unread tab",
+      "summary": "The app redirects to /notifications?page=1 (303). The ?q=read filter is gone, the 'Read' tab is no longer active and the 'Unread' tab is highlighted instead, so the page jumps the user into a different view than the one they were working in. Same happens in the other direction: 'Mark as read' on the Unread tab redirects to /notifications?page=1 and 'Pin notification' from the Read tab redirects to /notifications?page=, always dropping q. (on /notifications?q=read)",
+      "expected": "The action should keep the current Unread/Read filter: the page should come back on the Read tab (/notifications?q=read), with the row removed from that list, and the Read tab still highlighted.",
+      "actual": "The app redirects to /notifications?page=1 (303). The ?q=read filter is gone, the 'Read' tab is no longer active and the 'Unread' tab is highlighted instead, so the page jumps the user into a different view than the one they were working in. Same happens in the other direction: 'Mark as read' on the Unread tab redirects to /notifications?page=1 and 'Pin notification' from the Read tab redirects to /notifications?page=, always dropping q.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /notifications?q=read (the 'Read' tab is highlighted).",
+        "Hover a read notification row, e.g. 'eval/harbor-handbook #10 agent8 cross-user notification check', and click the bell icon 'Mark as unread' at the right end of the row.",
+        "Watch the address and the tabs after the page reloads."
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 662,
+      "name": "Going Back to the notification list after opening a notification shows the old unread state and count",
+      "summary": "The list comes back with the earlier state: the Unread tab still shows the old count and the notification just opened is still listed as unread (screenshot: \\\"Unread 1\\\" with eval/harbor-handbook #14 still in the list, after that row had been opened and marked read). Reloading the page corrects it (#14 disappears, count drops). Seen twice: with #15 (Unread stayed 2) and with #14 (Unread stayed 1). (on /notifications)",
+      "expected": "The notification list comes back with the current state: the notification that was just opened is no longer in the Unread list and the Unread count / bell badge match it (0 unread for that item).",
+      "actual": "The list comes back with the earlier state: the Unread tab still shows the old count and the notification just opened is still listed as unread (screenshot: \\\"Unread 1\\\" with eval/harbor-handbook #14 still in the list, after that row had been opened and marked read). Reloading the page corrects it (#14 disappears, count drops). Seen twice: with #15 (Unread stayed 2) and with #14 (Unread stayed 1).",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /notifications with at least one unread notification (e.g. an issue opened in eval/harbor-handbook by another user).",
+        "Note the Unread tab count and the notification rows.",
+        "Click a notification row (e.g. eval/harbor-handbook #14 \"agent2-round2-a\"); the app opens the issue, and the navbar bell badge goes to 0, i.e. that notification is now read.",
+        "Press the browser Back button to return to /notifications."
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 693,
+      "name": "Subscriptions list omits issues the issue page says you are subscribed to",
+      "summary": "The two views disagree: issues #8 and #10 (and #13) show an \"Unsubscribe\" control on their page and produce notifications for eval, but /notifications/subscriptions in the All view lists only #1–#6 and never shows #8 or #10, so those subscriptions cannot be seen or managed from the Subscriptions page. (on /notifications/subscriptions)",
+      "expected": "Every issue whose page reports the account as subscribed (its Notifications section offers \"Unsubscribe\") should be listed in /notifications/subscriptions, where subscriptions are managed; or, if eval is not really subscribed to #8/#10, the issue page should offer \"Subscribe\" instead of \"Unsubscribe\".",
+      "actual": "The two views disagree: issues #8 and #10 (and #13) show an \"Unsubscribe\" control on their page and produce notifications for eval, but /notifications/subscriptions in the All view lists only #1–#6 and never shows #8 or #10, so those subscriptions cannot be seen or managed from the Subscriptions page.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Open https://5503-iousaqru19me2ux8s0kmc.e2b.app/eval/harbor-handbook/issues/8 (issue \"agent6-disposable-a\", opened by alex; eval never commented there) and scroll the right sidebar to the \"Notifications\" section: the button reads \"Unsubscribe\", i.e. the issue page says eval is subscribed. Issue #13 \"agent2-notification-seed-3\" shows the same.",
+        "Open https://5503-iousaqru19me2ux8s0kmc.e2b.app/notifications?q=unread : eval's unread notifications include \"eval/harbor-handbook #8 agent6-disposable-a\" and \"#10 agent8 cross-user notification check\", so these issues do reach eval.",
+        "Open https://5503-iousaqru19me2ux8s0kmc.e2b.app/notifications/subscriptions?sort=oldest&state=all&issueType=&labels= : the Subscriptions list contains only 6 rows — #1, #2, #3, #4, #5 (PR) and #6. Issues #8, #9, #10, #11, #12 and #13 are missing from it."
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 727,
+      "name": "Unread count never refreshes on an open Notifications page (background count poll throws every 10 s)",
+      "summary": "Tab A keeps the count from its own page load and never changes it: it still showed \\\"2\\\" on the bell and on the Unread tab (screenshot s8) after the other tab had marked everything read (fresh load in tab B showed 0, s9); in the reverse run tab A kept showing 0 with no unread rows while the server had 2 unread (s10). Only a manual reload corrects it. The console repeats, every ~10 seconds, \\\"SyntaxError: \\\\\\\"[object Object]\\\\\\\" is not valid JSON at JSON.parse (<anonymous>) at bp (assets/js/index.js?v=1.24.7:30) at MessagePort.<anonymous>\\\" — the background notification-count refresh is failing. (on /notifications)",
+      "expected": "The bell badge and the \\\"Unread\\\" counter on an already open page refresh themselves in the background (the page polls the count), so the open page does not keep showing a count and unread rows that are no longer unread; no script error repeats in the console.",
+      "actual": "Tab A keeps the count from its own page load and never changes it: it still showed \\\"2\\\" on the bell and on the Unread tab (screenshot s8) after the other tab had marked everything read (fresh load in tab B showed 0, s9); in the reverse run tab A kept showing 0 with no unread rows while the server had 2 unread (s10). Only a manual reload corrects it. The console repeats, every ~10 seconds, \\\"SyntaxError: \\\\\\\"[object Object]\\\\\\\" is not valid JSON at JSON.parse (<anonymous>) at bp (assets/js/index.js?v=1.24.7:30) at MessagePort.<anonymous>\\\" — the background notification-count refresh is failing.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-iousaqru19me2ux8s0kmc.e2b.app/notifications?q=unread in tab A; note the number on the bell icon and next to the \"Unread\" tab (2 in my run).",
+        "Open the same URL in a second tab B.",
+        "In tab B mark the unread notifications as read (hover a row, click the check \"Mark as read\") until the unread list is empty / the count is 0.",
+        "Switch back to tab A and do not reload it; wait 15 seconds.",
+        "Look at the bell icon, the \"Unread\" tab label and the rows in tab A; then open the browser console.",
+        "Reload tab A and compare."
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 818,
+      "name": "Notification list is not ordered by the timestamps it shows — newer notifications sit below older ones",
+      "summary": "The rows are out of chronological order in both tabs. Read tab, top to bottom: eval/harbor-handbook #5 'now', #15 '4 minutes ago', #10 '6 minutes ago', #16 '2 minutes ago', #14 '4 minutes ago', #9 '6 minutes ago', #11 '6 minutes ago', #7 '7 minutes ago', #8 '7 minutes ago', #1 '13 minutes ago' — a 6 minute old notification is placed above a 2 minute old one. Unread tab: #13 '5 minutes ago' is the top row and the brand-new notification #5 'now' is the second row below it. Marking a notification read also moves it to the top of the Read tab while keeping its old timestamp, so the newest entries do not appear at the top of the feed. (on /notifications)",
+      "expected": "The list is ordered by the time shown next to each notification, newest first: on the Read tab the row with 'now' first, then 2 minutes, 4 minutes, 6 minutes, 7 minutes, 13 minutes; on the Unread tab the row with 'now' above the 5 minute old one.",
+      "actual": "The rows are out of chronological order in both tabs. Read tab, top to bottom: eval/harbor-handbook #5 'now', #15 '4 minutes ago', #10 '6 minutes ago', #16 '2 minutes ago', #14 '4 minutes ago', #9 '6 minutes ago', #11 '6 minutes ago', #7 '7 minutes ago', #8 '7 minutes ago', #1 '13 minutes ago' — a 6 minute old notification is placed above a 2 minute old one. Unread tab: #13 '5 minutes ago' is the top row and the brand-new notification #5 'now' is the second row below it. Marking a notification read also moves it to the top of the Read tab while keeping its old timestamp, so the newest entries do not appear at the top of the feed.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /notifications?q=read (the Read tab of the notification list).",
+        "Read the timestamps of the rows from top to bottom.",
+        "Also open /notifications?q=unread (the Unread tab) and read the timestamps from top to bottom."
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 851,
+      "name": "\"Smallest size\" and \"Largest size\" in the Watching Sort menu do nothing - the list stays in Recently updated order",
+      "summary": "The page reloads with ?sort=reversesize but the list is unchanged: it stays in the \"Recently updated\" order (agent10-mike, agent9-watchtest, agent10-zulu, agent10-alpha) and the empty repository agent10-alpha (0 bytes) is not moved to the top. Reopening the Sort menu shows \"Recently updated\" highlighted/selected instead of \"Largest size\". Choosing \"Smallest size\" behaves the same way (address gets ?sort=size, list and selection fall back to Recently updated), so the two size options produce the same list as each other and as the default order. (on /notifications/watching)",
+      "expected": "The list should be ordered by repository size - \"Smallest size\" with agent10-alpha (an empty repository) first and \"Largest size\" with it last - and the Sort menu should show the chosen option as selected.",
+      "actual": "The page reloads with ?sort=reversesize but the list is unchanged: it stays in the \"Recently updated\" order (agent10-mike, agent9-watchtest, agent10-zulu, agent10-alpha) and the empty repository agent10-alpha (0 bytes) is not moved to the top. Reopening the Sort menu shows \"Recently updated\" highlighted/selected instead of \"Largest size\". Choosing \"Smallest size\" behaves the same way (address gets ?sort=size, list and selection fall back to Recently updated), so the two size options produce the same list as each other and as the default order.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /notifications/watching (eval watches 5 repositories; agent10-mike holds a SIZE-TEST.md file, 23 KiB, while agent10-alpha is an empty repository with no commits, i.e. 0 bytes).",
+        "Open the Sort dropdown and click \"Largest size\".",
+        "Look at the list: it is still in the Recently updated order (agent10-mike, agent9-watchtest, agent10-zulu, agent10-alpha) - the empty agent10-alpha is last, not first, and agent10-mike is first as before.",
+        "Open the Sort dropdown again: \"Recently updated\" is highlighted as the selected option, although the address is .../notifications/watching?q=&sort=reversesize.",
+        "Repeat with \"Smallest size\": address becomes ...?sort=size, the list keeps the same order and the menu again shows \"Recently updated\" selected."
+      ]
+    }
+  ]
+}

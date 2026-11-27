@@ -1,0 +1,225 @@
+{
+  "fixture": "twenty/areas/settings-data-model",
+  "run": 3,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 400,
+      "name": "Domain settings address renders a completely blank content area with no message",
+      "summary": "The settings sidebar (Profile, General, Data model, ...) renders but the whole content pane to its right stays empty: no heading, no text, no spinner, no 404 or not-found message. The page title stays \"Twenty\"/\"General - Settings\" while there is nothing on screen. (on /settings/domains and /settings/general/domains)",
+      "expected": "The settings panel opens with a domain settings page, or, if the route does not exist, a not-found message with a way back to a valid settings page.",
+      "actual": "The settings sidebar (Profile, General, Data model, ...) renders but the whole content pane to its right stays empty: no heading, no text, no spinner, no 404 or not-found message. The page title stays \"Twenty\"/\"General - Settings\" while there is nothing on screen.",
+      "reproSteps": [
+        "Sign in with tim@apple.dev / tim@apple.dev",
+        "Type the address /settings/domains in the browser and press Enter",
+        "Observe the right-hand content area: it is empty grey/white with no title, no text and no error message",
+        "Now go to /settings/general/domains and wait 4 seconds: the content area is still completely blank"
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 574,
+      "name": "Object detail \"Relations\" and \"Fields\" rows overlap at mobile width 390px",
+      "summary": "At 390px the first column of both lists collapses to ~16px, so the related object name (Opportunities, People) and the field name are drawn on top of the \\\"Standard\\\" badge (rows read as \\\"Sta̶ndard\\\" with the two texts overlapping), and the \\\"Name\\\" and \\\"App\\\" column headers overlap each other. Names are unreadable. (on /settings/objects/companies)",
+      "expected": "Each row shows the object/field name, then its badge/type in its own column, readable and not overlapping, as it does at 1440px and 768px width.",
+      "actual": "At 390px the first column of both lists collapses to ~16px, so the related object name (Opportunities, People) and the field name are drawn on top of the \\\"Standard\\\" badge (rows read as \\\"Sta̶ndard\\\" with the two texts overlapping), and the \\\"Name\\\" and \\\"App\\\" column headers overlap each other. Names are unreadable.",
+      "reproSteps": [
+        "Set the browser window to 390x844 (mobile).",
+        "Sign in as tim@apple.dev and open Settings > Data model (/settings/objects).",
+        "Open the standard object \"Companies\" (/settings/objects/companies).",
+        "Look at the \"Relations\" list and the \"Fields\" list."
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 713,
+      "name": "Data model \"Records\" column shows 0 for a custom object that has 1 record",
+      "summary": "The Records column shows 0 for Agent3Widgets even though the object has one record; the value stayed 0 on a fresh navigation and after a page reload. The Fields column for the same object did show the two new fields (12). (on /settings/objects)",
+      "expected": "The Records column for Agent3Widgets should show 1, matching the record count shown in the object's list view (\\\"All Agent3Widgets · 1\\\").",
+      "actual": "The Records column shows 0 for Agent3Widgets even though the object has one record; the value stayed 0 on a fresh navigation and after a page reload. The Fields column for the same object did show the two new fields (12).",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open Settings > Data model (/settings/objects).",
+        "Click \"+ Add object\", type Singular \"agent3Widget\" (Plural auto-fills \"Agent3Widgets\"), Save.",
+        "Open the new Agent3Widgets object, click \"+ New Field\", choose Text, name it \"agent3Title\", Save; repeat with Number named \"agent3Qty\".",
+        "Click \"See records\" (top right) to open /objects/agent3Widgets, click \"Add a Agent3Widget\", then type \"agent3-record-1\" in the record's Name field and press Tab.",
+        "Note the list header now says \"All Agent3Widgets · 1\" and the row agent3-record-1 is listed.",
+        "Go back to /settings/objects (fresh navigation, then reload) and read the Records column of the Agent3Widgets row."
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 816,
+      "name": "Clearing the soft-delete retention field silently saves 0 days",
+      "summary": "The field silently becomes 0 and the value 0 is saved to the workspace: after a page reload the field shows 0. \\\"Permanent deletion. Enter the number of days.\\\" — 0 days means soft-deleted records are erased immediately, and nothing warned or blocked the empty value (typing -5 also ends up as 0). (on /settings/general#security)",
+      "expected": "An empty or invalid value is refused (or the previous value 14 is kept) with a message next to the field; a destructive retention value like 0 is never saved silently.",
+      "actual": "The field silently becomes 0 and the value 0 is saved to the workspace: after a page reload the field shows 0. \\\"Permanent deletion. Enter the number of days.\\\" — 0 days means soft-deleted records are erased immediately, and nothing warned or blocked the empty value (typing -5 also ends up as 0).",
+      "reproSteps": [
+        "Sign in with tim@apple.dev / tim@apple.dev",
+        "Open https://5500-i2yxv3mesmjzdnyssnas5.e2b.app/settings/general#security and scroll to the \"Other\" section",
+        "In \"Erasure of soft-deleted records\" (shows 14) clear the number field so it is empty and click elsewhere on the page (e.g. the \"Audit Logs\" heading)",
+        "The field shows 0 — reload the page (browser reload) and scroll back to the section"
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 847,
+      "name": "Skills list has a \"Type\" column that is empty for every skill",
+      "summary": "The header shows \\\"Type\\\" but the Type cell of every row is empty: 14 default skills and a newly created custom skill all render a blank 120px column between the name and the chevron. (on /settings/ai#skills)",
+      "expected": "Each row shows a value in the Type column (e.g. the kind of skill it is), or the Type column is not shown at all when there is nothing to show.",
+      "actual": "The header shows \\\"Type\\\" but the Type cell of every row is empty: 14 default skills and a newly created custom skill all render a blank 120px column between the name and the chevron.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev.",
+        "Open https://5500-i2yxv3mesmjzdnyssnas5.e2b.app/settings/ai and click the Skills tab.",
+        "Look at the table header row: \"Name\" and \"Type\".",
+        "Look at the 14 rows below it, and at a skill created in the same session (\"agent8 test skill\")."
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 915,
+      "name": "API key created with \\\"30 days\\\" expiration immediately shows \\\"Expires in 29 days\\\"",
+      "summary": "Both the record page and the API Keys list say \\\"Expires in 29 days\\\" / \\\"in 29 days\\\" immediately after creation, i.e. the key that was asked for 30 days is created with a date 29 days away (or the remaining time is rounded down by a day). The count never matches the option the person picked. (on /settings/mcp-apis#api)",
+      "expected": "A key created with the \\\"30 days\\\" expiration shows \\\"Expires in 30 days\\\" (or a date 30 days from today) on its record and in the list.",
+      "actual": "Both the record page and the API Keys list say \\\"Expires in 29 days\\\" / \\\"in 29 days\\\" immediately after creation, i.e. the key that was asked for 30 days is created with a date 29 days away (or the remaining time is rounded down by a day). The count never matches the option the person picked.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev",
+        "Go to Settings > MCP & APIs > API tab",
+        "Click \"+ Create API key\"",
+        "Type agent13-exp in Name",
+        "Open the \"Expiration Date\" dropdown and choose \"30 days\"",
+        "Click \"Save\" and read the Expiration row of the created key, then reopen Settings > MCP & APIs > API and read the key's Expiration column in the list"
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 933,
+      "name": "Empty Domain field on New Approved Access Domain shows a length/special-character message instead of \"required\"",
+      "summary": "The Domain field shows \"Domains have to be smaller than 256 characters, cannot contain spaces and cannot contain any special characters.\" while the field is empty, so the message describes problems that do not exist and never says the field is required (the Email field next to it does show the correct \"Email cannot be empty\"). (on /settings/security/approved-access-domain/new)",
+      "expected": "Saving with an empty Domain should say the Domain is required (e.g. \"Domain cannot be empty\"), as the Email verification field correctly does.",
+      "actual": "The Domain field shows \"Domains have to be smaller than 256 characters, cannot contain spaces and cannot contain any special characters.\" while the field is empty, so the message describes problems that do not exist and never says the field is required (the Email field next to it does show the correct \"Email cannot be empty\").",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open Settings > Members.",
+        "On the Members page open the Invite tab (/settings/members#invite).",
+        "In the Approved Domains section click \"Add Approved Access Domain\" (opens /settings/security/approved-access-domain/new).",
+        "Leave the Domain field empty and click Save."
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 1026,
+      "name": "Very long workspace name makes the sign-in greeting run off-screen and the page scroll sideways",
+      "summary": "The greeting is rendered on one unbroken line: the name runs off both edges of the window, the document becomes 2958 px wide on a 1280 px viewport, and the page gets a horizontal scrollbar with the name cut off. The Name field on Settings > General has no maximum length (no maxlength, no validation), so this value was saved and is what every visitor sees on the sign-in screen. (on /welcome)",
+      "expected": "The sign-in greeting stays inside the window: the workspace name wraps or is truncated with an ellipsis, no horizontal scrolling, nothing cut off.",
+      "actual": "The greeting is rendered on one unbroken line: the name runs off both edges of the window, the document becomes 2958 px wide on a 1280 px viewport, and the page gets a horizontal scrollbar with the name cut off. The Name field on Settings > General has no maximum length (no maxlength, no validation), so this value was saved and is what every visitor sees on the sign-in screen.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev and open https://5500-i2yxv3mesmjzdnyssnas5.e2b.app/settings/general",
+        "In the Name field under \"Name of your workspace\", paste a very long workspace name of 260 characters (agent10- followed by 255 'A' characters); the field accepts it without any length limit",
+        "Press Tab to save and reload the page: the long name is stored",
+        "Open https://5500-i2yxv3mesmjzdnyssnas5.e2b.app/welcome (the sign-in screen)"
+      ]
+    },
+    {
+      "index": 8,
+      "reported_at_seconds": 1037,
+      "name": "REST playground introduction shows raw Markdown asterisks in \\\"Find out more about **Twenty**\\\"",
+      "summary": "The button/label reads \\\"Find out more about **Twenty**\\\" — the Markdown asterisks are rendered as literal characters instead of bold text, so a raw formatting artefact is shown to the user. (on /settings/playground/rest/core)",
+      "expected": "The label reads \\\"Find out more about Twenty\\\" (bold) with no asterisks, like the other buttons next to it (\\\"AGPL-3.0\\\", \\\"Terms of Service\\\").",
+      "actual": "The button/label reads \\\"Find out more about **Twenty**\\\" — the Markdown asterisks are rendered as literal characters instead of bold text, so a raw formatting artefact is shown to the user.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev",
+        "Go to Settings > MCP & APIs",
+        "On the API tab click \"Launch\" next to Schema \"Core\" / API \"REST\"",
+        "In the \"Twenty Api\" introduction that loads, read the row of buttons under the title"
+      ]
+    },
+    {
+      "index": 9,
+      "reported_at_seconds": 1313,
+      "name": "Communication channels: the \\\"Domain\\\" column is empty for every channel",
+      "summary": "The Domain column holds no value for any channel — support@20202020.dev.twenty.local, contact@20202020.pending.dev.twenty.local and my agent7-test@example.com all show nothing there, and each row's Domain cell is rendered empty in the DOM. (on /settings/communications)",
+      "expected": "Each channel row shows the domain part of its address (e.g. example.com) in the \\\"Domain\\\" column, as the header promises.",
+      "actual": "The Domain column holds no value for any channel — support@20202020.dev.twenty.local, contact@20202020.pending.dev.twenty.local and my agent7-test@example.com all show nothing there, and each row's Domain cell is rendered empty in the DOM.",
+      "reproSteps": [
+        "Sign in and open Settings → Communication (the sidebar link goes to /settings/communications, not /settings/communication).",
+        "Read the \"Channels\" table with the \"Email\" and \"Domain\" column headers.",
+        "Compare the addresses listed (support@20202020.dev.twenty.local, contact@20202020.pending.dev.twenty.local, agent7-test@example.com created by me) with the Domain column.",
+        "Reload the page and read the table again."
+      ]
+    },
+    {
+      "index": 10,
+      "reported_at_seconds": 1371,
+      "name": "Email channel detail shows the raw label \\\"Sender name\\\" as the page title and hides the Sender name section",
+      "summary": "The page title (centre of the settings header, above the content) reads literally \\\"Sender name\\\", the field's label, and the \\\"Sender name\\\" section is missing from the page altogether; only Shared email and Forwarding address are shown. The channel I created with a display name (agent7-test@example.com) shows \\\"Agent7 Support\\\" as its title and a Sender name section. (on /settings/email/email-group/20202020-5a1e-4b2c-9d3e-200000000001)",
+      "expected": "The header shows an identifying value for the channel (its sender name, or its email address when no sender name is set) and the Sender name section is shown, saying it is not set.",
+      "actual": "The page title (centre of the settings header, above the content) reads literally \\\"Sender name\\\", the field's label, and the \\\"Sender name\\\" section is missing from the page altogether; only Shared email and Forwarding address are shown. The channel I created with a display name (agent7-test@example.com) shows \\\"Agent7 Support\\\" as its title and a Sender name section.",
+      "reproSteps": [
+        "Sign in and open Settings → Communication (/settings/communications).",
+        "In the Channels list, click the row \"support@20202020.dev.twenty.local\".",
+        "Read the title in the middle of the page header and the sections below the breadcrumb.",
+        "Reload the page and look again."
+      ]
+    },
+    {
+      "index": 11,
+      "reported_at_seconds": 1431,
+      "name": "Link sidebar item shows a broken-image icon instead of an icon",
+      "summary": "The entry renders a broken-image placeholder (red torn-image glyph); the console logs 'Failed to load resource: 404' for GET https://twenty-icons.com/example.com, and no fallback icon is drawn. (on /settings/layout (Layout customization) and the workspace sidebar)",
+      "expected": "A Link sidebar entry shows a usable icon (the site's favicon, or a default link icon when the favicon cannot be loaded).",
+      "actual": "The entry renders a broken-image placeholder (red torn-image glyph); the console logs 'Failed to load resource: 404' for GET https://twenty-icons.com/example.com, and no fallback icon is drawn.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open /settings/layout",
+        "Click 'Customize' in the 'Customize layout' card",
+        "Click 'Add menu item' at the bottom of the sidebar, then 'Link'",
+        "Set the label to 'agent9-link' (URL stays https://www.example.com)",
+        "Click 'Save'",
+        "Look at the workspace sidebar: under 'agent9-folder' the entry 'agent9-link' shows a red broken-image glyph instead of an icon"
+      ]
+    },
+    {
+      "index": 12,
+      "reported_at_seconds": 1436,
+      "name": "Empty folder name is accepted in the sidebar and Save fails with only a generic error toast",
+      "summary": "'Save' is enabled and the empty-named row stays in the sidebar. Clicking Save shows only a generic toast at the bottom right: 'Failed to save layout customization'. Nothing marks the folder name as required or invalid, the field gets no error, and the console logs 'CombinedGraphQLErrors: Multiple validation errors occurred while creating navigation menu items'. Every other pending layout edit in the same session is left unsaved. (on /settings/layout (Layout customization))",
+      "expected": "Either the name cannot be emptied / Save is blocked, or the page says next to the field that a folder name is required and which item blocks the save.",
+      "actual": "'Save' is enabled and the empty-named row stays in the sidebar. Clicking Save shows only a generic toast at the bottom right: 'Failed to save layout customization'. Nothing marks the folder name as required or invalid, the field gets no error, and the console logs 'CombinedGraphQLErrors: Multiple validation errors occurred while creating navigation menu items'. Every other pending layout edit in the same session is left unsaved.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open /settings/layout",
+        "Click 'Customize' in the 'Customize layout' card",
+        "Click 'Add menu item' at the bottom of the sidebar, then 'Folder'",
+        "Clear the 'Folder name' field so it is empty (the sidebar row shows only a folder icon, no label)",
+        "Click 'Save' in the top bar"
+      ]
+    },
+    {
+      "index": 13,
+      "reported_at_seconds": 1570,
+      "name": "A deactivated field's page never says it is deactivated and its Danger zone still reads \"Deactivate this field\"",
+      "summary": "The page shows no \"Deactivated\" indicator anywhere (the Name field, the Values panel and the page title look exactly like an active field), and the Danger zone subtitle still reads \"Deactivate this field\" while its only state action is the \"Activate\" button. The deactivated state is only visible in the object's field list. (on /settings/objects/agent4Things/agent4Renamed)",
+      "expected": "A deactivated field's detail page should say that the field is deactivated (and the Danger zone should describe the action it actually offers, \"Activate this field\"), so an admin can tell the field's state without going back to the object's field list.",
+      "actual": "The page shows no \"Deactivated\" indicator anywhere (the Name field, the Values panel and the page title look exactly like an active field), and the Danger zone subtitle still reads \"Deactivate this field\" while its only state action is the \"Activate\" button. The deactivated state is only visible in the object's field list.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev and go to /settings/objects.",
+        "Open the object I created earlier, Agent4Things, then open its field \"agent4Renamed\" (/settings/objects/agent4Things/agent4Renamed).",
+        "Scroll to the Danger zone and click \"Deactivate\" (the field is then marked \"Deactivated\" in the object's field list).",
+        "Open the same field page /settings/objects/agent4Things/agent4Renamed again and read the top of the page and the Danger zone."
+      ]
+    },
+    {
+      "index": 14,
+      "reported_at_seconds": 1626,
+      "name": "Profile: clearing First Name / Last Name is silently discarded, with no validation message (both fields, distinct from the disabled-field report)",
+      "summary": "Nothing is saved and nothing is said. First Name: after clearing it and pressing Tab the field snaps back to the stored value with no message and no red border. Last Name: after clearing it and pressing Tab the field stays visually empty (grey \"Cook\" placeholder) together with First Name, so the page looks like it accepted an empty name — but reloading /settings/profile brings the old values back. No save request is sent and no validation message is ever shown; neither field is marked required. (on /settings/profile)",
+      "expected": "The Profile page should either keep the cleared name and save it, or refuse it with a visible validation message next to the field, instead of silently reverting or leaving an unsaved empty field that looks saved.",
+      "actual": "Nothing is saved and nothing is said. First Name: after clearing it and pressing Tab the field snaps back to the stored value with no message and no red border. Last Name: after clearing it and pressing Tab the field stays visually empty (grey \"Cook\" placeholder) together with First Name, so the page looks like it accepted an empty name — but reloading /settings/profile brings the old values back. No save request is sent and no validation message is ever shown; neither field is marked required.",
+      "reproSteps": [
+        "Open https://5500-i2yxv3mesmjzdnyssnas5.e2b.app/settings/profile (signed in as tim@apple.dev).",
+        "Click into the \"First Name\" field, select all and clear it so the field is empty.",
+        "Press Tab to leave the field: it silently goes back to the stored value with no message.",
+        "Clear the \"Last Name\" field in the same way and press Tab: both name fields now look empty (grey \"Tim\" / \"Cook\" placeholders) and nothing warns you.",
+        "Reload the page: the old names are shown again, so the emptied values were never saved."
+      ]
+    }
+  ]
+}

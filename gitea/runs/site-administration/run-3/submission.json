@@ -1,0 +1,285 @@
+{
+  "fixture": "gitea/areas/site-administration",
+  "run": 3,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 189,
+      "name": "Queue pool settings accept a negative \"Max Number of workers\" and save it",
+      "summary": "The page shows the green \\\"Settings Updated\\\" banner, the queue table now shows \\\"Max Number of Workers\\\" = -1 (I typed -5, it stored -1) and the field placeholder reads \\\"Currently -1\\\". A negative worker count is persisted in the instance configuration. (on /-/admin/monitor/queue/1)",
+      "expected": "The page refuses a negative worker count (the same way it refuses letters with \\\"Max number of workers must be a number\\\") and keeps the previous value.",
+      "actual": "The page shows the green \\\"Settings Updated\\\" banner, the queue table now shows \\\"Max Number of Workers\\\" = -1 (I typed -5, it stored -1) and the field placeholder reads \\\"Currently -1\\\". A negative worker count is persisted in the instance configuration.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open Site Administration > Monitoring > Queues (/-/admin/monitor/queue).",
+        "Click \"Review / Add Workers\" on the notification-service row (/-/admin/monitor/queue/1).",
+        "In the \"Pool Settings\" panel, type -5 into the \"Max Number of workers\" field.",
+        "Click \"Update Settings\"."
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 230,
+      "name": "User search treats % and _ as SQL wildcards instead of literal characters",
+      "summary": "The search term is passed into a SQL LIKE pattern unescaped: '%' matches every user (Total: 3, all rows) and '_lex' matches 'alex' (Total: 1) because _ stands for any single character. A literal search proves it returns records that do not contain the typed text. (on /-/admin/users)",
+      "expected": "The search box searches usernames literally: no username contains a % or a _ character, so both searches should show 'Total: 0' with 'No results found.'",
+      "actual": "The search term is passed into a SQL LIKE pattern unescaped: '%' matches every user (Total: 3, all rows) and '_lex' matches 'alex' (Total: 1) because _ stands for any single character. A literal search proves it returns records that do not contain the typed text.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /-/admin/users (User Account Management (Total: 3), rows: alex, eval, maya).",
+        "Type % into the 'Search users...' box and press Enter.",
+        "Observe: heading says 'User Account Management (Total: 3)' and all three users are listed.",
+        "Now type _lex into the same box and press Enter.",
+        "Observe: 'Total: 1' and the single row is alex."
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 285,
+      "name": "Stacktrace page shows only the goroutine count and an empty panel, with no trace or message",
+      "summary": "Only the header \\\"142 Goroutines\\\" (68, then 142 on a second load) is rendered; underneath it the panel is completely blank — no stack text, no placeholder, no error, no message. Reloading and waiting several seconds changes nothing; opening /-/admin/monitor/stacktrace?show=process or ?show=stacktrace shows the full lists, so only the page's default address is empty. (on /-/admin/monitor/stacktrace)",
+      "expected": "The Stacktrace page shows the goroutine stack trace (or a clear message that no trace is available), the way the Running Processes / Stacktrace tabs show their lists. A header announcing N goroutines should be followed by the traces or an explanation.",
+      "actual": "Only the header \\\"142 Goroutines\\\" (68, then 142 on a second load) is rendered; underneath it the panel is completely blank — no stack text, no placeholder, no error, no message. Reloading and waiting several seconds changes nothing; opening /-/admin/monitor/stacktrace?show=process or ?show=stacktrace shows the full lists, so only the page's default address is empty.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open Site Administration.",
+        "Click Monitoring in the left admin menu, then Trace (or open /-/admin/monitor/stacktrace by address).",
+        "Look at the content area under the tab bar \"Running Processes | Stacktrace\": the only thing shown is a header such as \"142 Goroutines\" with no stack text, no code lines, no empty-state message below it."
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 306,
+      "name": "Unknown queue id gives a completely blank page instead of the site's 404 page",
+      "summary": "A completely blank white page: no title, no navigation bar, no footer, no text and no link back. The answer is HTTP 404 with an empty body. I saw this for both /-/admin/monitor/queue/999 and /-/admin/monitor/queue/abc. A non-existent address elsewhere on the site (/this-page-does-not-exist-agent9) does render the normal \\\"404 Not Found - The page you are trying to reach either does not exist or you are not authorized to view it.\\\" page, so the queue detail route is the odd one out. (on /-/admin/monitor/queue/999)",
+      "expected": "The normal \\\"404 Not Found\\\" page of the site, with the navigation bar and the message that the page does not exist.",
+      "actual": "A completely blank white page: no title, no navigation bar, no footer, no text and no link back. The answer is HTTP 404 with an empty body. I saw this for both /-/admin/monitor/queue/999 and /-/admin/monitor/queue/abc. A non-existent address elsewhere on the site (/this-page-does-not-exist-agent9) does render the normal \\\"404 Not Found - The page you are trying to reach either does not exist or you are not authorized to view it.\\\" page, so the queue detail route is the odd one out.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Open Site Administration > Monitoring > Queues (/-/admin/monitor/queue).",
+        "Change the address to a queue id that does not exist: /-/admin/monitor/queue/999 (same with /-/admin/monitor/queue/abc) and press Enter."
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 364,
+      "name": "At tablet and phone widths the \\\"Download diagnosis report\\\" button overlaps the \\\"Stacktrace\\\" tab",
+      "summary": "The \\\"Download diagnosis report\\\" button sits on top of the \\\"Stacktrace\\\" tab: at 768px wide the button covers the right half of the word \\\"Stacktrace\\\" (only \\\"Stac\\\" is readable) and the \\\"seconds\\\" label wraps out of the form under the button, onto the divider; at 390px wide the button covers the tab's right part and the seconds input overlaps the tab row. The tab is declared partly covered by the button, so it can only be clicked on its left part. (on /-/admin/monitor/perftrace and /-/admin/monitor/stacktrace)",
+      "expected": "The tab bar (Running Processes / Stacktrace) and the \"Download diagnosis report  [10] seconds\" form each keep their own row at tablet and phone widths: no element covers another, the tab labels stay fully readable and clickable, and \"seconds\" stays next to its input.",
+      "actual": "The \\\"Download diagnosis report\\\" button sits on top of the \\\"Stacktrace\\\" tab: at 768px wide the button covers the right half of the word \\\"Stacktrace\\\" (only \\\"Stac\\\" is readable) and the \\\"seconds\\\" label wraps out of the form under the button, onto the divider; at 390px wide the button covers the tab's right part and the seconds input overlaps the tab row. The tab is declared partly covered by the button, so it can only be clicked on its left part.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /-/admin/monitor/perftrace (or /-/admin/monitor/stacktrace).",
+        "Set the browser window to 768 x 1024: the blue \"Download diagnosis report\" button overlaps the \"Stacktrace\" tab in the tab bar, and the word \"seconds\" falls below the input onto the divider line.",
+        "Set the window to 390 x 844: the button still overlaps the \"Stacktrace\" tab and the \"10\" seconds input overlaps the tab row."
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 467,
+      "name": "At phone width the admin list headings are cut off by the action button",
+      "summary": "The heading is cut off: it renders as \\\"User Account Management (Tota\\\" with the \\\"Create User Account\\\" button sitting over the rest, so the total count is unreadable. The same truncation happens on /-/admin/orgs (\\\"Organization Management (Total: 0\\\") and /-/admin/repos (\\\"Repository Management (Tota…\\\", with \\\"Una­dopted Repositories\\\" covering it). (on /-/admin/users (also /-/admin/orgs, /-/admin/repos))",
+      "expected": "The full heading \\\"User Account Management (Total: 3)\\\" stays readable and the action button sits beside or below it without covering the text.",
+      "actual": "The heading is cut off: it renders as \\\"User Account Management (Tota\\\" with the \\\"Create User Account\\\" button sitting over the rest, so the total count is unreadable. The same truncation happens on /-/admin/orgs (\\\"Organization Management (Total: 0\\\") and /-/admin/repos (\\\"Repository Management (Tota…\\\", with \\\"Una­dopted Repositories\\\" covering it).",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1, open /-/admin/users.",
+        "Set the browser viewport to 390 x 844 (phone width).",
+        "Scroll to the \"User Account Management (Total: 3)\" panel and read its heading next to the \"Create User Account\" button.",
+        "Repeat on /-/admin/orgs (heading \"Organization Management (Total: 0)\") and /-/admin/repos (heading \"Repository Management (Total: 1)\")."
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 476,
+      "name": "Admin sidebar loses the expanded \\\"Monitoring\\\" group and the current-page highlight on a queue detail page",
+      "summary": "On the queue detail page the \\\"Monitoring\\\" group in the left admin sidebar is collapsed (just \\\"Monitoring\\\" with a \\\">\\\" chevron, no Stats / Cron Tasks / Queues / Trace sub-items) and no entry is highlighted, although the page is inside Monitoring > Queues. On the Queues list page the same group is expanded with \\\"Queues\\\" highlighted. So after clicking \\\"Review / Add Workers\\\" you lose the indicator of where you are and a click is needed to get to the sibling monitoring pages. (on /-/admin/monitor/queue/1)",
+      "expected": "The sidebar keeps the Monitoring group expanded with \\\"Queues\\\" marked as the current page on the queue detail page, as it does on the Queues list.",
+      "actual": "On the queue detail page the \\\"Monitoring\\\" group in the left admin sidebar is collapsed (just \\\"Monitoring\\\" with a \\\">\\\" chevron, no Stats / Cron Tasks / Queues / Trace sub-items) and no entry is highlighted, although the page is inside Monitoring > Queues. On the Queues list page the same group is expanded with \\\"Queues\\\" highlighted. So after clicking \\\"Review / Add Workers\\\" you lose the indicator of where you are and a click is needed to get to the sibling monitoring pages.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open Site Administration > Monitoring > Queues (/-/admin/monitor/queue). Note the left sidebar: Monitoring is expanded and Queues is highlighted.",
+        "Click \"Review / Add Workers\" on the notification-service row (opens /-/admin/monitor/queue/1).",
+        "Look at the left sidebar: Monitoring is now collapsed and nothing is highlighted."
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 496,
+      "name": "Statistics Summary reports Release 1 although no repository has any release",
+      "summary": "The Summary shows \\\"Release 1\\\" while the instance has no release anywhere: harbor-handbook's Releases tab says \\\"0 Releases\\\" (RSS feed empty, no release in the repository sidebar, tag v1.0.0 still offers \\\"New Release\\\") and the other two repositories are empty. The count stays 1 on repeated reloads of the statistics page. (on /-/admin/monitor/stats)",
+      "expected": "The Release row of the Summary should show 0, matching the repositories: none of the three repositories in the instance has a release (harbor-handbook shows \\\"0 Releases\\\", the other two are empty).",
+      "actual": "The Summary shows \\\"Release 1\\\" while the instance has no release anywhere: harbor-handbook's Releases tab says \\\"0 Releases\\\" (RSS feed empty, no release in the repository sidebar, tag v1.0.0 still offers \\\"New Release\\\") and the other two repositories are empty. The count stays 1 on repeated reloads of the statistics page.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /-/admin/monitor/stats.",
+        "Scroll the Summary table down to the row between PublicKey and Repo; read the row \"Release\" = 1 (Reports/Release 1, Repo 3, Tags 1).",
+        "Open /-/admin/repos: Repository Management (Total: 3) lists harbor-handbook (ID 1), agent4-zeta (ID 2) and agent4-alpha (ID 3).",
+        "Open /eval/harbor-handbook/releases: the page shows \"0 Releases\" and \"1 Tag\" (only tag v1.0.0, with a New Release link, so no release is published for it).",
+        "Open /eval/agent4-zeta/releases and /eval/agent4-alpha/releases: both answer 404 Not Found and have no Releases tab (repositories without commits)."
+      ]
+    },
+    {
+      "index": 8,
+      "reported_at_seconds": 497,
+      "name": "An \\\"Open with\\\" editor line without \\\"=\\\" is silently dropped on Save, with no error message",
+      "summary": "The page reloads silently: the textarea comes back containing only \"agent2 Editor = agent2://open?url={url}\". The line without \"=\" is discarded without any error or warning next to the field, and no confirmation of any kind is shown for the save. With only the malformed line entered, Save empties the whole field (screenshot s5) and the person is never told their entry was dropped. Repeating the same save gives the same result every time. (on /-/admin/config/settings)",
+      "expected": "The form should either refuse the line with a message next to the field (e.g. \"line 2 has no '=': expected Name = url-with-{url}\") and keep what the person typed, or keep the entry as typed. Either way the person must be able to see that their line was not accepted.",
+      "actual": "The page reloads silently: the textarea comes back containing only \"agent2 Editor = agent2://open?url={url}\". The line without \"=\" is discarded without any error or warning next to the field, and no confirmation of any kind is shown for the save. With only the malformed line entered, Save empties the whole field (screenshot s5) and the person is never told their entry was dropped. Repeating the same save gives the same result every time.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /-/admin/config/settings (Configuration → Settings in the admin sidebar).",
+        "In the \"Repository\" card, put the cursor in the large empty textarea under \"The 'Open with' editors for the clone menu…\" and type two lines: agent2 Editor = agent2://open?url={url} agent2 Broken Line Without Equals",
+        "Click the blue Save button in the same card.",
+        "Read the textarea again (reload the page if you like: the stored value is the same)."
+      ]
+    },
+    {
+      "index": 9,
+      "reported_at_seconds": 531,
+      "name": "After signing out, the Back button shows the admin User Accounts list with all users' email addresses",
+      "summary": "Back shows the full cached admin Users page — \"User Account Management (Total: 3)\", alex@example.test, admin@example.test, maya@example.test, the Admin Settings sidebar and the eval avatar in the navbar — to a visitor who is signed out. Only a reload then falls back to the Sign In page. (on /-/admin/users)",
+      "expected": "After signing out, Back must not show the admin page again: it should go to the sign-in page or an error, because the session no longer exists (reloading the page there does redirect to Sign In, so the access check itself works).",
+      "actual": "Back shows the full cached admin Users page — \"User Account Management (Total: 3)\", alex@example.test, admin@example.test, maya@example.test, the Admin Settings sidebar and the eval avatar in the navbar — to a visitor who is signed out. Only a reload then falls back to the Sign In page.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /-/admin/users (User Account Management, lists alex, eval, maya with their email addresses).",
+        "Open the account menu at the top right and click Sign Out (you land on the signed-out start page).",
+        "Press the browser's Back button once.",
+        "The admin User Accounts page is rendered again, with the three usernames, email addresses and the admin sidebar and the signed-in avatar in the navbar."
+      ]
+    },
+    {
+      "index": 10,
+      "reported_at_seconds": 540,
+      "name": "Choosing a filter silently resets the chosen sort order on the admin User Accounts list",
+      "summary": "The chosen sort is dropped: the address becomes /-/admin/users?q=&status_filter%5Bis_admin%5D=0 (no sort parameter), the rows come back in the default ID-ascending order (alex, maya) and the arrow moves back to ID ▲. The same happens with other combinations: sort \\\"Alphabetically\\\" + filter \\\"Active\\\" (address /-/admin/users?q=a&status_filter%5Bis_active%5D=1, alex/eval/maya revert to ID order), sort \\\"Reverse alphabetically\\\" + filter \\\"Admin\\\". Seen 3 times out of 3 tries; the typed search text (q) is kept, only the sort is lost. (on /-/admin/users)",
+      "expected": "The filter is added on top of the current state: the address keeps sort=reversealphabetically next to the status filter, and the list stays in reverse-alphabetical order (maya, alex) with the ▼ arrow still on Username.",
+      "actual": "The chosen sort is dropped: the address becomes /-/admin/users?q=&status_filter%5Bis_admin%5D=0 (no sort parameter), the rows come back in the default ID-ascending order (alex, maya) and the arrow moves back to ID ▲. The same happens with other combinations: sort \\\"Alphabetically\\\" + filter \\\"Active\\\" (address /-/admin/users?q=a&status_filter%5Bis_active%5D=1, alex/eval/maya revert to ID order), sort \\\"Reverse alphabetically\\\" + filter \\\"Admin\\\". Seen 3 times out of 3 tries; the typed search text (q) is kept, only the sort is lost.",
+      "reproSteps": [
+        "Sign in as eval (password given for the test) and open /-/admin/users.",
+        "Open the \"Sort\" dropdown in the list toolbar and choose \"Reverse alphabetically\": rows become maya (3), eval (1), alex (2) with a ▼ arrow on the Username column and the address becomes /-/admin/users?q=&sort=reversealphabetically.",
+        "Open the \"Filter\" dropdown and choose \"Not Admin\".",
+        "Read the address and the row order/arrow after the list reloads."
+      ]
+    },
+    {
+      "index": 11,
+      "reported_at_seconds": 565,
+      "name": "At phone width the queue detail table separates every label from its value",
+      "summary": "At 390 x 844 the table's headers and cells are each rendered as a full-width block: first all seven labels (Name, Type, Exemplar Type, Number of Workers, Active Workers, Max Number of Workers, Number in Queue), then all seven values (notification-service, level, u notification.issueNotificationOpts, 1, 0, 1, 0). The values are detached from the labels, so e.g. it is impossible to tell whether \\\"Max Number of Workers\\\" is 1 or 0 without opening it at a wider width. (on /-/admin/monitor/queue/1)",
+      "expected": "Each label stays next to its value on a phone (e.g. \\\"Number of Workers: 1\\\"), so the queue's state can be read at 390 px width.",
+      "actual": "At 390 x 844 the table's headers and cells are each rendered as a full-width block: first all seven labels (Name, Type, Exemplar Type, Number of Workers, Active Workers, Max Number of Workers, Number in Queue), then all seven values (notification-service, level, u notification.issueNotificationOpts, 1, 0, 1, 0). The values are detached from the labels, so e.g. it is impossible to tell whether \\\"Max Number of Workers\\\" is 1 or 0 without opening it at a wider width.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Set the browser viewport to 390 x 844.",
+        "Open /-/admin/monitor/queue/1 (Queues → \"Review / Add Workers\" of notification-service).",
+        "Read the \"Queue: notification-service\" table: all field names are listed first and all values underneath them."
+      ]
+    },
+    {
+      "index": 12,
+      "reported_at_seconds": 658,
+      "name": "Admin list search box keeps its old term after going Back, while the list shows all records (Total: 3)",
+      "summary": "The search field still contains the old term while the page shows the unfiltered inventory: on /-/admin/repos the address is /-/admin/repos, the header says \"Repository Management (Total: 3)\", all three repositories are listed, yet the search box reads \"harbor\". The same happens on /-/admin/users: the address is /-/admin/users, the header says \"User Account Management (Total: 3)\" and all three users are listed, but the search box still reads \"alex\". (on /-/admin/repos)",
+      "expected": "Going Back to the unfiltered list should leave the field consistent with the results: either the search box is cleared, or the filtered list is shown again. The field must never show a term the list is not filtered by.",
+      "actual": "The search field still contains the old term while the page shows the unfiltered inventory: on /-/admin/repos the address is /-/admin/repos, the header says \"Repository Management (Total: 3)\", all three repositories are listed, yet the search box reads \"harbor\". The same happens on /-/admin/users: the address is /-/admin/users, the header says \"User Account Management (Total: 3)\" and all three users are listed, but the search box still reads \"alex\".",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /-/admin/repos",
+        "Type harbor into the \"Search repos...\" box and press Enter (list filters to Total: 1, harbor-handbook)",
+        "Press the browser's Back button",
+        "The address is again /-/admin/repos and the header reads \"Repository Management (Total: 3)\" with all three repositories listed, but the search box still shows \"harbor\"",
+        "Same on /-/admin/users: search alex, press Enter, open a row's User Details, press Back twice - the unfiltered list (Total: 3) is shown with \"alex\" still in the search box"
+      ]
+    },
+    {
+      "index": 13,
+      "reported_at_seconds": 726,
+      "name": "A long \\\"Open with\\\" editor name overflows the repository clone menu and is cut off at the window edge",
+      "summary": "The \"Open with\" entry is rendered as one unbreakable line: the label runs out of the dropdown's right edge and is clipped by the window, so almost none of the editor name is readable. The rest of the menu (Clone, HTTPS/Tea CLI, Download ZIP/TAR.GZ/BUNDLE) is not affected. (on /eval/harbor-handbook (clone menu), set on /-/admin/config/settings)",
+      "expected": "The \"Open with\" menu item should stay inside the clone menu — the long name should wrap or be shortened with an ellipsis — so the menu is readable and its box is not overflowed.",
+      "actual": "The \"Open with\" entry is rendered as one unbreakable line: the label runs out of the dropdown's right edge and is clipped by the window, so almost none of the editor name is readable. The rest of the menu (Clone, HTTPS/Tea CLI, Download ZIP/TAR.GZ/BUNDLE) is not affected.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /-/admin/config/settings.",
+        "In the Repository group, put this one line in the \"Open with\" editors textarea: \"agent12-LongName-LoremIpsumDolorSitAmetConsecteturAdipiscingElitSedDoEiusmodTemporIncididuntUtLaboreEtDoloreMagnaAliquaUtEnimAdMinimVeniamQuisNostrudExercitationUllamcoLaborisNisiUtAliquipExEaCommodoConsequatDuisAuteIrureDolorInReprehenderitInVoluptateVelitEsseCillumDoloreEuFugiatNullaPariaturSintOccaecatCupidatat = agent12://open?url={url}\" and click Save.",
+        "Open /eval/harbor-handbook and click the \"Code\" button to open the clone menu.",
+        "Look at the \"Open with agent12-LongName-Lorem…\" item in the menu."
+      ]
+    },
+    {
+      "index": 14,
+      "reported_at_seconds": 740,
+      "name": "Dashboard update banner announces an impossible version \\\"Gitea 28.4.0\\\"",
+      "summary": "The banner reads \"Gitea 28.4.0 is now available, you are running 1.24.7. Check the blog for more details.\" — 28.4.0 is not a Gitea release line (Gitea versions are 1.x), and it contradicts the instance's own version shown in the same page footer (Version: 1.24.7). (on /-/admin)",
+      "expected": "The update notice should name a real, plausible newer Gitea version (a 1.x release above 1.24.7), consistent with the instance version in the footer, or not be shown at all.",
+      "actual": "The banner reads \"Gitea 28.4.0 is now available, you are running 1.24.7. Check the blog for more details.\" — 28.4.0 is not a Gitea release line (Gitea versions are 1.x), and it contradicts the instance's own version shown in the same page footer (Version: 1.24.7).",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1",
+        "Open /-/admin (Site Administration - Dashboard)",
+        "Read the pink banner above Maintenance Operations: \"Gitea 28.4.0 is now available, you are running 1.24.7. Check the blog for more details.\"",
+        "Compare with the page footer, which says Version: 1.24.7"
+      ]
+    },
+    {
+      "index": 15,
+      "reported_at_seconds": 745,
+      "name": "Organization page header at phone width breaks the \\\"Follow\\\" button label into \\\"Fol low\\\"",
+      "summary": "The Follow button's label is squeezed into a two-line \\\"Fol / low\\\" inside a narrow button next to the RSS button, so the control reads as garbage; the button is only about 30 px wide while its label needs more room. (on /agent6-org-a (organization page, phone width 390×844))",
+      "expected": "The Follow button keeps its label on one line (or the header wraps so the button still shows \\\"Follow\\\" legibly) at phone width, as it does at desktop width.",
+      "actual": "The Follow button's label is squeezed into a two-line \\\"Fol / low\\\" inside a narrow button next to the RSS button, so the control reads as garbage; the button is only about 30 px wide while its label needs more room.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1",
+        "Set the browser window to a phone size, 390 × 844 CSS pixels",
+        "Open the organization page /agent6-org-a",
+        "Look at the top right of the page header, next to the RSS button"
+      ]
+    },
+    {
+      "index": 16,
+      "reported_at_seconds": 771,
+      "name": "Submitting the search box drops the chosen sort order on the admin Organizations and Users lists",
+      "summary": "The sort is dropped: the address becomes /-/admin/orgs?q=agent (no sort parameter) and the arrow returns to the default ID ▲ order. On /-/admin/users the same happens: with sort=alphabetically and a filter active, submitting \\\"may\\\" in the search box leaves /-/admin/users?q=may&status_filter%5Bis_admin%5D=0 and the rows revert to ID order (the filter survives, the sort does not). /-/admin/repos keeps its sort when searching, so it is the Users and Organizations search forms. Seen on both pages, 1 try each. (on /-/admin/orgs)",
+      "expected": "The search is applied on top of the chosen sort: the address keeps sort=reversealphabetically next to q=agent and the list stays sorted (▼ on Name).",
+      "actual": "The sort is dropped: the address becomes /-/admin/orgs?q=agent (no sort parameter) and the arrow returns to the default ID ▲ order. On /-/admin/users the same happens: with sort=alphabetically and a filter active, submitting \\\"may\\\" in the search box leaves /-/admin/users?q=may&status_filter%5Bis_admin%5D=0 and the rows revert to ID order (the filter survives, the sort does not). /-/admin/repos keeps its sort when searching, so it is the Users and Organizations search forms. Seen on both pages, 1 try each.",
+      "reproSteps": [
+        "Sign in as eval and open /-/admin/orgs.",
+        "Open the \"Sort\" dropdown and choose \"Reverse alphabetically\": the address becomes /-/admin/orgs?sort=reversealphabetically&q= and the arrow on the Name column is ▼.",
+        "Type \"agent\" into the \"Search orgs...\" box and press Enter.",
+        "Read the address and the sort arrow of the list."
+      ]
+    },
+    {
+      "index": 17,
+      "reported_at_seconds": 850,
+      "name": "Confirming organization deletion sends an extra POST to .../settings/null that fails with 404",
+      "summary": "Two POSTs leave the page: one to /org/agent6-org-c/settings/delete (303, the real deletion) and one just before it to /org/agent6-org-c/settings/null, which the server answers 404 (\"Failed to load resource: the server responded with a status of 404\" in the console). The delete itself still goes through. Seen 3 times out of 3 (agent6-org-a, agent6-org-b, agent6-org-c). (on /org/{org}/settings/delete)",
+      "expected": "Confirming the deletion sends exactly one request, to the delete endpoint that the form names, with no failed request and no console error.",
+      "actual": "Two POSTs leave the page: one to /org/agent6-org-c/settings/delete (303, the real deletion) and one just before it to /org/agent6-org-c/settings/null, which the server answers 404 (\"Failed to load resource: the server responded with a status of 404\" in the console). The delete itself still goes through. Seen 3 times out of 3 (agent6-org-a, agent6-org-b, agent6-org-c).",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-iwf64r7qwvwmxm2zjk6v9.e2b.app/-/admin/orgs (this page's row action \"Edit\" and the New Organization page lead to the same flow).",
+        "Create an organization named agent6-org-c (New Organization → Organization Name agent6-org-c → Create Organization).",
+        "Open its settings: click the pencil in the organization's row on /-/admin/orgs, then \"Delete Organization\" in the left menu (address /org/agent6-org-c/settings/delete).",
+        "Type agent6-org-c into \"Organization Name\" and press \"Confirm Deletion\".",
+        "In the \"Delete Organization — This organization will be deleted permanently. Continue?\" dialog press \"Yes\", then read the network requests and the browser console for the action."
+      ]
+    },
+    {
+      "index": 18,
+      "reported_at_seconds": 870,
+      "name": "At 768 px the Repository Management table is cut off with the Created and delete columns unreachable",
+      "summary": "The table is clipped at the right edge of its panel: the header reads \\\"Upda\\\" and the Updated cells show only \\\"Nov 2 / 2026\\\"; the Created and Op. (delete) columns are completely outside the visible area, and there is no horizontal scrollbar to reach them, so the per-repository delete control cannot be used. Repository names break mid-word (\\\"agent4- / alpha\\\", \\\"handboo / k\\\"). (on /-/admin/repos)",
+      "expected": "At 768 px wide the repository list should stay usable: all columns readable (wrapped onto several lines as at 1024 px) or the table should scroll horizontally inside its panel, so Updated, Created and the delete action stay reachable.",
+      "actual": "The table is clipped at the right edge of its panel: the header reads \\\"Upda\\\" and the Updated cells show only \\\"Nov 2 / 2026\\\"; the Created and Op. (delete) columns are completely outside the visible area, and there is no horizontal scrollbar to reach them, so the per-repository delete control cannot be used. Repository names break mid-word (\\\"agent4- / alpha\\\", \\\"handboo / k\\\").",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and set the browser window to 768 px wide (768x1024).",
+        "Open /-/admin/repos (Repository Management, Total: 3).",
+        "Look at the table's right side: the last visible header is truncated (\"Upda\"), Updated cells show only \"Nov 2 / 2026\", and the Created and Op. columns are missing; the panel has no horizontal scrollbar."
+      ]
+    },
+    {
+      "index": 19,
+      "reported_at_seconds": 958,
+      "name": "A nonexistent admin user address silently shows the user list instead of the site's Not Found page",
+      "summary": "The address is silently redirected to /-/admin/users and the whole user list is shown, with no error, no message and no sign that the account does not exist. Same for /-/admin/users/999/edit (lands on the list instead of the edit form) and /-/admin/users/abc/edit. Other unknown admin addresses do show the site's own error page (/-/admin/doesnotexist → \\\"404 Not Found — The page you are trying to reach either does not exist or you are not authorized to view it.\\\"), so the same class of address is handled two different ways. Seen 3 times out of 3 tries. (on /-/admin/users/999)",
+      "expected": "The site's \\\"404 Not Found\\\" page (as /-/admin/doesnotexist gives), or a message saying the user does not exist, so the person knows the account is gone rather than landing on an unrelated list.",
+      "actual": "The address is silently redirected to /-/admin/users and the whole user list is shown, with no error, no message and no sign that the account does not exist. Same for /-/admin/users/999/edit (lands on the list instead of the edit form) and /-/admin/users/abc/edit. Other unknown admin addresses do show the site's own error page (/-/admin/doesnotexist → \\\"404 Not Found — The page you are trying to reach either does not exist or you are not authorized to view it.\\\"), so the same class of address is handled two different ways. Seen 3 times out of 3 tries.",
+      "reproSteps": [
+        "Sign in as eval and open /-/admin/users once so the list loads normally.",
+        "Navigate to the address /-/admin/users/999 (a user id that does not exist).",
+        "Look at the page and the address after the page loads; repeat with /-/admin/users/999/edit and /-/admin/users/abc/edit."
+      ]
+    }
+  ]
+}

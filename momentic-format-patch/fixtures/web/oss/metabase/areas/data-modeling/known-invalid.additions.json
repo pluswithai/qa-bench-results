@@ -1,0 +1,142 @@
+{
+  "bugs": [
+    {
+      "name": "Browse > Models / Metrics shows 'A model' / 'A metric' for items without a description",
+      "summary": "The Description column shows the text \"A model\" for every model whose description is empty — so the list invents a description that the model does not have. Seen on my two models 'agent1-nodesc' and 'agent1-maxname-…-END' (and on another agent's 'agent11-metric-dup'); the model's own page and /api/card show no description at all. (on /browse/models)",
+      "expected": "A model without a description shows an empty Description cell (or a neutral placeholder that is not data), matching the model's own page and its stored record (description = null).",
+      "actual": "The Description column shows the text \"A model\" for every model whose description is empty — so the list invents a description that the model does not have. Seen on my two models 'agent1-nodesc' and 'agent1-maxname-…-END' (and on another agent's 'agent11-metric-dup'); the model's own page and /api/card show no description at all.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai, go to /model/new, click 'Use the notebook editor'.",
+        "Choose 'Sample Database' > 'People' as the source table.",
+        "Click 'Save' (top right), type the name 'agent1-nodesc', leave the Description field empty, pick 'Our analytics' as the collection, click 'Save' in the dialog.",
+        "Go to /browse/models and look at the Description column of the row 'agent1-nodesc'.",
+        "Open the model (its own page shows no description) and read /api/card/<id> — the stored description is null."
+      ],
+      "reason": "Deliberate placeholder: getModelDescription / getMetricDescription return t`A model` / t`A metric` when the item has no description. It is a product decision in source, not stored or invented data."
+    },
+    {
+      "name": "Filter and Summarize buttons are not shown on model/metric pages at phone width",
+      "summary": "At 390x844 the toolbar holds only \"Editor\", the refresh/sharing/bookmark/info/\"...\" buttons, and the View/by controls. Neither \"Filter\" nor \"Summarize\" is on the page, and the \\\"...\\\" (Move, trash, and more…) menu contains only Add to dashboard, Create an alert, Edit metric definition, Turn into a model, Move, Duplicate, Move to trash — so a phone user cannot filter or summarize the metric at all. Widening the window to 820px brings both buttons back. (on /metric/49-agent10-revenue-copy-v2)",
+      "expected": "The metric page offers its Filter and Summarize actions at a phone width too (or provides them in the \\\"...\\\" menu), as it does at 820px and 1280px.",
+      "actual": "At 390x844 the toolbar holds only \"Editor\", the refresh/sharing/bookmark/info/\"...\" buttons, and the View/by controls. Neither \"Filter\" nor \"Summarize\" is on the page, and the \\\"...\\\" (Move, trash, and more…) menu contains only Add to dashboard, Create an alert, Edit metric definition, Turn into a model, Move, Duplicate, Move to trash — so a phone user cannot filter or summarize the metric at all. Widening the window to 820px brings both buttons back.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1 and open a metric page, e.g. /metric/49-agent10-revenue-copy-v2.",
+        "Set the browser window to a phone size, 390 x 844.",
+        "Look at the metric's toolbar row (only \"Editor\" plus icons) and open the \"...\" (Move, trash, and more…) menu.",
+        "Widen the window to 820 x 1180 and look at the same toolbar row."
+      ],
+      "reason": "Deliberate: both buttons are rendered with className={cx(CS.hide, CS.smShow)}, i.e. hidden below the small breakpoint by design, while the Editor (notebook) button, which offers filtering and summarizing, stays."
+    },
+    {
+      "name": "Hand-typed /metric/new, /metric/0-x, /model/0-x and /model/not-a-number open the new-question flow",
+      "summary": "The address is replaced by the plain question editor: the URL becomes /question#… with type \"query\", the page is 'New question' and the save dialog is titled 'Save new question'. Saving creates a saved QUESTION (/question/73-agent1-from-metric-new), not a metric — the user who asked for a new metric silently ends up with a question. The real metric flow is elsewhere: the '+' on Browse > Metrics opens /metric/query with a 'New metric' header. (on /metric/new)",
+      "expected": "/metric/new opens the metric editor ('New metric', as the '+' on Browse > Metrics does at /metric/query) and saving creates a metric, not a question.",
+      "actual": "The address is replaced by the plain question editor: the URL becomes /question#… with type \"query\", the page is 'New question' and the save dialog is titled 'Save new question'. Saving creates a saved QUESTION (/question/73-agent1-from-metric-new), not a metric — the user who asked for a new metric silently ends up with a question. The real metric flow is elsewhere: the '+' on Browse > Metrics opens /metric/query with a 'New metric' header.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and navigate straight to /metric/new in a fresh tab.",
+        "Observe that after loading, the address has become /question#eyJkYXRhc2V0X3F1ZXJ5Ijp7ImRhdGFiYXNlIjpudWxsLCJ0eXBlIjoicXVlcnki... (type \"query\") and the page is the question editor's 'Pick your starting data' screen (its title area reads 'New question').",
+        "Choose 'Sample Database' > 'Orders', then click 'Save' (top right).",
+        "The dialog is titled 'Save new question'; type the name 'agent1-from-metric-new' and click 'Save'.",
+        "The saved item opens at /question/73-agent1-from-metric-new — a saved question. Compare with /browse/metrics, where the '+' ('Create a new metric') opens /metric/query with a 'New metric' header."
+      ],
+      "reason": "There is no /metric/new route (metrics are created at /metric/query; the only 'new' route is /model/new) and no link in the app produces these addresses. They match '/metric/:slug' or '/model/:slug'; extractEntityId returns undefined (or a falsy 0), so the query builder starts a blank question. Input no real link produces."
+    },
+    {
+      "name": "Editing a metric through 'Editor' saves a new question instead of changing the metric",
+      "summary": "The save dialog is titled \"Save new question\" with Name prefilled \"agent7-metric-count v2 - Modified\"; saving it creates a NEW saved question (address /question/48-agent7-metric-count-v2-modified, subtitle \"Sample Database / Orders\", and it is not listed under Browse → Metrics) while metric 42 stays unchanged (still Count = 18,760) and its History tab gets no revision. The edit is lost for the metric. (on /metric/42-agent7-metric-count/notebook (editor of an existing metric))",
+      "expected": "Saving from the editor of an existing metric updates that metric in place: it keeps its metric type and address, its result shows the new aggregation, and its History tab gains a revision (as \"Edit metric definition\" → \"Save changes\" does).",
+      "actual": "The save dialog is titled \"Save new question\" with Name prefilled \"agent7-metric-count v2 - Modified\"; saving it creates a NEW saved question (address /question/48-agent7-metric-count-v2-modified, subtitle \"Sample Database / Orders\", and it is not listed under Browse → Metrics) while metric 42 stays unchanged (still Count = 18,760) and its History tab gets no revision. The edit is lost for the metric.",
+      "reproSteps": [
+        "Sign in with eval@momentic.ai / momentic-eval-1.",
+        "Open /browse/metrics, click the \"+\" (Create a new metric), choose Sample Database → Orders, keep Formula = Count, Save, name it \"agent7-metric-count\", Save.",
+        "On the saved metric page click the \"pencil_lines icon Editor\" button in the header.",
+        "In the notebook editor click \"Pick a column to group by\", choose Created At → Month. A \"Save\" button appears in the header.",
+        "Click \"Save\": the dialog is titled \"Save new question\" with Name \"agent7-metric-count v2 - Modified\".",
+        "Click the dialog's \"Save\" and look at where you land (/question/48-...).",
+        "Return to /metric/42-agent7-metric-count: the value is still 18,760 and Info → History has no revision for the edit."
+      ],
+      "reason": "By design: the metric page shows an ad-hoc question built on top of the metric (composeQuestion); exploring it with Editor/Filter/Summarize and saving creates a new question ('Save new question'), exactly as for models. The metric itself is changed through '... > Edit metric definition', which the same report says works."
+    },
+    {
+      "name": "Enter in the model description field does not commit the edit",
+      "summary": "Enter sends no request: the field stays in edit mode with the typed text and the edit is silently discarded. After reload the description is back to the previously saved value 'agent12 updated description'. Clicking outside the field instead does send PUT /api/card/45 and the value is kept, so only the Enter key loses the edit. (on /model/45-agent12-model-beta (Info panel → Overview → Description))",
+      "expected": "Enter in the single-line description field commits the new description, as it does elsewhere in the app; after reload the Info panel shows 'agent12 third description'.",
+      "actual": "Enter sends no request: the field stays in edit mode with the typed text and the edit is silently discarded. After reload the description is back to the previously saved value 'agent12 updated description'. Clicking outside the field instead does send PUT /api/card/45 and the value is kept, so only the Enter key loses the edit.",
+      "reproSteps": [
+        "Open /model/45-agent12-model-beta (model 'agent12-model-beta', formerly agent12-model-alpha, in Our analytics).",
+        "Click the circle-i 'More info' button in the header to open the Info panel.",
+        "Click the description text under the 'Description' heading so it turns into a text input.",
+        "Type 'agent12 third description' and press Enter (no request is sent).",
+        "Reload the page and reopen the Info panel."
+      ],
+      "reason": "The description is a multi-line Markdown field (EditableDescription passes isMultiline and isMarkdown); EditableText only submits on Enter when it is not multi-line, so Enter adds a line break and the value is committed on blur. The text was lost because the page was reloaded while the field was still in edit mode. Works as designed."
+    },
+    {
+      "name": "Move dialog for a model/metric is titled 'Where do you want to save this?'",
+      "summary": "The dialog is headed \\\"Where do you want to save this?\\\" — while the action is a move and the confirm button in the same dialog says \\\"Move\\\" (\\\"Cancel\\\" / \\\"Move\\\"). (on /model/46-agent14-metric-count (\\\"Move\\\" action))",
+      "expected": "The Move dialog is headed for what it does, e.g. \\\"Where do you want to move this?\\\", consistent with its \\\"Move\\\" button.",
+      "actual": "The dialog is headed \\\"Where do you want to save this?\\\" — while the action is a move and the confirm button in the same dialog says \\\"Move\\\" (\\\"Cancel\\\" / \\\"Move\\\").",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1.",
+        "Open https://5501-irj19dkxmuqxplj4vepre.e2b.app/model/46-agent14-metric-count (or any metric/model page).",
+        "Open the \"...\" (Move, trash, and more…) menu in the header and click \"Move\".",
+        "Read the heading of the dialog that opens."
+      ],
+      "reason": "The title is an explicit string chosen for the card move dialog (cards can be saved into a collection or a dashboard); it is not misleading and the confirm button says Move. Deliberate copy, not a defect."
+    },
+    {
+      "name": "'Last edited by' / 'Last edited at' are empty for every item of the Examples collection",
+      "summary": "Both columns are empty for every item: all 25 rows (including \\\"Revenue\\\", \\\"Number of Orders\\\", \\\"Checkout funnel\\\") show nothing under \\\"Last edited by\\\" and nothing under \\\"Last edited at\\\". (on /collection/2-examples)",
+      "expected": "Each row should show who last edited the item and when, as the two column headers promise.",
+      "actual": "Both columns are empty for every item: all 25 rows (including \\\"Revenue\\\", \\\"Number of Orders\\\", \\\"Checkout funnel\\\") show nothing under \\\"Last edited by\\\" and nothing under \\\"Last edited at\\\".",
+      "reproSteps": [
+        "Sign in and open Browse > Examples, i.e. /collection/2-examples.",
+        "Scroll down past the Dashboards and Models cards to the list of questions/metrics, which has the columns \"Type | Name | Last edited by | Last edited at\".",
+        "Look at the \"Last edited by\" and \"Last edited at\" columns for the rows (e.g. \"Aerodynamic Copper Knife trend\", \"Revenue\", \"Checkout funnel\")."
+      ],
+      "reason": "The Examples collection is Metabase's built-in sample content: run2-04/shot-2 shows the same items as 'Created ... by Metabase Internal'. The two columns come from the most recent revision row (left join revision r ... r.most_recent), and content loaded at startup has no revisions, so there is no editor to show. The same mechanism does show 'Harbor Admin / November 23, 2026' for user-edited items in the Trash list of the same run (run2-23/shot-1). Fixture/sample-content state, not a defect. Caveat: the list also has 'Checkout funnel - Modified', which could not be confirmed as seeded."
+    },
+    {
+      "name": "Model 'Columns' editor at phone width shows only the settings panel, with no way to pick another column",
+      "summary": "At 390px the column picker (the ID / TOTAL pills that sit above the preview and the settings panel on a wider screen) is gone: the page shows only the Display name/Description/Database column/Column type settings for the first column, ID. There is no control anywhere to select another column, so the second column (TOTAL) of this model cannot be edited on a phone. (on /model/44-agent1-zz-model/columns)",
+      "expected": "As on the 820px-wide layout, the Columns tab shows the model's columns (ID and TOTAL) above the settings so another column can be selected and edited.",
+      "actual": "At 390px the column picker (the ID / TOTAL pills that sit above the preview and the settings panel on a wider screen) is gone: the page shows only the Display name/Description/Database column/Column type settings for the first column, ID. There is no control anywhere to select another column, so the second column (TOTAL) of this model cannot be edited on a phone.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai.",
+        "At a phone size (390x844) open https://5501-ioic2igikzl9eu83lv3wv.e2b.app/model/44-agent1-zz-model/columns (the model agent1-zz-model > Columns).",
+        "Notice which column the settings belong to (Display name \"ID\") and look for a way to switch to the model's other column, TOTAL.",
+        "Compare with the same page at 820x1180, where the ID and TOTAL pills appear above the settings."
+      ],
+      "reason": "Deliberate small-screen layout: .TableContainer.isSidebarOpen is display: none below 40em, so the settings sidebar replaces the table whose headers select the column. Model authoring is a desktop workflow and the hiding is an explicit rule, not a regression. A human may still want to judge whether phone editing is in scope."
+    },
+    {
+      "name": "Turning the metric 'Number of Orders' into a model is said to add a 'previous 3 years or this year' filter and drop data",
+      "summary": "Right after \\\"Turn into a model\\\" the same card shows only 21 rows (April 2025 → December 2026) and the footer \\\"Showing 21 rows\\\"; the months from 2027 to 2029 with counts around 500 each are gone. Turning it back to a saved question leaves a filter chip \\\"Created At is in the previous 3 years or this year\\\" and \\\"View: Previous 3 years or this year\\\", which the metric never had (its View was \\\"All time\\\"). Setting View to \\\"All time\\\" and pressing Apply in the date popover brings back \\\"Showing 49 rows\\\" and the full chart, so the conversion itself changed the data scope and hides 28 months of data. (on /metric/19-number-of-orders (now /model/19-number-of-orders, turned back into the saved question /question/19-number-of-orders))",
+      "expected": "The converted model/question keeps the metric's own time setting (\\\"All time\\\") and returns the same 49 monthly rows with the same counts as the metric did.",
+      "actual": "Right after \\\"Turn into a model\\\" the same card shows only 21 rows (April 2025 → December 2026) and the footer \\\"Showing 21 rows\\\"; the months from 2027 to 2029 with counts around 500 each are gone. Turning it back to a saved question leaves a filter chip \\\"Created At is in the previous 3 years or this year\\\" and \\\"View: Previous 3 years or this year\\\", which the metric never had (its View was \\\"All time\\\"). Setting View to \\\"All time\\\" and pressing Apply in the date popover brings back \\\"Showing 49 rows\\\" and the full chart, so the conversion itself changed the data scope and hides 28 months of data.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open Browse > Metrics > \"Number of Orders\" (https://5501-ioic2igikzl9eu83lv3wv.e2b.app/metric/19-number-of-orders). Note the footer says \"Showing 49 rows\", the line chart runs to January 2029 and the View selector says \"All time\".",
+        "Open the \"...\" menu in the header and click \"Turn into a model\".",
+        "Look at the model that appears: its table has only 21 rows (April 2025 to December 2026) and the footer says \"Showing 21 rows\" — nothing after December 2026, although the metric showed monthly counts of about 500 for 2027-2029.",
+        "Open the \"...\" menu again and click \"Turn back to saved question\".",
+        "See the filter chip \"Created At is in the previous 3 years or this year\" above the table and \"View: Previous 3 years or this year\" under it.",
+        "Open the View selector, choose \"All time\" and press Apply: the result jumps to \"Showing 49 rows\" with the full chart, proving the filter the conversion introduced hid 28 months of data."
+      ],
+      "reason": "The evidence contradicts the claim. run3-25/shot-3 shows the metric before conversion: the 2027-2029 months are plotted at 0, not 'around 500 each', i.e. the 'previous 3 years or this year' filter is already part of the metric's saved definition and the metric page only pads the series with zero rows. The model and the question it turns back into run that same saved query (21 rows, filter chip visible in run3-25/shot-5). No filter was added and no data was dropped by the conversion."
+    },
+    {
+      "name": "Turning a metric into a model and back loses its line chart",
+      "summary": "The metric's line chart is gone after the round trip: the converted model and the saved question it turns back into both render as a plain table (\\\"Created At: Month\\\" / \\\"Count\\\" rows) even though the chart settings are still stored, and the saved question's menu offers no way to get the chart back. (on /question/19-number-of-orders (previously /metric/19-number-of-orders))",
+      "expected": "Turning the metric into a model and back keeps the metric's line chart (display \\\"line\\\" with the same x/y columns), so the metric looks as it did before the conversion.",
+      "actual": "The metric's line chart is gone after the round trip: the converted model and the saved question it turns back into both render as a plain table (\\\"Created At: Month\\\" / \\\"Count\\\" rows) even though the chart settings are still stored, and the saved question's menu offers no way to get the chart back.",
+      "reproSteps": [
+        "Open https://5501-ioic2igikzl9eu83lv3wv.e2b.app/metric/19-number-of-orders (metric \"Number of Orders\" in Examples) — it is displayed as a line chart of Count over Created At: Month.",
+        "Open the \"...\" menu in the header and click \"Turn into a model\".",
+        "The model (/model/19-number-of-orders) shows the same two columns but as a table, not a chart.",
+        "Open the \"...\" menu and click \"Turn back to saved question\".",
+        "The saved question (/question/19-number-of-orders) is still a table; the line chart the metric had before the conversion is not shown and cannot be reached from the header menu."
+      ],
+      "reason": "By design: turnQuestionIntoModel sets display to 'table' and clears the settings (models are tables) and offers an Undo toast ('This is a model now.'). Turning it back keeps the table display; the chart can be restored with the Visualization button in the footer, so the claim that it cannot be reached is wrong."
+    }
+  ]
+}

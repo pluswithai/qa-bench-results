@@ -1,0 +1,188 @@
+{
+  "bugs": [
+    {
+      "name": "Stacktrace page shows only the goroutine count, no stack traces",
+      "summary": "Only the header '76 Goroutines' is shown; the area below it is empty. The page DOM contains no stack-trace text block at all and there is no control to reveal the traces, while the Running Processes tab on the same toolbar does render its trace output. (on /-/admin/monitor/stacktrace)",
+      "expected": "The Stacktrace tab lists the goroutine stack traces it counts (76 Goroutines now), so an administrator can read them and diagnose the instance.",
+      "actual": "Only the header '76 Goroutines' is shown; the area below it is empty. The page DOM contains no stack-trace text block at all and there is no control to reveal the traces, while the Running Processes tab on the same toolbar does render its trace output.",
+      "reproSteps": [
+        "Sign in as eval.",
+        "Open Site Administration and expand Monitoring.",
+        "Click Trace (/-/admin/monitor/stacktrace).",
+        "Stay on the 'Stacktrace' tab of the panel."
+      ]
+    },
+    {
+      "name": "Repo search treats \"%\" and \"_\" as SQL wildcards and returns every repository",
+      "summary": "Searching for \"%\" returns Total: 1 with eval/harbor-handbook, and searching for \"_\" also returns Total: 1 with the same repo. The search value is passed into a LIKE pattern unescaped, so \"%\" and \"_\" behave as wildcards and match everything. (on /-/admin/repos)",
+      "expected": "A search for the literal text \"%\" or \"_\" should find no repository, because no repository name contains those characters — the page should show 'Total: 0' and 'No results found.', as it does for 'zzzznomatch'.",
+      "actual": "Searching for \"%\" returns Total: 1 with eval/harbor-handbook, and searching for \"_\" also returns Total: 1 with the same repo. The search value is passed into a LIKE pattern unescaped, so \"%\" and \"_\" behave as wildcards and match everything.",
+      "reproSteps": [
+        "Sign in as eval and open /-/admin/repos (Repository Management, Total: 1, one repo eval/harbor-handbook).",
+        "Type % into the 'Search repos...' box and press Enter (or click the magnifier button).",
+        "Observe: Repository Management (Total: 1) and the row eval/harbor-handbook is listed.",
+        "Repeat with a single underscore _ in the search box."
+      ]
+    },
+    {
+      "name": "Pressing the Search button silently throws away the chosen sort order on User Account Management",
+      "summary": "The URL becomes /-/admin/users?q=a&status_filter[is_admin]=0&status_filter[is_active]=1 — the sort parameter is gone — and the rows revert to alphabetical order (agent2-probe, alex, maya). The filter is kept but the sort is dropped with no notice, and the Sort control never shows which order is applied (its label stays \\\"Sort\\\" in both states), so the person cannot see that their choice was lost. (on /-/admin/users)",
+      "expected": "The search is re-run with the choices already made: the URL keeps sort=reversealphabetically and the rows stay in reverse alphabetical order (maya, alex, agent2-probe), just as they were before the Search click.",
+      "actual": "The URL becomes /-/admin/users?q=a&status_filter[is_admin]=0&status_filter[is_active]=1 — the sort parameter is gone — and the rows revert to alphabetical order (agent2-probe, alex, maya). The filter is kept but the sort is dropped with no notice, and the Sort control never shows which order is applied (its label stays \\\"Sort\\\" in both states), so the person cannot see that their choice was lost.",
+      "reproSteps": [
+        "Sign in as eval, open /-/admin/users",
+        "Type \"a\" in the \"Search users...\" box",
+        "Open the Filter dropdown and choose \"Not Admin\" (the list reloads, URL has q=a&status_filter[is_admin]=0&status_filter[is_active]=1)",
+        "Open the Sort dropdown and click \"Reverse alphabetically\" (URL gets &sort=reversealphabetically, rows are now maya, alex, agent2-probe)",
+        "Click the magnifier \"Search...\" button without touching anything else",
+        "Look at the URL and the row order"
+      ]
+    },
+    {
+      "name": "Admin user search treats % and _ as SQL wildcards and returns every account",
+      "summary": "Searching for % returns every account in the inventory (heading 'User Account Management (Total: 5)', all 5 rows listed) and the same happens with a single _ ; the two characters are matched as SQL LIKE wildcards instead of literal text. (on /-/admin/users)",
+      "expected": "No username or e-mail address contains a literal % or _, so the search should return no accounts and say there are no matches, in words.",
+      "actual": "Searching for % returns every account in the inventory (heading 'User Account Management (Total: 5)', all 5 rows listed) and the same happens with a single _ ; the two characters are matched as SQL LIKE wildcards instead of literal text.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-iyz9are0xdg985upn6ktx.e2b.app/-/admin/users",
+        "Click the 'Search users...' box and type a single percent sign %",
+        "Press Enter (or click the magnifier button) and read the heading and the table",
+        "Clear the box, type a single underscore _ , press Enter and read the table again"
+      ]
+    },
+    {
+      "name": "Queue pool settings accept a negative \\\"Max Number of workers\\\" and store it",
+      "summary": "The page shows the green \\\"Settings Updated\\\" message and the queue row now reports \\\"Max Number of Workers\\\" = -1 (it persisted across a reload); the same happens when -7 is entered. The row then shows Number of Workers 1 against a Max Number of Workers of -1. (on /-/admin/monitor/queue/1)",
+      "expected": "A negative maximum number of workers is refused with a validation message (the page already refuses non-numeric input with \\\"Max number of workers must be a number\\\"), and the stored max stays at its previous value.",
+      "actual": "The page shows the green \\\"Settings Updated\\\" message and the queue row now reports \\\"Max Number of Workers\\\" = -1 (it persisted across a reload); the same happens when -7 is entered. The row then shows Number of Workers 1 against a Max Number of Workers of -1.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-iyz9are0xdg985upn6ktx.e2b.app/-/admin/monitor/queue",
+        "Click \"Review / Add Workers\" on the first row (notification-service) to open /-/admin/monitor/queue/1",
+        "In the \"Pool Settings\" box, type -5 into the field next to \"Max Number of workers\" (placeholder \"Currently 1\")",
+        "Click \"Update Settings\"",
+        "Read the queue table row and reload the page"
+      ]
+    },
+    {
+      "name": "Nonexistent queue detail address answers 404 with an entirely blank page",
+      "summary": "The browser receives HTTP 404 and renders a completely blank white page: no page title, no navigation bar, no error wording and no link back. It stayed blank after a reload. (on /-/admin/monitor/queue/99)",
+      "expected": "The site's 404/error page with a message such as \"Page not found\" and the navigation/sidebar, so the administrator can get back; not a blank page.",
+      "actual": "The browser receives HTTP 404 and renders a completely blank white page: no page title, no navigation bar, no error wording and no link back. It stayed blank after a reload.",
+      "reproSteps": [
+        "Sign in as eval, then open https://5503-iyz9are0xdg985upn6ktx.e2b.app/-/admin/monitor/queue/99 directly in the address bar (a queue id that does not exist)",
+        "Reload the page"
+      ]
+    },
+    {
+      "name": "At phone width the \\\"User Account Management (Total: N)\\\" heading is cut off by the Create User Account button",
+      "summary": "The heading is cut off at \\\"User Account Management (Tota\\\" and the rest — including the record count — is hidden behind / clipped by the blue \\\"Create User Account\\\" button on the right. The count cannot be read at all at phone width. At 768 px and 1440 px the full heading is visible. (on /-/admin/users)",
+      "expected": "The page title with its count (\\\"User Account Management (Total: 5)\\\") is fully readable at phone width, wrapping onto a second line or sitting above the \\\"Create User Account\\\" button instead of being cut off.",
+      "actual": "The heading is cut off at \\\"User Account Management (Tota\\\" and the rest — including the record count — is hidden behind / clipped by the blue \\\"Create User Account\\\" button on the right. The count cannot be read at all at phone width. At 768 px and 1440 px the full heading is visible.",
+      "reproSteps": [
+        "Sign in as eval, open /-/admin/users",
+        "Set the browser window to a phone size, 390 x 844 CSS pixels",
+        "Scroll down to the \"User Account Management (Total: 5)\" title bar",
+        "Read the heading: it ends at \"(Tota\" with the \"Create User Account\" button on top of the rest"
+      ]
+    },
+    {
+      "name": "Monitoring Stacktrace/Trace pages: \"Download diagnosis report\" button overlaps and hides the page tabs at phone and tablet width",
+      "summary": "The 'Download diagnosis report' button sits on top of the secondary navigation and covers the second tab's label, which reads 'Stack' / 'Stac' instead of 'Stacktrace'. In the phone screenshot the blue button overlaps the tab row and hides the tab; at tablet width (768) the same overlap happens and the 'seconds' unit label of the 10-second field is pushed out under the button. (on /-/admin/monitor/stacktrace and /-/admin/monitor/perftrace)",
+      "expected": "The tab bar (Running Processes | Stacktrace / Trace) stays readable and the download button is placed beside or below it without covering any label, on phone and tablet widths.",
+      "actual": "The 'Download diagnosis report' button sits on top of the secondary navigation and covers the second tab's label, which reads 'Stack' / 'Stac' instead of 'Stacktrace'. In the phone screenshot the blue button overlaps the tab row and hides the tab; at tablet width (768) the same overlap happens and the 'seconds' unit label of the 10-second field is pushed out under the button.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /-/admin/monitor/stacktrace",
+        "Set the browser window to a phone width (390 x 844 CSS pixels) and look at the row with the 'Running Processes' / 'Stacktrace' tabs",
+        "Note the blue 'Download diagnosis report' button drawn over the tabs, hiding the 'Stacktrace' label",
+        "Set the window to 768 x 1024 and look again: the button still covers the tab, and the 'seconds' unit next to the 10 field is displaced below the button",
+        "The same overlap is visible on /-/admin/monitor/perftrace"
+      ]
+    },
+    {
+      "name": "Choosing a Filter option silently resets the chosen sort order of the user list",
+      "summary": "The list comes back in the default alphabetical order (first row is ID 10 agent11-qa1, last is ID 3 maya), the sort parameter disappears from the address (…/admin/users?q=&status_filter[is_restricted]=0&status_filter[is_2fa_enabled]=0) and the arrow moves from the ID column to Username. The person's chosen order is silently thrown away; choosing a sort afterwards keeps the filter, so the two controls are not symmetrical. (Different control from the already reported Search-button case: this one is the Filter dropdown.) (on /-/admin/users)",
+      "expected": "The filter should narrow the list and keep the order the person chose, i.e. rows still by ascending ID (1, 2, 3, 4, 7, 10, 11, 12) and the arrow still on ID.",
+      "actual": "The list comes back in the default alphabetical order (first row is ID 10 agent11-qa1, last is ID 3 maya), the sort parameter disappears from the address (…/admin/users?q=&status_filter[is_restricted]=0&status_filter[is_2fa_enabled]=0) and the arrow moves from the ID column to Username. The person's chosen order is silently thrown away; choosing a sort afterwards keeps the filter, so the two controls are not symmetrical. (Different control from the already reported Search-button case: this one is the Filter dropdown.)",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-iyz9are0xdg985upn6ktx.e2b.app/-/admin/users",
+        "Open the Sort dropdown and choose 'Oldest' — the rows are now in ascending ID order (1, 2, 3, 4, 7, 10, 11, 12) and the arrow sits on the ID column",
+        "Open the Filter dropdown and pick any option, e.g. '2FA Disabled' (or 'Not Restricted', or 'Admin')"
+      ]
+    },
+    {
+      "name": "Out-of-range \"Maximum Number of Repositories\" is silently saved as 0 with a success message",
+      "summary": "The number is accepted without any validation message, the page claims \\\"The user account has been updated.\\\", and the stored value becomes 0 instead of the entered 12345678901234567890 (the same happened with 99999999999999999999 earlier). The value the administrator typed is silently replaced by a different one. (on /-/admin/users/{id}/edit)",
+      "expected": "Either the form refuses a number that is out of range with a message next to the field (and keeps the typed value), or it stores exactly the number entered and shows it again.",
+      "actual": "The number is accepted without any validation message, the page claims \\\"The user account has been updated.\\\", and the stored value becomes 0 instead of the entered 12345678901234567890 (the same happened with 99999999999999999999 earlier). The value the administrator typed is silently replaced by a different one.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-iyz9are0xdg985upn6ktx.e2b.app/-/admin/users (User Accounts).",
+        "Open the edit form of the test account agent2-vis (/-/admin/users/11/edit) — any account works.",
+        "Scroll down to the field \"Maximum Number of Repositories\" (default -1) and type 12345678901234567890 into it.",
+        "Click the \"Update User Account\" button.",
+        "The page redirects to the User Details page and shows the green message \"The user account has been updated.\"",
+        "Open the edit form again (/-/admin/users/11/edit), scroll down to \"Maximum Number of Repositories\": the field now reads 0, not the value entered."
+      ]
+    },
+    {
+      "name": "Empty \\\"Max Number of workers\\\" submit shows \\\"Settings Updated\\\" but saves nothing",
+      "summary": "The green \\\"Settings Updated\\\" banner appears exactly as for a real change, but \\\"Max Number of Workers\\\" in the table and the \\\"Currently N\\\" hint still show the old value (2) - nothing was saved and nothing says the field was ignored. (on /-/admin/monitor/queue/9)",
+      "expected": "Either the empty field is refused with a message (as the same form refuses text with \\\"Max number of workers must be a number\\\") or no success banner is shown when nothing changed.",
+      "actual": "The green \\\"Settings Updated\\\" banner appears exactly as for a real change, but \\\"Max Number of Workers\\\" in the table and the \\\"Currently N\\\" hint still show the old value (2) - nothing was saved and nothing says the field was ignored.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-iyz9are0xdg985upn6ktx.e2b.app/-/admin/monitor/queue",
+        "Click \"Review / Add Workers\" of the mirror row to open /-/admin/monitor/queue/9",
+        "Type 2 into the \"Max Number of workers\" field and click \"Update Settings\" (the table then shows Max Number of Workers 2)",
+        "Clear the same field so it is completely empty and click \"Update Settings\""
+      ]
+    },
+    {
+      "name": "Monitoring menu has no Performance Trace entry: the working perftrace page is only reachable by typing its address",
+      "summary": "The Monitoring submenu lists only Stats, Cron Tasks, Queues and Trace. The working Performance Trace page (running-process traces, \\\"Download diagnosis report\\\", seconds input) at /-/admin/monitor/perftrace appears nowhere in the admin menu and no link on any admin page points to it; it can only be reached by typing the address, and no menu entry is highlighted while on it. (on /-/admin/monitor/perftrace)",
+      "expected": "The Monitoring submenu of Site Administration offers a Performance Trace entry next to Stats, Cron Tasks, Queues and Trace, and that entry is highlighted when the Performance Trace page is open.",
+      "actual": "The Monitoring submenu lists only Stats, Cron Tasks, Queues and Trace. The working Performance Trace page (running-process traces, \\\"Download diagnosis report\\\", seconds input) at /-/admin/monitor/perftrace appears nowhere in the admin menu and no link on any admin page points to it; it can only be reached by typing the address, and no menu entry is highlighted while on it.",
+      "reproSteps": [
+        "Sign in as eval and open /-/admin/monitor/stats.",
+        "In the Admin Settings sidebar click Monitoring so the submenu expands: it lists Stats, Cron Tasks, Queues, Trace only.",
+        "Type the address /-/admin/monitor/perftrace in the browser and press Enter: a working Performance Trace diagnostics page loads (Running Processes / Stacktrace tabs, Download diagnosis report, seconds box, trace list).",
+        "Look again at the Admin Settings sidebar: no Performance Trace entry exists and nothing is highlighted; a link scan of the page shows no link to /-/admin/monitor/perftrace anywhere."
+      ]
+    },
+    {
+      "name": "Running Processes header claims more processes than the page lists (74 claimed, 48 shown)",
+      "summary": "The header always claims more processes than the list shows: first load \\\"181 Goroutines, 89 Processes\\\" over 63 listed process entries; after a reload \\\"151 Goroutines, 74 Processes\\\" over 48 listed entries (the list visibly ends after the last entry, above the footer). Nobody can find the remaining 26 processes: they are counted but not listed. (on /-/admin/monitor/stacktrace?show=process)",
+      "expected": "The process number in the header equals the number of process entries listed on the page, so an administrator can see every running process the page claims to have.",
+      "actual": "The header always claims more processes than the list shows: first load \\\"181 Goroutines, 89 Processes\\\" over 63 listed process entries; after a reload \\\"151 Goroutines, 74 Processes\\\" over 48 listed entries (the list visibly ends after the last entry, above the footer). Nobody can find the remaining 26 processes: they are counted but not listed.",
+      "reproSteps": [
+        "Sign in as eval, open Site Administration and go to Monitoring -> Trace (or open /-/admin/monitor/stacktrace), then click the \"Running Processes\" tab (address /-/admin/monitor/stacktrace?show=process).",
+        "Read the grey header line above the list, e.g. \"151 Goroutines, 74 Processes\".",
+        "Scroll the list to its end and count the entries (each entry is one \"HTTP: ...\" line with a globe icon and a trash icon on the right): the list ends after 48 entries, directly above the page footer.",
+        "Reload the page and repeat: the header now reads e.g. \"181 Goroutines, 89 Processes\" while the list again has 26 entries fewer than the header claims."
+      ]
+    },
+    {
+      "name": "After signing out, Back shows the full admin user inventory again",
+      "summary": "The browser shows the complete User Account Management page again: total 9, every username, email address, Activated/Restricted/2FA flags, Created and Last Sign-In, the Create User Account button and the whole Admin Settings sidebar, and the account menu still reads 'Signed in as eval' with an admin badge. Reloading that page or clicking any link then redirects to the sign-in form, so the server is still protected — but the inventory stays on screen after signing out. (on /-/admin/users)",
+      "expected": "After signing out, Back must not bring the administrator page back: it should redirect to the sign-in page (or show an expired/session-ended page) and no user inventory should be visible.",
+      "actual": "The browser shows the complete User Account Management page again: total 9, every username, email address, Activated/Restricted/2FA flags, Created and Last Sign-In, the Create User Account button and the whole Admin Settings sidebar, and the account menu still reads 'Signed in as eval' with an admin badge. Reloading that page or clicking any link then redirects to the sign-in form, so the server is still protected — but the inventory stays on screen after signing out.",
+      "reproSteps": [
+        "Sign in at /user/login as eval / momentic-eval-1",
+        "Open /-/admin/users and wait for the User Account Management list (Total: 9) to be fully listed",
+        "Open the account menu in the top right (avatar 'eval') and click 'Sign Out' - the site home page with 'Sign In' is shown",
+        "Press the browser's Back button once",
+        "The page shows the full /-/admin/users inventory again, with the signed-in admin header, even though the session is gone (Reload then jumps to /user/login)"
+      ]
+    },
+    {
+      "name": "Dashboard update banner announces \\\"Gitea 28.4.0\\\" while the instance is and reports itself as 1.24.7",
+      "summary": "The red banner on the Site Administration dashboard reads \\\"Gitea 28.4.0 is now available, you are running 1.24.7. Check the blog for more details.\\\" — it announces a release number that does not belong to the instance's own version series: the Configuration Summary (Gitea Version 1.24.7, built with GNU Make 4.4.1, go1.24.9), the page footer (Version: 1.24.7) and the API docs page (Gitea API 1.24.7) all report 1.24.7, and the banner itself repeats \\\"you are running 1.24.7\\\". The banner stays on the dashboard across reloads and appears only there. (on /-/admin)",
+      "expected": "The update banner names an available release of the same Gitea version series as the running instance (1.24.x), or no update banner is shown when no such release can be determined.",
+      "actual": "The red banner on the Site Administration dashboard reads \\\"Gitea 28.4.0 is now available, you are running 1.24.7. Check the blog for more details.\\\" — it announces a release number that does not belong to the instance's own version series: the Configuration Summary (Gitea Version 1.24.7, built with GNU Make 4.4.1, go1.24.9), the page footer (Version: 1.24.7) and the API docs page (Gitea API 1.24.7) all report 1.24.7, and the banner itself repeats \\\"you are running 1.24.7\\\". The banner stays on the dashboard across reloads and appears only there.",
+      "reproSteps": [
+        "Sign in as eval and choose Site Administration from the account menu (address /-/admin, Maintenance -> Dashboard).",
+        "Read the red message at the top: \"Gitea 28.4.0 is now available, you are running 1.24.7. Check the blog for more details.\"",
+        "Reload the page: the same banner is shown again (it is dashboard-only).",
+        "Open Configuration -> Summary (/-/admin/config): \"Gitea Version 1.24.7 built with GNU Make 4.4.1, go1.24.9 ...\", and the footer of every page says \"Version: 1.24.7\"."
+      ]
+    }
+  ]
+}

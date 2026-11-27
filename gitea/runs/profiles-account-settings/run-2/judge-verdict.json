@@ -1,0 +1,197 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "gitea/areas/profiles-account-settings",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "e044a67b39460bd3bec95e4f91e8f1a0c8af1d50dbe39ff0d05ec63576d9c1da",
+    "known_invalid_sha256": "b3ad1135db24b12045d1b9966a37a6c8201051567d9483803dcd7cbd2900a5a6",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "22",
+    "bugs": "14",
+    "flags": "0",
+    "known_hits": "6",
+    "extra_known_hits": "0",
+    "unverified": "7",
+    "outside_area_known_hits": "0",
+    "outside_area_known_invalid": "0",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "",
+    "outside_area_ground_truth_sha256": "47db07b83af13b7c7dd75acd1b523ed86e8107b60e6f33878e8fb5b68a2acbe2",
+    "outside_area_known_invalid_sha256": "72e79c4023c85c9101fbf2b7613d3daf78b07fded510d117ab5b26f6ac3103f9",
+    "duplicates": "0",
+    "duplicate_known_hits": "0",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "1",
+    "known_misses": "1",
+    "precision": "0.8571428571428571",
+    "recall": "0.2727272727272727",
+    "findings_per_minute": "0.6677647687308017",
+    "correct_findings_per_minute": "0.2861849008846293",
+    "severity_1": "4",
+    "severity_3": "1",
+    "severity_5": "1",
+    "severity_sum": "12",
+    "score": "11",
+    "duration_seconds": "1257.928",
+    "partial": "false",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 15,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "The Follow portion matches: the count increases but the follower card appears only after reload. The report also describes the reciprocal Unfollow failure."
+      },
+      {
+        "groundTruthIndex": 1,
+        "reproStepsIndex": 0,
+        "findingIndex": 1,
+        "reason": "Matches mobile follower-card content fragmentation, including names breaking within words. Full-width cards are not required, but the observed readability failure matches."
+      },
+      {
+        "groundTruthIndex": 3,
+        "reproStepsIndex": 0,
+        "findingIndex": 2,
+        "reason": "Submitting a nonexistent username through Blocked users produces the same 500 error page."
+      },
+      {
+        "groundTruthIndex": 0,
+        "reproStepsIndex": 0,
+        "findingIndex": 5,
+        "reason": "Matches the false account-wide empty state reached by requesting an out-of-range repository-settings page."
+      },
+      {
+        "groundTruthIndex": 10,
+        "reproStepsIndex": 0,
+        "findingIndex": 6,
+        "reason": "The Website example matches the internal field key exposed in its validation banner. The additional Username example is not separately covered."
+      },
+      {
+        "groundTruthIndex": 5,
+        "reproStepsIndex": 0,
+        "findingIndex": 10,
+        "reason": "Matches the exact Public Profile introduction typo: 'show' instead of 'shown'."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 2,
+        "reproStepsIndex": 0,
+        "findingIndex": 13,
+        "reason": "Matches the rejected administrator-follow claim: eval is a site administrator, and blocks intentionally do not prevent administrator actions."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 3,
+        "reason": "No supplied entry covers an avatar update reporting success when no file was selected."
+      },
+      {
+        "findingIndex": 4,
+        "reason": "No supplied entry covers repository searches interpreting percent or underscore as wildcards."
+      },
+      {
+        "findingIndex": 7,
+        "reason": "Navigating from a profile's Unblock link to settings differs from the supplied bug where an administrator's Unblock action in settings fails with an error."
+      },
+      {
+        "findingIndex": 8,
+        "reason": "No supplied entry covers an RSS response served as HTML with escaped XML content."
+      },
+      {
+        "findingIndex": 9,
+        "reason": "No supplied entry covers the navigation administrator badge overlapping the avatar."
+      },
+      {
+        "findingIndex": 11,
+        "reason": "No supplied entry covers incorrect singular/plural wording in the contribution total; the calendar timezone bug concerns different behavior."
+      },
+      {
+        "findingIndex": 12,
+        "reason": "No supplied entry covers whitespace-only Location values producing an icon-only profile row. The rejected Location claim concerns excessive length."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 5,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 3,
+        "reason": "The submission reports an avatar update that did not occur."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 3,
+        "reason": "The claimed behavior returns repositories that do not contain the requested literal search text."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 3,
+        "reason": "The reported Unblock control navigates without performing the expected state change."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 3,
+        "reason": "The claimed response format prevents the linked resource from being presented as a proper feed/XML document; it is not an error dump."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 1,
+        "reason": "The overlap is a visual presentation defect without described functional impact."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 1,
+        "reason": "The described failure is grammatical wording, not an incorrect contribution count."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 1,
+        "reason": "The described impact is an empty visual row and missing placeholder, without functional misbehavior."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 3,
+        "reason": "The claimed impact is a persisted follow despite a block, which would be functional misbehavior if unintended."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

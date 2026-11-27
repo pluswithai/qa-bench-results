@@ -1,0 +1,199 @@
+{
+  "bugs": [
+    {
+      "name": "Negative hours in \"Manually Add Time\" shows raw truncated error \"form.Hours: RangeError: Range\"",
+      "summary": "A red toast appears reading exactly \"form.Hours: RangeError: Range\" — an untranslated translation key plus a cut-off technical message. The request POST /eval/harbor-handbook/issues/1/times/add answers 400 with that text. The dialog stays open with -2 in the field. (on /eval/harbor-handbook/issues/1)",
+      "expected": "The dialog refuses the value with a readable message next to the field, e.g. \"Hours must be a positive number\", like the other validation (\"No time was entered.\").",
+      "actual": "A red toast appears reading exactly \"form.Hours: RangeError: Range\" — an untranslated translation key plus a cut-off technical message. The request POST /eval/harbor-handbook/issues/1/times/add answers 400 with that text. The dialog stays open with -2 in the field.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-itj9npss7825cqyyppxe0.e2b.app/eval/harbor-handbook/issues/1",
+        "In the right sidebar click the gear/menu labelled \"Time Tracker\" and choose \"Add Time\"",
+        "Type -2 into the \"Hours\" field (leave Minutes empty)",
+        "Click the \"Add Time\" button of the dialog"
+      ]
+    },
+    {
+      "name": "Escape does not close the Labels and Assignees sidebar dropdowns on the New Issue page",
+      "summary": "The Labels menu stayed open after two Escape presses, and the Assignees menu stayed open after two Escape presses; only a mouse click outside closes them. While open they cover the Milestone, Projects and Assignees rows, so a keyboard-only user cannot get out of the menu. (on /eval/harbor-handbook/issues/new)",
+      "expected": "Pressing Escape closes the open dropdown menu, as it does for the Milestone menu on the same page (Escape closed that one immediately).",
+      "actual": "The Labels menu stayed open after two Escape presses, and the Assignees menu stayed open after two Escape presses; only a mouse click outside closes them. While open they cover the Milestone, Projects and Assignees rows, so a keyboard-only user cannot get out of the menu.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-itj9npss7825cqyyppxe0.e2b.app/eval/harbor-handbook/issues/new",
+        "In the right sidebar click 'Labels' – the label list opens with a 'Filter Label' box",
+        "Press the Escape key twice",
+        "Observed: the label menu is still open, covering Milestone, Projects and Assignees",
+        "Click empty space on the left to close it, then click 'Assignees' and pick 'alex'",
+        "Press Escape twice – the assignee menu is still open as well"
+      ]
+    },
+    {
+      "name": "Due date 1970-01-01 shows as \"-\" in the issue timeline while the sidebar and list show \"January 1, 1970\"",
+      "summary": "The timeline entry reads \\\"eval modified the due date from February 29, 2028 to - now\\\" - the new date is replaced by a bare \\\"-\\\" (seen again as \\\"from - to November 1, 2026\\\" when moving away from January 1, 1970). The sidebar and the issue list do show \\\"January 1, 1970\\\", so only the timeline loses the value. A control date of January 2, 1970 renders correctly (\\\"from November 1, 2026 to January 2, 1970\\\"). (on /eval/harbor-handbook/issues/6)",
+      "expected": "The timeline entry should read \\\"eval modified the due date from December 31, 2026 to January 1, 1970\\\", matching the date shown in the sidebar and the \\\"Jan 1, 1970\\\" badge in the issue list.",
+      "actual": "The timeline entry reads \\\"eval modified the due date from February 29, 2028 to - now\\\" - the new date is replaced by a bare \\\"-\\\" (seen again as \\\"from - to November 1, 2026\\\" when moving away from January 1, 1970). The sidebar and the issue list do show \\\"January 1, 1970\\\", so only the timeline loses the value. A control date of January 2, 1970 renders correctly (\\\"from November 1, 2026 to January 2, 1970\\\").",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-itj9npss7825cqyyppxe0.e2b.app/eval/harbor-handbook/issues/6 (any issue you own works)",
+        "In the right sidebar under \"Due Date\", click the pencil icon next to the current date to open the date field",
+        "Type 12/31/2026 in the date field and click the pencil (save) button; the sidebar shows \"December 31, 2026\"",
+        "In the sidebar under \"Due Date\", click the pencil icon next to \"December 31, 2026\", type 01/01/1970 in the date field and click the pencil (save) button",
+        "Look at the activity timeline above the comment box"
+      ]
+    },
+    {
+      "name": "Unchecking an assignee in the sidebar Assignees dropdown never removes them (survives reload)",
+      "summary": "The tick disappears only in the browser's copy of the list: no request is sent at all (no /issues/assignee call, nothing in the network log), the sidebar Assignees row keeps showing alex and maya, no unassign timeline entry is created, and after a reload both are still assigned exactly as before. (on /eval/harbor-handbook/issues/2)",
+      "expected": "Clicking a checked assignee in the dropdown sends the unassignment to the server, the person disappears from the Assignees sidebar row, an \\\"alex was unassigned by eval\\\" entry appears in the timeline, and the change survives a reload — as it does when an assignee is added.",
+      "actual": "The tick disappears only in the browser's copy of the list: no request is sent at all (no /issues/assignee call, nothing in the network log), the sidebar Assignees row keeps showing alex and maya, no unassign timeline entry is created, and after a reload both are still assigned exactly as before.",
+      "reproSteps": [
+        "Sign in as eval and open /eval/harbor-handbook/issues/2 (issue \"Clarify release ownership\"). It is assigned to eval, alex and maya.",
+        "In the right-hand sidebar click the \"Assignees\" heading to open its dropdown (Filter Assignee / Clear assignees / eval / alex / maya).",
+        "Click the \"alex\" row. The tick next to alex disappears and the row looks unchecked.",
+        "Reload the page (or navigate away and back).",
+        "Open the Assignees dropdown again and look at the sidebar list: alex is still assigned, the tick is back, and the timeline still shows only \"alex was assigned by eval\" with no unassign entry.",
+        "Same with maya: click her row (tick disappears), reload, maya is still assigned."
+      ]
+    },
+    {
+      "name": "Searching for an emoji that is in an issue title returns no results",
+      "summary": "The search answers \\\"No results / Try adjusting your search filters\\\" and the counters show 0 Open / 0 Closed. Searching the same title for \\\"probe\\\" (Exact), \\\"café\\\" (Exact), \\\"مرحبا\\\"/Cyrillic text (repo list) all work, so only the 4-byte emoji cannot be found in either the global or the repository search box. (on /issues and /eval/harbor-handbook/issues)",
+      "expected": "The search finds issue #13, whose title contains 🚀, just as it finds it when searching for \\\"probe\\\" or \\\"café\\\" from the same title.",
+      "actual": "The search answers \\\"No results / Try adjusting your search filters\\\" and the counters show 0 Open / 0 Closed. Searching the same title for \\\"probe\\\" (Exact), \\\"café\\\" (Exact), \\\"مرحبا\\\"/Cyrillic text (repo list) all work, so only the 4-byte emoji cannot be found in either the global or the repository search box.",
+      "reproSteps": [
+        "Sign in as eval and open /eval/harbor-handbook/issues/new",
+        "Create an issue titled \"agent15-café über 🚀 search probe\" with body \"Bodyword quinquereme zebra.\"",
+        "Open the issue: its title contains the rocket emoji and is shown on screen (issue #13)",
+        "Go to /issues and type the rocket emoji 🚀 in the \"Search issues...\" box, press Enter (mode Exact)",
+        "The result is \"No results\"; the same happens in the repository list search box at /eval/harbor-handbook/issues with q=🚀"
+      ]
+    },
+    {
+      "name": "\"Add dependency\" adds the top search suggestion instead of the issue number you typed",
+      "summary": "A dependency on the unrelated issue #19 was created: the timeline says \\\"eval added a new dependency #19 agent10-special <b>x</b> & \\\\\\\"quotes\\\\\\\" 'single'🤖 José 100% _under_ end\\\" and \\\"Depends on\\\" lists #19. The same happened with the number 3 typed (dependency on #19 added instead of issue #3/its match); only with a title word (\\\"Review\\\") did the first entry match and the right issue (#4) get added. (on /eval/harbor-handbook/issues/12)",
+      "expected": "Clicking \"+\" after typing the issue number 2 should link issue #2 (the issue whose number was typed), or the app should refuse and ask which suggestion is meant. It must not silently link a different issue.",
+      "actual": "A dependency on the unrelated issue #19 was created: the timeline says \\\"eval added a new dependency #19 agent10-special <b>x</b> & \\\\\\\"quotes\\\\\\\" 'single'🤖 José 100% _under_ end\\\" and \\\"Depends on\\\" lists #19. The same happened with the number 3 typed (dependency on #19 added instead of issue #3/its match); only with a title word (\\\"Review\\\") did the first entry match and the right issue (#4) get added.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open the issue https://5503-itj9npss7825cqyyppxe0.e2b.app/eval/harbor-handbook/issues/12 (agent6-dep-a).",
+        "Scroll the right sidebar to the \"Dependencies\" section and click the \"Add dependency…\" search field.",
+        "Type the number 2 (issue #2 \"Clarify release ownership\" exists and is open).",
+        "The suggestion list shows \"#19 agent10-special <b>x</b> & \\\"quotes\\\" 'single'🤖 José 100% _under_ end\" first and \"#2 Clarify release ownership\" second.",
+        "Click the \"+\" button next to the field without picking an entry.",
+        "Read the timeline and the \"Depends on\" list in the sidebar."
+      ]
+    },
+    {
+      "name": "Repository issue list: clicking the \"N Open\" counter shows closed issues too (link goes to state=all)",
+      "summary": "The address becomes /eval/harbor-handbook/issues?type=all&state=all and the list contains closed issues as well: \\\"agent12-state-test close and reopen #9 by eval was closed\\\", \\\"agent11-edit-target RENAMED title #5 by eval was closed\\\" and \\\"Publish the initial contributor guide #3 by eval was closed\\\" all appear under the \\\"Open\\\" pill. The counter says 17 but 21 issues are listed. (on /eval/harbor-handbook/issues)",
+      "expected": "Clicking the \\\"17 Open\\\" counter should list only the open issues (state=open), the way the same counter does on the global /issues page, whose link is ?state=open.",
+      "actual": "The address becomes /eval/harbor-handbook/issues?type=all&state=all and the list contains closed issues as well: \\\"agent12-state-test close and reopen #9 by eval was closed\\\", \\\"agent11-edit-target RENAMED title #5 by eval was closed\\\" and \\\"Publish the initial contributor guide #3 by eval was closed\\\" all appear under the \\\"Open\\\" pill. The counter says 17 but 21 issues are listed.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Open https://5503-itj9npss7825cqyyppxe0.e2b.app/eval/harbor-handbook/issues — the list shows the pills \"17 Open\" and \"3 Closed\" and only open issues.",
+        "Click the \"17 Open\" pill next to the bulk-action checkbox.",
+        "Look at the address bar and scroll down the list."
+      ]
+    },
+    {
+      "name": "Bulk label on a mixed selection removes the label from issues that have it instead of adding it to all",
+      "summary": "The bulk Label action removes the label from the issues that already had it and does not add it to the issues that did not: after the click the label 'documentation' is gone from #7 and #22 still shows only 'enhancement'. So a mixed selection makes you lose the label instead of applying it — the opposite of what the menu implies. (on /eval/harbor-handbook/issues?q=agent13&state=all)",
+      "expected": "'documentation' is added to every selected issue that did not have it (both #7 and #22 end up with 'documentation'), as the bulk label menu does when no selected issue has the label yet (picking 'enhancement' for #7 and #22 added it to both).",
+      "actual": "The bulk Label action removes the label from the issues that already had it and does not add it to the issues that did not: after the click the label 'documentation' is gone from #7 and #22 still shows only 'enhancement'. So a mixed selection makes you lose the label instead of applying it — the opposite of what the menu implies.",
+      "reproSteps": [
+        "Sign in as eval, open https://5503-itj9npss7825cqyyppxe0.e2b.app/eval/harbor-handbook/issues?q=agent13&state=all (shows my issues 'agent13-bulk one' #7 and 'agent13-bulk four' #22).",
+        "Give only #7 a label and leave #22 without it: tick only the checkbox of 'agent13-bulk one' #7, open the 'Label' menu in the bulk bar, click 'documentation'. Result: #7 shows 'documentation' and 'enhancement', #22 shows only 'enhancement'.",
+        "Now tick the checkboxes of BOTH 'agent13-bulk four' #22 and 'agent13-bulk one' #7.",
+        "Open the 'Label' menu in the bulk bar and click 'documentation' (the partial case: only one of the two has it).",
+        "Look at the two rows in the list."
+      ]
+    },
+    {
+      "name": "\\\"Clear assignees\\\" unticks the assignees but saves nothing; they are all back after a reload",
+      "summary": "The check mark next to maya disappears as if the assignment was removed, but no request is sent to the server (a per-user assignment does send POST /eval/harbor-handbook/issues/assignee, the clear sends nothing). After reloading the page both eval and maya are still listed under Assignees and the issue is still in maya's \\\"Assigned to you\\\". Tried twice (as maya on #16); reloaded each time and both assignees were still there. (on /eval/harbor-handbook/issues/16)",
+      "expected": "\"Clear assignees\" removes all assignees: the sidebar shows \"No Assignees\", the assignees are gone after a reload and the issue drops out of each user's \"Assigned to you\".",
+      "actual": "The check mark next to maya disappears as if the assignment was removed, but no request is sent to the server (a per-user assignment does send POST /eval/harbor-handbook/issues/assignee, the clear sends nothing). After reloading the page both eval and maya are still listed under Assignees and the issue is still in maya's \\\"Assigned to you\\\". Tried twice (as maya on #16); reloaded each time and both assignees were still there.",
+      "reproSteps": [
+        "Sign in as maya / momentic-eval-1 and open https://5503-itj9npss7825cqyyppxe0.e2b.app/eval/harbor-handbook/issues/16 (an issue assigned to eval and to maya).",
+        "In the right sidebar click the gear/Assignees combobox. The dropdown lists \"Clear assignees\" and the current assignees with a check mark (\"✓ maya\").",
+        "Click \"Clear assignees\". The check mark next to maya disappears.",
+        "Reload the page (F5).",
+        "Read the Assignees section of the sidebar and the timeline."
+      ]
+    },
+    {
+      "name": "Assignee ticks are only saved when the dropdown is closed — reloading with it open silently loses the assignment change",
+      "summary": "The tick moves at once but nothing is saved yet: no request is sent, the sidebar Assignees list and the timeline stay unchanged, and after a reload the box is unticked again and the person is still assigned (seen with maya and alex on /eval/harbor-handbook/issues/2). A user who unchecks an assignee and then reloads or follows a link loses the change with no warning. (on /eval/harbor-handbook/issues/2)",
+      "expected": "Ticking or unticking a person in the Assignees dropdown saves the assignment immediately (as the tick already shows it), so a reload right afterwards keeps the new state; or the control shows that the change is still pending.",
+      "actual": "The tick moves at once but nothing is saved yet: no request is sent, the sidebar Assignees list and the timeline stay unchanged, and after a reload the box is unticked again and the person is still assigned (seen with maya and alex on /eval/harbor-handbook/issues/2). A user who unchecks an assignee and then reloads or follows a link loses the change with no warning.",
+      "reproSteps": [
+        "Sign in as eval and open /eval/harbor-handbook/issues/20 (or any issue with the Assignees sidebar).",
+        "Click the \"Assignees\" heading in the right sidebar to open the dropdown.",
+        "Click \"eval\" (or any person) so that the tick appears next to them; the sidebar Assignees row does not change yet.",
+        "Without closing the dropdown, reload the page.",
+        "The tick is gone: the person is not assigned, the Assignees row and the timeline never changed.",
+        "The same happens the other way: unticking \"maya\" on issue #2 and reloading with the dropdown open leaves maya assigned. The change is only sent (POST /issues/assignee) when the dropdown is closed, e.g. by clicking the Assignees heading or anywhere else on the page."
+      ]
+    },
+    {
+      "name": "Label filter: the advertised \"alt + enter to exclude\" includes the label instead of excluding it",
+      "summary": "The label is included instead: the page reloads to ?type=all&state=all&labels=1, which filters for issues that HAVE documentation ANDed with any label already selected. With my long label already selected the result was \"0 Open 0 Closed\" and \"No results\", and reopening the Label dropdown shows \"documentation\" with a tick (selected). Pressing Alt+Enter also fires two navigations: a request to labels=3,-1 is aborted and the page ends on labels=1,3. Happened 2 times out of 2. (on /eval/harbor-handbook/issues)",
+      "expected": "The documentation label is excluded from the filter (address carries labels=-1, the list shows the issues that do NOT have documentation, e.g. #18 \"agent8-labels-test issue one\"), and the Label dropdown marks documentation as excluded, not as selected.",
+      "actual": "The label is included instead: the page reloads to ?type=all&state=all&labels=1, which filters for issues that HAVE documentation ANDed with any label already selected. With my long label already selected the result was \"0 Open 0 Closed\" and \"No results\", and reopening the Label dropdown shows \"documentation\" with a tick (selected). Pressing Alt+Enter also fires two navigations: a request to labels=3,-1 is aborted and the page ends on labels=1,3. Happened 2 times out of 2.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-itj9npss7825cqyyppxe0.e2b.app/eval/harbor-handbook/issues?type=all&state=all (repository issue list, 22 open / 5 closed)",
+        "In the filter bar above the list, click the \"Label\" dropdown button; it opens with the text \"Use alt + click/enter to exclude labels\"",
+        "Type \"doc\" in the \"Label\" filter input at the top of that dropdown so only the \"documentation\" label is offered",
+        "Press ArrowDown to highlight \"documentation\", then press Alt+Enter",
+        "Read the page and the address bar, then reopen the \"Label\" dropdown"
+      ]
+    },
+    {
+      "name": "At phone width the bulk-action \\\"Label\\\" dropdown opens off the left edge, its options are cut off",
+      "summary": "The panel opens with its left edge outside the viewport and its options are clipped: the first option reads \"ar labels\" instead of \"Clear labels\" (the \"C\" and \"Cle\" are off-screen), the label option is cut to \"gent8-this-is-a-deliberately-very-long-label…\", and the \"documentation\" and \"enhancement\" chips lose their left end. The bulk Milestone dropdown next to it opens correctly inside the screen, so the wide label list is what overflows. (on /eval/harbor-handbook/issues)",
+      "expected": "The dropdown opens inside the 390px viewport (right-aligned under its button, or with long label names truncated by an ellipsis), so every option is fully readable and clickable.",
+      "actual": "The panel opens with its left edge outside the viewport and its options are clipped: the first option reads \"ar labels\" instead of \"Clear labels\" (the \"C\" and \"Cle\" are off-screen), the label option is cut to \"gent8-this-is-a-deliberately-very-long-label…\", and the \"documentation\" and \"enhancement\" chips lose their left end. The bulk Milestone dropdown next to it opens correctly inside the screen, so the wide label list is what overflows.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and set the browser window to 390 x 844 (phone size)",
+        "Open https://5503-itj9npss7825cqyyppxe0.e2b.app/eval/harbor-handbook/issues",
+        "Tick the checkbox of any two issues in the list, e.g. #29 \"agent5-clear-milestone-test\", so the bulk action bar (Close / Delete / Label / Milestone / Projects / Assignee) appears",
+        "Click \"Label\" in that bulk action bar",
+        "Look at the left edge of the opened dropdown"
+      ]
+    },
+    {
+      "name": "Fuzzy search does no fuzzy matching: a one-letter typo returns no results",
+      "summary": "With the search type set to \\\"Fuzzy\\\", a one-letter typo returns \\\"No results\\\" and the sidebar counters drop to 0: \\\"relese\\\" finds nothing although \\\"release\\\" is in the titles of two open issues (eval/harbor-handbook#2 \\\"Clarify release ownership\\\" and #4 \\\"Review the release ownership proposal\\\"), and \\\"onbording\\\" finds nothing although #1 \\\"Expand the onboarding checklist\\\" contains \\\"onboarding\\\". A partial word is not matched either (\\\"onboard\\\" with Fuzzy = 0 results). Only the correctly spelled word returns the issue, so Fuzzy behaves like Exact. (on /issues)",
+      "expected": "The \\\"Fuzzy\\\" search type tolerates small differences and still finds the issue: \\\"relese\\\" or \\\"onbording\\\" should return the issues whose titles contain \\\"release\\\" / \\\"onboarding\\\", so Fuzzy is visibly different from Exact.",
+      "actual": "With the search type set to \\\"Fuzzy\\\", a one-letter typo returns \\\"No results\\\" and the sidebar counters drop to 0: \\\"relese\\\" finds nothing although \\\"release\\\" is in the titles of two open issues (eval/harbor-handbook#2 \\\"Clarify release ownership\\\" and #4 \\\"Review the release ownership proposal\\\"), and \\\"onbording\\\" finds nothing although #1 \\\"Expand the onboarding checklist\\\" contains \\\"onboarding\\\". A partial word is not matched either (\\\"onboard\\\" with Fuzzy = 0 results). Only the correctly spelled word returns the issue, so Fuzzy behaves like Exact.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-itj9npss7825cqyyppxe0.e2b.app/issues",
+        "In the search box type relese and set the dropdown right of the box to \"Fuzzy\", then press Enter",
+        "The list shows \"No results / Try adjusting your search filters.\" and all sidebar counters are 0",
+        "Repeat with onboard and with onbording (Fuzzy): both show \"No results\"",
+        "Control: searching release (Exact or Words) returns eval/harbor-handbook#2 and #4; searching onboarding or \"expand checklist\" (Exact/Words) returns eval/harbor-handbook#1, and the same correctly spelled words with Fuzzy set also return them"
+      ]
+    },
+    {
+      "name": "Stale tab's \\\"Start timer\\\" silently stops the stopwatch that another tab started",
+      "summary": "The stale tab still shows \\\"Start timer\\\"; clicking it sends the same toggle request and therefore STOPS the stopwatch running in the other tab: a new timeline entry \\\"eval worked for 21 seconds now\\\" (second try: \\\"worked for 17 seconds now\\\") appears, \\\"Time Tracker\\\" loses its stopwatch icon and the session is cut short. Nothing tells the person that the timer they meant to start was already running and has now been stopped. (on /eval/harbor-handbook/issues/30)",
+      "expected": "Either the stale tab should show that a stopwatch is already running (its stored state refreshed) or the action should be refused/ignored with a message, since the person asked to START a timer and none of their visible state says one is running.",
+      "actual": "The stale tab still shows \\\"Start timer\\\"; clicking it sends the same toggle request and therefore STOPS the stopwatch running in the other tab: a new timeline entry \\\"eval worked for 21 seconds now\\\" (second try: \\\"worked for 17 seconds now\\\") appears, \\\"Time Tracker\\\" loses its stopwatch icon and the session is cut short. Nothing tells the person that the timer they meant to start was already running and has now been stopped.",
+      "reproSteps": [
+        "Open https://5503-itj9npss7825cqyyppxe0.e2b.app/eval/harbor-handbook/issues/30 (my own issue, agent7-time-estimate-test) in a second browser tab while no stopwatch is running; that tab's Time Tracker gear menu offers \"Start timer\"",
+        "In the first tab, open the Time Tracker gear menu and click \"Start timer\": the stopwatch icon appears next to \"Time Tracker\" and the banner \"Timer will be stopped automatically when this issue gets closed\" shows",
+        "Go back to the second tab WITHOUT reloading it, open the Time Tracker gear menu (it still says \"Start timer\") and click \"Start timer\"",
+        "Read the timeline and the Time Tracker block"
+      ]
+    },
+    {
+      "name": "Time Tracker sidebar block renders empty for a non-owner account: only the heading and gear, no controls and no empty-state text",
+      "summary": "The Time Tracker block shows only its heading and gear icon, with nothing under it: no \\\"Set estimated time\\\", no \\\"Start timer\\\", no \\\"Add Time\\\", and no text such as \\\"No time tracked\\\". Every other sidebar block on the same page states its empty value (\\\"No Label\\\", \\\"No Milestone\\\", \\\"No project\\\", \\\"No Assignees\\\", \\\"No due date set.\\\", \\\"No dependencies set.\\\"). Same blank block on eval/harbor-handbook#5 viewed as alex (seen earlier in this hunt as eval on that page, the block listed \\\"Set estimated time / Start timer / Add Time\\\"). (on /alex/agent11-empty-repo/issues/1)",
+      "expected": "The Time Tracker block shows its controls (Set estimated time, Start timer, Add Time) for a user who may track time, as it does for the repo owner, or at minimum a line saying no time is tracked — not an empty area under the heading.",
+      "actual": "The Time Tracker block shows only its heading and gear icon, with nothing under it: no \\\"Set estimated time\\\", no \\\"Start timer\\\", no \\\"Add Time\\\", and no text such as \\\"No time tracked\\\". Every other sidebar block on the same page states its empty value (\\\"No Label\\\", \\\"No Milestone\\\", \\\"No project\\\", \\\"No Assignees\\\", \\\"No due date set.\\\", \\\"No dependencies set.\\\"). Same blank block on eval/harbor-handbook#5 viewed as alex (seen earlier in this hunt as eval on that page, the block listed \\\"Set estimated time / Start timer / Add Time\\\").",
+      "reproSteps": [
+        "Sign in as alex (username alex, password momentic-contributor-1) and open https://5503-itj9npss7825cqyyppxe0.e2b.app/alex/agent11-empty-repo/issues/1 (the repo has \"Enable Time Tracking\" checked in its settings).",
+        "Scroll the right sidebar down past Notifications to the \"Time Tracker\" heading.",
+        "Look at what is under the \"Time Tracker\" heading.",
+        "For comparison, open https://5503-itj9npss7825cqyyppxe0.e2b.app/eval/harbor-handbook/issues/5 as the same account and scroll to the same block."
+      ]
+    }
+  ]
+}

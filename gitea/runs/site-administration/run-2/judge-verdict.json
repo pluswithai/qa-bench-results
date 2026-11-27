@@ -1,0 +1,208 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "gitea/areas/site-administration",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "982c1a3e9808a262b6b41d5cbaab983c0ff00e93af9f0c3c75538f0e0c18875b",
+    "known_invalid_sha256": "f56ec4720a8cc325bb88362b3c1dcbc016c78ac54f7ca09aebc3dadef5bd45cf",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "32",
+    "bugs": "15",
+    "flags": "0",
+    "known_hits": "6",
+    "extra_known_hits": "0",
+    "unverified": "7",
+    "outside_area_known_hits": "0",
+    "outside_area_known_invalid": "0",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "",
+    "outside_area_ground_truth_sha256": "47db07b83af13b7c7dd75acd1b523ed86e8107b60e6f33878e8fb5b68a2acbe2",
+    "outside_area_known_invalid_sha256": "72e79c4023c85c9101fbf2b7613d3daf78b07fded510d117ab5b26f6ac3103f9",
+    "duplicates": "1",
+    "duplicate_known_hits": "1",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "1",
+    "known_misses": "1",
+    "precision": "0.875",
+    "recall": "0.1875",
+    "findings_per_minute": "0.5525262112295427",
+    "correct_findings_per_minute": "0.22101048449181707",
+    "severity_1": "4",
+    "severity_3": "2",
+    "severity_5": "0",
+    "severity_sum": "10",
+    "score": "8",
+    "duration_seconds": "1628.882",
+    "partial": "false",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 17,
+        "reproStepsIndex": 0,
+        "findingIndex": 2,
+        "reason": "Submitting User Accounts search drops the selected sort and restores alphabetical ordering."
+      },
+      {
+        "groundTruthIndex": 14,
+        "reproStepsIndex": 0,
+        "findingIndex": 4,
+        "reason": "Submitting a worker maximum below -1 silently stores -1 and reports success, matching the accepted normalization bug."
+      },
+      {
+        "groundTruthIndex": 26,
+        "reproStepsIndex": 0,
+        "findingIndex": 6,
+        "reason": "At 390×844, Create User Account covers the User Account Management heading and hides its total."
+      },
+      {
+        "groundTruthIndex": 5,
+        "reproStepsIndex": 0,
+        "findingIndex": 7,
+        "reason": "The diagnosis-report button overlaps and obscures the Stacktrace tab at the same mobile viewport."
+      },
+      {
+        "groundTruthIndex": 19,
+        "reproStepsIndex": 0,
+        "findingIndex": 9,
+        "reason": "An oversized user repository limit produces a success message but persists as 0 when reopened."
+      },
+      {
+        "groundTruthIndex": 31,
+        "reproStepsIndex": 0,
+        "findingIndex": 11,
+        "reason": "Describes the same working but unlinked Performance Trace endpoint, reachable directly with no corresponding active navigation."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 1,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Reports the empty initial Trace list, which is intentionally unloaded, rather than the separate lack-of-guidance bug."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 1,
+        "reason": "No reviewed entry covers repository search interpreting percent signs and underscores as wildcards."
+      },
+      {
+        "findingIndex": 3,
+        "reason": "No reviewed entry covers user search interpreting percent signs and underscores as wildcards."
+      },
+      {
+        "findingIndex": 5,
+        "reason": "No reviewed entry covers a nonexistent queue detail URL rendering a blank 404 response."
+      },
+      {
+        "findingIndex": 10,
+        "reason": "No reviewed entry covers an empty queue worker field reporting success while retaining its previous value."
+      },
+      {
+        "findingIndex": 12,
+        "reason": "No reviewed entry covers a Running Processes header count exceeding the number of displayed processes."
+      },
+      {
+        "findingIndex": 13,
+        "reason": "No reviewed entry covers browser Back restoring the cached administrator inventory after sign-out."
+      },
+      {
+        "findingIndex": 14,
+        "reason": "No reviewed entry covers the update banner; the version comparison alone does not establish that the advertised release is invalid."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 3,
+        "reason": "Describes missing diagnostic output, but the surrounding page and other diagnostic controls remain usable."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 3,
+        "reason": "The reported search returns repositories that should not match the entered literal text."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 3,
+        "reason": "The reported search returns accounts that should not match the entered literal text."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 5,
+        "reason": "The reported response is an entirely blank page without an error explanation or recovery controls."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 3,
+        "reason": "Filtering incorrectly resets the administrator's chosen result ordering."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 3,
+        "reason": "The finding describes a misleading successful submission despite the requested setting not being applied."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 3,
+        "reason": "The reported diagnostic count and displayed results disagree, suggesting processes are omitted."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 3,
+        "reason": "Sensitive inventory and authenticated UI state remain visible after logout, although fresh requests are protected."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 3,
+        "reason": "The claimed failure is an incorrect available-update result, rather than a typographical difference."
+      }
+    ],
+    "duplicates": [
+      {
+        "findingIndex": 8,
+        "canonicalFindingIndex": 2,
+        "reason": "Applying a User Accounts filter drops the selected sort, another trigger explicitly covered by this entry."
+      }
+    ]
+  },
+  "outsideArea": {
+    "knownHits": [],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "fixture": "metabase/areas/dashboards",
+  "run": 1,
+  "started_at": "2026-11-23T21:55:20.111Z",
+  "duration_seconds": 1710.167,
+  "time_limit_seconds": 1800,
+  "stop_reason": "completed",
+  "credits": {
+    "total": 1400,
+    "testing_team": 1184,
+    "verification": 216,
+    "findings_verified": 36
+  },
+  "team_container_errors": 0
+}

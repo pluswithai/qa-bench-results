@@ -1,0 +1,284 @@
+{
+  "fixture": "gitea/areas/issues",
+  "run": 2,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 453,
+      "name": "Assignee/Author filter is dropped by the Open/Closed tabs, and the closed list contradicts the \"0 Closed\" count",
+      "summary": "The assignee filter is silently dropped: the URL becomes ?type=your_repositories&sort=recentupdate&state=closed with no assignee parameter and the list shows all 5 closed issues in the repositories (agent9-bulk-2 #15, agent11 lifecycle test issue EDIT #7, agent10-bulk-c #14, agent10-bulk-a #10, Publish the initial contributor guide #3), none of them the filtered set. The same happens in the other direction and for the Author filter. (The search keyword, by contrast, is kept across the tab switch.) (on /issues)",
+      "expected": "The Closed tab should keep the assignee filter (URL with &assignee=alex) and show the 0 closed issues assigned to alex, as its own \\\"0 Closed\\\" count says.",
+      "actual": "The assignee filter is silently dropped: the URL becomes ?type=your_repositories&sort=recentupdate&state=closed with no assignee parameter and the list shows all 5 closed issues in the repositories (agent9-bulk-2 #15, agent11 lifecycle test issue EDIT #7, agent10-bulk-c #14, agent10-bulk-a #10, Publish the initial contributor guide #3), none of them the filtered set. The same happens in the other direction and for the Author filter. (The search keyword, by contrast, is kept across the tab switch.)",
+      "reproSteps": [
+        "Open https://5503-izxouzvjflo86mc67ty9v.e2b.app/issues signed in as eval (password momentic-eval-1).",
+        "In the right-hand filter bar click the \"Assignee\" dropdown, type alex in its \"Search users\" box and click the alex entry.",
+        "The list is now filtered by assignee (URL ends with &assignee=alex): 3 open issues are listed, each showing alex's avatar, and the tabs read \"3 Open\" and \"0 Closed\".",
+        "Click the \"0 Closed\" tab."
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 480,
+      "name": "Negative hours/minutes in \"Manually Add Time\" are refused with a raw internal error string",
+      "summary": "The dialog sends the value, the server answers 400 and a red toast appears with the internal validation string: \\\"form.Hours: RangeError: Range\\\" for hours -2, and \\\"form.Minutes: RangeError: Range form.Hours: RangeError: Range\\\" when minutes is -30 and hours is empty. No message appears next to the field and the negative value stays in the field. (on /eval/harbor-handbook/issues/1)",
+      "expected": "The dialog refuses a negative duration with a readable message next to the field (for example \\\"Hours must be 0 or more\\\"), and nothing is sent or, if sent, the message is understandable.",
+      "actual": "The dialog sends the value, the server answers 400 and a red toast appears with the internal validation string: \\\"form.Hours: RangeError: Range\\\" for hours -2, and \\\"form.Minutes: RangeError: Range form.Hours: RangeError: Range\\\" when minutes is -30 and hours is empty. No message appears next to the field and the negative value stays in the field.",
+      "reproSteps": [
+        "Open https://5503-izxouzvjflo86mc67ty9v.e2b.app/eval/harbor-handbook/issues/1 and scroll to the Time Tracker section in the right sidebar",
+        "Click the \"Time Tracker\" heading to open its menu and choose \"Add Time\"",
+        "In the \"Manually Add Time\" dialog type -2 in the Hours field (or leave it empty and type -30 in the Minutes field)",
+        "Click the \"Add Time\" button in the dialog"
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 489,
+      "name": "Add dependency search: typing \"#1\" does not find issue #1, shows unrelated #11 instead",
+      "summary": "With the query \\\"#1\\\" the list shows a single, unrelated entry \\\"#11 agent9-bulk-1\\\" (its title happens to contain a 1); issue #1 is not offered. Typing \\\"1\\\" lists 10 results including \\\"#1 Expand the onboarding checklist\\\", and typing \\\"onboarding\\\" finds it too, so the issue exists and is searchable — only the \\\"#\\\" form, the one the list itself uses to label issues, fails and returns a misleading result. (on /eval/harbor-handbook/issues/4)",
+      "expected": "Typing the issue reference as the dropdown itself displays it (#1) should find issue #1 \\\"Expand the onboarding checklist\\\" in eval/harbor-handbook, as typing 1 or onboarding does.",
+      "actual": "With the query \\\"#1\\\" the list shows a single, unrelated entry \\\"#11 agent9-bulk-1\\\" (its title happens to contain a 1); issue #1 is not offered. Typing \\\"1\\\" lists 10 results including \\\"#1 Expand the onboarding checklist\\\", and typing \\\"onboarding\\\" finds it too, so the issue exists and is searchable — only the \\\"#\\\" form, the one the list itself uses to label issues, fails and returns a misleading result.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-izxouzvjflo86mc67ty9v.e2b.app/eval/harbor-handbook/issues/4",
+        "Scroll down to the right-hand sidebar section \"Dependencies\" (shows \"No dependencies set.\")",
+        "Click the \"Add dependency…\" dropdown and type #1 into its search field",
+        "Read the result list",
+        "For comparison, clear the field and type 1, then type onboarding"
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 517,
+      "name": "Cancel in the issue title editor does not discard the change: reopening Edit shows the cancelled title",
+      "summary": "The reopened title field still holds the cancelled text \\\"agent13 cancelcheck2\\\" (first run: \\\"agent13 cancelled-title-should-not-come-back\\\"), so a single later click on \\\"Save\\\" would store a title the person had cancelled. (on /eval/harbor-handbook/issues/13)",
+      "expected": "After Cancel, the edit is discarded; clicking Edit again shows the issue's saved title (\\\"agent13 reload and double submit\\\").",
+      "actual": "The reopened title field still holds the cancelled text \\\"agent13 cancelcheck2\\\" (first run: \\\"agent13 cancelled-title-should-not-come-back\\\"), so a single later click on \\\"Save\\\" would store a title the person had cancelled.",
+      "reproSteps": [
+        "Open https://5503-izxouzvjflo86mc67ty9v.e2b.app/eval/harbor-handbook/issues/13 (issue \"agent13 reload and double submit\")",
+        "Click the \"Edit\" button at the top right of the issue title",
+        "In the title field replace the title with \"agent13 cancelcheck2\"",
+        "Click \"Cancel\" — the page header shows the original title again, so the edit looks discarded",
+        "Click \"Edit\" again",
+        "Read the title field"
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 531,
+      "name": "Branch/tag selector on an issue: picking a tag (v1.0.0) does nothing",
+      "summary": "The dropdown just closes. The selector still shows \\\"main\\\", no timeline entry is added and no request is sent; after a reload the reference is still refs/heads/main. The same happened from the initial \\\"No Branch/Tag Specified\\\" state: picking v1.0.0 left the selector unchanged. (on /eval/harbor-handbook/issues/6)",
+      "expected": "Picking the tag v1.0.0 sets the issue's reference to that tag: the selector shows v1.0.0, a timeline entry \\\"added reference v1.0.0\\\" appears, and the choice survives a reload (as selecting the branch \\\"main\\\" does).",
+      "actual": "The dropdown just closes. The selector still shows \\\"main\\\", no timeline entry is added and no request is sent; after a reload the reference is still refs/heads/main. The same happened from the initial \\\"No Branch/Tag Specified\\\" state: picking v1.0.0 left the selector unchanged.",
+      "reproSteps": [
+        "Open https://5503-izxouzvjflo86mc67ty9v.e2b.app/eval/harbor-handbook/issues/6 (issue agent14-labels-test).",
+        "In the right sidebar click the branch selector at the top (it reads \"main\").",
+        "Click the \"Tags\" tab inside the open dropdown.",
+        "Click the \"v1.0.0\" entry.",
+        "Look at the selector and at the activity timeline, then reload the page and look again."
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 584,
+      "name": "Choosing a user in the issue sidebar Assignees picker does not save the assignment",
+      "summary": "Only a tick appears inside the picker. No request is sent (nothing appears in the network log), the timeline gains no assignment entry, and after reload the sidebar still lists only \\\"eval\\\"; alex is not assigned. Unticking the existing \\\"eval\\\" assignee the same way likewise changes only the tick and is gone after a reload. (on /eval/harbor-handbook/issues/12)",
+      "expected": "alex is added to the issue's assignees: the sidebar lists alex (eval and alex), the issue timeline gets an \\\"eval assigned this to alex\\\" entry, and after a reload the assignment is still there, so the issue shows up under the Assignee filter for alex.",
+      "actual": "Only a tick appears inside the picker. No request is sent (nothing appears in the network log), the timeline gains no assignment entry, and after reload the sidebar still lists only \\\"eval\\\"; alex is not assigned. Unticking the existing \\\"eval\\\" assignee the same way likewise changes only the tick and is gone after a reload.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-izxouzvjflo86mc67ty9v.e2b.app/eval/harbor-handbook/issues/12 (issue \"agent10-bulk-b\", currently assigned to eval).",
+        "In the right sidebar click the \"Assignees\" heading to open its picker; \"eval\" is ticked.",
+        "Click \"alex\" in the open picker: a tick appears next to alex, but no request is sent, the picker stays open and no \"assigned\" entry is added to the issue timeline.",
+        "Reload the page.",
+        "Read the sidebar Assignees field again."
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 612,
+      "name": "Issue sidebar shows \"1 Participants\" instead of \"1 Participant\"",
+      "summary": "The heading reads \"1 Participants\" – the plural form is used for a count of one. Issue #1 with two participants shows \"2 Participants\", so only the singular case is wrong. (on /eval/harbor-handbook/issues/9)",
+      "expected": "With exactly one participant the heading should read \"1 Participant\" (singular).",
+      "actual": "The heading reads \"1 Participants\" – the plural form is used for a count of one. Issue #1 with two participants shows \"2 Participants\", so only the singular case is wrong.",
+      "reproSteps": [
+        "Sign in as alex (password momentic-contributor-1) or eval (momentic-eval-1).",
+        "Open https://5503-izxouzvjflo86mc67ty9v.e2b.app/eval/harbor-handbook/issues/9 (issue \"agent12-crossuser mention and assignment\": opened by eval, 0 comments, assignees alex and maya).",
+        "Read the right-hand sidebar, under the Assignees block: the participant heading reads \"1 Participants\"."
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 714,
+      "name": "Issue number is rendered in the middle of the title when the title ends with right-to-left text",
+      "summary": "The heading shows \\\"agent3-title-only 8# مرحبا\\\": the number jumps into the middle of the title and its own \\\"#\\\" is flipped to the right of the digits, so the title reads as two pieces with the issue number between them. Same with a title ending in an emoji + Arabic word (issue #18: \\\"agent3-special <b>x</b> & 'q' \\\"dq\\\" 100% _u_ José 18# 🚀 مرحبا\\\"). Latin-only titles are fine. (on /eval/harbor-handbook/issues/8)",
+      "expected": "The issue number is shown after the title as is does for every other issue (e.g. \\\"agent3-long-body #25\\\"), i.e. \\\"agent3-title-only مرحبا #8\\\".",
+      "actual": "The heading shows \\\"agent3-title-only 8# مرحبا\\\": the number jumps into the middle of the title and its own \\\"#\\\" is flipped to the right of the digits, so the title reads as two pieces with the issue number between them. Same with a title ending in an emoji + Arabic word (issue #18: \\\"agent3-special <b>x</b> & 'q' \\\"dq\\\" 100% _u_ José 18# 🚀 مرحبا\\\"). Latin-only titles are fine.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-izxouzvjflo86mc67ty9v.e2b.app/eval/harbor-handbook/issues/8 (my own issue, created for this test).",
+        "Click Edit next to the title, replace the title with: agent3-title-only مرحبا and click Save.",
+        "Look at the heading above the issue box, and at the same issue's row in the repository issue list."
+      ]
+    },
+    {
+      "index": 8,
+      "reported_at_seconds": 731,
+      "name": "Activity entry shows no date when the due date is 0001-01-01 (\"added the due date -\")",
+      "summary": "With a due date of 0001-01-01 the date is saved and the sidebar shows \"January 1, 1\", but both activity entries drop the date: \"eval added the due date - now\" and \"eval modified the due date from - to December 20, 2026\", leaving a broken sentence with a stray \" - \" where the date belongs. A due date of 1000-01-01 renders normally in the same entry (\"... to January 1, 1000\"), so only this value is affected. (on /eval/harbor-handbook/issues/5)",
+      "expected": "The activity entries name the dates, the way they do for every other value (e.g. \"eval added the due date December 5, 2026\", \"eval modified the due date from November 23, 2026 to December 31, 2026\"), because the app does save the date and shows it in the sidebar.",
+      "actual": "With a due date of 0001-01-01 the date is saved and the sidebar shows \"January 1, 1\", but both activity entries drop the date: \"eval added the due date - now\" and \"eval modified the due date from - to December 20, 2026\", leaving a broken sentence with a stray \" - \" where the date belongs. A due date of 1000-01-01 renders normally in the same entry (\"... to January 1, 1000\"), so only this value is affected.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-izxouzvjflo86mc67ty9v.e2b.app/eval/harbor-handbook/issues/5 (the issue \"agent6-due-date-test\").",
+        "In the right sidebar under \"Due Date\", type 01/01/0001 into the date field (the earliest value the picker accepts) and click the \"+\" button.",
+        "Read the sidebar: it shows \"January 1, 1\" in red.",
+        "Read the last activity entry in the timeline: it reads \"eval added the due date - now\" with no date at all.",
+        "Click the pencil (Edit) icon in the Due Date section, set the date to 12/20/2026 and click the save (pencil) button: the new entry reads \"eval modified the due date from - to December 20, 2026\"."
+      ]
+    },
+    {
+      "index": 9,
+      "reported_at_seconds": 775,
+      "name": "Search returns \\\"No results\\\" inside the \\\"Assigned to you\\\" view although the matching issue is assigned to me",
+      "summary": "The page says \\\"No results — Try adjusting your search filters\\\", the tabs read \\\"0 Open 0 Closed\\\" and the left menu \\\"Assigned to you 0\\\", although \\\"Clarify release ownership\\\" (#2) is assigned to eval and matches the term. The same search in the default \\\"In your repositories\\\" scope does list #2 (screenshot taken of that view). Reproduced with the terms agent10-bulk-b, agent10 and Clarify. (on /issues)",
+      "expected": "The search is applied inside the \\\"Assigned to you\\\" scope: \\\"Clarify release ownership\\\" (#2) is listed as the one matching issue, the counts read \\\"1 Open\\\" and \\\"Assigned to you 1\\\".",
+      "actual": "The page says \\\"No results — Try adjusting your search filters\\\", the tabs read \\\"0 Open 0 Closed\\\" and the left menu \\\"Assigned to you 0\\\", although \\\"Clarify release ownership\\\" (#2) is assigned to eval and matches the term. The same search in the default \\\"In your repositories\\\" scope does list #2 (screenshot taken of that view). Reproduced with the terms agent10-bulk-b, agent10 and Clarify.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-izxouzvjflo86mc67ty9v.e2b.app/issues",
+        "In the left menu click \"Assigned to you\" (URL /issues?type=assigned&state=open): it lists 3 issues, among them \"Clarify release ownership\" (eval/harbor-handbook#2, assigned to eval).",
+        "Type \"Clarify\" into the \"Search issues...\" box and press Enter.",
+        "Read the result area and the left-menu counters.",
+        "For comparison, open the same search in the default scope: https://5503-izxouzvjflo86mc67ty9v.e2b.app/issues?q=Clarify&state=open — \"Clarify release ownership\" is listed there."
+      ]
+    },
+    {
+      "index": 10,
+      "reported_at_seconds": 862,
+      "name": "\"Farthest due date\" sort puts a 2030 issue below issues with no due date",
+      "summary": "The two nearer due dates (#5 Dec 20, 2026 and #7 Mar 15, 2026) come first, and #16 — the issue with the farthest due date, Jan 1, 2030 — is placed after a dozen issues that have no due date. The same three issues sorted with \"Nearest due date\" are ordered correctly, so the data is right and only the farthest sort is wrong. (on /eval/harbor-handbook/issues)",
+      "expected": "With \"Farthest due date\" the issue whose due date is the most distant should come first: #16 (Jan 1, 2030), then #5 (Dec 20, 2026), then #7 (Mar 15, 2026), and only then the issues with no due date.",
+      "actual": "The two nearer due dates (#5 Dec 20, 2026 and #7 Mar 15, 2026) come first, and #16 — the issue with the farthest due date, Jan 1, 2030 — is placed after a dozen issues that have no due date. The same three issues sorted with \"Nearest due date\" are ordered correctly, so the data is right and only the farthest sort is wrong.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-izxouzvjflo86mc67ty9v.e2b.app/eval/harbor-handbook/issues?type=all&state=all",
+        "Make sure three issues carry a due date (see each issue's right sidebar, Due Date): #16 \"agent2-milestone-probe\" = January 1, 2030, #5 \"agent6-due-date-test\" = December 20, 2026, #7 \"agent11 lifecycle test issue EDIT\" = March 15, 2026 (today is 2026-11-23).",
+        "Open the Sort dropdown at the right of the filter bar and choose \"Farthest due date\" (the address becomes .../issues?type=all&state=all&sort=farduedate).",
+        "Read the list from the top: rows 1-2 are #5 (Dec 20, 2026) and #7 (Mar 15, 2026), then come issues with no due date at all (#28, #27, #26, #25, #24, #23, #21, #20, #19, #18, #17).",
+        "Scroll down: #16 with \"Jan 1, 2030\" is listed after #17, i.e. below every issue that has no due date.",
+        "For comparison, open the same list with Sort = \"Nearest due date\" (...&sort=nearduedate): #7, #5, #16 come first, in ascending date order."
+      ]
+    },
+    {
+      "index": 11,
+      "reported_at_seconds": 908,
+      "name": "The \"Open\" tab on the repo issue list lists closed issues too, and the bulk bar then has no Close action",
+      "summary": "The \"Open\" tab links to ?type=all&state=all: the list mixes in closed issues (e.g. #24 \"agent7-blocker issue ... was closed 4 minutes ago\") while the tab keeps the label and count of open issues (\"23 Open\"). On this view the bulk toolbar shows only \"Delete, Label, Milestone, Projects, Assignee\" - the \"Close\" action is missing even though the only selected row (#23) is open, so bulk-closing is impossible from the view the Open tab leads to. (on /eval/harbor-handbook/issues)",
+      "expected": "The tab labelled \"Open\" should list only open issues (state=open), so that its name, its count and its rows agree; and with only open issues selected the bulk toolbar should offer \"Close\" as it does on the open-only list.",
+      "actual": "The \"Open\" tab links to ?type=all&state=all: the list mixes in closed issues (e.g. #24 \"agent7-blocker issue ... was closed 4 minutes ago\") while the tab keeps the label and count of open issues (\"23 Open\"). On this view the bulk toolbar shows only \"Delete, Label, Milestone, Projects, Assignee\" - the \"Close\" action is missing even though the only selected row (#23) is open, so bulk-closing is impossible from the view the Open tab leads to.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-izxouzvjflo86mc67ty9v.e2b.app/eval/harbor-handbook/issues (no query string, the default list of open issues).",
+        "Look at the two tabs above the list: they read e.g. \"23 Open\" and \"4 Closed\"; the \"Open\" tab is the active one.",
+        "Click the \"Open\" tab itself (the link labelled \"23 Open\").",
+        "The address becomes ?type=all&state=all and the list now contains closed issues as well - e.g. \"agent7-blocker issue #24 by eval was closed 4 minutes ago\" with the red closed icon - while the tab still reads \"23 Open\" and \"4 Closed\".",
+        "With that view open, tick the checkbox of an OPEN row (e.g. \"agent3-spaces #23\") and look at the bulk toolbar.",
+        "Compare with the same selection on ?type=all&state=open, where the toolbar starts with a \"Close\" button."
+      ]
+    },
+    {
+      "index": 12,
+      "reported_at_seconds": 917,
+      "name": "A long line in a fenced code block is cut off and makes the issue page scroll sideways",
+      "summary": "The long code line is clipped at the edge of the comment box with the rest of it unreachable, and the whole issue page becomes 1706px wide on a 1280px viewport (426px of horizontal scrolling). The same measurement on issue #4 (no long code line) returns 1280/1280, so the overflow comes from the rendered comment content. (on /eval/harbor-handbook/issues/29)",
+      "expected": "The comment should keep the page at the viewport width: a long code line should either wrap or scroll inside the code block, the rest of the line must stay reachable, and the issue page should not gain a horizontal scrollbar.",
+      "actual": "The long code line is clipped at the edge of the comment box with the rest of it unreachable, and the whole issue page becomes 1706px wide on a 1280px viewport (426px of horizontal scrolling). The same measurement on issue #4 (no long code line) returns 1280/1280, so the overflow comes from the rendered comment content.",
+      "reproSteps": [
+        "Go to /eval/harbor-handbook/issues/new",
+        "Title: agent12-longtext wrap test. In the comment box paste: a line of ~130 'A' characters, then a fenced code block whose single line is: <?php echo \"a very long code line that should scroll inside its block rather than stretch the page AAAA...A\"; ?> (about 180 characters) followed by a small markdown table and 'مرحبا بالعالم 🚀 José'",
+        "Click Create Issue (opens /eval/harbor-handbook/issues/29)",
+        "Look at the rendered comment: the text inside the grey code block stops at the right edge of the comment box mid-word (no ellipsis, no scrollbar inside the block), while the normal paragraph above it wraps correctly",
+        "Compare the page width with any other issue (e.g. /eval/harbor-handbook/issues/4): the document of #29 is 1706px wide while the viewport is 1280px, so the page scrolls horizontally into empty space"
+      ]
+    },
+    {
+      "index": 13,
+      "reported_at_seconds": 1101,
+      "name": "Fuzzy search behaves exactly like Exact: partial words such as \"checklis\" and \"onboard\" find nothing",
+      "summary": "Fuzzy and Exact return the same empty set: \"checklis\" gives \"No results\" in both modes, and \"onboard\" also gives no results in Exact and in Fuzzy, although issue #1 (\\\"Expand the onboarding checklist\\\") and its body contain those words. Only the complete word (\"onboarding\") finds it (1 result, 1 Open). So choosing Fuzzy never changes the outcome — a near-miss word returns nothing. (on /issues)",
+      "expected": "With the search type set to \"Fuzzy\" a near match such as \"checklis\" or \"onboard\" should find the issues containing \"checklist\"/\"onboarding\" (issue #1), i.e. Fuzzy should return a superset of Exact, different from Exact's empty result.",
+      "actual": "Fuzzy and Exact return the same empty set: \"checklis\" gives \"No results\" in both modes, and \"onboard\" also gives no results in Exact and in Fuzzy, although issue #1 (\\\"Expand the onboarding checklist\\\") and its body contain those words. Only the complete word (\"onboarding\") finds it (1 result, 1 Open). So choosing Fuzzy never changes the outcome — a near-miss word returns nothing.",
+      "reproSteps": [
+        "Sign in as eval (momentic-eval-1) and open https://5503-izxouzvjflo86mc67ty9v.e2b.app/issues.",
+        "Type checklis in the \"Search issues...\" box, keep the search type on \"Exact\" and press Enter: the page shows \"No results\" (counters 0 Open 0 Closed).",
+        "Change the search type dropdown from \"Exact\" to \"Fuzzy\" and submit the same query checklis: the page again shows \"No results\" with 0 Open 0 Closed.",
+        "Repeat with onboard in both Exact and Fuzzy: \"No results\" in both, while searching the complete word onboarding returns issue #1 \"Expand the onboarding checklist\"."
+      ]
+    },
+    {
+      "index": 14,
+      "reported_at_seconds": 1119,
+      "name": "Prefilled new-issue link ignores the labels and assignee parameters",
+      "summary": "The Milestone sidebar is prefilled with \\\"Handbook 1.1\\\", but the Labels sidebar still reads \\\"No Label\\\" (the hidden label_ids input is empty) and Assignees still reads \\\"No Assignees\\\". An issue created from such a link would carry no label and no assignee, silently. (on /eval/harbor-handbook/issues/new)",
+      "expected": "The new issue form is prefilled with the given label and assignee, as it already is for title, body and milestone (?title=, ?body=, ?milestone=1).",
+      "actual": "The Milestone sidebar is prefilled with \\\"Handbook 1.1\\\", but the Labels sidebar still reads \\\"No Label\\\" (the hidden label_ids input is empty) and Assignees still reads \\\"No Assignees\\\". An issue created from such a link would carry no label and no assignee, silently.",
+      "reproSteps": [
+        "Sign in as eval (username eval).",
+        "Open https://5503-izxouzvjflo86mc67ty9v.e2b.app/eval/harbor-handbook/issues/new?labels=1&milestone=1&assignee=alex — label id 1 is \"documentation\" in this repository, milestone id 1 is \"Handbook 1.1\".",
+        "Look at the sidebar on the right of the create form: Labels, Milestone, Assignees.",
+        "Repeat with only ?labels=1: Labels still reads \"No Label\"."
+      ]
+    },
+    {
+      "index": 15,
+      "reported_at_seconds": 1187,
+      "name": "Double-clicking the bulk \\\"Close\\\" button sends a second request that answers 500 with a console error",
+      "summary": "The first POST /issues/status returns 200, the second returns 500 (Internal Server Error) and the console logs \\\"Failed to load resource: 500\\\" plus \\\"Error: Failed to update issues meta\\\". The issue does end up closed with a single \\\"closed this issue\\\" entry. On a second try of the same steps both requests returned 200 and nothing failed, so this is intermittent (1 of 2 attempts). (on /eval/harbor-handbook/issues)",
+      "expected": "A quick second click on the bulk \\\"Close\\\" button is ignored or handled cleanly: the issue is closed once and no request fails.",
+      "actual": "The first POST /issues/status returns 200, the second returns 500 (Internal Server Error) and the console logs \\\"Failed to load resource: 500\\\" plus \\\"Error: Failed to update issues meta\\\". The issue does end up closed with a single \\\"closed this issue\\\" entry. On a second try of the same steps both requests returned 200 and nothing failed, so this is intermittent (1 of 2 attempts).",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-izxouzvjflo86mc67ty9v.e2b.app/eval/harbor-handbook/issues?q=agent10-bulk-b&state=open (my issue \"agent10-bulk-b\" #12, open).",
+        "Tick the checkbox of the row \"agent10-bulk-b\" so the bulk bar with \"Close\" appears.",
+        "Click the bulk button \"Close\" twice as fast as possible.",
+        "Watch the network/console: the second POST to /eval/harbor-handbook/issues/status answers 500 and the console reports \"Failed to update issues meta\"."
+      ]
+    },
+    {
+      "index": 16,
+      "reported_at_seconds": 1317,
+      "name": "The search mode (Fuzzy/Words) is silently reset to Exact when the ownership section changes and is never kept in the address",
+      "summary": "The dropdown falls back to \"Exact\" on its own. The address after the switch is https://.../issues?type=created_by&sort=recentupdate&state=open&q=agent12 — the chosen mode is not carried in it at all, so it is lost on every section/tab switch, filter change and reload, and the list is searched with Exact again without any notice. (on /issues)",
+      "expected": "The chosen search mode should stay selected (and be part of the address) when the ownership section, the Open/Closed tab or a filter changes, so the list keeps being searched the way the person chose.",
+      "actual": "The dropdown falls back to \"Exact\" on its own. The address after the switch is https://.../issues?type=created_by&sort=recentupdate&state=open&q=agent12 — the chosen mode is not carried in it at all, so it is lost on every section/tab switch, filter change and reload, and the list is searched with Exact again without any notice.",
+      "reproSteps": [
+        "Go to /issues?q=agent12 (three issues match, the search-mode dropdown in the search bar reads \"Exact\")",
+        "Open the search-mode dropdown (left of the magnifier) and choose \"Fuzzy\" — the dropdown now reads \"Fuzzy\", the URL stays /issues?q=agent12",
+        "Click \"Created by you\" (or \"Assigned to you\", or any other entry) in the left filter menu",
+        "Look at the search-mode dropdown: it reads \"Exact\" again, with the query agent12 still in the box, and the address contains type=created_by&q=agent12 but no search-mode parameter"
+      ]
+    },
+    {
+      "index": 17,
+      "reported_at_seconds": 1366,
+      "name": "Tabbing through the issue-list filters opens every dropdown and stacks the open menus on top of each other",
+      "summary": "Every filter dropdown opens as soon as Tab lands on it, and the previously opened one is not closed: after three Tabs the Label, Milestone and Author menus are all open at once, stacked and overlapping over each other and over the issue rows. The screenshots show the Milestone menu open on top of the still-open Label menu, and then the Author menu on top of both. (on /eval/harbor-handbook/issues)",
+      "expected": "Tab moves focus through the filter buttons with only a focus ring; a menu opens only when the user activates it (Enter/Space/click), and opening one menu closes any other open menu.",
+      "actual": "Every filter dropdown opens as soon as Tab lands on it, and the previously opened one is not closed: after three Tabs the Label, Milestone and Author menus are all open at once, stacked and overlapping over each other and over the issue rows. The screenshots show the Milestone menu open on top of the still-open Label menu, and then the Author menu on top of both.",
+      "reproSteps": [
+        "Open https://5503-izxouzvjflo86mc67ty9v.e2b.app/eval/harbor-handbook/issues",
+        "Click in the \"Search...\" box, then press Tab to reach the \"24 Open\" / \"8 Closed\" tabs and press Tab once more so focus lands on the \"Label\" filter button",
+        "Press Tab again (focus moves to \"Milestone\") and note that the Label menu stays open while the Milestone menu opens on top of it",
+        "Press Tab again (focus moves to \"Author\") — the Author menu opens on top of the still-open Milestone and Label menus"
+      ]
+    },
+    {
+      "index": 18,
+      "reported_at_seconds": 1393,
+      "name": "The assignee in the issue sidebar is a dead link (href=\"#\") - clicking it does not open the user's profile",
+      "summary": "The assigned user's entry is an anchor with href=\"#\" (\\\"Alex Rivera alex\\\" -> /url: \\\"#\\\"). Clicking it does not open /alex: the address becomes .../issues/1# and the page stays on the issue, so the assignee name in the sidebar is a dead link. The Participants avatars and the timeline's \\\"alex\\\" links on the same page correctly go to /alex, and the sidebar milestone entry correctly goes to /eval/harbor-handbook/milestone/1. (on /eval/harbor-handbook/issues/1)",
+      "expected": "Clicking the assigned user in the issue sidebar should open that user's profile (/alex), like the avatar of the same user in the Participants block and in the assignment timeline entry.",
+      "actual": "The assigned user's entry is an anchor with href=\"#\" (\\\"Alex Rivera alex\\\" -> /url: \\\"#\\\"). Clicking it does not open /alex: the address becomes .../issues/1# and the page stays on the issue, so the assignee name in the sidebar is a dead link. The Participants avatars and the timeline's \\\"alex\\\" links on the same page correctly go to /alex, and the sidebar milestone entry correctly goes to /eval/harbor-handbook/milestone/1.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-izxouzvjflo86mc67ty9v.e2b.app/eval/harbor-handbook/issues/1 (an issue with an assignee).",
+        "In the right sidebar, find the Assignees block showing the user \"alex\" with their avatar.",
+        "Click the avatar or the name \"alex\".",
+        "Nothing opens: the address only gains a trailing \"#\" (.../issues/1#) and the page stays on the issue.",
+        "The same happens on issue #4 (assignee alex): clicking the sidebar assignee gives .../issues/4# and no profile page."
+      ]
+    }
+  ]
+}

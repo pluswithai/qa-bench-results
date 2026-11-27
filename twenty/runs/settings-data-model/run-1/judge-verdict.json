@@ -1,0 +1,202 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "twenty/areas/settings-data-model",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "c0df0972e38c61339922395fdda732c577f554e092949e03fd6be91b45100fb1",
+    "known_invalid_sha256": "0403ec9bfbd7220b5c60153fc357d29d18cf11f47f6259cd7dce12bd83cb8b08",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "91",
+    "bugs": "15",
+    "flags": "0",
+    "known_hits": "2",
+    "extra_known_hits": "0",
+    "unverified": "10",
+    "outside_area_known_hits": "0",
+    "outside_area_known_invalid": "0",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "",
+    "outside_area_ground_truth_sha256": "f3456299419b269b88f0ddc32ec53ab80fbf3ec14a32ac6ae1366aa22bd3a43a",
+    "outside_area_known_invalid_sha256": "e51afd4a5be9203d46a29a1087513447454829f8cacf9feb7379d606574f27e1",
+    "duplicates": "0",
+    "duplicate_known_hits": "0",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "3",
+    "known_misses": "3",
+    "precision": "0.4",
+    "recall": "0.02197802197802198",
+    "findings_per_minute": "0.5000163894260978",
+    "correct_findings_per_minute": "0.06666885192347971",
+    "severity_1": "1",
+    "severity_3": "1",
+    "severity_5": "0",
+    "severity_sum": "4",
+    "score": "1",
+    "duration_seconds": "1799.941",
+    "partial": "true",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 57,
+        "reproStepsIndex": 0,
+        "findingIndex": 1,
+        "reason": "Matches Skills Name sorting placing Word Documents and Excel & Spreadsheets according to hidden API names rather than displayed labels."
+      },
+      {
+        "groundTruthIndex": 39,
+        "reproStepsIndex": 0,
+        "findingIndex": 14,
+        "reason": "Matches the mobile record-layout header overlapping Edit actions with the record title or position text, reached through Customize record page."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 1,
+        "reproStepsIndex": 0,
+        "findingIndex": 2,
+        "reason": "Matches clearing First Name, receiving no validation feedback, and seeing the saved name restored after reload; this was rejected as intended required-name validation."
+      },
+      {
+        "knownInvalidIndex": 22,
+        "reproStepsIndex": 0,
+        "findingIndex": 10,
+        "reason": "Matches the Data model Records column showing zero despite saved, accessible records; this was rejected because the column intentionally uses planner estimates."
+      },
+      {
+        "knownInvalidIndex": 10,
+        "reproStepsIndex": 0,
+        "findingIndex": 4,
+        "reason": "Matches clearing Workspace Name, leaving an unsaved blank draft with a placeholder, and restoring the saved name on reload. The Apple placeholder adds presentation detail."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 0,
+        "reason": "No reference entry describes mailbox Reconnect failing and redirecting from Settings to Companies."
+      },
+      {
+        "findingIndex": 3,
+        "reason": "No entry covers a disabled Role picker during API-key creation. The saved-key applicability display mismatch is a different failure."
+      },
+      {
+        "findingIndex": 5,
+        "reason": "No entry describes blank Skills Type cells. The Type-sort crash is a different failing behavior."
+      },
+      {
+        "findingIndex": 6,
+        "reason": "No reference entry covers Logs filters displaying neither results nor an empty state beneath the upgrade card."
+      },
+      {
+        "findingIndex": 7,
+        "reason": "No entry describes the webhook Description field duplicating the Endpoint URL helper text."
+      },
+      {
+        "findingIndex": 8,
+        "reason": "Renaming an open field in another tab causing a 404 differs from background metadata synchronization resetting an unsaved form."
+      },
+      {
+        "findingIndex": 9,
+        "reason": "No reference entry covers lorem ipsum text in an empty object's Settings preview."
+      },
+      {
+        "findingIndex": 11,
+        "reason": "The bare /settings route failing to render settings or a default page is not the offered Domains Settings destination failure."
+      },
+      {
+        "findingIndex": 12,
+        "reason": "A nonexistent settings route lacking not-found handling differs from an offered Domains Settings command opening an empty destination."
+      },
+      {
+        "findingIndex": 13,
+        "reason": "Immediate regeneration of a saved custom plural when Singular changes differs from an earlier autosave overwriting newer edits in another field."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 3,
+        "reason": "Reconnect fails and unexpectedly navigates away. The short error toast is not a raw error dump."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "As reported, the name edit is silently discarded on reload, describing a persistence failure."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 3,
+        "reason": "The reported disabled selector prevents choosing the key's permissions; actual privilege escalation is not demonstrated."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 1,
+        "reason": "The described impact is misleading placeholder text and missing validation feedback; the saved workspace name remains intact."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 1,
+        "reason": "Missing column values are a presentation defect without a described failed action."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 3,
+        "reason": "The finding describes log results never appearing when filters are used."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 1,
+        "reason": "Incorrect helper copy does not describe functional misbehavior."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 5,
+        "reason": "The open field editor becomes an unusable not-found page and any in-progress editing is lost."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 1,
+        "reason": "Placeholder copy in a preview is a presentation issue."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 3,
+        "reason": "As described, the table reports an incorrect record count, though records remain accessible."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 5,
+        "reason": "The requested settings page remains blank and unusable after reload."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 5,
+        "reason": "The route leaves a persistently empty, unusable main content area instead of a recovery page."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 3,
+        "reason": "The reported behavior overwrites and persists a previously saved custom plural name."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

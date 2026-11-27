@@ -1,0 +1,543 @@
+{
+  "area": "repository-code",
+  "reviewer": "Claude Fable 5.2",
+  "bugs": [
+    {
+      "id": "repository-code-1",
+      "title": "File finder for a non-existent branch renders an empty finder (then \"No matching file found\") instead of a not-found answer",
+      "findings": [
+        "run1-03",
+        "run3-02"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "/find/* is served without resolving the ref (FindFiles only builds two links), so the page answers 200 and the failed tree-list fetch is swallowed; the screenshots show an empty list and then \"No matching file found\", while /src/branch/<same name> answers the app's own 404 page.",
+      "evidence": [
+        "run1-03/shot-3.png",
+        "run1-03/shot-2.png",
+        "run3-02/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/repo/find.go",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/web.go#L1173",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/web_src/js/features/repo-findfile.ts"
+      ]
+    },
+    {
+      "id": "repository-code-2",
+      "title": "Diff summary (\"N additions and M deletions\") ignores the whitespace option, so it contradicts the diff and per-file badges shown below it",
+      "findings": [
+        "run1-10",
+        "run3-20",
+        "run2-31",
+        "run2-25"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "The diff is built with the whitespace flag but the summary comes from GetDiffShortStat, which is called without it (commit.go:326 vs :332; gitdiff.go:1335 passes nil args), so the page totals disagree with the hunks and file badges. run2-31 is the same mismatch over an empty diff; run2-25 is also this bug, not a no-newline bug: its hunk \"@@ -6,3 +6,4 @@\" is exactly what git diff -w gives for that commit (checked locally), because the whitespace choice is saved per user (middlewares.go:73-80) and another agent of the same run had switched it on.",
+      "evidence": [
+        "run1-10/shot-3.png",
+        "run3-20/shot-2.png",
+        "run2-31/shot-2.png",
+        "run2-25/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/repo/commit.go#L326-L332",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/services/gitdiff/gitdiff.go#L1321-L1335",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/repo/middlewares.go#L64-L90",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/repo/diff/box.tmpl#L22"
+      ]
+    },
+    {
+      "id": "repository-code-3",
+      "title": "Apply Patch commits an empty file when the pasted diff has a new-file header but no hunk",
+      "findings": [
+        "run1-13"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Gitea hands the text to git apply (patch.go:163) and git itself accepts this input as a valid empty-file creation, ignoring the trailing non-diff line (reproduced locally with the same flags: exit 0, empty file added). The input was a deliberately malformed patch and the app did what git does with it.",
+      "evidence": [
+        "run1-13/shot-1.png",
+        "run1-13/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/services/repository/files/patch.go#L163"
+      ],
+      "rejection_kind": "product-decision",
+      "rejection_note": "behaviour is deliberate in Gitea 1.24.7 (see reason and source)"
+    },
+    {
+      "id": "repository-code-4",
+      "title": "Archive download for a non-existent tag answers a plain-text 404 \"unrecognized repository reference\"",
+      "findings": [
+        "run1-14"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Deliberate: the download handler explicitly answers this case with ctx.HTTPError(404, err.Error()), a plain-text reply for a file-download endpoint; the text is Gitea's own RepoRefNotFoundError message, not a raw git error, and the status is a correct 404.",
+      "evidence": [
+        "run1-14/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/repo/repo.go#L367-L378",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/services/repository/archiver/archiver.go#L63"
+      ],
+      "rejection_kind": "product-decision",
+      "rejection_note": "behaviour is deliberate in Gitea 1.24.7 (see reason and source)"
+    },
+    {
+      "id": "repository-code-5",
+      "title": "Commit search results do not show the tag badge that the plain commit list shows",
+      "findings": [
+        "run1-16"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Not a defect but a missing extra: tag badges are loaded only by the plain commit list handler (commit.go:95-100) and the shared template shows them only when present; the search view shows no wrong data, it just lacks the decoration (file history lacks it too).",
+      "evidence": [
+        "run1-16/shot-1.png",
+        "run1-16/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/repo/commit.go#L95-L100",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/repo/commit.go#L187-L218",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/repo/commits_list.tmpl#L57-L61"
+      ],
+      "rejection_kind": "product-decision",
+      "rejection_note": "behaviour is deliberate in Gitea 1.24.7 (see reason and source)"
+    },
+    {
+      "id": "repository-code-6",
+      "title": "Failed Apply Patch shows internal error plumbing: Unable to apply patch \"Error: Stdout: Stderr: ... Err: exit status 128\"",
+      "findings": [
+        "run1-17"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "The red banner shows the internal debug wrapper built in patch.go:174 (\"Error: Stdout: %s Stderr: %s Err: %w\") verbatim, with empty Stdout, nested quotes and the exit status, instead of just the cause. Showing git's reason is intended (fail_to_apply_patch takes the error), the Stdout/Stderr/Err scaffolding is not user wording.",
+      "evidence": [
+        "run1-17/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/services/repository/files/patch.go#L174",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/repo/patch.go",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/options/locale/locale_en-US.ini#L1355"
+      ]
+    },
+    {
+      "id": "repository-code-7",
+      "title": "Repository RSS feed item titles and descriptions carry escaped HTML anchor markup instead of plain text",
+      "findings": [
+        "run1-18",
+        "run2-28",
+        "run3-21"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "The feed XML shows <title>eval pushed to &lt;a href=&#34;...&#34;&gt;branch&lt;/a&gt; at ...</title>: the title is built from HTML locale strings (action.commit_repo) and put into the RSS title, which readers show as literal markup. The source itself flags this code as \"quite strange (maybe not right)\" (convert.go:70-72); the tags and branch feeds of the same repo have plain titles.",
+      "evidence": [
+        "run1-18/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/feed/convert.go#L70-L92",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/feed/convert.go#L244",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/options/locale/locale_en-US.ini#L3476"
+      ]
+    },
+    {
+      "id": "repository-code-8",
+      "title": "Upload page commit summary placeholder reads: Upload files to \"\" (empty quotes at the repository root)",
+      "findings": [
+        "run1-19",
+        "run2-23"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "The placeholder is rendered with the empty TreePath (commit_form.tmpl:12) while the handler that builds the real default message replaces an empty directory with \"/\" (editor.go:698-703), so the hint shows an empty quoted value and differs from the message actually committed. run2-23 expects the branch name there, which is wrong, but it is the same empty-quotes defect.",
+      "evidence": [
+        "run1-19/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/repo/editor/commit_form.tmpl#L12",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/repo/editor.go#L696-L704"
+      ]
+    },
+    {
+      "id": "repository-code-9",
+      "title": "Commit graph is unreadable at phone width: commit messages cut to 3 characters or hidden, dates clipped at the edge",
+      "findings": [
+        "run1-22",
+        "run2-32"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "At 390 px the screenshots show messages reduced to \"age…\"/\"Del…\" (run1) or absent (run2) and every date cut at the right edge, on an app that otherwise adapts to phone width (collapsed nav). Layout only; the \"no lane lines\" remark in run1-22 is not a defect (single-branch filter).",
+      "evidence": [
+        "run1-22/shot-1.png",
+        "run2-32/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/repo/graph/commits.tmpl",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/web_src/css/features/gitgraph.css"
+      ]
+    },
+    {
+      "id": "repository-code-10",
+      "title": "Raw view of a branch file keeps showing the previous commit's content after a new commit (browser-cached for hours)",
+      "findings": [
+        "run1-25"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "ServeBlob sends the branch-scoped raw response with max-age = STATIC_CACHE_TIME (default 6h) in production mode, so the browser reuses the old body without asking the server; screenshots show the file page at MAIN-SECOND-CHANGE and the Raw link still at FIRST-CHANGE. The setting is documented for static resources and avatars only (app.example.ini), not for mutable repository content.",
+      "evidence": [
+        "run1-25/shot-3.png",
+        "run1-25/shot-4.png",
+        "run1-25/shot-5.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/common/serve.go#L22-L43",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/modules/httpcache/httpcache.go#L24-L46",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/custom/conf/app.example.ini#L351-L352"
+      ]
+    },
+    {
+      "id": "repository-code-11",
+      "title": "Escape does not close the \"Code\" clone panel, unlike the \"Add File\" menu next to it",
+      "findings": [
+        "run2-09"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "The clone panel is a tippy popup that Gitea itself declares with role \"menu\" (tippy.ts:48) but which has no Escape handling; the video frames show it still open after Escape is pressed twice, while the neighbouring dropdown closes. Minor keyboard/accessibility inconsistency.",
+      "evidence": [
+        "run2-09/shot-2.png",
+        "run2-09/frame-5.jpg",
+        "run2-09/frame-6.jpg"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/web_src/js/modules/tippy.ts",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/repo/clone_panel.tmpl"
+      ]
+    },
+    {
+      "id": "repository-code-12",
+      "title": "Branch search treats % and _ as wildcards: searching \"%\" or \"_\" lists every branch",
+      "findings": [
+        "run2-14",
+        "run3-18"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "The keyword is passed unescaped into a SQL LIKE (builder.Like{\"name\", opts.Keyword}), so \"%\" and \"_\" match everything instead of the literal character; the screenshot shows the full branch list for q=% although no branch name contains a percent sign.",
+      "evidence": [
+        "run2-14/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/models/git/branch_list.go#L102-L104"
+      ]
+    },
+    {
+      "id": "repository-code-13",
+      "title": "Web edit with \"Create a new branch\" on a moved branch produces a commit with a stale parent that also contains other people's changes",
+      "findings": [
+        "run2-17"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "The commit page shows parent 0881bb63dc (the head when the editor was opened) and \"3 changed files\" including two files other users added meanwhile. Source confirms: the tree is written from a fresh clone of the current branch head, but the commit's parent is the form's old last_commit (update.go:271), and the out-of-date check is skipped when the target is a new branch (update.go:392).",
+      "evidence": [
+        "run2-17/shot-3.png",
+        "run2-17/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/services/repository/files/update.go#L176",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/services/repository/files/update.go#L271-L274",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/services/repository/files/update.go#L389-L399"
+      ]
+    },
+    {
+      "id": "repository-code-14",
+      "title": "A long tag name is not wrapped or shortened and widens the Tags page beyond the window",
+      "findings": [
+        "run2-18"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "Screenshot shows the tag names running off the right edge at 1280 px with the page scrolling sideways; Gitea accepted the name, so its own list should contain it. Layout only (same family as repository-code-15 and -16, different page and template).",
+      "evidence": [
+        "run2-18/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/repo/tag/list.tmpl"
+      ]
+    },
+    {
+      "id": "repository-code-15",
+      "title": "A long tag label on a commit row pushes the Date column out of view on the commit history page",
+      "findings": [
+        "run2-20"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "Screenshot shows the tag label drawn as one unbroken line in the Message column, the table wider than the window and the Date column gone for every row. Layout only (same family as repository-code-14 and -16).",
+      "evidence": [
+        "run2-20/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/repo/commits_list.tmpl#L57-L61",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/repo/tag/name.tmpl"
+      ]
+    },
+    {
+      "id": "repository-code-16",
+      "title": "Long tag names overflow the \"This commit is contained in\" panel on the commit page",
+      "findings": [
+        "run2-27"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "Screenshot shows both long tag names running past the right edge of the panel and the window after the panel is opened. Layout only (same family as repository-code-14 and -15).",
+      "evidence": [
+        "run2-27/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/repo/commit_load_branches_and_tags.tmpl"
+      ]
+    },
+    {
+      "id": "repository-code-17",
+      "title": "Delete page renders the delete form for a file path that does not exist",
+      "findings": [
+        "run2-19"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Only reachable by typing the address of a missing file; nothing wrong can be committed because the submit is validated and answers the clear, dedicated message \"The file being deleted ... no longer exists in this repository\" (the finding confirms it). Checking earlier, at page load, is a preference.",
+      "evidence": [
+        "run2-19/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/repo/editor.go#L426-L450",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/options/locale/locale_en-US.ini#L1376"
+      ],
+      "rejection_kind": "unsupported-input",
+      "rejection_note": "hand-typed path of a missing file"
+    },
+    {
+      "id": "repository-code-18",
+      "title": "Upload page: \"Commit Changes\" with no file chosen silently returns to the code page, with no message and no commit",
+      "findings": [
+        "run2-22",
+        "run3-06"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "With no uploaded file the service returns success without doing anything (upload.go:56-58) and the handler then redirects as after a real commit; the frames show the form with a typed message going straight to the branch page with no flash, so the user cannot tell that nothing was uploaded and the typed message is dropped.",
+      "evidence": [
+        "run3-06/frame-5.jpg",
+        "run3-06/frame-6.jpg",
+        "run2-22/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/services/repository/files/upload.go#L55-L58",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/repo/editor.go#L717-L790"
+      ]
+    },
+    {
+      "id": "repository-code-19",
+      "title": "Add File > New File (and Apply Patch) on a file's blame page uses the file as the folder: docs/releases.md/<name>",
+      "findings": [
+        "run2-30"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "The Add File menu is hidden only when IsViewFile is set; the blame page sets IsBlame instead, so the menu is shown and its links append the file's own path as the directory (view_content.tmpl:44-57). Screenshot shows the editor breadcrumb \"harbor-handbook / docs / releases.md /\", a location where no file can be created.",
+      "evidence": [
+        "run2-30/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/repo/view_content.tmpl#L44-L60",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/repo/blame.go#L46"
+      ]
+    },
+    {
+      "id": "repository-code-20",
+      "title": "Apply Patch answers \"The file contents have changed since you started editing\" on the first Commit Changes click",
+      "findings": [
+        "run3-03"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Per source this banner appears only when the branch head differs from the commit recorded when the page was opened (patch.go:143-158); the target was main, which other agents of the same run were pushing to (run3-06's last frame shows a fresh foreign commit on main), so the \"false\" conflict is most likely a shared-environment artifact, and the evidence does not show otherwise. A human should repeat it on a branch nobody else touches: (a) if the first click still fails, accept as stated; (b) check the finding's second claim, that after this error the Commit Changes button is disabled although the banner says \"Commit Changes again\" - source supports it (PageHasPosted is set only in the file editor, editor.go:225, never in patch.go) but no screenshot shows the button; if confirmed, accept that narrower bug with severity 3.",
+      "evidence": [
+        "run3-03/shot-1.png",
+        "run3-03/shot-2.png",
+        "run3-06/frame-6.jpg"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/services/repository/files/patch.go#L143-L158",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/repo/patch.go",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/repo/editor.go#L225",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/web_src/js/features/repo-editor.ts#L156-L174"
+      ],
+      "fable": {
+        "verdict": "unsure",
+        "severity": null
+      },
+      "override_reason": "Owner checked by hand on a clean instance: on a branch nobody else touched, Apply Patch committed on the first click (commit created, parent 4ff25d14a0); no false \"contents have changed\" banner. The run saw other agents pushing to main.",
+      "override_by": "owner manual check 2026-11-24",
+      "rejection_kind": "false-positive",
+      "rejection_note": "environment: other agents were pushing to the same branch"
+    },
+    {
+      "id": "repository-code-21",
+      "title": "Branches list shows \"eval\" next to a branch whose latest commit was authored by Alex Rivera",
+      "findings": [
+        "run3-07"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Deliberate: the user shown after \"Updated ...\" on a branch row is the branch's pusher (DBBranch.Pusher, stored as PusherID), not the commit author, and the row does not label it as author; the commit pages correctly show the author.",
+      "evidence": [
+        "run3-07/shot-1.png",
+        "run3-07/shot-3.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/repo/branch/list.tmpl#L106",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/models/git/branch.go#L113-L114"
+      ],
+      "rejection_kind": "product-decision",
+      "rejection_note": "behaviour is deliberate in Gitea 1.24.7 (see reason and source)"
+    },
+    {
+      "id": "repository-code-22",
+      "title": "Code search for a term starting with \"-\" (\"-i\") returns lines that do not contain it",
+      "findings": [
+        "run3-09"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "The stated cause is wrong and the behaviour is coded on purpose: the term is always passed with -e and its leading dashes are stripped first (grep.go:68: strings.TrimLeft(search, \"-\")), so \"-i\" is searched as \"i\" and \"--name-only\" as \"name-only\"; nothing is parsed as a git option, and the blank lines in the result are context lines. Results are a superset of the literal matches, never missing any.",
+      "evidence": [
+        "run3-09/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/modules/git/grep.go#L62-L78"
+      ],
+      "rejection_kind": "product-decision",
+      "rejection_note": "behaviour is deliberate in Gitea 1.24.7 (see reason and source)"
+    },
+    {
+      "id": "repository-code-23",
+      "title": "Creating a tag with an invalid name answers \"New branch name must be a well-formed Git reference name.\"",
+      "findings": [
+        "run3-10"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "Tag creation from the ref selector reuses NewBranchForm (field NewBranchName, CreateTag flag) and the name is validated before the tag branch of the handler, so the error names a branch although the user clicked \"Create tag\"; the screenshots show the selector on the Tags tab and then the branch-worded banner. Wording only, the tag is correctly refused.",
+      "evidence": [
+        "run3-10/shot-1.png",
+        "run3-10/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/services/forms/repo_branch_form.go#L16-L20",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/repo/branch.go"
+      ]
+    },
+    {
+      "id": "repository-code-24",
+      "title": "File finder opened with a directory appended to the address links every result to a 404",
+      "findings": [
+        "run3-13"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "This address shape is not offered anywhere in the app: \"Go to file\" is rendered only at the repository root and always links to /find/<ref> (view_content.tmpl:40-42). The 404 links come from a hand-edited URL that the finder was never meant to take (it treats everything after /find/ as the ref), so no real path leads a user here.",
+      "evidence": [
+        "run3-13/shot-3.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/repo/view_content.tmpl#L39-L42",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/repo/find.go",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/repo/treelist.go#L23-L44"
+      ],
+      "fable": {
+        "verdict": "reject",
+        "severity": null
+      },
+      "override_reason": "The file finder opened with a directory in the address lists results that all link to 404 pages. Counted under the rule for addresses the app does not generate.",
+      "override_by": "owner rule 2026-11-24: an address or parameter the app does not generate counts when the app breaks on it (error page, blank page, endless loading, raw error), as in OWASP WSTG-ERRH-01; it does not count when the app handles it (default view, redirect, not-found message)"
+    },
+    {
+      "id": "repository-code-25",
+      "title": "Renaming a file in the web editor without touching its content leaves \"Commit Changes\" disabled",
+      "findings": [
+        "run3-15"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "Screenshot shows the button still greyed out after the file name was changed (placeholder still \"Update docs/releases-renamed.md\"). The source states the opposite intent: the dirty tracking that enables the button is registered \"for the file path and the file content\" (repo-editor.ts:164), yet a path-only change does not enable it, so a plain rename needs a fake content edit.",
+      "evidence": [
+        "run3-15/shot-2.png",
+        "run3-15/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/web_src/js/features/repo-editor.ts#L150-L174",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/repo/editor/edit.tmpl#L21-L28"
+      ]
+    },
+    {
+      "id": "repository-code-26",
+      "title": "Commit Changes on a branch deleted while the editor was open lands on a generic 404 and the typed content is lost",
+      "findings": [
+        "run3-22"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "Frames show the filled edit form being submitted and the generic \"404 Not Found\" page coming back, with nothing about the branch and no way to recover the text. The editor has a dedicated in-form answer for this exact case (editor.branch_does_not_exist, editor.go:333) that keeps the content, but the route's ref check answers 404 before the handler runs, so it is never shown. Rare (needs a concurrent branch delete, e.g. auto-delete after merge), hence 3 for the lost input, not 5: the 404 page itself is the styled, correct one.",
+      "evidence": [
+        "run3-22/frame-6.jpg",
+        "run3-22/shot-5.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/repo/editor.go#L331-L334",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/services/context/repo.go#L794",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/options/locale/locale_en-US.ini#L1370"
+      ]
+    }
+  ],
+  "rejections": [
+    {
+      "kind": "false-positive",
+      "label": "False positive (agent was wrong)",
+      "count": 1,
+      "bugs": [
+        "repository-code-20"
+      ]
+    },
+    {
+      "kind": "unsupported-input",
+      "label": "Address or input the app never produces",
+      "count": 2,
+      "bugs": [
+        "repository-code-17",
+        "repository-code-24"
+      ]
+    },
+    {
+      "kind": "product-decision",
+      "label": "Product decision (real behaviour Gitea chose on purpose)",
+      "count": 5,
+      "bugs": [
+        "repository-code-3",
+        "repository-code-4",
+        "repository-code-5",
+        "repository-code-21",
+        "repository-code-22"
+      ]
+    }
+  ]
+}

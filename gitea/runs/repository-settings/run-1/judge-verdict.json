@@ -1,0 +1,329 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "gitea/areas/repository-settings",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "a209371f7dd4ef9c8aa5278551ec2d9504eedf0c105c6a8f30cf1bc0293aafa4",
+    "known_invalid_sha256": "95a9f368681a50ab5f25123133625791908fadeedd5b61b6653423271302ff4c",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "50",
+    "bugs": "22",
+    "flags": "0",
+    "known_hits": "8",
+    "extra_known_hits": "0",
+    "unverified": "10",
+    "outside_area_known_hits": "2",
+    "outside_area_known_invalid": "1",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "0.6666666666666666",
+    "outside_area_ground_truth_sha256": "47db07b83af13b7c7dd75acd1b523ed86e8107b60e6f33878e8fb5b68a2acbe2",
+    "outside_area_known_invalid_sha256": "72e79c4023c85c9101fbf2b7613d3daf78b07fded510d117ab5b26f6ac3103f9",
+    "duplicates": "0",
+    "duplicate_known_hits": "0",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "1",
+    "known_misses": "1",
+    "precision": "0.8888888888888888",
+    "recall": "0.16",
+    "findings_per_minute": "0.8019611595629312",
+    "correct_findings_per_minute": "0.2916222398410659",
+    "severity_1": "2",
+    "severity_3": "5",
+    "severity_5": "1",
+    "severity_sum": "22",
+    "score": "21",
+    "duration_seconds": "1645.965",
+    "partial": "false",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 0,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Same invalid tag glob exposes form.NamePattern instead of the Tag Pattern label."
+      },
+      {
+        "groundTruthIndex": 22,
+        "reproStepsIndex": null,
+        "findingIndex": 3,
+        "reason": "Same whitespace-only tag pattern accepted as a blank rule, but reached through creation rather than editing."
+      },
+      {
+        "groundTruthIndex": 15,
+        "reproStepsIndex": 0,
+        "findingIndex": 4,
+        "reason": "Same empty avatar submission exposes the Avatar.Open filesystem error."
+      },
+      {
+        "groundTruthIndex": 1,
+        "reproStepsIndex": 0,
+        "findingIndex": 6,
+        "reason": "Same malformed branch glob produces a 500 while nevertheless persisting the rule."
+      },
+      {
+        "groundTruthIndex": 28,
+        "reproStepsIndex": 0,
+        "findingIndex": 10,
+        "reason": "Same archived wiki editor remains available through its URL and returns a full-page 404 on save."
+      },
+      {
+        "groundTruthIndex": 10,
+        "reproStepsIndex": null,
+        "findingIndex": 13,
+        "reason": "Same branch-rule validation failure discards the entered policy, but triggered by empty status-check patterns rather than negative approvals."
+      },
+      {
+        "groundTruthIndex": 29,
+        "reproStepsIndex": null,
+        "findingIndex": 15,
+        "reason": "Same whitespace-only branch pattern saves a blank rule, but through Add New Rule rather than editing an existing rule."
+      },
+      {
+        "groundTruthIndex": 30,
+        "reproStepsIndex": 0,
+        "findingIndex": 20,
+        "reason": "Same archived issue detail offers New Issue, which opens a 404 page."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 8,
+        "reproStepsIndex": 0,
+        "findingIndex": 11,
+        "reason": "Same rejected expectation that private visibility overrides an explicit public-access read grant. Anonymous Read also grants the observed signed-in non-member access."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 1,
+        "reason": "No entry covers the Website validation message exposing an internal field key."
+      },
+      {
+        "findingIndex": 2,
+        "reason": "Duplicate tag rules are not covered; the duplicate branch-rule overwrite is a different behavior."
+      },
+      {
+        "findingIndex": 5,
+        "reason": "No entry covers long tag patterns causing table overflow."
+      },
+      {
+        "findingIndex": 7,
+        "reason": "Reports retained Anonymous Read settings and conflicting badges, not the mandatory-sign-in omission or demonstrated non-member access covered by existing entries."
+      },
+      {
+        "findingIndex": 8,
+        "reason": "No entry covers wiki-data deletion being permitted on an archived repository."
+      },
+      {
+        "findingIndex": 9,
+        "reason": "No entry covers Escape failing to dismiss the branch-protection deletion dialog."
+      },
+      {
+        "findingIndex": 12,
+        "reason": "No entry covers disabling Wiki discarding its external URL and selected mode."
+      },
+      {
+        "findingIndex": 14,
+        "reason": "No entry covers authenticated settings being redisplayed from browser history after sign-out."
+      },
+      {
+        "findingIndex": 16,
+        "reason": "No entry covers collaborator search interpreting underscores and percent signs as wildcards."
+      },
+      {
+        "findingIndex": 17,
+        "reason": "No entry covers creation using an update success message; no existing rule is overwritten here."
+      },
+      {
+        "findingIndex": 18,
+        "reason": "No entry covers malformed mirror URLs receiving a misleading local-import permission message."
+      },
+      {
+        "findingIndex": 19,
+        "reason": "No entry covers a tag-protection user picker omitting an existing Write collaborator."
+      },
+      {
+        "findingIndex": 21,
+        "reason": "No entry covers invalid regular expressions being saved in External Issue Tracker settings."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 1,
+        "reason": "Describes incorrect validation wording without functional misbehavior."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "Duplicate submissions persist redundant protection rules, including after one is removed."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 1,
+        "reason": "Layout overflow requires horizontal scrolling but does not disable the controls."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 5,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 1,
+        "reason": "The described observation is conflicting labels and missing warning text; unauthorized access is not demonstrated."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 3,
+        "reason": "Describes a destructive operation succeeding despite the expected read-only restriction."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 1,
+        "reason": "A keyboard usability defect; the dialog remains dismissible through No."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 3,
+        "reason": "The claimed impact is unauthorized source-code access, a functional permission failure if valid."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 3,
+        "reason": "Saved configuration is lost and re-enabling selects a different wiki mode."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 3,
+        "reason": "Displays stale authenticated state and settings after logout; working unauthorized actions are not claimed."
+      },
+      {
+        "findingIndex": 15,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 16,
+        "severity": 3,
+        "reason": "Search returns incorrect matches instead of filtering by the entered text."
+      },
+      {
+        "findingIndex": 17,
+        "severity": 1,
+        "reason": "Only the success-message wording is incorrect."
+      },
+      {
+        "findingIndex": 18,
+        "severity": 1,
+        "reason": "The invalid input is rejected; the defect is misleading feedback."
+      },
+      {
+        "findingIndex": 19,
+        "severity": 3,
+        "reason": "The picker prevents selecting the intended user for tag protection."
+      },
+      {
+        "findingIndex": 20,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 21,
+        "severity": 3,
+        "reason": "An invalid expression is persisted as successful configuration, leaving matching nonfunctional."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [
+      {
+        "findingIndex": 1,
+        "reference": {
+          "name": "Profile Website validation error shows an internal field key",
+          "summary": "Saving the profile with an invalid Website URL shows an error banner that names the field with an internal translation key, form.Website\"Url\", instead of the readable field name.",
+          "expected": "The Website validation error names the field in readable language, for example 'Website is not a valid URL'.",
+          "actual": "Entering ftp://example.org (or a javascript: or mailto: value) in Website and clicking Update Profile showed the banner `form.Website\"Url\" is not a valid URL.` at both mobile and desktop widths.",
+          "reproSteps": [
+            [
+              "Open Settings > Profile.",
+              "Enter ftp://example.org in Website and click Update Profile.",
+              "Read the error banner at the top of the page."
+            ]
+          ],
+          "severity": 1
+        },
+        "reason": "The same Website validation error exposes the internal form.Website\"Url\" key, but through repository settings rather than profile settings."
+      },
+      {
+        "findingIndex": 21,
+        "reference": {
+          "name": "External issue tracker saves an invalid regular expression and reports success",
+          "summary": "In repository Settings, the External Issue Tracker's Regular Expression Pattern accepts a malformed pattern such as '[' and shows 'The repository settings have been updated.' Issue references then stop linking.",
+          "expected": "Saving an invalid regular expression is rejected with a validation message instead of a success message.",
+          "actual": "With Regular Expression mode and pattern '[', Update Settings showed 'The repository settings have been updated.' and the pattern was still saved after refresh. Malformed patterns such as '[', '(' or '[z-a]' make issue references like ISSUE-42, and even cross-repository PR references, render as plain text. A valid pattern links them.",
+          "reproSteps": [
+            [
+              "In a repository's Settings > Advanced Settings, choose Use External Issue Tracker and fill in the tracker URL and URL format.",
+              "Select the Regular Expression number format and enter '[' as the pattern.",
+              "Click Update Settings, read the message, and refresh to check the saved pattern."
+            ]
+          ],
+          "severity": 3
+        },
+        "reason": "Matches saving the malformed external issue-tracker regex '[' with success feedback and persistence after reload, using the same settings flow."
+      }
+    ],
+    "knownInvalid": [
+      {
+        "findingIndex": 12,
+        "reference": {
+          "name": "Switching external issue tracker to built-in deletes saved external URL, format and regex configuration",
+          "summary": "The report says that after saving an external issue tracker configuration and then switching the repository to the built-in issue tracker, switching back to the external tracker shows the earlier URL, URL format and regex cleared.",
+          "expected": "The reported expectation is that the external tracker's URL, format and regex are kept while the built-in tracker is in use, and reappear when switching back.",
+          "actual": "After switching to the built-in tracker and saving, then choosing the external tracker again, the external URL, URL format and regex fields were empty.",
+          "reproSteps": [
+            [
+              "In a repository's settings, choose the external issue tracker, fill in its URL, URL format and regex, and save.",
+              "Switch to the built-in issue tracker and save.",
+              "Choose the external issue tracker again and check its fields."
+            ]
+          ],
+          "reason": "Intended: the built-in and external issue trackers are separate repository units, and saving settings removes the unit that isn't in use, so the external tracker's settings are deleted by design rather than kept for later. The same applies to the external wiki."
+        },
+        "reason": "Matches the rejected loss of inactive external-unit configuration, which explicitly also applies to external wikis. Disabling Wiki is a different reproduction flow."
+      }
+    ],
+    "duplicates": []
+  }
+}

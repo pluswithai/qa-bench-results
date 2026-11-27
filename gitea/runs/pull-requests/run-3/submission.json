@@ -1,0 +1,122 @@
+{
+  "fixture": "gitea/areas/pull-requests",
+  "run": 3,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 392,
+      "name": "Files tab of a pull request whose branch is already in the target shows a blank page with the raw text \"after commit not found in PR commits\" (HTTP 400)",
+      "summary": "The page is blank white and shows the raw internal string 'after commit not found in PR commits' with no navigation, no message and no way on; the response status is HTTP 400. It happens every time this address is opened (load, reload and a fresh navigation). (on /eval/harbor-handbook/pulls/5/files)",
+      "expected": "The Files tab should render the normal page chrome with an empty diff or a readable message such as 'This branch is already included in the target branch', the way the Conversation tab does.",
+      "actual": "The page is blank white and shows the raw internal string 'after commit not found in PR commits' with no navigation, no message and no way on; the response status is HTTP 400. It happens every time this address is opened (load, reload and a fresh navigation).",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-i6dtbtklp3c8hdj643mx8.e2b.app/eval/harbor-handbook/pulls/5 (the pull request 'agent9-inline-comments: Document release captain and verification responsibilities', head branch docs/release-owners, base main).",
+        "Its conversation now says 'wants to merge 0 commits' and 'This branch is already included in the target branch. There is nothing to merge.' (the head branch was merged into main by another pull request).",
+        "Open the 'Files Changed' tab (https://5503-i6dtbtklp3c8hdj643mx8.e2b.app/eval/harbor-handbook/pulls/5/files).",
+        "Reload the same address."
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 579,
+      "name": "Pull request header says \"1 commits\" instead of \"1 commit\"",
+      "summary": "The line reads 'eval wants to merge 1 commits from docs/release-owners into main' (PR #8) and 'eval wants to merge 1 commits from agent12-b1 into main' (PR #9 and again after it was updated). With 2 commits it reads correctly ('2 commits'), so the singular form is never used. Same wrong plural on 2 different PRs. (on /eval/harbor-handbook/pulls/9 (also /pulls/8))",
+      "expected": "The header uses the singular for one commit: 'wants to merge 1 commit from agent12-b1 into main'.",
+      "actual": "The line reads 'eval wants to merge 1 commits from docs/release-owners into main' (PR #8) and 'eval wants to merge 1 commits from agent12-b1 into main' (PR #9 and again after it was updated). With 2 commits it reads correctly ('2 commits'), so the singular form is never used. Same wrong plural on 2 different PRs.",
+      "reproSteps": [
+        "Open https://5503-i6dtbtklp3c8hdj643mx8.e2b.app/eval/harbor-handbook/pulls/8 (a pull request with exactly one commit) or opens PR #9 before it was updated",
+        "Read the status line under the pull request title"
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 614,
+      "name": "A commit and its pull request list other users' files as changed by my commit",
+      "summary": "The commit page says \"4 changed files with 8 additions\" and lists agent12-main-note.md (content \"agent12 note committed directly to main to make the open PR out of date.\"), agent12-main-note2.md (content \"second agent12 note on main\") and docs/releases.md as added by my commit, though I only created docs/agent6-talk-1.md. The branch page for agent6-talk-1 attributes agent12-main-note.md and agent12-main-note2.md to the commit \"agent6 add talk test file\", and PR #15's header shows \"Commits 1\" beside \"Files Changed 4 / +8\". The PR merge box then reports \"This pull request has changes conflicting with the target branch: docs/releases.md\" — a file my commit never touched. (on /eval/harbor-handbook/commit/21d462fe29f38a869c65653fc1e38ddd69b29859 and /eval/harbor-handbook/pulls/15)",
+      "expected": "The commit adds exactly one file (docs/agent6-talk-1.md), so its page should say 1 changed file / 1 addition, the PR should show Commits 1 with Files Changed 1, and no conflict in a file I never touched.",
+      "actual": "The commit page says \"4 changed files with 8 additions\" and lists agent12-main-note.md (content \"agent12 note committed directly to main to make the open PR out of date.\"), agent12-main-note2.md (content \"second agent12 note on main\") and docs/releases.md as added by my commit, though I only created docs/agent6-talk-1.md. The branch page for agent6-talk-1 attributes agent12-main-note.md and agent12-main-note2.md to the commit \"agent6 add talk test file\", and PR #15's header shows \"Commits 1\" beside \"Files Changed 4 / +8\". The PR merge box then reports \"This pull request has changes conflicting with the target branch: docs/releases.md\" — a file my commit never touched.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-i6dtbtklp3c8hdj643mx8.e2b.app/eval/harbor-handbook/src/branch/main",
+        "Use Add File > New File (address /eval/harbor-handbook/_new/main/), name the file docs/agent6-talk-1.md, type the single line \"# agent6 talk test\", pick \"Create a new branch for this commit and start a pull request\" with branch name agent6-talk-1 and commit message \"agent6 add talk test file\", then click \"Propose file change\"",
+        "On the compare page fill the title \"agent6 discussion test PR\" and the body \"agent6 body **bold** check\" and click \"Create Pull Request\" (PR #15)",
+        "Read the pull request header tabs: \"Conversation 0\", \"Commits 1\" but \"Files Changed 4\" and \"+8\"",
+        "Open the commit 21d462fe29 (https://5503-i6dtbtklp3c8hdj643mx8.e2b.app/eval/harbor-handbook/commit/21d462fe29f38a869c65653fc1e38ddd69b29859) and read the changed-files summary and the file list",
+        "Open https://5503-i6dtbtklp3c8hdj643mx8.e2b.app/eval/harbor-handbook/src/branch/agent6-talk-1 and read the file list with its commit attribution",
+        "Return to PR #15 Conversation tab and read the merge box"
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 708,
+      "name": "Global /pulls with state=all lists only open pull requests while its counters say 2 Closed",
+      "summary": "The list shows only the open pull request 'agent7-life-2' (#19). The two closed pull requests (#22 merged, #7 closed) are missing although the page's counters read '1 Open' and '2 Closed'. The repository-level list /eval/harbor-handbook/pulls?q=agent7&state=all shows all three rows for the same filter, and /pulls?q=agent7&state=closed shows the two closed ones, so state=all behaves differently only on the global page. (on /pulls)",
+      "expected": "With state=all the result list should contain every pull request matching the search in every state: the open 'agent7-life-2' (#19) plus the two closed ones, 'agent7-merge-3: merge state check' (#22, merged) and 'agent7 lifecycle: Document release captain and verification responsibilities' (#7, closed) — exactly the numbers the page's own counters show (1 Open, 2 Closed), and the same rows the repository-level list returns for the same search and state.",
+      "actual": "The list shows only the open pull request 'agent7-life-2' (#19). The two closed pull requests (#22 merged, #7 closed) are missing although the page's counters read '1 Open' and '2 Closed'. The repository-level list /eval/harbor-handbook/pulls?q=agent7&state=all shows all three rows for the same filter, and /pulls?q=agent7&state=closed shows the two closed ones, so state=all behaves differently only on the global page.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Open https://5503-i6dtbtklp3c8hdj643mx8.e2b.app/pulls?q=agent7&state=all (search box value 'agent7', state=all).",
+        "Read the counters and the result list.",
+        "Compare with the repository page https://5503-i6dtbtklp3c8hdj643mx8.e2b.app/eval/harbor-handbook/pulls?q=agent7&state=all and with https://5503-i6dtbtklp3c8hdj643mx8.e2b.app/pulls?q=agent7&state=closed."
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 710,
+      "name": "Assigning a user to a pull request shows a checkmark but the assignee is never saved",
+      "summary": "The dropdown only puts a checkmark next to eval: the \\\"Assignees\\\" panel right below still reads \\\"No Assignees\\\", after a reload the PR still has \\\"No Assignees\\\", the /pulls row for #12 shows no assignee avatar, and \\\"Assigned to you\\\" stays 0. No error or message is shown. Tried 3 times (eval 3 times), same every time; a reload always shows no assignee. (on /eval/harbor-handbook/pulls/12)",
+      "expected": "The chosen user becomes the assignee: the \\\"Assignees\\\" panel shows eval, the pull request keeps the assignee after a reload, the PR row in /pulls shows the assignee's avatar, and the left sidebar entry \\\"Assigned to you\\\" counts 1 and lists this PR.",
+      "actual": "The dropdown only puts a checkmark next to eval: the \\\"Assignees\\\" panel right below still reads \\\"No Assignees\\\", after a reload the PR still has \\\"No Assignees\\\", the /pulls row for #12 shows no assignee avatar, and \\\"Assigned to you\\\" stays 0. No error or message is shown. Tried 3 times (eval 3 times), same every time; a reload always shows no assignee.",
+      "reproSteps": [
+        "Sign in as eval (eval / momentic-eval-1).",
+        "Open https://5503-i6dtbtklp3c8hdj643mx8.e2b.app/eval/harbor-handbook/pulls/12 (my PR \"agent5-pr-one: Add docs note\").",
+        "In the right sidebar click the gear icon next to \"Assignees\".",
+        "In the opened dropdown click the row \"eval\".",
+        "Read the \"Assignees\" panel in the same sidebar, then reload the page with the browser reload button.",
+        "Also open https://5503-i6dtbtklp3c8hdj643mx8.e2b.app/pulls?q=agent5&state=open and look at the PR row and at the left sidebar entry \"Assigned to you\"."
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 952,
+      "name": "Creating a pull request as a non-collaborator answers a garbled \\\"Push Failed … Review the Git Hooks\\\" error",
+      "summary": "A red toast says \\\"Push Failed: The push was rejected. Review the Git Hooks for this repository. You must be a collaborator to create pull request.\\\" The POST to /agent15org/agent15repo/compare/main...agent15-branch-2 answers 400 Bad Request and the console logs a failed resource; the form stays on screen with the title still filled in. Nothing was pushed and no pull request was created, so the \\\"Push Failed / Git Hooks\\\" wording describes an action that never happened. (on /agent15org/agent15repo/compare/main...agent15-branch-2)",
+      "expected": "Either no create form is offered to a user without write access (the compare page/button should say that alex cannot open a pull request in this repository), or the failure is stated plainly, e.g. \"You must be a collaborator to create pull request\", without mentioning push or Git hooks.",
+      "actual": "A red toast says \\\"Push Failed: The push was rejected. Review the Git Hooks for this repository. You must be a collaborator to create pull request.\\\" The POST to /agent15org/agent15repo/compare/main...agent15-branch-2 answers 400 Bad Request and the console logs a failed resource; the form stays on screen with the title still filled in. Nothing was pushed and no pull request was created, so the \\\"Push Failed / Git Hooks\\\" wording describes an action that never happened.",
+      "reproSteps": [
+        "Sign out of eval and sign in as alex (alex / momentic-contributor-1), who is not a member of the organization agent15org.",
+        "Open https://5503-i6dtbtklp3c8hdj643mx8.e2b.app/agent15org/agent15repo/compare/main...agent15-branch-2 (branch agent15-branch-2 of the public org repo agent15org/agent15repo against main).",
+        "Click the \"New Pull Request\" button to open the create form.",
+        "Type \"agent15-alex-pr third file\" in the Title field and click \"Create Pull Request\"."
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 1097,
+      "name": "At phone width the compare page's branch dropdown is wider than the screen and clips the long branch name",
+      "summary": "The open dropdown is wider than the 390px screen: the option \\\"eval:agentAE-a-deliberately-extremely-long-branch-name-for-wrapping-1\\\" is cut off at the right edge (only \\\"...-for-wra\\\" visible) and the whole page overflows sideways — scrolling the page right is the only way to read the end of the branch name, and the page stays shifted so the left of the compare form is then clipped. (on /eval/harbor-handbook/compare/main...agentAE-a-deliberately-extremely-long-branch-name-for-wrapping-1)",
+      "expected": "At phone width the branch dropdown should stay inside the screen and wrap or truncate the long branch name so the whole choice can be read without horizontal page scrolling.",
+      "actual": "The open dropdown is wider than the 390px screen: the option \\\"eval:agentAE-a-deliberately-extremely-long-branch-name-for-wrapping-1\\\" is cut off at the right edge (only \\\"...-for-wra\\\" visible) and the whole page overflows sideways — scrolling the page right is the only way to read the end of the branch name, and the page stays shifted so the left of the compare form is then clipped.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1, open https://5503-i6dtbtklp3c8hdj643mx8.e2b.app/eval/harbor-handbook/_new/main/, create the file docs/agentAE-longbranch.md with one line, choose \"Create a new branch for this commit and start a pull request\" with the branch name agentAE-a-deliberately-extremely-long-branch-name-for-wrapping-1 and click \"Propose file change\"",
+        "Set the browser to 390x844 and open https://5503-i6dtbtklp3c8hdj643mx8.e2b.app/eval/harbor-handbook/compare/main...agentAE-a-deliberately-extremely-long-branch-name-for-wrapping-1",
+        "Click the \"pull from: eval:agentAE-a-deliberately-extremely-long-branch-name-for-wrapping-1\" selector to open the branch dropdown",
+        "Read the first option in the dropdown and try to scroll the page sideways"
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 1251,
+      "name": "After signing out, the browser Back button still shows the private repository's pull request conversation and Files tab with the signed-in header and interactive controls",
+      "summary": "Both earlier pages come back from the browser's back-forward cache exactly as they were before signing out: the top-right still shows the signed-in eval avatar instead of \"Sign In\", the PR conversation still shows \"Owner\", \"Edit\", the merge box with \"Update branch by merge\" and the comment editor, and the Files tab still shows the full diff of all 3 files with \"1 / 3 files viewed\" and the Review button. Only a reload shows the truth — it redirects to /user/login, proving the session is gone and the pages are private-repository content. (on /eval/harbor-handbook/pulls/16)",
+      "expected": "After signing out, Back should not show the private repository's pull request pages with the signed-in header and working-looking controls; the person should get the sign-in page (or a clearly anonymous, read-only view) instead of cached authenticated content.",
+      "actual": "Both earlier pages come back from the browser's back-forward cache exactly as they were before signing out: the top-right still shows the signed-in eval avatar instead of \"Sign In\", the PR conversation still shows \"Owner\", \"Edit\", the merge box with \"Update branch by merge\" and the comment editor, and the Files tab still shows the full diff of all 3 files with \"1 / 3 files viewed\" and the Review button. Only a reload shows the truth — it redirects to /user/login, proving the session is gone and the pages are private-repository content.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-i6dtbtklp3c8hdj643mx8.e2b.app/eval/harbor-handbook/pulls/16 (also visit its Files Changed tab /files).",
+        "Open the avatar menu at the top right and click \"Sign Out\": the site returns to the signed-out home page.",
+        "Press the browser's Back button once: the pull request conversation /16 comes back fully rendered with the signed-in header, Owner badge, Edit button, merge box and comment editor.",
+        "Press Back again: the /16/files tab also comes back fully rendered with its diff and Review button. Reloading that address then redirects to /user/login."
+      ]
+    }
+  ]
+}

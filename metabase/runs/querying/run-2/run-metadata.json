@@ -1,0 +1,15 @@
+{
+  "fixture": "metabase/areas/querying",
+  "run": 2,
+  "started_at": "2026-11-23T22:32:26.464Z",
+  "duration_seconds": 1676.577,
+  "time_limit_seconds": 1800,
+  "stop_reason": "completed",
+  "credits": {
+    "total": 379,
+    "testing_team": 349,
+    "verification": 30,
+    "findings_verified": 5
+  },
+  "team_container_errors": 2
+}

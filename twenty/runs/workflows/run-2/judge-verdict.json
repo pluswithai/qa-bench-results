@@ -1,0 +1,264 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "twenty/areas/workflows",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "dfa253bb812141eb426e106fcf8dd61ff3995cc8e242d67029f7ac4c3dd81972",
+    "known_invalid_sha256": "5e7445e22776cbb32d97624bc512753b29c1806214d83e13d3450f5f181f2a5b",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "136",
+    "bugs": "21",
+    "flags": "0",
+    "known_hits": "5",
+    "extra_known_hits": "0",
+    "unverified": "12",
+    "outside_area_known_hits": "0",
+    "outside_area_known_invalid": "0",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "",
+    "outside_area_ground_truth_sha256": "f3456299419b269b88f0ddc32ec53ab80fbf3ec14a32ac6ae1366aa22bd3a43a",
+    "outside_area_known_invalid_sha256": "e51afd4a5be9203d46a29a1087513447454829f8cacf9feb7379d606574f27e1",
+    "duplicates": "0",
+    "duplicate_known_hits": "0",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "4",
+    "known_misses": "4",
+    "precision": "0.5555555555555556",
+    "recall": "0.03676470588235294",
+    "findings_per_minute": "0.6999525587710166",
+    "correct_findings_per_minute": "0.16665537113595633",
+    "severity_1": "2",
+    "severity_3": "3",
+    "severity_5": "0",
+    "severity_sum": "11",
+    "score": "7",
+    "duration_seconds": "1800.122",
+    "partial": "true",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 21,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Same Quick Lead duplication defect: copied nodes overlap persistently, obscuring otherwise retained actions."
+      },
+      {
+        "groundTruthIndex": 53,
+        "reproStepsIndex": 0,
+        "findingIndex": 2,
+        "reason": "Same desktop-to-mobile resize failure: the visible workflow graph disappears and reload restores it."
+      },
+      {
+        "groundTruthIndex": 29,
+        "reproStepsIndex": 0,
+        "findingIndex": 5,
+        "reason": "Same restoration path: loading the deleted workflow before Restore leaves its editor blank until reload."
+      },
+      {
+        "groundTruthIndex": 58,
+        "reproStepsIndex": 0,
+        "findingIndex": 6,
+        "reason": "Same creation-page refresh defect: an empty name editor commits over the saved name on a canvas click."
+      },
+      {
+        "groundTruthIndex": 5,
+        "reproStepsIndex": 0,
+        "findingIndex": 19,
+        "reason": "Same version See Runs defect: the selected version filter is omitted, and a fresh version-page load can also omit workflow scope."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 25,
+        "reproStepsIndex": 0,
+        "findingIndex": 7,
+        "reason": "Same rejected expectation that changing a Form field type must preserve its custom label and placeholder rather than initialize defaults."
+      },
+      {
+        "knownInvalidIndex": 16,
+        "reproStepsIndex": 0,
+        "findingIndex": 9,
+        "reason": "Same duplicate-label draft Test behavior: colliding output keys retain only the later answer; the reviewed claim was rejected as invalid configuration."
+      },
+      {
+        "knownInvalidIndex": 52,
+        "reproStepsIndex": 0,
+        "findingIndex": 11,
+        "reason": "Same rejected initial-draft discard claim: deletion is intentionally prohibited and the action reports that restriction."
+      },
+      {
+        "knownInvalidIndex": 54,
+        "reproStepsIndex": 0,
+        "findingIndex": 14,
+        "reason": "Matches the rejected negative-Delay editor-validation claim: negative durations can be saved, while execution validates the configuration."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 1,
+        "reason": "No reviewed entry covers incorrect start-time and executor fields on a failed run."
+      },
+      {
+        "findingIndex": 3,
+        "reason": "No reviewed entry covers the blank editor shown for a nonexistent workflow ID."
+      },
+      {
+        "findingIndex": 4,
+        "reason": "No reviewed entry covers live Workflows record sorting failing to change direction; saved group-sort reversion is different."
+      },
+      {
+        "findingIndex": 8,
+        "reason": "No reviewed entry covers Quick Lead dropping the submitted Job title from the created Person."
+      },
+      {
+        "findingIndex": 10,
+        "reason": "No reviewed entry covers the workflow row context menu extending beyond the viewport and making lower commands unreachable."
+      },
+      {
+        "findingIndex": 12,
+        "reason": "No reviewed entry covers truncated raw trigger configuration in the Version trigger field."
+      },
+      {
+        "findingIndex": 13,
+        "reason": "No reviewed entry covers saving an empty custom cron expression; rejected local edits and persisted fractional schedules are different claims."
+      },
+      {
+        "findingIndex": 15,
+        "reason": "No reviewed entry covers mailbox Reconnect navigating to a blank verification page."
+      },
+      {
+        "findingIndex": 16,
+        "reason": "No reviewed entry covers double-clicking Test starting two runs; duplicate event execution after restoration has a different cause and invocation path."
+      },
+      {
+        "findingIndex": 17,
+        "reason": "This concerns missing workflow record-search results, not the rejected claim about registering an activated manual workflow as a launch command."
+      },
+      {
+        "findingIndex": 18,
+        "reason": "No reviewed entry covers header Add a Node creating a disconnected action and allowing publication; edge-insertion disconnections are different."
+      },
+      {
+        "findingIndex": 20,
+        "reason": "No reviewed entry covers Duplicate Workflow rejecting a draft without a trigger; initial-draft discard restrictions are a separate behavior."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 3,
+        "reason": "The run displays incorrect execution metadata."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 5,
+        "reason": "The route displays an unusable empty page instead of a recoverable not-found state."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 3,
+        "reason": "Selecting Descending fails to apply the requested record ordering."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 3,
+        "reason": "The described behavior overwrites previously entered configuration values."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 3,
+        "reason": "Completed runs create records missing a supplied field value."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 3,
+        "reason": "One submitted answer is omitted from the completed output."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 3,
+        "reason": "Clipping prevents users from accessing offered menu actions."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 3,
+        "reason": "The offered Discard Draft action fails and leaves the draft unchanged."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 1,
+        "reason": "This is an unreadable configuration presentation, not a raw error dump or execution failure."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 3,
+        "reason": "The described validation failure replaces a saved schedule with an empty configuration."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 3,
+        "reason": "The claimed functional defect is accepting and persisting an invalid duration."
+      },
+      {
+        "findingIndex": 15,
+        "severity": 5,
+        "reason": "Reconnect opens a completely blank, unusable page."
+      },
+      {
+        "findingIndex": 16,
+        "severity": 3,
+        "reason": "The reported duplicate execution creates unwanted duplicate records."
+      },
+      {
+        "findingIndex": 17,
+        "severity": 3,
+        "reason": "Search fails to return existing records while returning older controls."
+      },
+      {
+        "findingIndex": 18,
+        "severity": 3,
+        "reason": "The added action remains unreachable and therefore does not execute."
+      },
+      {
+        "findingIndex": 19,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 20,
+        "severity": 3,
+        "reason": "The offered duplication action fails to create a copy."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

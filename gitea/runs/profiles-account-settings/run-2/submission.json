@@ -1,0 +1,207 @@
+{
+  "fixture": "gitea/areas/profiles-account-settings",
+  "run": 2,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 303,
+      "name": "Followers tab list does not update after Follow/Unfollow — count and list disagree until reload",
+      "summary": "Follow/Unfollow updates only the 'N Followers' counter in the sidebar; the followers list is left as it was. After Follow the counter says '1 Followers' while the list is empty (screenshot after follow), after Unfollow the counter says '0 Followers' while one follower card is still displayed (screenshot after unfollow). Only a full page reload brings the list in line with the count. (on /alex?tab=followers)",
+      "expected": "The followers list on the Followers tab is re-rendered together with the count: after Follow the new follower's card appears immediately, after Unfollow it disappears immediately, so the list and the 'N Followers' counter always agree.",
+      "actual": "Follow/Unfollow updates only the 'N Followers' counter in the sidebar; the followers list is left as it was. After Follow the counter says '1 Followers' while the list is empty (screenshot after follow), after Unfollow the counter says '0 Followers' while one follower card is still displayed (screenshot after unfollow). Only a full page reload brings the list in line with the count.",
+      "reproSteps": [
+        "Sign in as eval (username eval / password momentic-eval-1) and open https://5503-io7gkkxhkz5bckp0f49nq.e2b.app/alex?tab=followers (alex has 0 followers at this point).",
+        "Click the 'Follow' button under alex's profile card in the left sidebar.",
+        "The page re-renders: the sidebar counter now reads '1 Followers', but the followers list area to the right of the tab bar stays completely empty.",
+        "Reload the page (F5): eval's card now appears in the followers list, so the data exists.",
+        "With the list showing eval, click 'Unfollow': the counter goes back to '0 Followers' but eval's card is still listed in the followers area."
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 333,
+      "name": "Followers/Following list cards collapse to a narrow column at 390px and names break mid-word",
+      "summary": "At 390px each follower/following card is only about 115px wide (about a third of the content column) and the user name is broken in the middle of words: \"Ale x Riv era\" for Alex Rivera and \"Ma ya Che n\" for Maya Chen; the joined date wraps over three lines. At 768px the same card stays about 170px wide, far narrower than the content column. (on /maya?tab=followers and /alex?tab=following (user profile followers/following lists))",
+      "expected": "At 390px the follower/following card uses the full width of the content column (like the profile card above it), and the user name wraps only between words, so \"Alex Rivera\" and \"Maya Chen\" stay readable.",
+      "actual": "At 390px each follower/following card is only about 115px wide (about a third of the content column) and the user name is broken in the middle of words: \"Ale x Riv era\" for Alex Rivera and \"Ma ya Che n\" for Maya Chen; the joined date wraps over three lines. At 768px the same card stays about 170px wide, far narrower than the content column.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 on https://5503-io7gkkxhkz5bckp0f49nq.e2b.app/user/login",
+        "Open https://5503-io7gkkxhkz5bckp0f49nq.e2b.app/maya?tab=followers (Maya Chen's Followers tab, 1 row: Alex Rivera)",
+        "Set the browser window to a phone size, about 390 x 844 CSS pixels",
+        "Look at the follower card in the content area below Maya's profile card",
+        "Repeat with https://5503-io7gkkxhkz5bckp0f49nq.e2b.app/alex?tab=following at the same 390px width"
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 343,
+      "name": "Blocking a non-existent username returns a raw 500 Internal Server Error page",
+      "summary": "The whole app is replaced by the bare error page \\\"500 Internal Server Error / Gitea Version: 1.24.7\\\" and the console shows a failed request: POST /user/settings/blocked_users → 500. The settings navigation is gone; the person has to go back or reload to get out. (on /user/settings/blocked_users)",
+      "expected": "The page stays on Blocked users and says the user could not be found (or refuses the value next to the field); no account is blocked.",
+      "actual": "The whole app is replaced by the bare error page \\\"500 Internal Server Error / Gitea Version: 1.24.7\\\" and the console shows a failed request: POST /user/settings/blocked_users → 500. The settings navigation is gone; the person has to go back or reload to get out.",
+      "reproSteps": [
+        "Sign in as alex (username alex, password momentic-contributor-1).",
+        "Open the account settings Blocked users page: /user/settings/blocked_users (or Settings → Blocked users).",
+        "Type a username that does not exist, e.g. \"agent11-nonexistent\", into the \"Search users...\" field (do not pick anything from the autocomplete).",
+        "Click the red \"Block\" button."
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 349,
+      "name": "\"Update Avatar\" with no file chosen reports \"Your avatar has been updated.\" and changes nothing",
+      "summary": "The page shows the green success message \"Your avatar has been updated.\" although the file input still says \"No file chosen\". Nothing was uploaded: the avatar URL on /eval is unchanged (/avatars/51965088c5db83c3fd307f308d25198a) and the same generated identicon is still displayed on the profile card and in the top navigation. (on /user/settings)",
+      "expected": "The page should refuse the update and say that no image file was chosen (a message next to the file field), or do nothing; no success message should be shown, because there is no new image to save.",
+      "actual": "The page shows the green success message \"Your avatar has been updated.\" although the file input still says \"No file chosen\". Nothing was uploaded: the avatar URL on /eval is unchanged (/avatars/51965088c5db83c3fd307f308d25198a) and the same generated identicon is still displayed on the profile card and in the top navigation.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-io7gkkxhkz5bckp0f49nq.e2b.app/user/settings",
+        "Scroll to the Avatar section at the bottom of the Profile page",
+        "Tick the 'Use Custom Avatar' radio (leave the 'Choose new avatar' file input at 'No file chosen')",
+        "Click the 'Update Avatar' button",
+        "Read the green message at the top of the page",
+        "Open https://5503-io7gkkxhkz5bckp0f49nq.e2b.app/eval and look at the avatar in the profile card"
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 407,
+      "name": "Repository search treats SQL wildcards as wildcards: \"%\" and \"_\" match every repo",
+      "summary": "The query '%' returns the repository 'harbor-handbook' (and '_' returns every repo as well). The characters are sent as SQL LIKE wildcards instead of literal text, so a search that should match nothing lists repositories whose names/descriptions do not contain the searched text at all. URL after searching: /eval?tab=repositories&q=%25&sort=recentupdate. (on /eval?tab=repositories)",
+      "expected": "Searching for '%' (or '_') should find no repository, because no repository name or description contains that character; the page should show 'No matching results found.' like it does for any other non-matching query (e.g. 'zzz-no-match').",
+      "actual": "The query '%' returns the repository 'harbor-handbook' (and '_' returns every repo as well). The characters are sent as SQL LIKE wildcards instead of literal text, so a search that should match nothing lists repositories whose names/descriptions do not contain the searched text at all. URL after searching: /eval?tab=repositories&q=%25&sort=recentupdate.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-io7gkkxhkz5bckp0f49nq.e2b.app/eval?tab=repositories",
+        "In the 'Search repos...' box type a single '%' and press Enter (or click the magnifier)",
+        "Note the result list",
+        "Repeat with a single '_' as the query"
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 468,
+      "name": "Settings Repositories page 2 falsely says \"You do not own any repositories.\"",
+      "summary": "The page shows the empty-state text \"You do not own any repositories.\" although the account owns 11 repositories, all listed on page 1. (on /user/settings/repos)",
+      "expected": "An out-of-range page of the owned-repositories list should say that there is nothing on this page / show page 1 again, and must never claim the user owns no repositories while the previous page lists them.",
+      "actual": "The page shows the empty-state text \"You do not own any repositories.\" although the account owns 11 repositories, all listed on page 1.",
+      "reproSteps": [
+        "Sign in as eval (username eval, password momentic-eval-1).",
+        "The account owns repositories (e.g. eval/harbor-handbook and the agent10-* test repos created during this hunt).",
+        "Open https://5503-io7gkkxhkz5bckp0f49nq.e2b.app/user/settings/repos and confirm the list of owned repositories is shown.",
+        "Change the address to https://5503-io7gkkxhkz5bckp0f49nq.e2b.app/user/settings/repos?page=2 (an out-of-range page, no pagination control is offered)."
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 501,
+      "name": "Profile validation errors show internal field names (\"form.Name\", \"form.Website\\\"Url\\\"\") instead of the field label",
+      "summary": "The red banner shows internal validator names, not words for a person: setting the Username to \"BAD NAME!\" or \"-eval\" gives \"form.Name can only contain alphanumeric chars ('0'-'9','a'-'Z','A'-'Z'), dash ('-'), underscore ('_') and dot ('.'). It cannot begin or end with non-alphanumeric chars, and consecutive non-alphanumeric chars are also forbidden.\" and setting the Website to \"javascript:alert(1)\" gives \"form.Website\\\"Url\\\" is not a valid URL.\". The same form's taken-name error, by contrast, reads \"The username is already taken.\". (on /user/settings (Profile))",
+      "expected": "Rejected values produce a plain message naming the field as the label does (\"Username can only contain...\", \"The website address is invalid\"), as the taken-name error on the same form does.",
+      "actual": "The red banner shows internal validator names, not words for a person: setting the Username to \"BAD NAME!\" or \"-eval\" gives \"form.Name can only contain alphanumeric chars ('0'-'9','a'-'Z','A'-'Z'), dash ('-'), underscore ('_') and dot ('.'). It cannot begin or end with non-alphanumeric chars, and consecutive non-alphanumeric chars are also forbidden.\" and setting the Website to \"javascript:alert(1)\" gives \"form.Website\\\"Url\\\" is not a valid URL.\". The same form's taken-name error, by contrast, reads \"The username is already taken.\".",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-io7gkkxhkz5bckp0f49nq.e2b.app/user/settings",
+        "Type \"BAD NAME!\" in the Username field and submit with Enter (or click Update Profile)",
+        "Read the red error banner at the top of the form",
+        "Restore the Username to \"eval\", type \"javascript:alert(1)\" in the Website field and submit again",
+        "Read the red error banner"
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 504,
+      "name": "'Unblock' on a blocked user's profile does not unblock — it only opens the blocked-users settings page",
+      "summary": "The browser only navigates to /user/settings/blocked_users (a plain GET, no unblock request) and maya is still in the 'Blocked users' list with 'You have blocked this user.' on her profile — the user stays blocked. (on /maya (profile of a blocked user))",
+      "expected": "The 'Unblock' control unblocks the user: the blocked user disappears from /user/settings/blocked_users and the profile shows a normal profile with a Follow button.",
+      "actual": "The browser only navigates to /user/settings/blocked_users (a plain GET, no unblock request) and maya is still in the 'Blocked users' list with 'You have blocked this user.' on her profile — the user stays blocked.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1, open /user/settings/blocked_users, type maya in 'Search users...', pick the maya suggestion, then click 'Block'",
+        "Open /maya — the profile shows 'You have blocked this user.' and an 'Unblock' link at the bottom of the left column",
+        "Click 'Unblock'",
+        "Look at the page you land on (/user/settings/blocked_users): maya is still listed under 'Blocked users'",
+        "Open /maya again: it still says 'You have blocked this user.' and still offers 'Unblock'"
+      ]
+    },
+    {
+      "index": 8,
+      "reported_at_seconds": 507,
+      "name": "Profile RSS feed (/eval.rss) is served as text/html, so the browser shows escaped XML markup instead of the feed",
+      "summary": "The response is delivered with Content-Type text/html, so the browser prints the whole feed as escaped plain text: '&lt;?xml version=\"1.0\" ... &lt;title&gt;Feed of &#34;Agent1 Full Name&#34;&lt;/title&gt; ...'. A person clicking the profile's RSS link sees raw, escaped XML with no readable feed. (on /eval.rss)",
+      "expected": "The RSS feed opens as a feed/XML document (e.g. a browser XML tree or a feed view), as the 'RSS Feed' link promises.",
+      "actual": "The response is delivered with Content-Type text/html, so the browser prints the whole feed as escaped plain text: '&lt;?xml version=\"1.0\" ... &lt;title&gt;Feed of &#34;Agent1 Full Name&#34;&lt;/title&gt; ...'. A person clicking the profile's RSS link sees raw, escaped XML with no readable feed.",
+      "reproSteps": [
+        "Sign in as eval (username eval, password momentic-eval-1).",
+        "Open the profile /eval.",
+        "In the left profile card click the small RSS icon next to '0 Followers · 0 Following' (link /eval.rss).",
+        "Look at what the browser renders."
+      ]
+    },
+    {
+      "index": 9,
+      "reported_at_seconds": 548,
+      "name": "The \"admin\" badge overlaps and hides the user avatar in the top navigation",
+      "summary": "The blue \"admin\" label (span.navbar-profile-admin, box 1222,6 30×17) is drawn on top of the user's avatar image (24×24 at 1217,13), hiding its middle; only two dots of the generated avatar pattern show below the label. The accessibility tree flags the avatar as \"partly covered by span.navbar-profile-admin\". The same overlap occurs at 768 px (avatar at 705,13 24×24 under the label at 710,6). (on /eval)",
+      "expected": "The \"admin\" label and the user avatar sit next to each other in the account menu so that the whole avatar is visible.",
+      "actual": "The blue \"admin\" label (span.navbar-profile-admin, box 1222,6 30×17) is drawn on top of the user's avatar image (24×24 at 1217,13), hiding its middle; only two dots of the generated avatar pattern show below the label. The accessibility tree flags the avatar as \"partly covered by span.navbar-profile-admin\". The same overlap occurs at 768 px (avatar at 705,13 24×24 under the label at 710,6).",
+      "reproSteps": [
+        "Sign in as eval (an administrator account) and open https://5503-io7gkkxhkz5bckp0f49nq.e2b.app/eval at 1280 px width",
+        "Look at the account menu in the top-right corner of the navigation bar",
+        "Compare the avatar image and the blue 'admin' label",
+        "Repeat at a 768 px wide viewport"
+      ]
+    },
+    {
+      "index": 10,
+      "reported_at_seconds": 549,
+      "name": "Profile settings help text has a grammar error: \"Control how your profile is show to other users.\"",
+      "summary": "The description under the 'Public Profile' heading reads 'Control how your profile is show to other users.' — 'show' should be 'shown'. (on /user/settings)",
+      "expected": "A grammatically correct sentence, e.g. 'Control how your profile is shown to other users.'",
+      "actual": "The description under the 'Public Profile' heading reads 'Control how your profile is show to other users.' — 'show' should be 'shown'.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-io7gkkxhkz5bckp0f49nq.e2b.app/user/settings (or choose Settings from the account menu).",
+        "Read the help text directly under the 'Public Profile' panel heading, above the Username field."
+      ]
+    },
+    {
+      "index": 11,
+      "reported_at_seconds": 596,
+      "name": "Contribution counter says \"1 contributions in the last 12 months\"",
+      "summary": "The text under the heatmap reads '1 contributions in the last 12 months' — plural form used with the number 1, so the page's own sentence is ungrammatical (and the same string is used for every count). (on /alex?tab=activity)",
+      "expected": "The count sentence should be singular for one contribution: '1 contribution in the last 12 months'.",
+      "actual": "The text under the heatmap reads '1 contributions in the last 12 months' — plural form used with the number 1, so the page's own sentence is ungrammatical (and the same string is used for every count).",
+      "reproSteps": [
+        "Sign in as eval.",
+        "Open the seeded contributor profile /alex.",
+        "Click the 'Public Activity' tab (or open /alex?tab=activity).",
+        "Read the text under the contribution heatmap: it says '1 contributions in the last 12 months'."
+      ]
+    },
+    {
+      "index": 12,
+      "reported_at_seconds": 815,
+      "name": "Location saved as spaces only leaves an empty location row (icon, no text) on the profile",
+      "summary": "The profile shows a location row that contains only the map-pin icon and no text (a blank line above the email row). The settings form also keeps the spaces: after saving, the Location field looks empty but its placeholder \"Share your approximate location with others\" is gone, because the field holds a whitespace value. The same test done on Full Name and Biography is handled: with \"   \" the profile correctly falls back to the username and shows no bio row, so Location is the inconsistent one. (on /maya (saved from /user/settings))",
+      "expected": "A whitespace-only Location is treated as empty: no location row on the profile (as already happens for a whitespace-only Biography and Full Name), and the settings field shows its placeholder again.",
+      "actual": "The profile shows a location row that contains only the map-pin icon and no text (a blank line above the email row). The settings form also keeps the spaces: after saving, the Location field looks empty but its placeholder \"Share your approximate location with others\" is gone, because the field holds a whitespace value. The same test done on Full Name and Biography is handled: with \"   \" the profile correctly falls back to the username and shows no bio row, so Location is the inconsistent one.",
+      "reproSteps": [
+        "Sign in as maya (password momentic-eval-1) and open https://5503-io7gkkxhkz5bckp0f49nq.e2b.app/user/settings (Profile).",
+        "In the Location field type only three spaces \" \" (keep Full Name, Biography and Website empty).",
+        "Click \"Update Profile\" and wait for \"Your profile has been updated.\"",
+        "Open https://5503-io7gkkxhkz5bckp0f49nq.e2b.app/maya and look at the profile card between the followers line and the email row."
+      ]
+    },
+    {
+      "index": 13,
+      "reported_at_seconds": 877,
+      "name": "A user who is blocked by someone can still follow them",
+      "summary": "The Follow button works: after the click the profile shows \"1 Followers\" and the button turns into \"Unfollow\", and the state survives a reload, so eval's account is now following alex even though alex has eval blocked. Nothing on the page says the follow was refused. The block therefore does not prevent the blocked user from following the blocker, contrary to the panel's own list of what blocking prevents. (on /alex)",
+      "expected": "Because alex blocks eval, eval must not be able to follow alex: the follow is refused with a message (as the Block panel states, blocking prevents \"following your account\"), and eval does not appear in alex's followers.",
+      "actual": "The Follow button works: after the click the profile shows \"1 Followers\" and the button turns into \"Unfollow\", and the state survives a reload, so eval's account is now following alex even though alex has eval blocked. Nothing on the page says the follow was refused. The block therefore does not prevent the blocked user from following the blocker, contrary to the panel's own list of what blocking prevents.",
+      "reproSteps": [
+        "Sign in as alex / momentic-contributor-1 and open https://5503-io7gkkxhkz5bckp0f49nq.e2b.app/user/settings/blocked_users — eval is in alex's 'Blocked users' list (the panel states blocking prevents 'following your account')",
+        "Sign out, sign in as eval / momentic-eval-1 and open https://5503-io7gkkxhkz5bckp0f49nq.e2b.app/alex",
+        "Click the 'Follow' button in alex's profile card",
+        "Reload the page"
+      ]
+    }
+  ]
+}

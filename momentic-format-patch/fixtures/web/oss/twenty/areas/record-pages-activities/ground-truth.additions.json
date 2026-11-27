@@ -1,0 +1,172 @@
+{
+  "bugs": [
+    {
+      "name": "Timeline sentences lose the record name when the label is empty (\"You updated 2 fields on\", \"was created by You\")",
+      "summary": "The title saves as empty (record shows the \\\"Untitled\\\" placeholder in the breadcrumb and header), and the Timeline entries lose the record name and read \\\"You updated 2 fields on\\\" (the \\\"on\\\" dangles) and \\\"was created by You\\\". The Title change entry also shows \\\"Title → Empty\\\". (on /object/note/14611a41-c44e-4294-9ac5-0acdaff3ffa8)",
+      "expected": "Either an empty title is refused/kept as the previous value, or the Timeline entries still read as a complete sentence with the record placeholder name, e.g. \\\"You updated 2 fields on Untitled\\\" and \\\"Untitled was created by You\\\".",
+      "actual": "The title saves as empty (record shows the \\\"Untitled\\\" placeholder in the breadcrumb and header), and the Timeline entries lose the record name and read \\\"You updated 2 fields on\\\" (the \\\"on\\\" dangles) and \\\"was created by You\\\". The Title change entry also shows \\\"Title → Empty\\\".",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open the note record /object/note/14611a41-c44e-4294-9ac5-0acdaff3ffa8 (\"agent9-note-UNSAVED\").",
+        "Click the Timeline tab so the timeline entries are visible.",
+        "Click the record title above \"Added ...\" and clear it completely with the keyboard.",
+        "Press Enter to save the empty title.",
+        "Look at the breadcrumb/header (shows \"Untitled\") and at the Timeline entries."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Note card body preview breaks ordinary words in the middle",
+      "summary": "The body preview in the note cards breaks words in the middle without any hyphen: \\\"...potential identified\\\" ends a line and its full stop starts the next one, \\\"market rea\\\" ends a line and \\\"ch and technical capabilities.\\\" continues on the next. Seen in the two-column layout at 1280 px wide and in the narrower one-column state, on every reload. (on /object/company/20202020-a305-41e7-8c72-ba44072a4c58 (Notes tab))",
+      "expected": "Words wrap at word boundaries (\\\"...potential identified. Complementary strengths in market reach and technical capabilities.\\\"); no word is split mid-word.",
+      "actual": "The body preview in the note cards breaks words in the middle without any hyphen: \\\"...potential identified\\\" ends a line and its full stop starts the next one, \\\"market rea\\\" ends a line and \\\"ch and technical capabilities.\\\" continues on the next. Seen in the two-column layout at 1280 px wide and in the narrower one-column state, on every reload.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open https://5500-ixmruf4hfnd9dnfal6vzl.e2b.app/object/company/20202020-a305-41e7-8c72-ba44072a4c58 at a 1280 px wide window.",
+        "Click the Notes tab.",
+        "Read the body text inside the note card \"Partnership Opportunity\"."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Emails tab clips participant names mid-word with no ellipsis, flush against the message count",
+      "summary": "In the sender column every name is cut in the middle of a word with no ellipsis and glued to the recipient-count badge, so rows read \\\"Workspace Membe 2\\\", \\\"Person 429, Alex J 2\\\", \\\"William Miller, Jame 2\\\", \\\"Maria Garcia, Mich 2\\\", \\\"John Smith, Works 2\\\", \\\"Person 403, Perso 2\\\". The full values are \\\"Workspace Member, Robert Taylor\\\", \\\"William Miller, James …\\\" etc. — the column just clips them, so the reader cannot tell which sender the mail is from. (on /object/company/20202020-a305-41e7-8c72-ba44072a4c58 (Emails tab))",
+      "expected": "The sender cell should show the sender readable — either the full name, or a clear ellipsis (\\\"Workspace Memb…\\\") — and be separated from the recipient count, so the name is distinguishable.",
+      "actual": "In the sender column every name is cut in the middle of a word with no ellipsis and glued to the recipient-count badge, so rows read \\\"Workspace Membe 2\\\", \\\"Person 429, Alex J 2\\\", \\\"William Miller, Jame 2\\\", \\\"Maria Garcia, Mich 2\\\", \\\"John Smith, Works 2\\\", \\\"Person 403, Perso 2\\\". The full values are \\\"Workspace Member, Robert Taylor\\\", \\\"William Miller, James …\\\" etc. — the column just clips them, so the reader cannot tell which sender the mail is from.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev at 1440 px",
+        "Open https://5500-ixmruf4hfnd9dnfal6vzl.e2b.app/object/company/20202020-a305-41e7-8c72-ba44072a4c58",
+        "Click the Emails tab (it lists 278 emails)",
+        "Read the first column of the rows: the sender names are cut mid-word with no ellipsis and run straight into the recipient count"
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Currency dropdown shows the code twice in every unselected option (\"UAE dirham (AED) (AED)\")",
+      "summary": "Every currency option repeats the code in brackets: \"UAE dirham (AED) (AED)\", \"Afghan afghani (AFN) (AFN)\", \"Albanian lek (ALL) (ALL)\", \"Armenian dram (AMD) (AMD)\". (on /object/company/20202020-a305-41e7-8c72-ba44072a4c58)",
+      "expected": "Each option names the currency once, e.g. \"UAE dirham (AED)\".",
+      "actual": "Every currency option repeats the code in brackets: \"UAE dirham (AED) (AED)\", \"Afghan afghani (AFN) (AFN)\", \"Albanian lek (ALL) (ALL)\", \"Armenian dram (AMD) (AMD)\".",
+      "reproSteps": [
+        "Open /object/company/20202020-a305-41e7-8c72-ba44072a4c58 (Google) at desktop width.",
+        "In the Fields panel, click the 'Annual Revenue' row to open its editor.",
+        "Open the currency dropdown that shows 'USD'.",
+        "Read the options in the list."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Hand-typed record address /object/company/does-not-exist shows an empty record shell and \"Invalid value for UUID\" toasts",
+      "summary": "The app renders an empty ghost record page: the header shows \\\"Companies / Untitled (0/0)\\\", a skeleton avatar and title, an empty Fields panel with grey placeholders (Domain Name, Account Owner, Annual Revenue, Address, LinkedIn, Creation date, Created by), the full tab set (Timeline/Tasks/Notes/Files/Emails/Calendar), \\\"Send Email\\\" in the top bar and \\\"No activity yet\\\" — as if a real record existed. Over the bottom-right corner it stacks raw error toasts reading `Invalid value for UUID: \\\"does-not-exist\\\"` (three of them, one per failed request). There is no \\\"record not found\\\" message and no way back. (on /object/company/does-not-exist)",
+      "expected": "The page says the record was not found (or is invalid) with a way back to the Companies list, and does not show an editable empty record with raw `Invalid value for UUID: \"does-not-exist\"` error toasts.",
+      "actual": "The app renders an empty ghost record page: the header shows \\\"Companies / Untitled (0/0)\\\", a skeleton avatar and title, an empty Fields panel with grey placeholders (Domain Name, Account Owner, Annual Revenue, Address, LinkedIn, Creation date, Created by), the full tab set (Timeline/Tasks/Notes/Files/Emails/Calendar), \\\"Send Email\\\" in the top bar and \\\"No activity yet\\\" — as if a real record existed. Over the bottom-right corner it stacks raw error toasts reading `Invalid value for UUID: \\\"does-not-exist\\\"` (three of them, one per failed request). There is no \\\"record not found\\\" message and no way back.",
+      "reproSteps": [
+        "Open the address https://5500-ixmruf4hfnd9dnfal6vzl.e2b.app/object/company/does-not-exist in the signed-in tab.",
+        "Wait for the page to load and read the header, the Fields panel and the bottom-right corner."
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Note card Relations row hard-clips the second chip and hides further relations with no \"+N\"",
+      "summary": "The Relations row keeps all chips on one line without wrapping: the second chip is cut mid-name at the card's right edge (\"J Jeffery Grif\" at 1440, \"J Jeffery Gri\" at 390) and the third related person (\"Lee Jones\") is completely invisible — the third chip has zero width and is clipped by the card's overflow. Nothing indicates there are more relations and no way to reach them from the card. (on /object/company/20202020-a305-41e7-8c72-ba44072a4c58)",
+      "expected": "All related records of the note are readable in the card's Relations row — the chips wrap onto a new line, or the overflow is summarised (e.g. \"+1\") with a way to see the rest.",
+      "actual": "The Relations row keeps all chips on one line without wrapping: the second chip is cut mid-name at the card's right edge (\"J Jeffery Grif\" at 1440, \"J Jeffery Gri\" at 390) and the third related person (\"Lee Jones\") is completely invisible — the third chip has zero width and is clipped by the card's overflow. Nothing indicates there are more relations and no way to reach them from the card.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open the company record https://5500-ixmruf4hfnd9dnfal6vzl.e2b.app/object/company/20202020-a305-41e7-8c72-ba44072a4c58",
+        "Open the record's Notes tab (on a desktop width the tab is in the tab bar; at phone width open '+4 More' in the tab bar and choose 'Notes')",
+        "Look at the bottom Relations row of the first note card, which is related to Google and to the people Jeffery Griffin and Lee Jones"
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Body field editor on a task/note record opens above the top of the window: blank white panel, text invisible while editing",
+      "summary": "The popover renders as a large empty white rectangle. The editable area is positioned above the viewport (its element sits at y=-20, outside the popover), so the existing body text and anything typed are invisible while editing. The text is saved (it appears in the Body row after Escape) but cannot be seen or edited while the editor is open. (on /object/task/2226cb47-d514-4d17-936c-241f8da11c8a (task record page))",
+      "expected": "The Body editor popover should show the field's current text and the caret where I type, so the person can read and edit the body.",
+      "actual": "The popover renders as a large empty white rectangle. The editable area is positioned above the viewport (its element sits at y=-20, outside the popover), so the existing body text and anything typed are invisible while editing. The text is saved (it appears in the Body row after Escape) but cannot be seen or edited while the editor is open.",
+      "reproSteps": [
+        "Go to /objects/tasks and click '+ New Task' to open the record side panel, type the title 'agent11-task-alpha'.",
+        "Click 'Open Ctrl+⏎' at the bottom right of the panel to open the task record page.",
+        "In the left 'Fields' panel click the 'Body' row (once to focus, a second time to open the editor).",
+        "A large white popover appears over the page with no placeholder, no caret and no text.",
+        "Type 'agent11 body text line one.' — nothing appears in the white area.",
+        "Press Escape: the Body row now shows 'agent11 body text line one.', proving the text was entered.",
+        "Click the Body value again twice: the same blank white popover opens and the existing body text is still not shown."
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Tasks tab rows with the side panel open: due date runs into the card border and the relation chip disappears",
+      "summary": "The due date text runs into the card's right border and is cut mid-value, and the relation chip that is shown on the same row at full width is gone. Text is clipped without an ellipsis. (on /object/company/20202020-a305-41e7-8c72-ba44072a4c58#77c258a2-14d5-45eb-8cb2-464adcd4684f)",
+      "expected": "Task row content adapts to the narrower column: the title truncates with an ellipsis as it does, and the due date and relation chip either stay readable or are hidden deliberately as whole elements, never cut in half.",
+      "actual": "The due date text runs into the card's right border and is cut mid-value, and the relation chip that is shown on the same row at full width is gone. Text is clipped without an ellipsis.",
+      "reproSteps": [
+        "Sign in with tim@apple.dev / tim@apple.dev and open https://5500-i2bvhtm4sxq8s677s7h83.e2b.app/object/company/20202020-a305-41e7-8c72-ba44072a4c58 at a 1280x720 window",
+        "Open the Tasks tab",
+        "Note a task row that shows a due date plus the Google relation chip (e.g. 'Dec 4, 2026 Google')",
+        "Click that row (or any row) so the record side panel opens on the right and the tabs column becomes ~240px wide",
+        "Look at the task rows: the due date is cut off in the middle of the value ('Nov 30, 2026' loses its last digit at the card border, 'Nov 28, 2026' likewise) and the Google relation chip that was on the same row disappears"
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Body field row on a note/task is hard-clipped at the panel edge with no ellipsis",
+      "summary": "The Body row prints the whole body text on a single line that runs past the panel's right edge (and the window edge) and stops mid-word with no ellipsis, e.g. 'agent3 body check: <b>x</b> & \"quotes' — the rest of the body cannot be read there. (on /object/company/20202020-a305-41e7-8c72-ba44072a4c58#d2577f0c-79eb-4a2f-8988-b975694a6cae)",
+      "expected": "The Body preview truncates with an ellipsis (or wraps) inside the panel, like the other field rows, so the panel stays readable.",
+      "actual": "The Body row prints the whole body text on a single line that runs past the panel's right edge (and the window edge) and stops mid-word with no ellipsis, e.g. 'agent3 body check: <b>x</b> & \"quotes' — the rest of the body cannot be read there.",
+      "reproSteps": [
+        "Sign in with tim@apple.dev / tim@apple.dev and open the company record https://5500-i2bvhtm4sxq8s677s7h83.e2b.app/object/company/20202020-a305-41e7-8c72-ba44072a4c58 at a 1280x720 window",
+        "Open the Notes tab and click the note titled 'agent3 note title' (body text: 'agent3 body check: <b>x</b> & \"quotes\" José 100% _x_ 1234567890...')",
+        "Look at the Fields section of the note side panel on the right: the Body row shows the body text on one line running out of the panel"
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Timeline field-update card clips the value chip mid-word with no ellipsis at 768 px and below",
+      "summary": "In the Timeline activity card the chip under \\\"Domain Name\\\" stops mid-word: it reads \\\"agent15-domain-one.te\\\" (last character cut, no ellipsis), and at 390px it reads \\\"agent15-domain-one.te:\\\" — the value is clipped by the card edge instead of wrapping or being truncated with \\\"…\\\". (on /object/company/b381b6a6-27e2-4480-8276-c1afbc2f76c5 (record page, Timeline tab))",
+      "expected": "The chip shows the whole saved value (\\\"agent15-domain-one.test\\\") or is truncated with an ellipsis, and stays inside the activity card at tablet and phone widths.",
+      "actual": "In the Timeline activity card the chip under \\\"Domain Name\\\" stops mid-word: it reads \\\"agent15-domain-one.te\\\" (last character cut, no ellipsis), and at 390px it reads \\\"agent15-domain-one.te:\\\" — the value is clipped by the card edge instead of wrapping or being truncated with \\\"…\\\".",
+      "reproSteps": [
+        "Sign in with tim@apple.dev / tim@apple.dev and open https://5500-i2bvhtm4sxq8s677s7h83.e2b.app/object/company/b381b6a6-27e2-4480-8276-c1afbc2f76c5 (company \"agent15-testco\").",
+        "On the record, double-click the \"Domain Name\" value cell in the Fields panel, type \"agent15-domain-one.test\" and press Enter.",
+        "Open the record's \"Timeline\" tab.",
+        "Look at the activity card \"You updated 2 fields on agent15-testco\" and read the value next to \"Domain Name\".",
+        "Set the window to 768x1024 and then 390x844 and look at the same chip."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Long record name takes the whole record header: the three-dot button is drawn over the record counter and the favorite / previous / next buttons leave the header",
+      "summary": "The breadcrumb grows to the full window width, its title is cut with no ellipsis, the position counter is clipped to \"(1,807/1,815\" at the window edge, and the record header actions that were visible before (Add to Favorites star, previous/next record arrows, Command Menu ⋮) are pushed off screen and are no longer in the page's accessibility tree either. Renaming the record back to a short title brings all of them back. (on /object/note/ae62af53-946b-414b-9b2d-3871d32e8486)",
+      "expected": "A long record name is truncated with an ellipsis inside the breadcrumb (or wraps), and the header action buttons plus the record counter stay visible and clickable, as they are with a short name.",
+      "actual": "The breadcrumb grows to the full window width, its title is cut with no ellipsis, the position counter is clipped to \"(1,807/1,815\" at the window edge, and the record header actions that were visible before (Add to Favorites star, previous/next record arrows, Command Menu ⋮) are pushed off screen and are no longer in the page's accessibility tree either. Renaming the record back to a short title brings all of them back.",
+      "reproSteps": [
+        "Sign in with tim@apple.dev / tim@apple.dev and open the note record https://5500-i2bvhtm4sxq8s677s7h83.e2b.app/object/note/ae62af53-946b-414b-9b2d-3871d32e8486 at a 1280x720 window ('agent3 note title')",
+        "Note the header right side shows the favourite star, the previous/next record arrows and the ⋮ Command Menu button",
+        "Click the note title heading, select all and type a 200-character unbroken title: agent3 followed by 200 'x' characters, then press Enter",
+        "The breadcrumb becomes 'Notes / agent3xxxx…' and runs to the window edge: the counter is clipped to '(1,807/1,815' and the star, previous/next arrows and ⋮ button are gone",
+        "Click the title, replace it with 'agent3 note title' and press Enter: the counter and all the header buttons come back"
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Standard field label is spelled \"Linkedin\" instead of \"LinkedIn\"",
+      "summary": "Both the field label and its empty placeholder read \"Linkedin\" (lowercase second i); the platform's name is \"LinkedIn\". The same spelling appears as the column header in the Companies list. (on /object/company/53a4a890-5548-4c50-97a3-3458d43384ce)",
+      "expected": "The field is labelled \"LinkedIn\", like the platform it links to.",
+      "actual": "Both the field label and its empty placeholder read \"Linkedin\" (lowercase second i); the platform's name is \"LinkedIn\". The same spelling appears as the column header in the Companies list.",
+      "reproSteps": [
+        "Sign in with tim@apple.dev / tim@apple.dev and open https://5500-i2bvhtm4sxq8s677s7h83.e2b.app/object/company/53a4a890-5548-4c50-97a3-3458d43384ce",
+        "Look at the Contact section of the Fields panel: the field label is 'Linkedin' and its empty value placeholder is also 'Linkedin'",
+        "Open /objects/companies: the same column header reads 'Linkedin'"
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Calendar events list shows the internal value \"FIELD_RESTRICTED_ADDITIONAL_PERMISSIONS_REQUIRED\" as the event title",
+      "summary": "At least 10 rows in the first screenful of the list show the event title as \\\"FIELD_RESTRICTED_AD…\\\" (full value \\\"FIELD_RESTRICTED_ADDITIONAL_PERMISSIONS_REQUIRED\\\" in the list data), e.g. the events on Aug 6 2026 11:00 AM, Jun 21 2026 11:45 AM, Feb 26 2027 3:00 PM, Jul 2 2026 2:45 PM, Mar 17 2027 2:00 PM, Jan 18 2027 10:00 AM. An internal permission constant is shown to the user in place of an event name. (on /objects/calendarEvents)",
+      "expected": "Every event row shows a real event name (like \\\"Team Standup\\\", \\\"Client Presentation\\\"); an internal permission constant is never rendered as a record title.",
+      "actual": "At least 10 rows in the first screenful of the list show the event title as \\\"FIELD_RESTRICTED_AD…\\\" (full value \\\"FIELD_RESTRICTED_ADDITIONAL_PERMISSIONS_REQUIRED\\\" in the list data), e.g. the events on Aug 6 2026 11:00 AM, Jun 21 2026 11:45 AM, Feb 26 2027 3:00 PM, Jul 2 2026 2:45 PM, Mar 17 2027 2:00 PM, Jan 18 2027 10:00 AM. An internal permission constant is shown to the user in place of an event name.",
+      "reproSteps": [
+        "Open https://5500-i45u0h4ud1r3um0mrduul.e2b.app/objects/calendarEvents while signed in as tim@apple.dev.",
+        "Read the Title column of the list (no clicking needed)."
+      ],
+      "severity": 3
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "fixture": "metabase/areas/admin",
+  "run": 3,
+  "started_at": "2026-11-23T22:55:34.035Z",
+  "duration_seconds": 1529.27,
+  "time_limit_seconds": 1800,
+  "stop_reason": "completed",
+  "credits": {
+    "total": 563,
+    "testing_team": 437,
+    "verification": 126,
+    "findings_verified": 21
+  },
+  "team_container_errors": 0
+}

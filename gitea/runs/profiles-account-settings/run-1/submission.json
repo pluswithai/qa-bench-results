@@ -1,0 +1,184 @@
+{
+  "fixture": "gitea/areas/profiles-account-settings",
+  "run": 1,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 183,
+      "name": "Profile save error shows a raw translation key: \"form.Website\"Url\" is not a valid URL.\"",
+      "summary": "The red error banner above the form shows the untranslated template key with stray quotes: form.Website\"Url\" is not a valid URL. (on /user/settings)",
+      "expected": "A readable validation message naming the field, e.g. \"Website is not a valid URL.\"",
+      "actual": "The red error banner above the form shows the untranslated template key with stray quotes: form.Website\"Url\" is not a valid URL.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1",
+        "Open https://5503-ibar5w2u23qskgb6cuz7t.e2b.app/user/settings",
+        "In the Website field type javascript:alert(1)",
+        "Click Update Profile"
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 211,
+      "name": "Blocking a non-existent username replaces the settings page with a 500 Internal Server Error",
+      "summary": "The POST /user/settings/blocked_users returns 500 and the whole page is replaced by a bare '500 Internal Server Error' page (Gitea Version: 1.24.7) with a link out to GitHub; the user is thrown out of their settings flow with no way back except the browser. (on /user/settings/blocked_users)",
+      "expected": "The page should stay on the Blocked users settings page and show a readable message such as 'The user does not exist', leaving the blocked list unchanged.",
+      "actual": "The POST /user/settings/blocked_users returns 500 and the whole page is replaced by a bare '500 Internal Server Error' page (Gitea Version: 1.24.7) with a link out to GitHub; the user is thrown out of their settings flow with no way back except the browser.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /user/settings/blocked_users",
+        "Type 'zzz-not-a-user-11' into the 'Search users...' field (no autocomplete suggestion appears)",
+        "Click the red 'Block' button"
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 221,
+      "name": "\"Update Avatar\" with no file chosen reports \"Your avatar has been updated.\" although nothing was uploaded",
+      "summary": "The page redirects back to /user/settings with the green success band \"Your avatar has been updated.\" although no file was chosen. The avatar is unchanged on /eval (still the default identicon) — a success message with nothing behind it. (on /user/settings)",
+      "expected": "The page should refuse the empty submission with an error next to the avatar field (e.g. that no image file was chosen), and no success message should appear.",
+      "actual": "The page redirects back to /user/settings with the green success band \"Your avatar has been updated.\" although no file was chosen. The avatar is unchanged on /eval (still the default identicon) — a success message with nothing behind it.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-ibar5w2u23qskgb6cuz7t.e2b.app/user/settings",
+        "Scroll down to the Avatar section (\"Choose new avatar\" file input shows \"No file chosen\")",
+        "Click the \"Update Avatar\" button without choosing any file",
+        "Read the green confirmation band at the top and then open /eval to see the avatar"
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 252,
+      "name": "Followers list does not update after clicking Follow/Unfollow on the profile page",
+      "summary": "The counter changes to \\\"1 Followers\\\" and the button changes to \\\"Unfollow\\\", but the Followers list stays empty (no follower card) until the page is reloaded. The reverse also happens: clicking \\\"Unfollow\\\" on /maya?tab=followers changes the counter to \\\"0 Followers\\\" but the removed follower José Müller is still listed. In both cases count and list contradict each other until a manual reload. (on /maya?tab=followers)",
+      "expected": "The folllowers count becomes 1 and Maya Chen's followers list immediately shows the new follower (José Müller / eval), so the count and the list agree.",
+      "actual": "The counter changes to \\\"1 Followers\\\" and the button changes to \\\"Unfollow\\\", but the Followers list stays empty (no follower card) until the page is reloaded. The reverse also happens: clicking \\\"Unfollow\\\" on /maya?tab=followers changes the counter to \\\"0 Followers\\\" but the removed follower José Müller is still listed. In both cases count and list contradict each other until a manual reload.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Open https://5503-ibar5w2u23qskgb6cuz7t.e2b.app/maya (Maya Chen).",
+        "If the sidebar button says \"Unfollow\", click it and reload the page so Maya Chen shows \"0 Followers\" and the button says \"Follow\", then open https://5503-ibar5w2u23qskgb6cuz7t.e2b.app/maya?tab=followers (the Followers list is empty).",
+        "Click \"Follow\" in the left sidebar of that page.",
+        "Look at the \"Followers\" list on the right."
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 284,
+      "name": "Out-of-range page on account settings Repositories says \"Du besitzt keine Repositories\" although the account owns repositories",
+      "summary": "The panel shows the empty-state text \"Du besitzt keine Repositories.\" (\"You do not own any repositories\") even though the account owns 3 repositories, and no pagination or link is shown to return to the list. The same happened before the other repos existed, when eval owned 1 repository. (on /user/settings/repos)",
+      "expected": "A page past the end of the list should either show the first/last valid page, or an empty page that says this page has no more entries, with the pagination control still visible so the user can get back. It must not claim the account owns no repositories when it owns three.",
+      "actual": "The panel shows the empty-state text \"Du besitzt keine Repositories.\" (\"You do not own any repositories\") even though the account owns 3 repositories, and no pagination or link is shown to return to the list. The same happened before the other repos existed, when eval owned 1 repository.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Open https://5503-ibar5w2u23qskgb6cuz7t.e2b.app/user/settings/repos — the list shows the owned repositories (eval/agent13-alpha, eval/agent13-zebra, eval/harbor-handbook).",
+        "Change the address to https://5503-ibar35w2u23qskgb6cuz7t.e2b.app/user/settings/repos?page=2 (append ?page=2)."
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 303,
+      "name": "Typo in Public Profile description: \"your profile is show to other users\"",
+      "summary": "The paragraph reads \"Control how your profile is show to other users.\" — the word \"shown\" is missing its final \"n\", so the sentence is grammatically broken. (on /user/settings)",
+      "expected": "\"Control how your profile is shown to other users.\"",
+      "actual": "The paragraph reads \"Control how your profile is show to other users.\" — the word \"shown\" is missing its final \"n\", so the sentence is grammatically broken.",
+      "reproSteps": [
+        "Sign in as eval",
+        "Open https://5503-ibar5w2u23qskgb6cuz7t.e2b.app/user/settings",
+        "Read the first paragraph under the heading Public Profile"
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 309,
+      "name": "Follow on a profile that blocked you shows a raw technical error toast and does nothing",
+      "summary": "A red toast appears with the raw technical text \\\"Error 400 when calling /maya?action=follow\\\"; the button stays on \\\"Follow\\\" and nothing else changes. The network request POST /maya?action=follow returns 400 and the console shows \\\"Response Status Error Code 400 from /maya?action=follow\\\". (on /maya)",
+      "expected": "A clear message that following this user is not possible (e.g. \\\"You cannot follow this user\\\" / the button disabled or hidden), and the button state unchanged.",
+      "actual": "A red toast appears with the raw technical text \\\"Error 400 when calling /maya?action=follow\\\"; the button stays on \\\"Follow\\\" and nothing else changes. The network request POST /maya?action=follow returns 400 and the console shows \\\"Response Status Error Code 400 from /maya?action=follow\\\".",
+      "reproSteps": [
+        "Set up the state: sign in as maya / momentic-eval-1, open /alex, click \"Block user\", then \"Block\" in the dialog (maya now blocks alex).",
+        "Sign out and sign in as alex / momentic-contributor-1.",
+        "Open https://5503-ibar5w2u23qskgb6cuz7t.e2b.app/maya (the profile of the user who blocked you).",
+        "Click the \"Follow\" button in the left sidebar."
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 402,
+      "name": "Follower/Following entries are squeezed to about 120 px on a phone-sized screen, so the user name breaks into single letter fragments",
+      "summary": "Each entry in the list is only about 120 px wide inside a ~358 px wide content column, so the name is broken into single fragments (\"Ma\" / \"ya\" / \"Che\" / \"n\") and the date into four lines (\"Beigetreten / am 23. Nov. / 2026\"). The card leaves about two thirds of the row empty. At 768 px the card is ~180 px wide and the name already wraps to two lines. (on /eval?tab=following (and the Followers list) at 390 px width)",
+      "expected": "The follower/following entries use the width of the content column on a phone-sized screen, so the user name and the joined date read on one or two lines instead of one word fragment per line.",
+      "actual": "Each entry in the list is only about 120 px wide inside a ~358 px wide content column, so the name is broken into single fragments (\"Ma\" / \"ya\" / \"Che\" / \"n\") and the date into four lines (\"Beigetreten / am 23. Nov. / 2026\"). The card leaves about two thirds of the row empty. At 768 px the card is ~180 px wide and the name already wraps to two lines.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-ibar5w2u23qskgb6cuz7t.e2b.app/eval?tab=following (the profile shows \"1 Folge ich\" and the list holds the user Maya Chen).",
+        "Set the browser window to a phone width (390 × 844).",
+        "Scroll down to the list below the profile tab bar and look at the entry card."
+      ]
+    },
+    {
+      "index": 8,
+      "reported_at_seconds": 512,
+      "name": "Simplified-Chinese \"Hidden comment types\" explanation is a broken sentence with stray quotes and no placeholders",
+      "summary": "The sentence reads: 「此处选中的注释类型不会显示在问题页面中。比如，勾选”标签“删除所有 \" 添加/删除的 \" 注释。」 — the quotes around 标签 are unmatched (”…“), the placeholders for user and label are gone, and the trailing fragment \" 添加/删除的 \" with stray straight quotes makes no sense. A user cannot tell which comments the option hides. The German and English versions of the same paragraph show the placeholders correctly (\"{user} hat {label} hinzugefügt/entfernt\" / \"(user) added/removed (label)\"). (on /user/settings/appearance)",
+      "expected": "The explanatory sentence under \\\"Hidden comment types\\\" names the label and the placeholder example, e.g. that checking \\\"Label\\\" removes all \\\"(user) added/removed (label)\\\" comments, with correct quotation marks.",
+      "actual": "The sentence reads: 「此处选中的注释类型不会显示在问题页面中。比如，勾选”标签“删除所有 \" 添加/删除的 \" 注释。」 — the quotes around 标签 are unmatched (”…“), the placeholders for user and label are gone, and the trailing fragment \" 添加/删除的 \" with stray straight quotes makes no sense. A user cannot tell which comments the option hides. The German and English versions of the same paragraph show the placeholders correctly (\"{user} hat {label} hinzugefügt/entfernt\" / \"(user) added/removed (label)\").",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1, open /user/settings/appearance",
+        "In the Language dropdown choose 简体中文 and click 更新语言",
+        "Read the paragraph under 隐藏的评论类型"
+      ]
+    },
+    {
+      "index": 9,
+      "reported_at_seconds": 777,
+      "name": "?tab=packages silently shows the Repositories list with no tab highlighted on the profile",
+      "summary": "The page renders the full Repositories list (the four repositories with the 'Search repos…' box and Filter/Sort) and the address bar still says /eval?tab=packages, but no tab in the tab bar is marked active — nothing tells the user they are seeing the Repositories tab rather than Packages. /alex?tab=packages behaves the same. The real Packages page is /eval/-/packages and it does show an active 'Packages' tab with 'There are no packages yet.' (on /eval?tab=packages)",
+      "expected": "Either the Packages view (/eval/-/packages) is shown, or the page falls back to the Repositories tab with that tab visibly selected, so the user can tell which tab the address refers to.",
+      "actual": "The page renders the full Repositories list (the four repositories with the 'Search repos…' box and Filter/Sort) and the address bar still says /eval?tab=packages, but no tab in the tab bar is marked active — nothing tells the user they are seeing the Repositories tab rather than Packages. /alex?tab=packages behaves the same. The real Packages page is /eval/-/packages and it does show an active 'Packages' tab with 'There are no packages yet.'",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1",
+        "Open the address /eval?tab=packages directly",
+        "Compare with /eval?tab=stars (Starred Repositories tab is highlighted) and with /alex?tab=packages"
+      ]
+    },
+    {
+      "index": 10,
+      "reported_at_seconds": 777,
+      "name": "German heading of the hidden comment types section is ungrammatical: \\\"Ausgeblendeter Kommentartypen\\\"",
+      "summary": "The section heading reads \"Ausgeblendeter Kommentartypen\" — grammatically wrong German (genitive singular \"Ausgeblendeter\" with plural \"Kommentartypen\"). The correct wording would be \"Ausgeblendete Kommentartypen\" (as the English original \"Hidden comment types\" says). Visible at 1280 and 390 px width. (on /user/settings/appearance)",
+      "expected": "The heading of the hidden-comment-types section reads correct German, e.g. \"Ausgeblendete Kommentartypen\".",
+      "actual": "The section heading reads \"Ausgeblendeter Kommentartypen\" — grammatically wrong German (genitive singular \"Ausgeblendeter\" with plural \"Kommentartypen\"). The correct wording would be \"Ausgeblendete Kommentartypen\" (as the English original \"Hidden comment types\" says). Visible at 1280 and 390 px width.",
+      "reproSteps": [
+        "Sign in as eval (momentic-eval-1) and open /user/settings/appearance.",
+        "Scroll to the third section, below \"Standard-Theme auswählen\" and \"Sprache\".",
+        "Read the section heading above the 14 checkboxes."
+      ]
+    },
+    {
+      "index": 11,
+      "reported_at_seconds": 787,
+      "name": "Blocking a user who is already blocked shows the raw error \"cannot block the user\" and the autocomplete offers already blocked users",
+      "summary": "A red banner appears: \\\"Fehler beim Sperren des Benutzers: cannot block the user\\\" — a raw English technical error inside the German UI, and the same user is still sitting in the \\\"Gesperrte Benutzer\\\" list right below the form. The search box also suggests users who are already blocked, which is how the mistake happens. (on /user/settings/blocked_users)",
+      "expected": "The page either does not offer users that are already blocked in the \\\"Benutzer durchsuchen ...\\\" suggestions, or it tells the person in plain German that this user is already blocked; it must not show a raw technical error string.",
+      "actual": "A red banner appears: \\\"Fehler beim Sperren des Benutzers: cannot block the user\\\" — a raw English technical error inside the German UI, and the same user is still sitting in the \\\"Gesperrte Benutzer\\\" list right below the form. The search box also suggests users who are already blocked, which is how the mistake happens.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-ibar5w2u23qskgb6cuz7t.e2b.app/user/settings/blocked_users.",
+        "Block a user first so that it appears under \"Gesperrte Benutzer\" (e.g. type \"maya\" in \"Benutzer durchsuchen ...\", press ArrowDown and Enter, then click \"Sperren\").",
+        "Type the same user name again in \"Benutzer durchsuchen ...\", choose the suggestion with ArrowDown and Enter, and click \"Sperren\".",
+        "The autocomplete still offers the already blocked user (maya, also alex earlier) and the submit answers \"Fehler beim Sperren des Benutzers: cannot block the user\".",
+        "Repeated a second time with maya after the first error: same raw error."
+      ]
+    },
+    {
+      "index": 12,
+      "reported_at_seconds": 925,
+      "name": "Follower count shows \"1 Followers\" instead of \"1 Follower\"",
+      "summary": "The profile card reads \"1 Followers · 0 Following\" — the plural label is used with the value 1, next to the correct singular \"0 Following\" style used elsewhere. (on /eval)",
+      "expected": "\"1 Follower · 0 Following\" when the count is one.",
+      "actual": "The profile card reads \"1 Followers · 0 Following\" — the plural label is used with the value 1, next to the correct singular \"0 Following\" style used elsewhere.",
+      "reproSteps": [
+        "Sign in as alex / momentic-contributor-1 in one browser",
+        "Open https://5503-ibar5w2u23qskgb6cuz7t.e2b.app/eval",
+        "Click the Follow button so eval has exactly one follower",
+        "Read the follower counts under the user name in the left profile card"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,187 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "findings": 17,
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 0,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Matches the false account-wide empty-state message caused by out-of-range repository-settings pagination."
+      },
+      {
+        "groundTruthIndex": 3,
+        "reproStepsIndex": 0,
+        "findingIndex": 1,
+        "reason": "Matches submitting a nonexistent username on Blocked users and receiving a 500 page."
+      },
+      {
+        "groundTruthIndex": 1,
+        "reproStepsIndex": null,
+        "findingIndex": 3,
+        "reason": "Matches mobile user-card content fragmentation, although full-width cards are not required. The concrete reproducer uses Following rather than Followers."
+      },
+      {
+        "groundTruthIndex": 5,
+        "reproStepsIndex": 0,
+        "findingIndex": 4,
+        "reason": "Matches the exact grammatical error in the Public Profile introduction."
+      },
+      {
+        "groundTruthIndex": 6,
+        "reproStepsIndex": 0,
+        "findingIndex": 9,
+        "reason": "Matches Unfollow updating the sidebar while leaving the signed-in user's follower card visible until reload."
+      },
+      {
+        "groundTruthIndex": 10,
+        "reproStepsIndex": 0,
+        "findingIndex": 12,
+        "reason": "The primary claim matches the internal Website validation key shown after submitting an unsupported URL scheme."
+      },
+      {
+        "groundTruthIndex": 8,
+        "reproStepsIndex": null,
+        "findingIndex": 14,
+        "reason": "Matches validation-error re-rendering that discards unsaved profile edits, but uses an invalid Username rather than an unsupported Website URL."
+      }
+    ],
+    "invalidMatches": [],
+    "unverified": [
+      {
+        "findingIndex": 2,
+        "reason": "No entry covers avatar-update success and custom-avatar state when no file is selected."
+      },
+      {
+        "findingIndex": 5,
+        "reason": "No entry covers private-profile RSS disclosure. The rejected activity-tab claim concerns browser history caching, not a fresh RSS response."
+      },
+      {
+        "findingIndex": 6,
+        "reason": "No entry covers a failed Follow action with an unexplained HTTP-400 toast. The rejected administrator-block claim describes following succeeding."
+      },
+      {
+        "findingIndex": 7,
+        "reason": "No entry covers missing right-to-left layout after selecting Persian."
+      },
+      {
+        "findingIndex": 8,
+        "reason": "No entry covers Biography truncation. The rejected Location-length claim concerns a different field and validation behavior."
+      },
+      {
+        "findingIndex": 10,
+        "reason": "No entry covers cached account settings reappearing after sign-out. The rejected history claim concerns a profile made private, not logout."
+      },
+      {
+        "findingIndex": 11,
+        "reason": "No entry covers submitting a stale profile form after logout and receiving a bare CSRF-error page."
+      },
+      {
+        "findingIndex": 13,
+        "reason": "Partial Persian and German translations differ from the accepted Bulgarian selection that leaves the entire interface in English."
+      },
+      {
+        "findingIndex": 15,
+        "reason": "No entry covers repository searches interpreting percent and underscore as wildcards."
+      },
+      {
+        "findingIndex": 16,
+        "reason": "No entry covers whitespace-only block notes producing an empty note label."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 5,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "Reports a successful avatar update and persists custom-avatar state without uploading an image."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 3,
+        "reason": "Describes a privacy-control failure exposing profile information and activity."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 3,
+        "reason": "The offered Follow action fails with a technical error, but the profile remains usable."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 1,
+        "reason": "Language-direction and alignment presentation defect."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 3,
+        "reason": "Describes silent loss of submitted biography content despite a success message."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 3,
+        "reason": "Displays stale authenticated settings and navigation after sign-out, although reload correctly requires login."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 5,
+        "reason": "Submission replaces the application with a bare technical-error page without recovery navigation."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 1,
+        "reason": "Untranslated interface copy without described functional failure."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 15,
+        "severity": 3,
+        "reason": "Search returns repositories that do not contain the requested literal characters."
+      },
+      {
+        "findingIndex": 16,
+        "severity": 1,
+        "reason": "The described visible impact is a dangling label; blocking and note saving remain usable."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

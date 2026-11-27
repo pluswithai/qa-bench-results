@@ -1,0 +1,96 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "findings": 8,
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 16,
+        "reproStepsIndex": null,
+        "findingIndex": 0,
+        "reason": "Matches the empty PR Files Changed failure: a bare HTTP 400 error replaces the page. Here the PR became empty through another PR’s merge, rather than being created between equal branches."
+      },
+      {
+        "groundTruthIndex": 0,
+        "reproStepsIndex": 0,
+        "findingIndex": 1,
+        "reason": "Matches the incorrect “1 commits” summary on a single-commit PR. Opening an existing PR instead of creating one is an insignificant setup difference."
+      }
+    ],
+    "invalidMatches": [],
+    "unverified": [
+      {
+        "findingIndex": 2,
+        "reason": "No reviewed entry describes a newly created commit including unrelated files and causing unexpected conflicts. The temporary post-rebase totals defect is different."
+      },
+      {
+        "findingIndex": 3,
+        "reason": "No reviewed entry covers global state=all omitting closed PRs. The rejected repository default-state claim concerns a different behavior."
+      },
+      {
+        "findingIndex": 4,
+        "reason": "No reviewed entry describes assignment failing to persist. The reviewed assignment-search bugs involve successfully assigned PRs disappearing during filtering."
+      },
+      {
+        "findingIndex": 5,
+        "reason": "No reviewed entry covers misleading Push Failed/Git Hooks wording when PR creation is rejected for a non-collaborator."
+      },
+      {
+        "findingIndex": 6,
+        "reason": "No reviewed entry covers mobile branch-dropdown overflow. The rejected long-branch claim concerns a shortened commit-list header, not an overflowing selector."
+      },
+      {
+        "findingIndex": 7,
+        "reason": "No reviewed entry covers private PR content and authenticated-looking controls restored after logout. The rejected Back-navigation claim only concerns retained search-field text."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 5,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "Describes incorrect commit contents, PR changes and conflict detection, not merely presentation."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 3,
+        "reason": "An explicit all-states query returns an incomplete result set."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 3,
+        "reason": "The assignment action silently fails to save the selected assignee."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 1,
+        "reason": "The rejection explains the collaborator requirement; the described defect is misleading error wording and minor usability."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 1,
+        "reason": "Mobile layout and readability are impaired, but no branch-selection failure is described."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 3,
+        "reason": "Private content and an incorrect authenticated state remain visible after logout, although reload enforces authentication."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

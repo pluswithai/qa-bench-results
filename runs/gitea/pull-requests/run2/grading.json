@@ -1,0 +1,147 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "findings": 12,
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 16,
+        "reproStepsIndex": null,
+        "findingIndex": 0,
+        "reason": "Same bare HTTP 400 error replacing Files Changed on a zero-commit PR. The finding uses an existing already-contained branch rather than creating a PR between equal branches."
+      },
+      {
+        "groundTruthIndex": 32,
+        "reproStepsIndex": 0,
+        "findingIndex": 2,
+        "reason": "Same temporarily inflated PR diff totals after updating the branch, including base-branch changes. The described rebase alternative follows the recorded reproduction."
+      },
+      {
+        "groundTruthIndex": 0,
+        "reproStepsIndex": 0,
+        "findingIndex": 3,
+        "reason": "Explicitly reports the same 'wants to merge 1 commits' wording on a one-commit PR. The other plural labels extend beyond this match."
+      },
+      {
+        "groundTruthIndex": 26,
+        "reproStepsIndex": 0,
+        "findingIndex": 4,
+        "reason": "Same rebase timeline event claiming two added commits and listing both the replaced and rewritten commit while the PR contains one."
+      },
+      {
+        "groundTruthIndex": 8,
+        "reproStepsIndex": 0,
+        "findingIndex": 6,
+        "reason": "Same global PR text search dropping poster=alex and admitting matching PRs by another author."
+      },
+      {
+        "groundTruthIndex": 60,
+        "reproStepsIndex": 0,
+        "findingIndex": 7,
+        "reason": "Same global Open/Closed tab navigation dropping the Author parameter and broadening the list beyond its filtered count."
+      },
+      {
+        "groundTruthIndex": 58,
+        "reproStepsIndex": 0,
+        "findingIndex": 11,
+        "reason": "Same deleted source branch remaining linked in the repository PR list after merging with Delete Branch, with the link opening a 404."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 2,
+        "reproStepsIndex": 0,
+        "findingIndex": 1,
+        "reason": "Same omission of an All repositories team from the organization team-repository filter. This configuration is intentionally excluded, as the rejection explains."
+      },
+      {
+        "knownInvalidIndex": 5,
+        "reproStepsIndex": 0,
+        "findingIndex": 8,
+        "reason": "Same global Fuzzy search failing to match a one-character omission. Typo tolerance is disabled by default, which is the recorded rejection reason."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 5,
+        "reason": "No entry covers saving a disabled merge style as the default while the PR uses an enabled fallback. The other merge-default entries describe different failures."
+      },
+      {
+        "findingIndex": 9,
+        "reason": "No entry covers this Author-control selection feedback and missing selected-user option. The accepted visual-feedback entry specifically concerns Assignee."
+      },
+      {
+        "findingIndex": 10,
+        "reason": "No entry describes organization sidebar counts ignoring an applied Author filter while the result list and state counts are filtered."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 5,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 3,
+        "reason": "The claimed impact is an inability to filter by team repositories, a functional limitation, although this behavior was rejected as intended."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 3,
+        "reason": "The saved configuration contradicts the effective merge behavior."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 3,
+        "reason": "The reported impact is missing matching search results, although the reviewed behavior is intended under the default configuration."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 1,
+        "reason": "The Author filter works; the described defect concerns selection visibility and minor dropdown usability."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 3,
+        "reason": "The sidebar displays incorrect counts relative to the described filtered results."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

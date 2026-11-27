@@ -1,0 +1,477 @@
+{
+  "fixture": "metabase/areas/data-modeling",
+  "run": 2,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 207,
+      "name": "Model History tab shows \"undefined modified this.\" instead of the editor's name",
+      "summary": "The history entry reads \\\"undefined modified this. a few seconds ago\\\" — a raw undefined value is printed instead of the user's name. (on /model/1-orders-people (Info panel → History))",
+      "expected": "The history entry names who made the revision, e.g. \\\"Metabase Internal modified this.\\\" (the Overview tab of the same panel shows \\\"November 23, 2026 by Metabase Internal\\\").",
+      "actual": "The history entry reads \\\"undefined modified this. a few seconds ago\\\" — a raw undefined value is printed instead of the user's name.",
+      "reproSteps": [
+        "Go to /browse/models",
+        "Click the model \"Orders + People\"",
+        "Click the \"More info\" (i) button in the top-right toolbar to open the Info panel",
+        "Click the \"History\" tab"
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 341,
+      "name": "Data reference shows a phantom page instead of \"not found\" for a database, table or field id that does not exist",
+      "summary": "The data reference renders a normal-looking but empty detail page with no name anywhere: empty title, breadcrumb without the last step, 'No description yet' used as the actual name and data type, and generated questions with the entity name missing ('Count of', 'See raw data for', 'Number of Orders grouped by'). The page still offers Edit and X-ray actions on nothing. For /reference/databases/999 the API answers 404 and the page shows no error at all. (on /reference/databases/999, /reference/databases/1/tables/9999, /reference/databases/1/tables/2/fields/9999)",
+      "expected": "A page for a database, table or field that does not exist should say so in words (a \"not found\" message, a 404 page) and offer a way back to the data reference.",
+      "actual": "The data reference renders a normal-looking but empty detail page with no name anywhere: empty title, breadcrumb without the last step, 'No description yet' used as the actual name and data type, and generated questions with the entity name missing ('Count of', 'See raw data for', 'Number of Orders grouped by'). The page still offers Edit and X-ray actions on nothing. For /reference/databases/999 the API answers 404 and the page shows no error at all.",
+      "reproSteps": [
+        "Sign in and go to https://5501-irj19dkxmuqxplj4vepre.e2b.app/reference/databases/999 (a database id that does not exist)",
+        "Look at the page: no title, the breadcrumb ends at 'DATABASES >', the left panel shows 'Tables in' with no name, the details card shows 'No description yet' and an Edit button",
+        "Go to https://5501-irj19dkxmuqxplj4vepre.e2b.app/reference/databases/1/tables/9999 (a table id that does not exist)",
+        "The page again renders with no title, 'Actual name in database: No description yet', and questions labelled 'Count of' and 'See raw data for' with no name",
+        "Go to https://5501-irj19dkxmuqxplj4vepre.e2b.app/reference/databases/1/tables/2/fields/9999 (a field id that does not exist)",
+        "The page renders with 'Data type: No description yet', 'Field type: No field type' and questions labelled 'Number of Orders grouped by' with nothing after 'by'"
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 382,
+      "name": "Table list cards in the data reference overflow the window at 1280px wide and their text is cut off",
+      "summary": "At a 1280×720 window the table cards are wider than the content column: their right border is outside the window and the descriptions are cut off at the window edge (e.g. \"…submit feedbac|k\", \"…pie subscriptio|n on a monthly basis.\"). No horizontal scrollbar appears, so the cut text cannot be reached. At 1440 wide the same cards fit and show their right border and full sentences. (on /reference/databases/1/tables)",
+      "expected": "The table cards fit inside the content column: full right border visible, descriptions wrapped inside the card, no text cut off at the window edge.",
+      "actual": "At a 1280×720 window the table cards are wider than the content column: their right border is outside the window and the descriptions are cut off at the window edge (e.g. \"…submit feedbac|k\", \"…pie subscriptio|n on a monthly basis.\"). No horizontal scrollbar appears, so the cut text cannot be reached. At 1440 wide the same cards fit and show their right border and full sentences.",
+      "reproSteps": [
+        "Set the browser window to 1280×720",
+        "Sign in and open https://5501-irj19dkxmuqxplj4vepre.e2b.app/reference/databases/1/tables (Sample Database → Tables in Sample Database)",
+        "Scroll down the list of tables (Accounts … Reviews)",
+        "Look at the right side of the table cards: they are cut off at the window edge and the descriptions are truncated mid-word with no right border",
+        "Widen the window to 1440×900: the same cards fit and show their right border and full text"
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 438,
+      "name": "Data reference \"Questions about this table\" page loses the whole main navigation sidebar",
+      "summary": "The main navigation sidebar is not rendered at all: the whole content shifts to the left edge (the reference panel starts at x=0, breadcrumb \\\"DATABASES > SAMPLE DATABASE > ORDERS\\\") and only the header (search, New, settings) remains. It stays missing after a reload and on a direct visit to /reference/databases/2/tables/9/questions too, with no console error. (on /reference/databases/1/tables/2/questions)",
+      "expected": "The page keeps the same main navigation sidebar as the other data reference pages (e.g. \\\"Details\\\" and \\\"Fields in this table\\\" on the same table), so a person can go Home/Collections/Data from it.",
+      "actual": "The main navigation sidebar is not rendered at all: the whole content shifts to the left edge (the reference panel starts at x=0, breadcrumb \\\"DATABASES > SAMPLE DATABASE > ORDERS\\\") and only the header (search, New, settings) remains. It stays missing after a reload and on a direct visit to /reference/databases/2/tables/9/questions too, with no console error.",
+      "reproSteps": [
+        "Sign in and open /reference/databases (Browse → Databases).",
+        "Open \"Sample Database\", then \"Tables in Sample Database\", then the table \"Orders\".",
+        "In the left reference panel click \"Questions about this table\" (address becomes /reference/databases/1/tables/2/questions).",
+        "Look at the left part of the window where the app navigation (Home, Getting Started, Collections, Data, Trash) normally sits, then reload the page."
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 473,
+      "name": "Creating a metric from /metric/new opens the question editor and offers to \"Save new question\" instead of a metric",
+      "summary": "As soon as a database is picked the address changes from /metric/new to /question#eyJ... and the editor is a plain question editor (header \\\"New question\\\", question toolbar \\\"Filter / Summarize / Editor\\\"). Clicking Save opens a dialog titled \\\"Save new question\\\", i.e. the metric entry point creates a question. The real metric editor only exists at /metric/query (reached from the \\\"+\\\" on /browse/metrics), where the header is \\\"New metric\\\" and the dialog is \\\"Save metric\\\". (on /metric/new)",
+      "expected": "The metric creation editor opens (header \\\"New metric\\\", Save opens a \\\"Save metric\\\" dialog) and the result is saved as a metric that appears in Browse > Metrics.",
+      "actual": "As soon as a database is picked the address changes from /metric/new to /question#eyJ... and the editor is a plain question editor (header \\\"New question\\\", question toolbar \\\"Filter / Summarize / Editor\\\"). Clicking Save opens a dialog titled \\\"Save new question\\\", i.e. the metric entry point creates a question. The real metric editor only exists at /metric/query (reached from the \\\"+\\\" on /browse/metrics), where the header is \\\"New metric\\\" and the dialog is \\\"Save metric\\\".",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open https://5501-irj19dkxmuqxplj4vepre.e2b.app/metric/new",
+        "In \"Pick your starting data\" click \"Sample Database\"",
+        "Click the \"Orders\" table",
+        "Look at the editor header and the page address, then click \"Save\" in the top right"
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 501,
+      "name": "Collection picker in the metric save dialog is shifted left: folder icons and the start of every collection name are cut off",
+      "summary": "The left list is drawn shifted about 73px to the left, outside the dialog's left edge: the folder icons are gone and the names are cut to \\\"analytics\\\", \\\"bor Admin's Personal Collection\\\" and \\\"personal collections\\\". The list items' boxes start at x=72 while the dialog panel starts at x=129. (on /metric/query (Save metric → Select a collection))",
+      "expected": "Each collection row shows its folder icon and its full name, e.g. \\\"Our analytics\\\", \\\"Harbor Admin's Personal Collection\\\", \\\"All personal collections\\\", all inside the dialog.",
+      "actual": "The left list is drawn shifted about 73px to the left, outside the dialog's left edge: the folder icons are gone and the names are cut to \\\"analytics\\\", \\\"bor Admin's Personal Collection\\\" and \\\"personal collections\\\". The list items' boxes start at x=72 while the dialog panel starts at x=129.",
+      "reproSteps": [
+        "Sign in and open https://5501-irj19dkxmuqxplj4vepre.e2b.app/browse/metrics",
+        "Click the \"+\" (Create a new metric) at the top right of the Metrics list",
+        "Pick Sample Database → Orders, then click \"Save\" at the top right",
+        "In the \"Save metric\" dialog click the collection button (it shows the default collection, e.g. \"agent6-collection\")",
+        "In the \"Select a collection\" dialog click the \"Collections\" tab and look at the left-hand list of collections"
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 522,
+      "name": "Field type \\\"Creation timestamp\\\" is cut off and overlaps the data type in the table field list",
+      "summary": "The field type label is clipped and runs into the data type with no gap, reading \\\"Creation timestanTIMESTAMP\\\" (the word \\\"timestamp\\\" is cut off and the two column values touch). The same collision appears in the Reviews table field list. This is a different element and page from the table-list cards overflow: it is a row of the field list (Field type vs Data type columns). (on /reference/databases/1/tables/2/fields)",
+      "expected": "The \\\"Creation timestamp\\\" field type and the \\\"TIMESTAMP\\\" data type are shown as two separate, fully readable column values, like every other row (Entity Key/BIGINT, Foreign Key/INTEGER).",
+      "actual": "The field type label is clipped and runs into the data type with no gap, reading \\\"Creation timestanTIMESTAMP\\\" (the word \\\"timestamp\\\" is cut off and the two column values touch). The same collision appears in the Reviews table field list. This is a different element and page from the table-list cards overflow: it is a row of the field list (Field type vs Data type columns).",
+      "reproSteps": [
+        "Sign in and open /reference/databases, then \"Sample Database\" → \"Tables in Sample Database\".",
+        "Open the table \"Orders\" and click \"Fields in this table\" (address /reference/databases/1/tables/2/fields).",
+        "Scroll to the row \"Created At CREATED_AT\".",
+        "Read the Field type and Data type columns of that row. Repeat on the \"Reviews\" table field list (/reference/databases/1/tables/4/fields)."
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 548,
+      "name": "Model with no description shows \"A model\" as its description in Browse → Models",
+      "summary": "The Description column of \\\"Orders\\\" literally reads \\\"A model\\\", in the same black text style as real descriptions (\\\"Sample orders joined with products\\\"), while the same model's Info → Overview says \\\"Add description\\\" and the API returns description: null. The table invents a description that no view of the model has. (on /browse/models)",
+      "expected": "The model had no description, so the Models table shows an empty description (or an obvious placeholder), matching its Info panel which says \\\"Add description\\\".",
+      "actual": "The Description column of \\\"Orders\\\" literally reads \\\"A model\\\", in the same black text style as real descriptions (\\\"Sample orders joined with products\\\"), while the same model's Info → Overview says \\\"Add description\\\" and the API returns description: null. The table invents a description that no view of the model has.",
+      "reproSteps": [
+        "Go to /model/new, choose \"Use the notebook editor\", pick Sample Database > Orders, click Save, keep the default name \"Orders\", leave Description empty, click Save.",
+        "Open Browse → Models (/browse/models) and look at the Description column of the row \"Orders\" (collection \"Our analytics\").",
+        "Open that model (/model/40-orders) and click the \"More info\" (i) button to see its Overview."
+      ]
+    },
+    {
+      "index": 8,
+      "reported_at_seconds": 551,
+      "name": "Model's Actions page shows the wrong collection in the top-left breadcrumb (\"Our analytics\" instead of the model's collection)",
+      "summary": "The top-left collection breadcrumb on that page reads \\\"Our analytics\\\", although the model is saved in \\\"agent6-collection\\\" (the model page itself and Info → \\\"Saved in\\\" both say agent6-collection). (on /model/47-agent6-slash-q-frag/detail/actions)",
+      "expected": "The breadcrumb in the top bar names the collection the model is actually saved in (agent6-collection), as on the model page.",
+      "actual": "The top-left collection breadcrumb on that page reads \\\"Our analytics\\\", although the model is saved in \\\"agent6-collection\\\" (the model page itself and Info → \\\"Saved in\\\" both say agent6-collection).",
+      "reproSteps": [
+        "Create a model saved in a collection other than Our analytics (e.g. save a model into the collection \"agent6-collection\").",
+        "Open the model's page and click \"More info\" (i), then the \"Actions\" tab (or open /model/47-agent6-slash-q-frag/detail/actions directly).",
+        "Look at the collection name in the top-left navigation bar of the page that opens."
+      ]
+    },
+    {
+      "index": 9,
+      "reported_at_seconds": 580,
+      "name": "Whitespace-only metric name passes the dialog's validation, then fails with the raw error \\\"Value must be a non-blank string.\\\" and a \\\"Failed\\\" button",
+      "summary": "The Save button stays enabled for a whitespace-only name (it is correctly disabled for an empty name). Clicking it sends POST /api/card, which returns 400, and the dialog shows the raw API message \\\"Value must be a non-blank string.\\\" under the Name field while the Save button changes its label to \\\"Failed\\\" and stays disabled. The name has to be retyped before saving is possible again. (on /metric/query (Save metric dialog))",
+      "expected": "A whitespace-only name is rejected in the dialog itself, like an empty name (Save stays disabled), or is trimmed to empty so the person gets a plain validation message instead of a raw server error.",
+      "actual": "The Save button stays enabled for a whitespace-only name (it is correctly disabled for an empty name). Clicking it sends POST /api/card, which returns 400, and the dialog shows the raw API message \\\"Value must be a non-blank string.\\\" under the Name field while the Save button changes its label to \\\"Failed\\\" and stays disabled. The name has to be retyped before saving is possible again.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open https://5501-irj19dkxmuqxplj4vepre.e2b.app/browse/metrics",
+        "Click the \"+\" (Create a new metric) in the top right of the Metrics list",
+        "In \"Pick your starting data\" click \"Sample Database\" then the \"Orders\" table (Count is already chosen)",
+        "Click \"Save\" in the top right to open the \"Save metric\" dialog",
+        "Replace the Name with three spaces and click \"Save\""
+      ]
+    },
+    {
+      "index": 10,
+      "reported_at_seconds": 641,
+      "name": "Editing an existing metric through its Editor and saving creates a separate question and leaves the metric unchanged",
+      "summary": "The save dialog is titled \"Save new question\" with Name prefilled \"agent7-metric-count v2 - Modified\"; saving it creates a NEW saved question (address /question/48-agent7-metric-count-v2-modified, subtitle \"Sample Database / Orders\", and it is not listed under Browse → Metrics) while metric 42 stays unchanged (still Count = 18,760) and its History tab gets no revision. The edit is lost for the metric. (on /metric/42-agent7-metric-count/notebook (editor of an existing metric))",
+      "expected": "Saving from the editor of an existing metric updates that metric in place: it keeps its metric type and address, its result shows the new aggregation, and its History tab gains a revision (as \"Edit metric definition\" → \"Save changes\" does).",
+      "actual": "The save dialog is titled \"Save new question\" with Name prefilled \"agent7-metric-count v2 - Modified\"; saving it creates a NEW saved question (address /question/48-agent7-metric-count-v2-modified, subtitle \"Sample Database / Orders\", and it is not listed under Browse → Metrics) while metric 42 stays unchanged (still Count = 18,760) and its History tab gets no revision. The edit is lost for the metric.",
+      "reproSteps": [
+        "Sign in with eval@momentic.ai / momentic-eval-1.",
+        "Open /browse/metrics, click the \"+\" (Create a new metric), choose Sample Database → Orders, keep Formula = Count, Save, name it \"agent7-metric-count\", Save.",
+        "On the saved metric page click the \"pencil_lines icon Editor\" button in the header.",
+        "In the notebook editor click \"Pick a column to group by\", choose Created At → Month. A \"Save\" button appears in the header.",
+        "Click \"Save\": the dialog is titled \"Save new question\" with Name \"agent7-metric-count v2 - Modified\".",
+        "Click the dialog's \"Save\" and look at where you land (/question/48-...).",
+        "Return to /metric/42-agent7-metric-count: the value is still 18,760 and Info → History has no revision for the edit."
+      ]
+    },
+    {
+      "index": 11,
+      "reported_at_seconds": 675,
+      "name": "Model Info panel lists 14 fields (two of them duplicates) although the model returns 12 columns",
+      "summary": "After saving the model's metadata the Overview tab reports 14 fields and lists two fields twice (\\\"User ID\\\" next to \\\"User → User ID\\\", \\\"Product ID\\\" next to \\\"Product → Product ID\\\") and renames the joined columns to \\\"People - User → Customer Email\\\" / \\\"People - User → State\\\", while the grid still renders exactly 12 columns. The wrong count and duplicates persist after a reload and after a second metadata save. (on /model/1-orders-people (Info panel → Overview))",
+      "expected": "The Info panel's field count and field list match the model's real columns: 12 fields, each once, with the display names shown in the grid (Customer Email, State).",
+      "actual": "After saving the model's metadata the Overview tab reports 14 fields and lists two fields twice (\\\"User ID\\\" next to \\\"User → User ID\\\", \\\"Product ID\\\" next to \\\"Product → Product ID\\\") and renames the joined columns to \\\"People - User → Customer Email\\\" / \\\"People - User → State\\\", while the grid still renders exactly 12 columns. The wrong count and duplicates persist after a reload and after a second metadata save.",
+      "reproSteps": [
+        "Go to /model/1-orders-people (signed in as eval@momentic.ai) and open the Info panel with the \"More info\" (i) button: the Overview tab reports \"12 fields\" matching the 12 grid columns ID, User ID, Product ID, Subtotal ($), Tax ($), Total ($), Discount ($), Created At, Quantity, Customer Email, Age, State.",
+        "Open the \"Move, trash, and more…\" (...) menu and choose \"Edit metadata\".",
+        "In the metadata editor open the \"Settings\" tab, switch the default view from \"Table\" to \"List\" and click \"Save changes\".",
+        "Back on /model/1-orders-people click \"More info\" again and read the Overview tab: it now says \"14 fields\" and the list contains \"User ID\" and \"User → User ID\", \"Product ID\" and \"Product → Product ID\" (the same fields twice), and \"People - User → Customer Email\" / \"People - User → State\" instead of \"Customer Email\" / \"State\".",
+        "Count the grid's own columns behind the panel: there are still only 12 (ID, User ID, Product ID, Subtotal ($), Tax ($), Total ($), Discount ($), Created At, Quantity, Customer Email, Age, State)."
+      ]
+    },
+    {
+      "index": 12,
+      "reported_at_seconds": 676,
+      "name": "Pressing Enter in the model description field does not save the edit and the new text is lost",
+      "summary": "Enter sends no request: the field stays in edit mode with the typed text and the edit is silently discarded. After reload the description is back to the previously saved value 'agent12 updated description'. Clicking outside the field instead does send PUT /api/card/45 and the value is kept, so only the Enter key loses the edit. (on /model/45-agent12-model-beta (Info panel → Overview → Description))",
+      "expected": "Enter in the single-line description field commits the new description, as it does elsewhere in the app; after reload the Info panel shows 'agent12 third description'.",
+      "actual": "Enter sends no request: the field stays in edit mode with the typed text and the edit is silently discarded. After reload the description is back to the previously saved value 'agent12 updated description'. Clicking outside the field instead does send PUT /api/card/45 and the value is kept, so only the Enter key loses the edit.",
+      "reproSteps": [
+        "Open /model/45-agent12-model-beta (model 'agent12-model-beta', formerly agent12-model-alpha, in Our analytics).",
+        "Click the circle-i 'More info' button in the header to open the Info panel.",
+        "Click the description text under the 'Description' heading so it turns into a text input.",
+        "Type 'agent12 third description' and press Enter (no request is sent).",
+        "Reload the page and reopen the Info panel."
+      ]
+    },
+    {
+      "index": 13,
+      "reported_at_seconds": 702,
+      "name": "Model save dialog disables \\\"Save\\\" with no message when the model name is long (prefilled \\\"<name> - Modified\\\" exceeds 254 characters)",
+      "summary": "The dialog prefills the Name with the model's 254-character name plus \\\" - Modified\\\" (265 characters, longer than the field's own 254-character limit), and the dialog's \\\"Save\\\" button stays greyed out and cannot be clicked, with no error or explanation anywhere in the dialog. Typing a short name (agent2-short) immediately enables Save, so the length is the cause. (on /model/44/notebook)",
+      "expected": "Either the suggested name fits the limit (or is trimmed) and Save works, or the dialog says why it cannot be saved (e.g. \\\"Name must be 254 characters or fewer\\\").",
+      "actual": "The dialog prefills the Name with the model's 254-character name plus \\\" - Modified\\\" (265 characters, longer than the field's own 254-character limit), and the dialog's \\\"Save\\\" button stays greyed out and cannot be clicked, with no error or explanation anywhere in the dialog. Typing a short name (agent2-short) immediately enables Save, so the length is the cause.",
+      "reproSteps": [
+        "Create a model (Browse → Models → the + ) and give it the longest name the title field accepts: type a name of 300+ characters such as \"agent2-\" followed by repeated \"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\"; the title field caps it at 254 characters and saves it.",
+        "Open that model and click Editor to reach /model/<id>/notebook.",
+        "Click \"Row limit\", type 10 in \"Enter a limit\" and press Tab so the \"Save\" button appears.",
+        "Click Save. The dialog \"Save new question\" opens with Name = the 254-character model name + \" - Modified\" (265 characters).",
+        "Look at the dialog's \"Save\" button: it is disabled and clicking it does nothing; no validation message is shown. Replace the Name with a short text and the button becomes enabled."
+      ]
+    },
+    {
+      "index": 14,
+      "reported_at_seconds": 753,
+      "name": "Pressing Back from the \\\"Based on → Orders\\\" link in the model Info panel turns the model page into an unsaved question and Back cannot return to the model",
+      "summary": "Back does not return to the model. The tab's address becomes a /question#… address for an unsaved question based on card 1 and the page renders as an unsaved question: a plain table icon in the breadcrumb instead of the model cube, a blue \\\"Save\\\" button, and no model toolbar at all (the \\\"More info\\\" (i) button, bookmark and \\\"Move, trash, and more…\\\" menu are gone), so the model page cannot be reached by Back. (on /model/1-orders-people (Info panel → Overview → \\\"Based on\\\" → Orders))",
+      "expected": "Back returns to the model page at /model/1-orders-people with its model header (cube icon, Info button, bookmark and more menu).",
+      "actual": "Back does not return to the model. The tab's address becomes a /question#… address for an unsaved question based on card 1 and the page renders as an unsaved question: a plain table icon in the breadcrumb instead of the model cube, a blue \\\"Save\\\" button, and no model toolbar at all (the \\\"More info\\\" (i) button, bookmark and \\\"Move, trash, and more…\\\" menu are gone), so the model page cannot be reached by Back.",
+      "reproSteps": [
+        "Signed in as eval@momentic.ai, go to /model/1-orders-people and click the \"More info\" (i) button in the top-right toolbar.",
+        "In the Overview tab, click the \"Orders\" chip under the \"Based on\" heading (it opens /question#… with the Orders table).",
+        "Press the browser Back button.",
+        "Look at the address bar, the breadcrumb icon and the top-right toolbar."
+      ]
+    },
+    {
+      "index": 15,
+      "reported_at_seconds": 777,
+      "name": "Info → History shows raw internal type keywords \":metric to :model\" after turning a metric into a model",
+      "summary": "The revision line reads \\\"changed the display from scalar to table, type changed from :metric to :model and edited the metadata.\\\" — the internal type keywords with leading colons (\\\" :metric\\\", \\\" :model\\\") are shown to the user as-is. (on /model/46-agent14-metric-count (Info panel → History))",
+      "expected": "The revision text is written in plain language a user can read, e.g. \\\"turned this into a model and edited the metadata\\\".",
+      "actual": "The revision line reads \\\"changed the display from scalar to table, type changed from :metric to :model and edited the metadata.\\\" — the internal type keywords with leading colons (\\\" :metric\\\", \\\" :model\\\") are shown to the user as-is.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1.",
+        "Open https://5501-irj19dkxmuqxplj4vepre.e2b.app/metric/46-agent14-metric-count (the metric \"agent14-metric-count\", created in Examples/Our analytics during this hunt).",
+        "Open the \"...\" (Move, trash, and more…) menu and choose \"Turn into a model\", then confirm \"Turn this into a model\" in the dialog.",
+        "The page becomes https://5501-irj19dkxmuqxplj4vepre.e2b.app/model/46-agent14-metric-count — click the info (i) button in the header and open the History tab."
+      ]
+    },
+    {
+      "index": 16,
+      "reported_at_seconds": 780,
+      "name": "\\\"Move\\\" action opens a dialog headed \\\"Where do you want to save this?\\\"",
+      "summary": "The dialog is headed \\\"Where do you want to save this?\\\" — while the action is a move and the confirm button in the same dialog says \\\"Move\\\" (\\\"Cancel\\\" / \\\"Move\\\"). (on /model/46-agent14-metric-count (\\\"Move\\\" action))",
+      "expected": "The Move dialog is headed for what it does, e.g. \\\"Where do you want to move this?\\\", consistent with its \\\"Move\\\" button.",
+      "actual": "The dialog is headed \\\"Where do you want to save this?\\\" — while the action is a move and the confirm button in the same dialog says \\\"Move\\\" (\\\"Cancel\\\" / \\\"Move\\\").",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1.",
+        "Open https://5501-irj19dkxmuqxplj4vepre.e2b.app/model/46-agent14-metric-count (or any metric/model page).",
+        "Open the \"...\" (Move, trash, and more…) menu in the header and click \"Move\".",
+        "Read the heading of the dialog that opens."
+      ]
+    },
+    {
+      "index": 17,
+      "reported_at_seconds": 812,
+      "name": "Saving a new metric before choosing any data shows a raw SQL/database error and a red \\\"Failed\\\" button",
+      "summary": "The \\\"Save metric\\\" dialog opens normally and accepts a name; clicking Save sends POST /api/card, which returns 500, and the dialog shows a raw SQL error to the person: \\\"NULL not allowed for column \\\\\\\"DATABASE_ID\\\\\\\"; SQL statement: INSERT INTO \\\\\\\"REPORT_CARD\\\\\\\" (…) VALUES (NULL, ?, ?, …) [23502-214]\\\", while the Save button turns red with the label \\\"Failed\\\". Nothing warns that data has to be picked first. (on /metric/query (Save metric dialog, new metric))",
+      "expected": "Either saving is blocked until a table/summary is chosen (Save disabled, or a plain message such as \\\"pick your starting data\\\"), or the person gets a readable error instead of the database's SQL statement.",
+      "actual": "The \\\"Save metric\\\" dialog opens normally and accepts a name; clicking Save sends POST /api/card, which returns 500, and the dialog shows a raw SQL error to the person: \\\"NULL not allowed for column \\\\\\\"DATABASE_ID\\\\\\\"; SQL statement: INSERT INTO \\\\\\\"REPORT_CARD\\\\\\\" (…) VALUES (NULL, ?, ?, …) [23502-214]\\\", while the Save button turns red with the label \\\"Failed\\\". Nothing warns that data has to be picked first.",
+      "reproSteps": [
+        "Sign in and open https://5501-irj19dkxmuqxplj4vepre.e2b.app/browse/metrics",
+        "Click the \"+\" (Create a new metric) link at the top right of the Metrics list",
+        "Without choosing any table or summary, click \"Save\" in the top right of the metric editor",
+        "Type any name (e.g. agent8-no-table-metric) in the \"Save metric\" dialog and click \"Save\""
+      ]
+    },
+    {
+      "index": 18,
+      "reported_at_seconds": 819,
+      "name": "Duplicating a model lands on an unsaved question with an active Save button although the copy is already saved",
+      "summary": "The duplicate is created (a POST /api/card succeeds and the copy \"agent11-model-life\" appears in Browse → Models in Examples), but the page it leaves you on is the unsaved-question editor: the address is /question#<base64> titled \"Question\", the breadcrumb reads \"Examples / agent11-model-life\", and a blue \"Save\" button is active in the toolbar, so the app treats the already-saved model as an unsaved question the user still has to save. Opening /model/59-agent11-model-life directly shows no Save button, confirming the copy is already saved. (on /model/1-orders-people → duplicate → /question)",
+      "expected": "After Duplicate the app should open the new model's own page (/model/<id>-<name>) in its saved, unmodified state, with no Save button, the same as opening the copy by its address.",
+      "actual": "The duplicate is created (a POST /api/card succeeds and the copy \"agent11-model-life\" appears in Browse → Models in Examples), but the page it leaves you on is the unsaved-question editor: the address is /question#<base64> titled \"Question\", the breadcrumb reads \"Examples / agent11-model-life\", and a blue \"Save\" button is active in the toolbar, so the app treats the already-saved model as an unsaved question the user still has to save. Opening /model/59-agent11-model-life directly shows no Save button, confirming the copy is already saved.",
+      "reproSteps": [
+        "Sign in and open https://5501-irj19dkxmuqxplj4vepre.e2b.app/model/1-orders-people (a model)",
+        "Click the \"...\" button \"Move, trash, and more…\" in the toolbar and choose Duplicate",
+        "In the Duplicate dialog set Name to agent11-model-life and click Duplicate",
+        "The app lands on an unsaved-question editor: the address is /question#…, the title is \"Question\", the breadcrumb is \"Examples / agent11-model-life\" and a blue Save button is enabled in the toolbar (screenshot)",
+        "Check Browse → Models: the copy agent11-model-life exists in Examples with description \"Sample orders joined with products\"",
+        "Open https://5501-irj19dkxmuqxplj4vepre.e2b.app/model/59-agent11-model-life: the saved model page loads with no Save button"
+      ]
+    },
+    {
+      "index": 19,
+      "reported_at_seconds": 885,
+      "name": "Collection list shows \\\"Last edited by\\\" and \\\"Last edited at\\\" columns with no values for any item",
+      "summary": "Both columns are empty for every item: all 25 rows (including \\\"Revenue\\\", \\\"Number of Orders\\\", \\\"Checkout funnel\\\") show nothing under \\\"Last edited by\\\" and nothing under \\\"Last edited at\\\". (on /collection/2-examples)",
+      "expected": "Each row should show who last edited the item and when, as the two column headers promise.",
+      "actual": "Both columns are empty for every item: all 25 rows (including \\\"Revenue\\\", \\\"Number of Orders\\\", \\\"Checkout funnel\\\") show nothing under \\\"Last edited by\\\" and nothing under \\\"Last edited at\\\".",
+      "reproSteps": [
+        "Sign in and open Browse > Examples, i.e. /collection/2-examples.",
+        "Scroll down past the Dashboards and Models cards to the list of questions/metrics, which has the columns \"Type | Name | Last edited by | Last edited at\".",
+        "Look at the \"Last edited by\" and \"Last edited at\" columns for the rows (e.g. \"Aerodynamic Copper Knife trend\", \"Revenue\", \"Checkout funnel\")."
+      ]
+    },
+    {
+      "index": 20,
+      "reported_at_seconds": 908,
+      "name": "Cancel on an untouched new-metric editor warns \\\"Discard your changes?\\\" although nothing was changed",
+      "summary": "The dialog \\\"Discard your changes? Your changes haven't been saved, so you'll lose them if you navigate away.\\\" with a red \\\"Discard changes\\\" button appears even though the editor is still empty (no table, no summary, nothing changed); the only interaction was typing a query into the closed \\\"Search for tables and more...\\\" box. \\\"Discard changes\\\" then sends the person to the app's home page, not back to Browse > Metrics where they came from. (on /metric/query (new metric, Cancel))",
+      "expected": "Cancel on an unchanged new metric leaves the editor without a warning about unsaved changes (or only warns when something was actually changed), and returns to the page the person came from.",
+      "actual": "The dialog \\\"Discard your changes? Your changes haven't been saved, so you'll lose them if you navigate away.\\\" with a red \\\"Discard changes\\\" button appears even though the editor is still empty (no table, no summary, nothing changed); the only interaction was typing a query into the closed \\\"Search for tables and more...\\\" box. \\\"Discard changes\\\" then sends the person to the app's home page, not back to Browse > Metrics where they came from.",
+      "reproSteps": [
+        "Sign in and open https://5501-irj19dkxmuqxplj4vepre.e2b.app/browse/metrics, then click the \"+\" (Create a new metric) link",
+        "Do not choose any table or aggregation; the \"Data\" card stays empty",
+        "Click \"Cancel\" in the top right of the metric editor"
+      ]
+    },
+    {
+      "index": 21,
+      "reported_at_seconds": 910,
+      "name": "Data reference at 390px: sidebar labels truncated and the database cards overflow, so the page scrolls sideways",
+      "summary": "At 390 × 844 the page is wider than the screen and scrolls sideways: the sidebar keeps ~117px and its entries are cut to \\\"S…\\\", \\\"O…\\\" and \\\"G…\\\", and the main column runs past the right edge — the \\\"Release operations\\\" and \\\"Sample Database\\\" cards lose their right border and the description is cut mid-word (\\\"Some example data for you to pla\\\"). The rest is only reachable by scrolling the page horizontally, which also cuts off the left menu. (on /reference/databases)",
+      "expected": "At phone size the data reference fits the screen: the sidebar collapses behind the menu button (no truncated \\\"S…\\\" entries) and the database cards wrap inside the viewport, with no horizontal scrolling and no text cut off.",
+      "actual": "At 390 × 844 the page is wider than the screen and scrolls sideways: the sidebar keeps ~117px and its entries are cut to \\\"S…\\\", \\\"O…\\\" and \\\"G…\\\", and the main column runs past the right edge — the \\\"Release operations\\\" and \\\"Sample Database\\\" cards lose their right border and the description is cut mid-word (\\\"Some example data for you to pla\\\"). The rest is only reachable by scrolling the page horizontally, which also cuts off the left menu.",
+      "reproSteps": [
+        "Set the browser window to a phone size, 390 × 844.",
+        "Go to /reference/databases.",
+        "Look at the left \"DATA REFERENCE\" menu and the database cards on the right, then scroll the page to the right."
+      ]
+    },
+    {
+      "index": 22,
+      "reported_at_seconds": 913,
+      "name": "Trashed collection \"E-commerce\" shows no \"Deleted by\" and no \"Deleted at\" value in Trash",
+      "summary": "The trashed collection \"E-commerce\" row shows the Type, Name and the info icon but both the \"Deleted by\" and \"Deleted at\" cells are empty, while every trashed model and metric on the same page shows \"Harbor Admin\" and \"November 23, 2026\". The row therefore gives no indication of who deleted the collection or when. (on /trash)",
+      "expected": "Every row in the Trash table shows who deleted the item and when, like the model and metric rows next to it.",
+      "actual": "The trashed collection \"E-commerce\" row shows the Type, Name and the info icon but both the \"Deleted by\" and \"Deleted at\" cells are empty, while every trashed model and metric on the same page shows \"Harbor Admin\" and \"November 23, 2026\". The row therefore gives no indication of who deleted the collection or when.",
+      "reproSteps": [
+        "Sign in and open https://5501-irj19dkxmuqxplj4vepre.e2b.app/trash",
+        "Look at the table: rows agent12-model-beta, agent11-model-life, agent5-metric-a, agent6-dup-of-47, agent13-model-fromB each show \"Harbor Admin\" under Deleted by and \"November 23, 2026\" under Deleted at",
+        "Look at the last row, the collection \"E-commerce\": both Deleted by and Deleted at are empty"
+      ]
+    },
+    {
+      "index": 23,
+      "reported_at_seconds": 942,
+      "name": "Global search treats % and _ as wildcards: searching for them returns 70+ unrelated items",
+      "summary": "Searching for the single wildcard characters \\\"%\\\" or \\\"_\\\" returns almost the whole library: 72 results for \\\"%\\\" and 70 for \\\"_\\\" (e.g. \\\"Orders + People\\\", \\\"Release requests by region and category\\\", \\\"agent7-metric-count\\\"), even though none of those names contains \\\"%\\\" or \\\"_\\\". The characters are treated as SQL-LIKE wildcards instead of literal text. (on /search?q=%25 and /search?q=_ (global search))",
+      "expected": "Only items whose name or description contains the typed character are returned (a name with \\\"%\\\" or \\\"_\\\", e.g. \\\"agent7-metric-count\\\" for \\\"_\\\"), or, if nothing matches, the \\\"Didn't find anything\\\" empty state — not the entire library.",
+      "actual": "Searching for the single wildcard characters \\\"%\\\" or \\\"_\\\" returns almost the whole library: 72 results for \\\"%\\\" and 70 for \\\"_\\\" (e.g. \\\"Orders + People\\\", \\\"Release requests by region and category\\\", \\\"agent7-metric-count\\\"), even though none of those names contains \\\"%\\\" or \\\"_\\\". The characters are treated as SQL-LIKE wildcards instead of literal text.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1.",
+        "Open the global search from the top bar (the \"Search...\" box, or Ctrl/Cmd+K) and type a single underscore _ , then press Enter, or open https://5501-irj19dkxmuqxplj4vepre.e2b.app/search?q=_ directly.",
+        "Read the result count and the names listed (70 RESULTS, including items with no underscore such as \"Orders + People\").",
+        "Repeat with a single percent sign % (https://5501-irj19dkxmuqxplj4vepre.e2b.app/search?q=%25): 72 RESULTS, again listing items without a % in the name."
+      ]
+    },
+    {
+      "index": 24,
+      "reported_at_seconds": 958,
+      "name": "Table page at 390px: the \\\"Orders\\\" title overlaps the \\\"See this table\\\" button and the header runs off the right edge",
+      "summary": "At 390 × 844 the table page's header row does not fit: the \\\"Orders\\\" title sits underneath the blue \\\"See this table\\\" button (the button's left edge covers the last letters of the title), the \\\"1:PUBLIC\\\" label above it is cut off, the \\\"Edit\\\" button runs past the right edge, and the whole page scrolls sideways to reach it (after scrolling right, the top-left reads \\\"BLIC\\\" and the sidebar entries are reduced to \\\"D…\\\", \\\"F…\\\", \\\"Q…\\\", \\\"X…\\\"). (on /reference/databases/1/tables/2)",
+      "expected": "At phone size the table page header wraps: the breadcrumb, the table title and the \\\"See this table\\\" / \\\"Edit\\\" buttons each get their own space, none overlapping or cut off, and the page does not scroll sideways.",
+      "actual": "At 390 × 844 the table page's header row does not fit: the \\\"Orders\\\" title sits underneath the blue \\\"See this table\\\" button (the button's left edge covers the last letters of the title), the \\\"1:PUBLIC\\\" label above it is cut off, the \\\"Edit\\\" button runs past the right edge, and the whole page scrolls sideways to reach it (after scrolling right, the top-left reads \\\"BLIC\\\" and the sidebar entries are reduced to \\\"D…\\\", \\\"F…\\\", \\\"Q…\\\", \\\"X…\\\").",
+      "reproSteps": [
+        "Set the browser window to a phone size, 390 × 844.",
+        "Open /reference/databases/1/tables/2 (Data reference → Sample Database → Tables in Sample Database → Orders).",
+        "Look at the header row with the breadcrumb, the \"Orders\" title and the \"See this table\" / \"Edit\" buttons, then scroll the page to the right."
+      ]
+    },
+    {
+      "index": 25,
+      "reported_at_seconds": 961,
+      "name": "After a model is trashed in one tab, the other tab still shows it as a live editable model and saves a rename into the trashed model without any notice",
+      "summary": "Tab B keeps showing the model as an active, editable model (Filter, Summarize, Editor buttons, no trash banner) and the rename is silently written to the already-trashed model with no warning or error. (on /model/54-agent13-model2-rn)",
+      "expected": "The second tab should show the model is in the trash (as a fresh load of the same address does: red \"This model is in the trash.\" banner with Restore / Move / Delete permanently and no editor toolbar), or at least warn that the model was trashed elsewhere before writing to it.",
+      "actual": "Tab B keeps showing the model as an active, editable model (Filter, Summarize, Editor buttons, no trash banner) and the rename is silently written to the already-trashed model with no warning or error.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open https://5501-irj19dkxmuqxplj4vepre.e2b.app/model/54-agent13-model2-rn in tab A.",
+        "Open the same address in a second tab B and let it load fully (Filter / Summarize / Editor toolbar visible, no red banner).",
+        "In tab A click the '…' (Move, trash, and more…) button, choose 'Move to trash' and confirm 'Move to trash'. Tab A now shows the red banner 'This model is in the trash.' and loses the Filter/Summarize/Editor toolbar.",
+        "Switch to tab B (it was loaded before the trash): it still shows the full Filter / Summarize / Editor toolbar and the same page as a normal live model, with no banner.",
+        "In tab B click the model title in the header, replace 'agent13-model2-rn' with 'agent13-model2-zombie' and press Enter.",
+        "The rename is accepted (PUT /api/card/54 returns 200), the header shows the new name and tab B still shows no trash notice and keeps the Editor button."
+      ]
+    },
+    {
+      "index": 26,
+      "reported_at_seconds": 971,
+      "name": "At phone width the model header loses the Filter and Summarize buttons entirely",
+      "summary": "At this width the toolbar row shows only \\\"Editor\\\", refresh, bookmark, info and \\\"…\\\". \\\"Filter\\\" and \\\"Summarize\\\" are gone from the visible header (they exist in the page but are laid out around 1,300px down, outside the window), and the \\\"…\\\" menu does not contain them either (only Edit query definition, Edit metadata, Turn back to saved question, Move, Duplicate, Move to trash), so the model cannot be filtered or summarized on a phone. The page cannot be scrolled to reach them. (on /model/62-agent10-kbd-model)",
+      "expected": "As at tablet width (820px) and desktop, the model header keeps a reachable \\\"Filter\\\" and \\\"Summarize\\\" control (icon buttons are fine) so a person on a phone can filter or summarize the model.",
+      "actual": "At this width the toolbar row shows only \\\"Editor\\\", refresh, bookmark, info and \\\"…\\\". \\\"Filter\\\" and \\\"Summarize\\\" are gone from the visible header (they exist in the page but are laid out around 1,300px down, outside the window), and the \\\"…\\\" menu does not contain them either (only Edit query definition, Edit metadata, Turn back to saved question, Move, Duplicate, Move to trash), so the model cannot be filtered or summarized on a phone. The page cannot be scrolled to reach them.",
+      "reproSteps": [
+        "Sign in, open Browse → Models and open any model (e.g. the model named \"agent10-kbd-model\", /model/62-agent10-kbd-model).",
+        "With the window at desktop size note the header toolbar: Filter, Summarize, Editor, refresh, bookmark, info, \"…\".",
+        "Set the browser window to a phone size (390 × 844) and reload the page.",
+        "Look at the toolbar row under the model title, then open the \"…\" (Move, trash, and more…) menu and look for Filter/Summarize in it."
+      ]
+    },
+    {
+      "index": 27,
+      "reported_at_seconds": 974,
+      "name": "Model History says 'changed pin position' for edits that only renamed or re-described the model",
+      "summary": "Both revision summaries claim an unpublished pin change that never happened: the rename revision reads 'renamed this Card from \"agent12-model-alpha\" to \"agent12-model-beta\", edited the metadata and changed pin position.' and the description edit reads 'changed pin position and changed the description.' The model was never pinned or unpinned — it was only renamed (title field) and had its description edited once in the Info panel, and it still appears unpinned among the ordinary models of Our analytics. (on /model/45-agent12-model-beta (Info panel → History))",
+      "expected": "Each History entry describes only what actually changed: for the rename 'renamed this Card from \"agent12-model-alpha\" to \"agent12-model-beta\"' and for the edit 'changed the description', with no mention of a pin position change that did not happen.",
+      "actual": "Both revision summaries claim an unpublished pin change that never happened: the rename revision reads 'renamed this Card from \"agent12-model-alpha\" to \"agent12-model-beta\", edited the metadata and changed pin position.' and the description edit reads 'changed pin position and changed the description.' The model was never pinned or unpinned — it was only renamed (title field) and had its description edited once in the Info panel, and it still appears unpinned among the ordinary models of Our analytics.",
+      "reproSteps": [
+        "Open /model/45-agent12-model-beta (the model agent12-model-beta, in Our analytics; it was created in this hunt and is now in the trash).",
+        "Click the circle-i 'More info' button in the header.",
+        "Open the Info panel's 'History' tab.",
+        "Read the two revision entries: the rename one and the 'changed pin position and changed the description' one."
+      ]
+    },
+    {
+      "index": 28,
+      "reported_at_seconds": 974,
+      "name": "Fields list at 390px: headers and the field type / data type values overlap each other and run off the page",
+      "summary": "At 390 × 844 the field table cannot fit: the column headers overlap each other and read \\\"Field typeData type\\\", and in every row the type badge and data type are drawn on top of each other — \\\"EntBIGINT\\\", \\\"INTEGE\\\", \\\"INTE\\\" for the first fields — with the rest cut off past the right edge of the page. (on /reference/databases/1/tables/2/fields)",
+      "expected": "At phone size the fields list keeps its columns readable: headers and the field-type / data-type values are either stacked per field or the table scrolls inside its own container, with no overlapping text.",
+      "actual": "At 390 × 844 the field table cannot fit: the column headers overlap each other and read \\\"Field typeData type\\\", and in every row the type badge and data type are drawn on top of each other — \\\"EntBIGINT\\\", \\\"INTEGE\\\", \\\"INTE\\\" for the first fields — with the rest cut off past the right edge of the page.",
+      "reproSteps": [
+        "Set the browser window to a phone size, 390 × 844.",
+        "Open /reference/databases/1/tables/2/fields (Data reference → Sample Database → Tables in Sample Database → Orders → Fields in this table).",
+        "Look at the column headers \"Field name / Field type / Data type\" and at the first three field rows (ID, User ID, Product ID)."
+      ]
+    },
+    {
+      "index": 29,
+      "reported_at_seconds": 1002,
+      "name": "Filter \"Customer Email contains _\" returns every row — the filter text's wildcard characters are not escaped",
+      "summary": "The filter pill reads \"People - User → Customer Email contains _\" and the table lists every row again (footer: \"Showing first 2,000 rows\"), i.e. the underscore is treated as a LIKE wildcard instead of a literal character: the filter returns rows that do not contain the text it says it filters for. (on /model/1-orders-people)",
+      "expected": "The result should be empty, because no customer email in this model contains an underscore (all of them look like borer-hudson@yahoo.com or lina.heaney@yahoo.com) — the page should show the \"No results!\" empty state, exactly as it does for the control filter \"Customer Email contains zzz-agent15\" (0 rows).",
+      "actual": "The filter pill reads \"People - User → Customer Email contains _\" and the table lists every row again (footer: \"Showing first 2,000 rows\"), i.e. the underscore is treated as a LIKE wildcard instead of a literal character: the filter returns rows that do not contain the text it says it filters for.",
+      "reproSteps": [
+        "Sign in with eval@momentic.ai / momentic-eval-1 and open https://5501-irj19dkxmuqxplj4vepre.e2b.app/model/1-orders-people (model \"Orders + People\").",
+        "Click the \"Filter\" button in the header toolbar.",
+        "In the column list of the filter popover, click \"People - User → Customer Email\".",
+        "In the filter popover, open the operator dropdown on the right (it shows \"Is\") and choose \"Contains\".",
+        "Type a single underscore _ into the \"Enter some text\" box.",
+        "Click \"Apply filter\"."
+      ]
+    },
+    {
+      "index": 30,
+      "reported_at_seconds": 1168,
+      "name": "A whitespace-only display name is accepted for a model column and leaves the column header empty in the grid",
+      "summary": "The Display name field accepts a whitespace-only value with no validation or message; \\\"Save changes\\\" sends PUT /api/card/65 → 200, and from then on that column has an empty header in the model grid (only the column-type icon is left, the numbers below are unlabelled). Reproduced on \\\"Subtotal\\\" (saved as three spaces) and on \\\"Tax\\\" (saved as two spaces), and it survives a page reload. (on /model/65-agent8-meta-model/columns)",
+      "expected": "A whitespace-only display name is rejected (or trimmed to empty and refused, or falls back to the original column name), so the column keeps a visible header.",
+      "actual": "The Display name field accepts a whitespace-only value with no validation or message; \\\"Save changes\\\" sends PUT /api/card/65 → 200, and from then on that column has an empty header in the model grid (only the column-type icon is left, the numbers below are unlabelled). Reproduced on \\\"Subtotal\\\" (saved as three spaces) and on \\\"Tax\\\" (saved as two spaces), and it survives a page reload.",
+      "reproSteps": [
+        "Sign in and open the model https://5501-irj19dkxmuqxplj4vepre.e2b.app/model/65-agent8-meta-model/columns (a model I created from Sample Database > Orders)",
+        "Click the \"Subtotal\" column header in the grid",
+        "In the right-hand panel, replace the \"Display name\" value \"Subtotal\" with three spaces",
+        "Click \"Save changes\" in the top right and reload the page: the Subtotal column has no header any more",
+        "Repeat with the \"Tax\" column, typing two spaces as its display name and clicking \"Save changes\""
+      ]
+    },
+    {
+      "index": 31,
+      "reported_at_seconds": 1190,
+      "name": "A non-numeric model address opens the \\\"Pick your starting data\\\" creation flow instead of a not-found page",
+      "summary": "The address /model/not-a-number silently opens the model-creation data picker: the page is titled \\\"Pick your starting data\\\" with a \\\"Search for tables and more…\\\" box and a list of Release operations, Sample Database, Our analytics and \\\"Browse all\\\". Nothing says the model in the address does not exist, and the address bar keeps /model/not-a-number. (on /model/not-a-number)",
+      "expected": "A model address that is not a valid id shows the not-found page (like /model/999999 does: \\\"We're a little lost… The page you asked for couldn't be found.\\\"), not the creation flow.",
+      "actual": "The address /model/not-a-number silently opens the model-creation data picker: the page is titled \\\"Pick your starting data\\\" with a \\\"Search for tables and more…\\\" box and a list of Release operations, Sample Database, Our analytics and \\\"Browse all\\\". Nothing says the model in the address does not exist, and the address bar keeps /model/not-a-number.",
+      "reproSteps": [
+        "Signed in as eval@momentic.ai, type the address /model/not-a-number in a fresh tab navigation.",
+        "Look at the page that opens."
+      ]
+    },
+    {
+      "index": 32,
+      "reported_at_seconds": 1391,
+      "name": "Metric Info panel History calls the metric a \"Card\" instead of a metric",
+      "summary": "The History tab calls the metric a \"Card\": \"You renamed this Card from \\\"agent13-metric-fromA\\\" to \\\"agent13-metric-fromB\\\".\" and, on the previous revision, \"renamed this Card from \\\"agent13-metric-life\\\" to \\\"agent13-metric-fromA\\\" and changed pin position.\" Nowhere else on the page is it called a Card — it is a metric everywhere else (Browse > Metrics, \"Edit metric definition\", \"This metric is in the trash\"). (on /metric/67-agent13-metric-fromb (Info panel → History))",
+      "expected": "The history entries should describe the object the way the rest of the app does, e.g. \"You renamed this metric from \"agent13-metric-fromA\" to \"agent13-metric-fromB\".\"",
+      "actual": "The History tab calls the metric a \"Card\": \"You renamed this Card from \\\"agent13-metric-fromA\\\" to \\\"agent13-metric-fromB\\\".\" and, on the previous revision, \"renamed this Card from \\\"agent13-metric-life\\\" to \\\"agent13-metric-fromA\\\" and changed pin position.\" Nowhere else on the page is it called a Card — it is a metric everywhere else (Browse > Metrics, \"Edit metric definition\", \"This metric is in the trash\").",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open a metric of your own, e.g. https://5501-irj19dkxmuqxplj4vepre.e2b.app/metric/67-agent13-metric-fromb.",
+        "Click the model/metric title in the header and rename it (click the title, type a new name, press Enter).",
+        "Click the 'More info' (i) button in the page header and open the History tab.",
+        "Read the revision entries: the rename is described as 'You renamed this Card from … to …'."
+      ]
+    }
+  ]
+}

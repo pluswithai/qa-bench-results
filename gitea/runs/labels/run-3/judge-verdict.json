@@ -1,0 +1,229 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "gitea/areas/labels",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "87b5258fc85782372c044b3338f2e7deb7206ceb8ed8163bb465394a742af86a",
+    "known_invalid_sha256": "855c5101a0fbba2e242de39e2d383e14739ddbeac8ef84b8d3e6d5b5c047ca58",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "32",
+    "bugs": "15",
+    "flags": "0",
+    "known_hits": "8",
+    "extra_known_hits": "0",
+    "unverified": "5",
+    "outside_area_known_hits": "1",
+    "outside_area_known_invalid": "0",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "1",
+    "outside_area_ground_truth_sha256": "47db07b83af13b7c7dd75acd1b523ed86e8107b60e6f33878e8fb5b68a2acbe2",
+    "outside_area_known_invalid_sha256": "72e79c4023c85c9101fbf2b7613d3daf78b07fded510d117ab5b26f6ac3103f9",
+    "duplicates": "0",
+    "duplicate_known_hits": "0",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "1",
+    "known_misses": "1",
+    "precision": "0.8888888888888888",
+    "recall": "0.25",
+    "findings_per_minute": "0.5169318143962064",
+    "correct_findings_per_minute": "0.27569696767797675",
+    "severity_1": "4",
+    "severity_3": "4",
+    "severity_5": "0",
+    "severity_sum": "16",
+    "score": "15",
+    "duration_seconds": "1741.042",
+    "partial": "false",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 3,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Matches the organization Labels heading displaying “1 labels” after creating a single label."
+      },
+      {
+        "groundTruthIndex": 5,
+        "reproStepsIndex": 0,
+        "findingIndex": 1,
+        "reason": "Matches long repository label badges overlapping adjacent metadata at narrow widths; the tablet viewport is a variation of the repository reproduction."
+      },
+      {
+        "groundTruthIndex": 8,
+        "reproStepsIndex": 0,
+        "findingIndex": 2,
+        "reason": "Matches saving a repository label whose name contains only spaces, producing a visibly nameless label."
+      },
+      {
+        "groundTruthIndex": 2,
+        "reproStepsIndex": 0,
+        "findingIndex": 3,
+        "reason": "Matches repository usage counts including PRs while their links exclude PRs. Mixed issue/PR usage exposes the same failure as PR-only usage."
+      },
+      {
+        "groundTruthIndex": 6,
+        "reproStepsIndex": null,
+        "findingIndex": 4,
+        "reason": "Matches the plural usage-count wording for exactly one item, but observes it on repository Labels rather than through the organization-label case."
+      },
+      {
+        "groundTruthIndex": 16,
+        "reproStepsIndex": 0,
+        "findingIndex": 5,
+        "reason": "Matches creating a second repository label with an existing name, leaving duplicate choices in the issue label picker."
+      },
+      {
+        "groundTruthIndex": 11,
+        "reproStepsIndex": 0,
+        "findingIndex": 12,
+        "reason": "Matches the issue-list Label filter opening mostly off the left edge at 390px, making its options unreachable."
+      },
+      {
+        "groundTruthIndex": 23,
+        "reproStepsIndex": null,
+        "findingIndex": 14,
+        "reason": "Matches Alt+Enter including a label instead of excluding it, but reproduces through the Issues list rather than the Pull Requests list."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 5,
+        "reproStepsIndex": null,
+        "findingIndex": 13,
+        "reason": "Matches the rejected claim that Clear labels loses recent addition/removal history. Rapid changes intentionally merge; this finding uses an issue rather than a pull request."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 6,
+        "reason": "No supplied entry describes silently failing to assign a label deleted in another tab."
+      },
+      {
+        "findingIndex": 7,
+        "reason": "No supplied entry describes direct navigation to the label-creation endpoint producing a blank 405 page."
+      },
+      {
+        "findingIndex": 8,
+        "reason": "No supplied entry describes Least issues sorting by totals that include closed issues rather than the displayed open counts."
+      },
+      {
+        "findingIndex": 9,
+        "reason": "No supplied entry concerns the organization header or its Follow button wrapping on mobile."
+      },
+      {
+        "findingIndex": 10,
+        "reason": "No supplied entry describes saving an edit after another tab deletes the label and reaching a bare 404 page."
+      },
+      {
+        "findingIndex": 11,
+        "reason": "No supplied entry describes an incorrect preview swatch for accepted three-digit hex colors; the rejected color-picker reports concern JavaScript errors."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 3,
+        "reason": "Label assignment fails without feedback; the background 500 does not break the page."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 5,
+        "reason": "The destination is a completely blank, unusable page."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 3,
+        "reason": "The selected sort produces an incorrect ordering relative to the displayed counts."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 1,
+        "reason": "Header and button-text wrapping are presentation defects without described functional impact."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 5,
+        "reason": "Saving replaces the app with a bare error page lacking navigation or recovery controls."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 1,
+        "reason": "Only the preview is visually incorrect; the picker and saved color are correct."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 3,
+        "reason": "The described impact is missing activity-history results, although that behavior was reviewed as intentional."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [
+      {
+        "findingIndex": 9,
+        "reference": {
+          "name": "Organization Follow button label splits across lines at mobile width",
+          "summary": "Below 768px on an organization’s profile, the Follow button is squeezed beside the organization name and its label breaks mid-word (“Fol”/“low”; “Unfollow” across three lines).",
+          "expected": "At phone width the Follow/Unfollow button keeps its label on one line, or the header wraps so the button has room.",
+          "actual": "At 390px on an organization page reached from Site Administration > Organizations, the Follow button shrank to about 62×46px and rendered “Fol” and “low” on two lines; after following, “Unfollow” split into “Unf”/“ollo”/“w”. Widths of 768px and up, and a one-letter display name, rendered on one line.",
+          "reproSteps": [
+            [
+              "Sign in as eval and set the viewport to 390×844.",
+              "Open Site Administration > Organizations and open an organization with a typical-length display name.",
+              "Look at the Follow button next to the organization name and observe its label split mid-word across lines."
+            ]
+          ],
+          "severity": 1
+        },
+        "reason": "Matches the mobile organization Follow-button label splitting mid-word. It is reached through organization label settings rather than the reviewed organization-profile flow."
+      }
+    ],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

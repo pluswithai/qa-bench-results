@@ -1,0 +1,15 @@
+{
+  "fixture": "twenty/areas/settings-data-model",
+  "run": 1,
+  "started_at": "2026-11-24T04:18:38.400Z",
+  "duration_seconds": 1799.941,
+  "time_limit_seconds": 1800,
+  "stop_reason": "time_limit",
+  "credits": {
+    "total": 1081,
+    "testing_team": 907,
+    "verification": 174,
+    "findings_verified": 29
+  },
+  "team_container_errors": 0
+}

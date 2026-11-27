@@ -1,0 +1,214 @@
+{
+  "fixture": "twenty/areas/records-views",
+  "run": 3,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 477,
+      "name": "Sort panel's \"Descending\" option is ignored — list stays ascending and the control reverts to Ascending",
+      "summary": "Choosing \"Descending\" has no effect: the rows stay in ascending order (45k, 45k, 65k, 75k … 320k), the sort chips keep the ascending \"↑\" arrow, and after closing and re-opening the Sort panel the direction button is \"Ascending\" again. There is no way through the Sort panel to sort descending. (on /objects/opportunities)",
+      "expected": "Choosing \"Descending\" should reverse the sort: the chip should show a down arrow and the rows should be ordered highest amount first (3.2m, 2.8m, 2.5m …), and the panel should keep \"Descending\" selected.",
+      "actual": "Choosing \"Descending\" has no effect: the rows stay in ascending order (45k, 45k, 65k, 75k … 320k), the sort chips keep the ascending \"↑\" arrow, and after closing and re-opening the Sort panel the direction button is \"Ascending\" again. There is no way through the Sort panel to sort descending.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev and open /objects/opportunities (table view).",
+        "Click the \"Sort\" button in the toolbar.",
+        "In the field list click \"Amount\" — a sort chip \"↑ Amount\" appears above the table and the rows are ordered 45k, 45k, 45k, 65k, … ascending.",
+        "Click the direction button that reads \"Ascending\" at the top of the Sort panel and choose \"Descending\" in the dropdown.",
+        "Read the chips above the table and the rows: the chips still read \"↑ Amount\" and the order is still 45k, 45k, 45k, 65k, 75k … ascending.",
+        "Close the panel (Escape) and re-open Sort: the direction button is back to \"Ascending\".",
+        "Repeat with two sort fields (Amount then Close date): choose \"Descending\" again — both chips stay \"↑\" and the order stays ascending."
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 568,
+      "name": "Selection is silently cleared by sorting from a column header and by opening the Filter or Options panel",
+      "summary": "The selection is silently thrown away: both row checkboxes become unchecked, the \"2 selected\" counter disappears from the header and the bulk action bar (\"Send Email\", \"Update\") disappears. The same happens when only opening the \"Filter\" panel or the \"Options\" panel with rows selected. Nothing tells the person their selection was lost, so a bulk action they were about to run silently never applies to what they picked. (on /objects/people)",
+      "expected": "The selected rows stay selected (counter and bulk actions keep showing \"2 selected\") while the list is re-sorted, so the person can run the bulk action on the rows they picked.",
+      "actual": "The selection is silently thrown away: both row checkboxes become unchecked, the \"2 selected\" counter disappears from the header and the bulk action bar (\"Send Email\", \"Update\") disappears. The same happens when only opening the \"Filter\" panel or the \"Options\" panel with rows selected. Nothing tells the person their selection was lost, so a bulk action they were about to run silently never applies to what they picked.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev and open /objects/people.",
+        "Filter the list to Company = Google (Filter → Company → type Google → tick Google → Escape): the list shows 2 rows and \"All People · 2\".",
+        "Click the header checkbox \"Select all rows\": the header shows \"2 selected\" and the bulk actions appear.",
+        "Click the \"Name\" column header, then click \"Sort\" in the small menu that opens.",
+        "Look at the header and the two rows."
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 634,
+      "name": "At phone width the selection counter and all bulk actions disappear once rows are selected",
+      "summary": "The two rows are checked, but there is no \"2 selected\" counter and no bulk action bar: \"Send Email\" and \"Update\" are nowhere on the page (the toolbar shows only the panel icon and the \"⋮\" menu, whose contents are the command menu — Import/Export/Settings entries — not the bulk actions). At 1280 px wide the same selection shows \\\"2 selected\\\", \\\"Send Email\\\" and \\\"Update\\\" in the header. So on a phone-sized screen a person can select rows but can neither see how many are selected nor run any bulk action on them. (on /objects/people)",
+      "expected": "As on the desktop width, the header shows \"2 selected\" and the bulk actions (\"Send Email\", \"Update\") once rows are selected, so they can be used on a phone.",
+      "actual": "The two rows are checked, but there is no \"2 selected\" counter and no bulk action bar: \"Send Email\" and \"Update\" are nowhere on the page (the toolbar shows only the panel icon and the \"⋮\" menu, whose contents are the command menu — Import/Export/Settings entries — not the bulk actions). At 1280 px wide the same selection shows \\\"2 selected\\\", \\\"Send Email\\\" and \\\"Update\\\" in the header. So on a phone-sized screen a person can select rows but can neither see how many are selected nor run any bulk action on them.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev, open /objects/people.",
+        "Set the browser width to 390 × 844 (phone).",
+        "Click \"Main navigation\" in the bottom bar to close the sidebar so the record list is visible.",
+        "Tick the header checkbox \"Select all rows\" (both rows become checked).",
+        "Look at the top of the page for the selection counter and the bulk actions; also open the \"⋮\" button at the top right."
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 717,
+      "name": "Week view: tasks at the same time overlap each other so only a single letter of each title is visible",
+      "summary": "All 11 chips are drawn on top of each other in a diagonal cascade: each chip starts 13 px to the right of the previous one and ends at the same right edge, so only a ~13 px sliver of every chip is visible. The column shows a row of single letters \\\"P P P P P P P P P P P\\\" and, under them, a row of dots where the time should be. No title or time can be read in Week mode for concurrent tasks. The same day in Day mode draws the 11 chips side by side (readably truncated), so the two modes disagree. (on /objects/tasks (calendar view \"agent8-calendar\", Week mode))",
+      "expected": "The 11 tasks due Nov 26, 2026 at 6:05 AM are laid out side by side so each one is readable (title + time), as the Day mode does for the same day.",
+      "actual": "All 11 chips are drawn on top of each other in a diagonal cascade: each chip starts 13 px to the right of the previous one and ends at the same right edge, so only a ~13 px sliver of every chip is visible. The column shows a row of single letters \\\"P P P P P P P P P P P\\\" and, under them, a row of dots where the time should be. No title or time can be read in Week mode for concurrent tasks. The same day in Day mode draws the 11 chips side by side (readably truncated), so the two modes disagree.",
+      "reproSteps": [
+        "Open https://5500-iqh0wqmhiiadae58emvlq.e2b.app/objects/tasks",
+        "Click the view name button \"All Tasks · 1,800\" at the top left of the list and pick the calendar view \"agent8-calendar\" (Date field = Due Date). Alternatively create it with \"Add view\" → View type Calendar → Date field Due Date.",
+        "In the calendar toolbar set the mode dropdown to \"Week\" and make sure the period is Nov 22 – 28, 2026 (the date range dropdown next to it).",
+        "Look at the Thu 26 column in the 6:00 AM row."
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 722,
+      "name": "\"Reset\" does not clear the advanced filter on the first click while the filter panel is open",
+      "summary": "The first click on \\\"Reset\\\" while the filter panel is open only closes the panel: the filter stays applied (\\\"All Companies · 309\\\", chip \\\"1 advanced rule\\\", 309 filtered rows), and the Reset button turns grey/disabled. A second click on Reset is needed to actually clear the filter. (on /objects/companies)",
+      "expected": "Clicking \\\"Reset\\\" clears the active filters at once, independently of whether the advanced-filter panel is open: the filter chip disappears, the view goes back to \\\"All Companies · 599\\\" and all rows are listed again.",
+      "actual": "The first click on \\\"Reset\\\" while the filter panel is open only closes the panel: the filter stays applied (\\\"All Companies · 309\\\", chip \\\"1 advanced rule\\\", 309 filtered rows), and the Reset button turns grey/disabled. A second click on Reset is needed to actually clear the filter.",
+      "reproSteps": [
+        "Open https://5500-iqh0wqmhiiadae58emvlq.e2b.app/objects/companies (signed in as tim@apple.dev).",
+        "Click \"Filter\" in the view toolbar, then click \"Advanced filter\" in the dropdown — the filter panel opens under the toolbar and the view is labelled \"All Companies · 599\".",
+        "Type o in the rule's \"Enter value\" field — the list narrows to 309 rows and the chip \"1 advanced rule\" appears.",
+        "With the filter panel still open, click the \"Reset\" button at the right end of the filter bar.",
+        "Look at the view label and the rows: it still says \"All Companies · 309\", the chip \"1 advanced rule\" is still there and the same 309 rows are shown; the panel merely closed and \"Reset\" is now shown greyed out.",
+        "Click \"Reset\" a second time (panel now closed) — only now the filter clears and the view returns to 599."
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 746,
+      "name": "Changing \"Group by\" on the Tasks kanban view empties the board and the change is saved: only a \"No Value\" column remains",
+      "summary": "Grouping by Assignee shows a single \"No Value\" column with 1 card out of 1,801 records (all tasks that have an assignee, e.g. 'Schedule follow-up call' assigned to Jony Ive, disappear from the board). Grouping back by Status does not restore the status columns: the board keeps only an empty \"No Value\" column with 0 cards while the label still says 'By Status · 1,801'. The broken state is saved to the workspace view and survives a full page reload. No error message is shown, and the console has no error. (on /objects/tasks (saved view \"By Status\", kanban layout))",
+      "expected": "Grouping the board by Assignee shows one column per assignee present on the tasks (plus a \"No value\" column for unassigned tasks), and the cards shown add up to the 1,801 records the view label reports. Grouping back by Status restores the To do / In progress / Done columns with their cards.",
+      "actual": "Grouping by Assignee shows a single \"No Value\" column with 1 card out of 1,801 records (all tasks that have an assignee, e.g. 'Schedule follow-up call' assigned to Jony Ive, disappear from the board). Grouping back by Status does not restore the status columns: the board keeps only an empty \"No Value\" column with 0 cards while the label still says 'By Status · 1,801'. The broken state is saved to the workspace view and survives a full page reload. No error message is shown, and the console has no error.",
+      "reproSteps": [
+        "Go to https://5500-iqh0wqmhiiadae58emvlq.e2b.app/objects/tasks",
+        "Open the view dropdown next to the Tasks title and choose the saved view 'By Status' (kanban with To do / In progress / Done columns, label shows 'By Status · 1,800' and cards are visible)",
+        "Click 'Options' at the top right, click the 'Group' row, then click 'Group by' (currently 'Status')",
+        "Choose 'Assignee' in the Group by list",
+        "Wait 5 s: the board now shows only one column 'No Value' containing a single card (the task I had created, 'agent7 kanban test'), while the view label still says 'By Status · 1,801'",
+        "Click 'Options' > 'Group' > 'Group by' again and choose 'Status' back",
+        "Reload the page (F5) and wait 10 s"
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 773,
+      "name": "Month view silently shows only the first 5 tasks of a day, with no \"+N more\"",
+      "summary": "The Nov 26 cell shows exactly 5 task cards and then the week row ends — no \\\"+N more\\\", no counter, no scroll area (the cell's scroll height equals its client height). The other 6 tasks due that day exist and are shown in the same view's Week and Day modes (11 chips for Nov 26, 2026). The same truncation happens on every day that has more than 5 tasks (Nov 27, 28, 29, 30, Dec 1, 2, 4). The view header counts 1,801 tasks while the month grid can only ever show 5 per day. (on /objects/tasks (calendar view \"agent8-calendar\", Month mode))",
+      "expected": "Every task due on a day is reachable from the month grid (all of them shown, or a \"+N more\" indicator that leads to the rest), and the number of events shown matches what the Day and Week modes show for the same day.",
+      "actual": "The Nov 26 cell shows exactly 5 task cards and then the week row ends — no \\\"+N more\\\", no counter, no scroll area (the cell's scroll height equals its client height). The other 6 tasks due that day exist and are shown in the same view's Week and Day modes (11 chips for Nov 26, 2026). The same truncation happens on every day that has more than 5 tasks (Nov 27, 28, 29, 30, Dec 1, 2, 4). The view header counts 1,801 tasks while the month grid can only ever show 5 per day.",
+      "reproSteps": [
+        "Open https://5500-iqh0wqmhiiadae58emvlq.e2b.app/objects/tasks",
+        "Click the view name button \"All Tasks · 1,800\" and choose the calendar view \"agent8-calendar\" (Date field = Due Date), or create it with \"Add view\" → Calendar → Date field Due Date.",
+        "Keep the mode on \"Month\" / November 2026.",
+        "Scroll down to the week row Sun 22 – Sat 28 and count the task cards in the Thu 26 cell: there are 5, then the row ends.",
+        "For comparison switch the mode dropdown to \"Week\" or \"Day\" and go to Nov 26: the same day lists 11 tasks ('Prepare meeting agenda', 6:05 AM)."
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 818,
+      "name": "Empty state on the Opportunities table says \"Add a Opportunity\" instead of \"Add an Opportunity\"",
+      "summary": "The empty state shows the button \"Add a Opportunity\" and the heading \"No Opportunity found\". The article is wrong: it reads \"a Opportunity\" instead of \"an Opportunity\". (on /objects/opportunities)",
+      "expected": "The empty-state button should read \"Add an Opportunity\", like the other empty states use the correct article.",
+      "actual": "The empty state shows the button \"Add a Opportunity\" and the heading \"No Opportunity found\". The article is wrong: it reads \"a Opportunity\" instead of \"an Opportunity\".",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev and open /objects/opportunities (table view).",
+        "Click \"Filter\" in the toolbar above the table.",
+        "Click \"Close date\" in the field list — a filter \"Close date is <today>\" is applied and no record matches, so the empty state appears in the middle of the table.",
+        "Read the empty state: heading \"No Opportunity found\", sub-text \"No records matching the filter criteria were found.\", and a button \"Add a Opportunity\"."
+      ]
+    },
+    {
+      "index": 8,
+      "reported_at_seconds": 1060,
+      "name": "Changing a Kanban column's aggregate to Sum of Amount blanks the entire By Stage board, and it stays blank after reload",
+      "summary": "Immediately after choosing Sum → Amount the whole record area goes blank: no columns, no cards, no empty-state message, while the view label still says \"By Stage · 151\". Reloading the page does not help — the board stays completely blank. The board only comes back if you open Options → Group → Group by and re-select \"Stage\". (on /objects/opportunities)",
+      "expected": "Each column header shows the sum of the Amount of its cards (e.g. New 16.4m) and all five columns with their 151 cards stay on screen.",
+      "actual": "Immediately after choosing Sum → Amount the whole record area goes blank: no columns, no cards, no empty-state message, while the view label still says \"By Stage · 151\". Reloading the page does not help — the board stays completely blank. The board only comes back if you open Options → Group → Group by and re-select \"Stage\".",
+      "reproSteps": [
+        "Sign in with tim@apple.dev / tim@apple.dev and open /objects/opportunities",
+        "Open the view dropdown next to the record count and choose the Kanban view \"By Stage\"",
+        "Click the aggregate value in the \"New\" column header (it shows a number such as 16.4m)",
+        "In the dropdown choose \"More options\", then \"Sum\", then \"Amount\""
+      ]
+    },
+    {
+      "index": 9,
+      "reported_at_seconds": 1072,
+      "name": "Kanban columns fall back to alphabetical order after re-applying the Group by field while Sort still says \"Manual\"",
+      "summary": "The columns come back in alphabetical order — Customer 7.7m, Meeting 37.8m, New 16.4m, Proposal 31.1m, Screening 13.1m — and the \"Visible groups\" list in Options → Group shows the same alphabetical order (Customer, Meeting, New, Proposal, Screening). The view's group Sort still reads \"Manual\", so the saved manual stage order is silently dropped and cannot be put back (dragging the entries in the Visible groups list does not reorder them). (on /objects/opportunities)",
+      "expected": "The board keeps the saved column order of its groups (the Stage options order New, Screening, Meeting, Proposal, Customer) because the group Sort is \"Manual\", or at least keeps whichever manual order was saved.",
+      "actual": "The columns come back in alphabetical order — Customer 7.7m, Meeting 37.8m, New 16.4m, Proposal 31.1m, Screening 13.1m — and the \"Visible groups\" list in Options → Group shows the same alphabetical order (Customer, Meeting, New, Proposal, Screening). The view's group Sort still reads \"Manual\", so the saved manual stage order is silently dropped and cannot be put back (dragging the entries in the Visible groups list does not reorder them).",
+      "reproSteps": [
+        "Sign in with tim@apple.dev / tim@apple.dev and open /objects/opportunities, then choose the Kanban view \"By Stage\" — the columns are in stage order: New, Screening, Meeting, Proposal, Customer",
+        "Click \"Options\" → \"Group\" → \"Group by\" and pick \"Stage\" (the field that is already selected)",
+        "Look at the order of the columns on the board and at the \"Visible groups\" list in the same panel",
+        "Options → Group → Sort shows \"Manual\" even though the order is now alphabetical"
+      ]
+    },
+    {
+      "index": 10,
+      "reported_at_seconds": 1080,
+      "name": "Kanban column headers show \"-\" instead of a record count",
+      "summary": "Every column header shows a dash where the record count belongs: \"To do -\", \"In progress -\", \"Done -\", \"No Value -\", even though the columns are full of cards and the view label says 1,802 records. The same dash appears on the seeded \"By Status\" board (before it was modified) and on a fresh Kanban view created from scratch; it survives a reload. (on /objects/tasks (Kanban layout))",
+      "expected": "Each Kanban column header shows how many records the column holds (e.g. \"To do 612\"), as the view label shows the total in the list.",
+      "actual": "Every column header shows a dash where the record count belongs: \"To do -\", \"In progress -\", \"Done -\", \"No Value -\", even though the columns are full of cards and the view label says 1,802 records. The same dash appears on the seeded \"By Status\" board (before it was modified) and on a fresh Kanban view created from scratch; it survives a reload.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev and open /objects/tasks.",
+        "Click the view dropdown at the top left ('All Tasks · 1,802'), click 'Add view', type the name agent4-counts, set View type to Kanban (Stages = Status) and click Create.",
+        "Look at the column headers of the new board (To do, In progress, Done, No Value).",
+        "Reload the page and look at the headers again."
+      ]
+    },
+    {
+      "index": 11,
+      "reported_at_seconds": 1188,
+      "name": "Reloading the By Stage Kanban renders a completely empty board while the view label still says 151",
+      "summary": "The record area is completely empty: no stage columns, no cards and no empty-state message, only the toolbar and the banner. The view label still reads \"By Stage · 151\", so the 151 records are neither shown nor explained. The blank board stays that way indefinitely; the columns only come back after opening Options → Group → Group by and re-selecting \"Stage\" (the already selected field). This happens on every reload of the saved view now, without changing any setting in between. (on /objects/opportunities)",
+      "expected": "The Kanban board renders its stage columns with their cards on load, as it did on the first visit to the view.",
+      "actual": "The record area is completely empty: no stage columns, no cards and no empty-state message, only the toolbar and the banner. The view label still reads \"By Stage · 151\", so the 151 records are neither shown nor explained. The blank board stays that way indefinitely; the columns only come back after opening Options → Group → Group by and re-selecting \"Stage\" (the already selected field). This happens on every reload of the saved view now, without changing any setting in between.",
+      "reproSteps": [
+        "Sign in with tim@apple.dev / tim@apple.dev and open /objects/opportunities",
+        "Open the view dropdown next to the record count and choose the saved Kanban view \"By Stage\"",
+        "Wait until the five stage columns with their cards are shown (the label reads \"By Stage · 151\")",
+        "Reload the page (browser reload / F5) and wait several seconds"
+      ]
+    },
+    {
+      "index": 12,
+      "reported_at_seconds": 1315,
+      "name": "Header \"Select all rows\" checkbox clears a partial selection instead of selecting all rows",
+      "summary": "The list is emptied of selection instead: the single selected row is unticked, the header goes back to 'Companies' with no selection counter, and no row is selected. (on /objects/companies)",
+      "expected": "All rows of the list get selected: every row checkbox is ticked and the header shows 'Companies → 12 selected' (with no filter: 599 selected).",
+      "actual": "The list is emptied of selection instead: the single selected row is unticked, the header goes back to 'Companies' with no selection counter, and no row is selected.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev and open /objects/companies (table view 'All Companies').",
+        "Click the checkbox at the start of any one data row (e.g. the row 'nCino, Inc.') — the header changes to 'Companies → 1 selected'.",
+        "Click the 'Select all rows' checkbox in the table header row (first column header, left of 'Name')."
+      ]
+    },
+    {
+      "index": 13,
+      "reported_at_seconds": 1442,
+      "name": "Changing a Kanban view's Group by silently discards the active filter",
+      "summary": "The filter chip \\\"Amount ≥ 2000000\\\" disappears from the toolbar (no chip, no Reset/Update view, no record count) and the filter is no longer applied or present in the Filter panel; the board also collapses to a single \\\"No Value\\\" column. Seen twice: with Owner and with Company as the new grouping. (on /objects/opportunities)",
+      "expected": "The board is re-grouped and keeps the active filter \\\"Amount ≥ 2000000\\\" (the chip stays in the toolbar and the record count stays consistent with the filter, e.g. 12).",
+      "actual": "The filter chip \\\"Amount ≥ 2000000\\\" disappears from the toolbar (no chip, no Reset/Update view, no record count) and the filter is no longer applied or present in the Filter panel; the board also collapses to a single \\\"No Value\\\" column. Seen twice: with Owner and with Company as the new grouping.",
+      "reproSteps": [
+        "Sign in as phil.schiler@apple.dev / tim@apple.dev and open /objects/opportunities.",
+        "Create (or open) a Kanban view: view name dropdown → \"Add view\" → name agent14-kanban, View type Kanban (Stages: Stage) → Create. The toolbar reads \"agent14-kanban · 151\".",
+        "Click \"Filter\" in the toolbar, choose Amount, leave the operator \"Greater than or equal\", type 2000000. The chip \"$ Amount ≥ 2000000\" appears with × and the count becomes 12.",
+        "Click \"Options\" → the \"Group\" row → \"Group by\" → choose Owner (or Company). The toolbar shows \"agent14-kanban\" with no count and the line with the Amount chip is gone; the board shows only a \"No Value\" column.",
+        "Click \"Filter\" again: the panel opens with no filter configured."
+      ]
+    }
+  ]
+}

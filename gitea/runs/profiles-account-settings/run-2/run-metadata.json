@@ -1,0 +1,15 @@
+{
+  "fixture": "gitea/areas/profiles-account-settings",
+  "run": 2,
+  "started_at": "2026-11-23T16:34:18.049Z",
+  "duration_seconds": 1257.928,
+  "time_limit_seconds": 1800,
+  "stop_reason": "completed",
+  "credits": {
+    "total": 752,
+    "testing_team": 608,
+    "verification": 144,
+    "findings_verified": 24
+  },
+  "team_container_errors": 0
+}

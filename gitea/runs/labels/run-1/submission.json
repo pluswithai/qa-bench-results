@@ -1,0 +1,178 @@
+{
+  "fixture": "gitea/areas/labels",
+  "run": 1,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 346,
+      "name": "Mobile label list: a long label name overflows its chip and overlaps the open-issues count and Delete button",
+      "summary": "The label name runs out of the chip, continues across the row over the description column and over the '0 open issues/pull requests' text, and ends under the Delete icon; the description text and the count are unreadable where they overlap. Same with the pre-existing long label 'qa-r-longword-aaaa...' on that page. (on /eval/harbor-handbook/labels)",
+      "expected": "The label name is truncated or wrapped inside its coloured chip, and the row keeps its columns (name, description, '0 open issues/pull requests', Edit, Delete) separate and readable.",
+      "actual": "The label name runs out of the chip, continues across the row over the description column and over the '0 open issues/pull requests' text, and ends under the Delete icon; the description text and the count are unreadable where they overlap. Same with the pre-existing long label 'qa-r-longword-aaaa...' on that page.",
+      "reproSteps": [
+        "Sign in as eval and set the viewport to 390x844.",
+        "Open /eval/harbor-handbook/labels.",
+        "Click 'New Label', enter the name 'agent4-longword-label-aaaaaaaaaaaaaaaaaaaaaaaaaaaa', a long description and colour #ff8800, then Save.",
+        "Look at the new row in the label list."
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 384,
+      "name": "New Label accepts a name of only spaces and creates a blank, unidentifiable label",
+      "summary": "The label is saved. The list count goes from 15 to 16 labels and a new row appears whose chip is a tiny empty red rectangle with no readable name (its name is the three spaces, \\\"   \\\"), with no description and \\\"0 open issues/pull requests\\\". The label cannot be told apart or recognised anywhere it is used. (on /eval/harbor-handbook/labels)",
+      "expected": "The form says the Name field is required; a name made only of whitespace is refused with a message next to the field and no label is created.",
+      "actual": "The label is saved. The list count goes from 15 to 16 labels and a new row appears whose chip is a tiny empty red rectangle with no readable name (its name is the three spaces, \\\"   \\\"), with no description and \\\"0 open issues/pull requests\\\". The label cannot be told apart or recognised anywhere it is used.",
+      "reproSteps": [
+        "Sign in as eval (password momentic-eval-1) and open https://5503-ig6idqpc9wl8ew3cs6uan.e2b.app/eval/harbor-handbook/labels",
+        "Click \"New Label\"",
+        "Click the Name field and type three spaces (no other character)",
+        "Click any colour swatch in the palette (e.g. the first red one) so the colour field gets a value",
+        "Click \"Save\""
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 477,
+      "name": "Long label name in the issue sidebar overflows the sidebar and is cut off at the window edge",
+      "summary": "The red chip is wider than its container: it runs from the sidebar's left edge past the sidebar's right border (panel ends at x=1248 at 1280 px width) to the window edge, where the name is cut off mid-word with no ellipsis and no way to see the rest (the page has no horizontal scroll). The name needs about 353 px of text while the sidebar column offers about 270 px. (on /eval/harbor-handbook/issues/4)",
+      "expected": "The assigned label chip in the sidebar's Labels section stays inside the 300 px sidebar panel, shortens or wraps its name so the whole sidebar is readable.",
+      "actual": "The red chip is wider than its container: it runs from the sidebar's left edge past the sidebar's right border (panel ends at x=1248 at 1280 px width) to the window edge, where the name is cut off mid-word with no ellipsis and no way to see the rest (the page has no horizontal scroll). The name needs about 353 px of text while the sidebar column offers about 270 px.",
+      "reproSteps": [
+        "Sign in as eval, open https://5503-ig6idqpc9wl8ew3cs6uan.e2b.app/eval/harbor-handbook/labels",
+        "Click New Label, enter name \"qa-r-longword-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\" (50 a's, the field's maximum), description \"agent15 long unbroken name test\", colour #ff0000, click Save",
+        "Open https://5503-ig6idqpc9wl8ew3cs6uan.e2b.app/eval/harbor-handbook/issues/4 (browser window 1280 px wide)",
+        "In the right sidebar click the \"Labels\" heading, then click the label \"qa-r-longword-aaaa…\" in the dropdown to assign it and close the dropdown"
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 546,
+      "name": "\"1 labels\" / \"1 open issues/pull requests\": counts are not pluralised for one",
+      "summary": "The header reads \"1 labels\" and the label row reads \"1 open issues/pull requests\" — the plural form is used with the number 1. (on /org/qa-labels-agent13/settings/labels)",
+      "expected": "With one label the header should read \"1 label\" and the row's issue counter should read \"1 open issue/pull request\" (singular forms), as the app does elsewhere for a single item.",
+      "actual": "The header reads \"1 labels\" and the label row reads \"1 open issues/pull requests\" — the plural form is used with the number 1.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-ig6idqpc9wl8ew3cs6uan.e2b.app/org/qa-labels-agent13/settings/labels (Settings → Labels of the org qa-labels-agent13).",
+        "The org has exactly one label, 'qa-o-alpha & <b>x</b> 'q' José'.",
+        "Read the list header line and the label row."
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 736,
+      "name": "Label count \"1 open issues/pull requests\" links to an issue list that shows \"No results\" when the label is only on a pull request",
+      "summary": "The labels page says the label has 1 open issue/pull request, but its link (/eval/harbor-handbook/issues?labels=20) shows \"No results\" because pull requests are not listed there; the same label filters /eval/harbor-handbook/pulls?labels=20 down to the single pull request #5. (on /eval/harbor-handbook/labels)",
+      "expected": "Clicking a count of 1 should list the one item that carries the label (pull request #5), so the count and the list it links to agree.",
+      "actual": "The labels page says the label has 1 open issue/pull request, but its link (/eval/harbor-handbook/issues?labels=20) shows \"No results\" because pull requests are not listed there; the same label filters /eval/harbor-handbook/pulls?labels=20 down to the single pull request #5.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-ig6idqpc9wl8ew3cs6uan.e2b.app/eval/harbor-handbook/labels",
+        "Find the label qa-pr-agent8-one, which is assigned only to pull request #5 (agent8-pr-label-assignment-test), and note its count: \"1 open issues/pull requests\"",
+        "Click that count link",
+        "The browser goes to /eval/harbor-handbook/issues?labels=20 and the page says \"No results / Try adjusting your search filters.\"",
+        "Open /eval/harbor-handbook/pulls?labels=20 instead: the single pull request #5 with that label is listed"
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 741,
+      "name": "On mobile, the issue-list Label filter menu opens off the left of the screen and shows no labels to pick",
+      "summary": "A tall blank white panel opens under the 'Label' button: only a sliver of the empty search box is visible at the left edge and no label option ('All labels', 'No label', the label names) can be read or picked. The menu is rendered off the left edge of the window (its box starts at x=-305px). Reopening gives the same result. (on /eval/harbor-handbook/issues?labels=3&state=all)",
+      "expected": "The label filter menu opens inside the window, listing 'All labels', 'No label' and the label names with their descriptions, and each option can be clicked.",
+      "actual": "A tall blank white panel opens under the 'Label' button: only a sliver of the empty search box is visible at the left edge and no label option ('All labels', 'No label', the label names) can be read or picked. The menu is rendered off the left edge of the window (its box starts at x=-305px). Reopening gives the same result.",
+      "reproSteps": [
+        "Sign in as eval and set the viewport to 390x844.",
+        "Open /eval/harbor-handbook/issues?labels=3&state=all (the issue list of eval/harbor-handbook).",
+        "Click the 'Label' filter button in the filter row under the search box.",
+        "Look at the panel that opens."
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 780,
+      "name": "Issue sidebar \"Filter Label\" finds nothing when you type a scoped label's full name \"scope/item\"",
+      "summary": "Typing the full scoped name agent7/excl2 (or the rendered form \"agent7 excl2\") returns \"No results found.\"; only the bare scope \"agent7\" or the bare item \"excl\" matches, so a label cannot be found by its own name. (on /eval/harbor-handbook/issues/1 (sidebar Labels selector))",
+      "expected": "The filter lists every label whose name matches what is typed, including scoped labels searched by their full name agent7/excl2 (the name shown in the label list and in the New Label form).",
+      "actual": "Typing the full scoped name agent7/excl2 (or the rendered form \"agent7 excl2\") returns \"No results found.\"; only the bare scope \"agent7\" or the bare item \"excl\" matches, so a label cannot be found by its own name.",
+      "reproSteps": [
+        "Sign in as eval, open /eval/harbor-handbook/labels and create labels named agent7/excl and agent7/excl2 with Exclusive ticked (name must contain \"/\" for the Exclusive box to be clickable); assign agent7/excl2 to issue #1.",
+        "Open /eval/harbor-handbook/issues/1 and click the Labels heading in the right sidebar to open the label selector.",
+        "Type agent7/excl2 into the \"Filter Label\" box.",
+        "Observe \"No results found.\" although agent7/excl2 is assigned to this issue and its chip is visible in the same sidebar.",
+        "Replace the text with \"agent7\" or \"excl\" and the two scoped labels do appear."
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 1076,
+      "name": "Org Settings > Labels at 768px: the label chip overlaps the count and the count wraps onto two lines",
+      "summary": "The first row's label chip is 181px wide and ends at x=467 while the \"0 open issues/pull requests\" link starts at x=435, so the end of the name and its emoji are painted over the count text; the count is squeezed and wraps onto two lines at this width. Unlike the repo labels list, this needs only a ~21-character name; on this org settings page the label column is only ~149px wide. (on /org/qa-labels-agent13/settings/labels)",
+      "expected": "The label name stays inside the label column of the org labels list and the \"N open issues/pull requests\" count stays on one line, fully readable, next to it.",
+      "actual": "The first row's label chip is 181px wide and ends at x=467 while the \"0 open issues/pull requests\" link starts at x=435, so the end of the name and its emoji are painted over the count text; the count is squeezed and wraps onto two lines at this width. Unlike the repo labels list, this needs only a ~21-character name; on this org settings page the label column is only ~149px wide.",
+      "reproSteps": [
+        "Sign in as eval and set the window to 768 x 1024 (tablet).",
+        "Open https://5503-ig6idqpc9wl8ew3cs6uan.e2b.app/org/qa-labels-agent13/settings/labels (organisation Settings > Labels; the Settings sidebar is on the left).",
+        "Look at the first row of the \"3 labels\" list: the label whose name is \"qa-o-alpha 🎉<b>x</b> b\" with the description \"Desc <i>tag</i> & \\\"quote\\\" — José\"."
+      ]
+    },
+    {
+      "index": 8,
+      "reported_at_seconds": 1095,
+      "name": "At 390px the org Settings > Labels header breaks the \"Follow\" button text mid-word (\"Fol low\")",
+      "summary": "The Follow button is squeezed so its label breaks mid-word onto two lines and reads \"Fol\" / \"low\"; the org name also wraps to two lines. Nothing else on the page is cut, but the button text is broken. (on /org/qa-or-agent12/settings/labels)",
+      "expected": "The Follow button shows \"Follow\" on one line (or the header wraps the buttons below the name) at 390px width.",
+      "actual": "The Follow button is squeezed so its label breaks mid-word onto two lines and reads \"Fol\" / \"low\"; the org name also wraps to two lines. Nothing else on the page is cut, but the button text is broken.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Set the browser window to 390 x 844 CSS pixels.",
+        "Open /org/qa-or-agent12/settings/labels (organization qa-or-agent12, Settings > Labels).",
+        "Look at the organization header at the top right, next to the RSS icon."
+      ]
+    },
+    {
+      "index": 9,
+      "reported_at_seconds": 1109,
+      "name": "Saving an Edit Label dialog for a label deleted in another tab ends on a raw \\\"Not Found\\\" page (404)",
+      "summary": "The Save posts to /eval/harbor-handbook/labels/edit, which answers 404, and the browser is left on a bare white page containing only the text \\\"Not Found\\\" — no site header, no message about the deleted label, no way back except the browser's Back button. The typed changes are lost. Reproduced twice (once with the label qa-s-dbl, once with qa-s-dbl2). (on /eval/harbor-handbook/labels (Edit Label dialog, deleted from a second tab))",
+      "expected": "The label no longer exists, so the app should say so (for example a red \\\"This label has been deleted\\\" message on the labels list) and return the person to the list, instead of rendering a raw \\\"Not Found\\\" page.",
+      "actual": "The Save posts to /eval/harbor-handbook/labels/edit, which answers 404, and the browser is left on a bare white page containing only the text \\\"Not Found\\\" — no site header, no message about the deleted label, no way back except the browser's Back button. The typed changes are lost. Reproduced twice (once with the label qa-s-dbl, once with qa-s-dbl2).",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-ig6idqpc9wl8ew3cs6uan.e2b.app/eval/harbor-handbook/labels in tab A",
+        "In tab A click \"New Label\", type the name \"qa-s-dbl2\", type a colour such as \"#abcdef\" and click \"Save\"",
+        "Open the same labels page in a second tab (tab B) and in tab B click \"Edit\" on the \"qa-s-dbl2\" row so the Edit Label dialog stays open",
+        "Back in tab A reload the page, click \"Delete\" on the \"qa-s-dbl2\" row and click \"Confirm\" (the list now says \"The label has been deleted.\")",
+        "Return to tab B, where the Edit Label dialog for qa-s-dbl2 is still open, and click \"Save\""
+      ]
+    },
+    {
+      "index": 10,
+      "reported_at_seconds": 1416,
+      "name": "Excluding a label with Alt+Enter in the issue Label filter shows the issues that HAVE the label instead of the ones that do not",
+      "summary": "The page navigates to /issues?type=all&state=open&labels=2 (include) and shows only the one issue that carries the label (\\\"1 Open\\\" — agent11-label-B enhancement #9). The exclude request to labels=-2 is issued and then aborted. Typing labels=-2 in the address by hand gives the expected 5 results, so only the UI's exclude action is wrong. Reproduced twice with the \\\"enhancement\\\" label. (on /eval/harbor-handbook/issues (Label filter))",
+      "expected": "The label should be excluded: the address should become labels=-2 and the list should show the 5 open issues that do NOT carry \\\"enhancement\\\" (#10, #7, #4, #2, #1), as the hint \\\"Use alt + click/enter to exclude labels\\\" says.",
+      "actual": "The page navigates to /issues?type=all&state=open&labels=2 (include) and shows only the one issue that carries the label (\\\"1 Open\\\" — agent11-label-B enhancement #9). The exclude request to labels=-2 is issued and then aborted. Typing labels=-2 in the address by hand gives the expected 5 results, so only the UI's exclude action is wrong. Reproduced twice with the \\\"enhancement\\\" label.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-ig6idqpc9wl8ew3cs6uan.e2b.app/eval/harbor-handbook/issues (6 open issues; issue #9 carries the label \"enhancement\")",
+        "Click the \"Label\" filter dropdown in the issue list toolbar",
+        "Type \"enhancement\" into the dropdown's search field so the \"enhancement\" item is the only one shown",
+        "Press Alt+Enter (the dropdown says \"Use alt + click/enter to exclude labels\")",
+        "Read the address and the result list"
+      ]
+    },
+    {
+      "index": 11,
+      "reported_at_seconds": 1588,
+      "name": "Sort Order field silently drops an out-of-range number and saves 0",
+      "summary": "Save goes through (the dialog closes and the label is saved) but the value is silently discarded: reopening Edit shows Sort Order 0, and in the labels list \"agent10/so-b\" shows no order number at all, while the same form saved \"10\" for \"agent10/so-a\" and shows it beside the chip. No message, no field error — the field simply keeps a number it never stores. (on /eval/harbor-handbook/labels)",
+      "expected": "The form either refuses an out-of-range Sort Order value with a message next to the field and keeps what was typed, or saves the number it accepted. Today it accepts 999999999999999999999, shows no error and stores 0 silently.",
+      "actual": "Save goes through (the dialog closes and the label is saved) but the value is silently discarded: reopening Edit shows Sort Order 0, and in the labels list \"agent10/so-b\" shows no order number at all, while the same form saved \"10\" for \"agent10/so-a\" and shows it beside the chip. No message, no field error — the field simply keeps a number it never stores.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /eval/harbor-handbook/labels.",
+        "Create a label named \"agent10/so-b\" with the Exclusive box ticked, colour #0e8a16, and type 999999999999999999999 into the \"Sort Order\" field that appears.",
+        "Click Save: the dialog closes and the label is created, with no error shown.",
+        "Click \"Edit\" on the row \"agent10/so-b\" (or on \"agent10/so-a\", created the same way with 10): the Sort Order field shows 0, and in the list \"agent10/so-a\" displays 10 next to its chip while \"agent10/so-b\" displays nothing."
+      ]
+    }
+  ]
+}

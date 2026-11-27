@@ -1,0 +1,169 @@
+{
+  "bugs": [
+    {
+      "name": "Non-numeric dashboard id (/dashboard/abc) spins on \"Loading...\" forever instead of a not-found page",
+      "summary": "The page stays on the spinner with the text \\\"Loading…\\\" indefinitely and makes no dashboard request at all (no 404, no error message). The person is stuck with no way to tell whether it is still working. (on /dashboard/abc)",
+      "expected": "Like /dashboard/999999, the app says in words that the page could not be found (\\\"We're a little lost… The page you asked for couldn't be found.\\\") and offers a way on.",
+      "actual": "The page stays on the spinner with the text \\\"Loading…\\\" indefinitely and makes no dashboard request at all (no 404, no error message). The person is stuck with no way to tell whether it is still working.",
+      "reproSteps": [
+        "Sign in with eval@momentic.ai / momentic-eval-1.",
+        "In the address bar open https://5501-iu5qaxtlo2oqrkbh4xt5i.e2b.app/dashboard/abc directly.",
+        "Wait 8 seconds and look at the page."
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Whitespace-only dashboard name passes client validation; dialog shows raw server validation text and the button turns into \"Failed\" (New dashboard and Duplicate dialogs)",
+      "summary": "The save is refused with a raw schema message under the field — \\\"Value must be a non-blank string.\\\" — and the primary button's label changes from \\\"Create\\\" to \\\"Failed\\\" and stays that way. Nothing tells the person in plain words that the name may not be blank or only spaces, and the button now reads like a status rather than an action. The POST /api/dashboard returns 400 and two console errors are logged. (on /collection/root (New → Dashboard dialog))",
+      "expected": "The Create button stays disabled for a blank/whitespace-only name, or the dialog refuses it with a plain message such as \\\"Name can't be blank\\\", and the button keeps its label so the person can correct the name and try again.",
+      "actual": "The save is refused with a raw schema message under the field — \\\"Value must be a non-blank string.\\\" — and the primary button's label changes from \\\"Create\\\" to \\\"Failed\\\" and stays that way. Nothing tells the person in plain words that the name may not be blank or only spaces, and the button now reads like a status rather than an action. The POST /api/dashboard returns 400 and two console errors are logged.",
+      "reproSteps": [
+        "Sign in with eval@momentic.ai / momentic-eval-1.",
+        "On /collection/root click \"New\" in the top bar, then \"Dashboard\" in the menu.",
+        "Type three spaces into the Name field of the \"New dashboard\" dialog and click \"Create\"."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Text card on the sample dashboard clips its last line at phone width",
+      "summary": "The card clips the text: the last line \\\"growth in the number of orders\\\" is cut in half by the card's bottom edge. The rest only becomes readable by scrolling inside the card with the mouse wheel, and there is no scrollbar or other hint that the card scrolls (scrolling brings the last line into view but then cuts the first line instead). (on /dashboard/1)",
+      "expected": "The text card grows with its text at phone width (the sentence takes 3 lines instead of 2), so the whole sentence is visible without scrolling inside the card, or the card shows a visible scrollbar / truncation indicator.",
+      "actual": "The card clips the text: the last line \\\"growth in the number of orders\\\" is cut in half by the card's bottom edge. The rest only becomes readable by scrolling inside the card with the mouse wheel, and there is no scrollbar or other hint that the card scrolls (scrolling brings the last line into view but then cuts the first line instead).",
+      "reproSteps": [
+        "Sign in with eval@momentic.ai / momentic-eval-1 and open /dashboard/1 (E-commerce Insights).",
+        "Resize the window to a phone size, 390x844.",
+        "Scroll to the section \"Overall Business Health\" and read the text card under it: \"Business KPIs look strong based on the consistent MoM revenue growth following the growth in the number of orders\".",
+        "Look at the line \"growth in the number of orders\" at the bottom edge of the card."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Long unbroken word in a text card is cut off at the card edge (no wrap, no scroll)",
+      "summary": "The long word is not wrapped or broken at the card edge: the line runs to the right edge and the rest of the word (and anything after it on that line) is simply cut off, with no ellipsis, no scrollbar and no tooltip. Measured in the page: the paragraph's content is 1113px wide inside a 292px card at phone width, and it is cut the same way at 1440px. Only \"and a normal sentence after it.\" on the following line is fully readable. (on /dashboard/10-agent1-double-create)",
+      "expected": "The text card wraps or breaks the long word so all of the text the person wrote is readable (as text cards do for normal sentences), without overflowing or losing characters.",
+      "actual": "The long word is not wrapped or broken at the card edge: the line runs to the right edge and the rest of the word (and anything after it on that line) is simply cut off, with no ellipsis, no scrollbar and no tooltip. Measured in the page: the paragraph's content is 1113px wide inside a 292px card at phone width, and it is cut the same way at 1440px. Only \"and a normal sentence after it.\" on the following line is fully readable.",
+      "reproSteps": [
+        "Open /dashboard/10-agent1-double-create and click the pencil \"Edit dashboard\" button",
+        "Click the \"T\" (Add a heading or text box) button and choose \"Text\"",
+        "Type: agent1 long unbroken word: agent1verylongunbrokenword followed by 127 x characters, then \" and a normal sentence after it.\" (any long unbroken token does it)",
+        "Click \"Save\" and look at the text card at 1440px wide and at 320px wide (browser window resized)"
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Link card's search popover opens by itself on entering edit mode and does not close on Escape",
+      "summary": "The popover stays open after Escape: \\\"Didn't find anything\\\" still covers the dashboard and the card stays in URL-editing state. Only clicking on empty canvas elsewhere closes it. (on /dashboard/6-agent5-cards)",
+      "expected": "Escape should dismiss the link card's search popover (and leave the card editor), as Escape closes other popovers/dialogs in the app.",
+      "actual": "The popover stays open after Escape: \\\"Didn't find anything\\\" still covers the dashboard and the card stays in URL-editing state. Only clicking on empty canvas elsewhere closes it.",
+      "reproSteps": [
+        "Open https://5501-ieaktt3pj66aduas4qpqc.e2b.app/dashboard/6-agent5-cards (dashboard \"agent5-cards\")",
+        "Click \"Edit dashboard\"",
+        "Click the link card that reads \"not a valid url\" (top-right area, second column) — its URL field and a \"Didn't find anything\" popover open below it",
+        "Press the Escape key"
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Saving a dashboard with an expired/invalid session leaves a blank white page instead of the sign-in redirect",
+      "summary": "The save request (PUT /api/dashboard/6) was answered 401 Unauthenticated and the whole app went to a blank white page (title still \\\"Metabase\\\"): no error message, no redirect to the sign-in form, no notice that the edit was not saved. After reloading and signing in again the dashboard still showed the old text card, so the edit was silently lost. The console logged \\\"Request entities,dashboards,6,update failed: {status: 401, data: Unauthenticated}\\\". (on /dashboard/6-agent11-dash)",
+      "expected": "When the save cannot be authenticated, the person is told the change was not saved (an error message or a redirect to the sign-in page). The unsaved edit is not silently discarded behind a blank page.",
+      "actual": "The save request (PUT /api/dashboard/6) was answered 401 Unauthenticated and the whole app went to a blank white page (title still \\\"Metabase\\\"): no error message, no redirect to the sign-in form, no notice that the edit was not saved. After reloading and signing in again the dashboard still showed the old text card, so the edit was silently lost. The console logged \\\"Request entities,dashboards,6,update failed: {status: 401, data: Unauthenticated}\\\".",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1 and open the dashboard /dashboard/6-agent11-dash (my own dashboard, one heading card and one text card).",
+        "Click the pencil \"Edit dashboard\", click the text card \"maya edited this text card\", type \"(eval)\" at the end of it.",
+        "Click \"Save\" in the blue \"You're editing this dashboard.\" banner after the session behind the tab has ended (in my run the session had already been invalidated, so the save hit an unauthenticated request).",
+        "Watch the page, then reload and read the console/network."
+      ],
+      "severity": 5
+    },
+    {
+      "name": "Global search treats % and _ as SQL wildcards (typing \"%\" or \"_\" returns every item)",
+      "summary": "Typing just \\\"%\\\" answers \\\"View and filter all 95 results\\\" and lists dashboards such as agent14-tab1-stale, agent7-only-dash, agent12 / a&b, agent2-dash - none of them contains a \\\"%\\\". Typing \\\"_\\\" answers \\\"View and filter all 96 results\\\" and lists the same kind of unrelated dashboards. The character is treated as a wildcard, so the search returns almost the whole site instead of matching the text the person typed. (on /collection/root (global search))",
+      "expected": "The search treats \\\"%\\\" and \\\"_\\\" as literal characters and shows only items whose name or description contains that character - in this case no results, with the empty-state wording.",
+      "actual": "Typing just \\\"%\\\" answers \\\"View and filter all 95 results\\\" and lists dashboards such as agent14-tab1-stale, agent7-only-dash, agent12 / a&b, agent2-dash - none of them contains a \\\"%\\\". Typing \\\"_\\\" answers \\\"View and filter all 96 results\\\" and lists the same kind of unrelated dashboards. The character is treated as a wildcard, so the search returns almost the whole site instead of matching the text the person typed.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open https://5501-iu5qaxtlo2oqrkbh4xt5i.e2b.app/collection/root",
+        "Click the \"Search\" button in the top bar (the field \"Search for anything…\" opens).",
+        "Type a single % into the field and read the results.",
+        "Replace it with a single _ and read the results again."
+      ],
+      "severity": 3
+    },
+    {
+      "name": "\"Exit fullscreen\" does not exit on the first click after the dashboard was loaded with #fullscreen",
+      "summary": "Nothing happens. The page stays in fullscreen, the header still shows the \\\"Exit fullscreen\\\" button, and the address still ends in #fullscreen (the click only rewrites the filter parameters, e.g. adds product_category=Doohickey&Gizmo&Gadget&Widget). A second click on the same button then does exit fullscreen. Seen 3 times out of 3 with this sequence; entering fullscreen from the menu and exiting immediately, without a reload, works on the first click. (on /dashboard/1)",
+      "expected": "The dashboard leaves fullscreen on the first click: the left navigation bar comes back, the header shows \\\"Enter fullscreen\\\" again and #fullscreen is removed from the address.",
+      "actual": "Nothing happens. The page stays in fullscreen, the header still shows the \\\"Exit fullscreen\\\" button, and the address still ends in #fullscreen (the click only rewrites the filter parameters, e.g. adds product_category=Doohickey&Gizmo&Gadget&Widget). A second click on the same button then does exit fullscreen. Seen 3 times out of 3 with this sequence; entering fullscreen from the menu and exiting immediately, without a reload, works on the first click.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open https://5501-ieaktt3pj66aduas4qpqc.e2b.app/dashboard/1",
+        "Open the \"Move, trash, and more…\" (…) menu at the top right of the dashboard header and click \"Enter fullscreen\" (the address becomes …/dashboard/1?…#fullscreen and the left navigation bar disappears). Alternatively open /dashboard/1#fullscreen directly.",
+        "Reload the page (F5 / browser reload). The dashboard is still in fullscreen, with the \"Exit fullscreen\" shrink button in the header.",
+        "Click the \"Exit fullscreen\" button once."
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Duplicate dialog pre-fills a name longer than the 254-character limit it then refuses",
+      "summary": "The dialog opens already invalid: the prefilled name is 266 characters (\\\"<name> - Duplicate\\\" on top of the 254-character name), a red \\\"Must be 254 characters or less\\\" appears immediately, and the \\\"Duplicate\\\" button is disabled. The person cannot duplicate the dashboard without first shortening the generated name by hand. (on /dashboard/19/copy)",
+      "expected": "The Duplicate dialog opens with a valid, shorter default name (for example the name truncated so that \\\" - Duplicate\\\" still fits in 254 characters) and the Duplicate button enabled, as it is for dashboards with a shorter name.",
+      "actual": "The dialog opens already invalid: the prefilled name is 266 characters (\\\"<name> - Duplicate\\\" on top of the 254-character name), a red \\\"Must be 254 characters or less\\\" appears immediately, and the \\\"Duplicate\\\" button is disabled. The person cannot duplicate the dashboard without first shortening the generated name by hand.",
+      "reproSteps": [
+        "Sign in with eval@momentic.ai / momentic-eval-1.",
+        "Open the dashboard whose name is at the 254-character limit: /dashboard/19 (name starts \"agent12-0123456…\").",
+        "Click the \"…\" (Move, trash, and more…) button at the top right, then \"Duplicate\"."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Dashboard title is squeezed into a ~55 px column and breaks mid-word at tablet width in edit mode with the sidebar open",
+      "summary": "The title is confined to a ~100px column and breaks mid-word into six lines (\\\"agent\\\" / \\\"13-\\\" / \\\"respo\\\" / \\\"nsive-\\\" / \\\"dashb\\\" / \\\"oard\\\") while about 400px of empty space sits to the right of the edit toolbar on the same row. (on /dashboard/17-agent13-responsive-dashboard#edit)",
+      "expected": "The dashboard title keeps a readable width (wraps at word boundaries, or the toolbar moves to its own row) at tablet width, as it does at 1280px where it stays on one line.",
+      "actual": "The title is confined to a ~100px column and breaks mid-word into six lines (\\\"agent\\\" / \\\"13-\\\" / \\\"respo\\\" / \\\"nsive-\\\" / \\\"dashb\\\" / \\\"oard\\\") while about 400px of empty space sits to the right of the edit toolbar on the same row.",
+      "reproSteps": [
+        "Sign in with eval@momentic.ai / momentic-eval-1 and open /dashboard/17-agent13-responsive-dashboard.",
+        "Click the pencil \"Edit dashboard\" button so the \"Add a chart\" side panel is open.",
+        "Resize the window to a tablet size, 820x1180.",
+        "Look at the dashboard title under the blue \"You're editing this dashboard.\" banner."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Public link popover is wider than a phone screen; the URL is cut and the copy button is off-screen",
+      "summary": "The popover is wider than the screen and runs off the right edge: its inner content is 448 px wide inside a 380 px popover on a 390 px viewport. The URL field is 400 px wide, so the link text is cut (\"…/public/da\") and the \"copy icon\" button that belongs to it sits at x=401, entirely off-screen (not visible and not clickable). Only \"Remove public link\" stays reachable. The same popover fits correctly at desktop width. This is a different failure from the copy icon giving no confirmation (it cannot even be reached here). (on /dashboard/1)",
+      "expected": "The \"Public link\" popover fits inside the 390 px screen: the whole public URL is readable in its field and the copy icon is visible and clickable.",
+      "actual": "The popover is wider than the screen and runs off the right edge: its inner content is 448 px wide inside a 380 px popover on a 390 px viewport. The URL field is 400 px wide, so the link text is cut (\"…/public/da\") and the \"copy icon\" button that belongs to it sits at x=401, entirely off-screen (not visible and not clickable). Only \"Remove public link\" stays reachable. The same popover fits correctly at desktop width. This is a different failure from the copy icon giving no confirmation (it cannot even be reached here).",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai, open https://5501-ieaktt3pj66aduas4qpqc.e2b.app/dashboard/1 and set the browser window to a phone size (390 × 844).",
+        "In the dashboard header click the \"Sharing\" icon (share arrows, first icon of the header button row).",
+        "In the Sharing menu click \"Public link\"."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Type-column icon in collection tables is a pointer-cursor <button> with an empty click handler",
+      "summary": "Clicking the type icon does nothing at all: the page does not change, no menu, tooltip, preview or navigation appears (the row only shows its hover highlight). Tried on the \\\"agent15-tab1-title\\\" row and on the \\\"agent2-onlydash-copy\\\" row, twice out of two attempts. (on /collection/root)",
+      "expected": "Either the icon opens the item (as the row name does) or it is plain decoration that cannot be clicked or focused.",
+      "actual": "Clicking the type icon does nothing at all: the page does not change, no menu, tooltip, preview or navigation appears (the row only shows its hover highlight). Tried on the \\\"agent15-tab1-title\\\" row and on the \\\"agent2-onlydash-copy\\\" row, twice out of two attempts.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open https://5501-ieaktt3pj66aduas4qpqc.e2b.app/collection/root",
+        "In the item table, click the dashboard icon at the left of the Type column on the row \"agent15-tab1-title\"",
+        "Repeat on the same icon on the row \"agent2-onlydash-copy\""
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Iframe card accepts an empty snippet and then only shows the generic \"There was a problem rendering this content.\"",
+      "summary": "Clicking 'Done' with the snippet box empty creates the card anyway, with no validation message at the field and no warning: the card immediately shows only \"There was a problem rendering this content.\" (a lock icon and that one sentence). It saves like that (PUT /api/dashboard/25 → 200) and after a reload the dashboard shows the same broken card with the same generic message and no hint of what is wrong. (on /dashboard/25-agent6-iframe)",
+      "expected": "The empty snippet is refused with a message next to the snippet box (e.g. that a URL/iframe snippet is required), or at least the card says what is missing instead of a generic rendering error; no broken card is saved.",
+      "actual": "Clicking 'Done' with the snippet box empty creates the card anyway, with no validation message at the field and no warning: the card immediately shows only \"There was a problem rendering this content.\" (a lock icon and that one sentence). It saves like that (PUT /api/dashboard/25 → 200) and after a reload the dashboard shows the same broken card with the same generic message and no hint of what is wrong.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and go to /collection/root.",
+        "In my own dashboard /dashboard/25-agent6-iframe press 'Edit dashboard' (URL gets #edit).",
+        "Click the link/embed icon in the edit toolbar (the icon with a chevron next to the 'T' text button) and choose 'Iframe'.",
+        "Leave the 'Paste your snippet here' box completely empty and click 'Done'.",
+        "Click 'Save', then reload the page."
+      ],
+      "severity": 1
+    }
+  ]
+}

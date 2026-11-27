@@ -1,0 +1,131 @@
+{
+  "area": "notifications",
+  "bugs": [
+    {
+      "id": "notifications-1",
+      "title": "Watching repo search treats % and _ as SQL LIKE wildcards instead of literal text",
+      "findings": [
+        "run1-02",
+        "run2-01",
+        "run3-01"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "Searching '%' or '_' lists every watched repo and 'h_rbor' returns harbor-handbook, although none contains that text, while a normal non-matching word gives 'No matching results found.'. The keyword goes straight into builder.Like with no escaping and nothing in Gitea documents wildcard syntax for this box, so it is an unescaped-pattern defect, not a feature.",
+      "evidence": [
+        "run1-02/shot-2.png",
+        "run2-01/shot-4.png",
+        "run3-01/shot-3.png"
+      ],
+      "source": [
+        "models/repo/repo_list.go (SearchRepositoryCondition: builder.Like{\"lower_name\", strings.ToLower(v)} and LOWER(description), no wildcard escaping)",
+        "routers/web/user/notification.go (NotificationWatching passes q as Keyword)"
+      ]
+    },
+    {
+      "id": "notifications-2",
+      "title": "Notification list order does not follow the times shown on the rows",
+      "findings": [
+        "run1-06",
+        "run2-07",
+        "run3-08"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "Rows are sorted by the notification row's own updated_unix, which is bumped by the user's own pin / mark-read / mark-unread clicks, but the time printed on each row is the issue's updated time, so e.g. a '6 minutes ago' row sits above a '2 minutes ago' row and a just-pinned old row jumps to the top. The list contradicts its own timestamps and no comment or doc says a status change should reorder the feed.",
+      "evidence": [
+        "run1-06/shot-1.png",
+        "run2-07/shot-1.png",
+        "run2-07/shot-2.png",
+        "run3-08/shot-1.png"
+      ],
+      "source": [
+        "models/activities/notification_list.go (FindNotificationOptions.ToOrders: \"notification.updated_unix DESC\")",
+        "models/activities/notification.go (UpdatedUnix `xorm:\"updated\"`; SetNotificationStatus does a full Update, which bumps it)",
+        "templates/user/notification/notification_div.tmpl (row time = DateUtils.TimeSince .Issue.UpdatedUnix)"
+      ]
+    },
+    {
+      "id": "notifications-3",
+      "title": "Watching search form keeps stale control state after browser Back (filter radios, search text) and re-submits it",
+      "findings": [
+        "run1-07",
+        "run3-04",
+        "run3-07"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "After Back the list is unfiltered but the form still shows the values of the page that was left (Private / Archived radio selected, or the old search term), and the next filter choice submits them: run1-07 picks 'Not Archived' and gets 'No matching results found.' for a non-archived repo that matches. The template renders these controls from the URL parameters, so they are meant to mirror the page; the change handler serialises the whole form with no reset on restore. run3-07 (search text only) is the weakest member and would be a reject on its own.",
+      "evidence": [
+        "run1-07/shot-3.png",
+        "run1-07/shot-4.png",
+        "run3-04/shot-4.png",
+        "run3-07/shot-4.png"
+      ],
+      "source": [
+        "templates/shared/repo_search.tmpl (radios get `checked` from .IsArchived/.IsPrivate, input value from .Keyword; no autocomplete=off)",
+        "web_src/js/features/repo-search.ts (on change: new FormData(form) -> window.location.search, so restored stale radios are sent)",
+        "modules/httpcache/httpcache.go (comment: no-cache preferred over no-store so browsers restore input fields after navigate-back)"
+      ]
+    },
+    {
+      "id": "notifications-4",
+      "title": "After sign-out, browser Back shows the cached signed-in notifications page",
+      "findings": [
+        "run1-04"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "The session is really ended (the finding itself notes the next click redirects to /user/login); what Back shows is the browser's own cached copy. Gitea deliberately sends 'max-age=0, private, must-revalidate' instead of 'no-store' and says why in the source, so cached history pages are a chosen trade-off, the same header policy GitHub uses.",
+      "evidence": [
+        "run1-04/frame-4.jpg",
+        "run1-04/frame-6.jpg",
+        "run1-04/shot-4.png"
+      ],
+      "source": [
+        "modules/httpcache/httpcache.go (SetCacheControlInHeader: \"max-age=0 + must-revalidate (aka no-cache) is preferred instead of no-store because browsers may restore some input fields after navigate-back / reload a page\")",
+        "services/context/context.go (applies that header to every page)",
+        "routers/web/auth/auth.go (HandleSignOut destroys the session and cookies)"
+      ]
+    },
+    {
+      "id": "notifications-5",
+      "title": "Pinning a notification clears its unread count",
+      "findings": [
+        "run2-02"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "In Gitea a notification has one status with three exclusive values (unread, read, pinned), so pinning replaces 'unread' and the badge counts only status unread; pinned rows are deliberately listed in both tabs. The screenshots also contradict the report's claim that the row leaves the Unread tab: it stays there with a pin icon.",
+      "evidence": [
+        "run2-02/shot-1.png",
+        "run2-02/shot-2.png",
+        "run2-02/shot-5.png"
+      ],
+      "source": [
+        "models/activities/notification.go (NotificationStatusUnread / Read / Pinned as one enum field)",
+        "routers/web/user/notification.go (getNotifications: statuses := {status, NotificationStatusPinned} for both tabs; count uses status only)",
+        "templates/user/notification/notification_div.tmpl (pin button posts status=pinned)"
+      ]
+    },
+    {
+      "id": "notifications-6",
+      "title": "Back to the notification list after opening a notification shows the old unread row and count",
+      "findings": [
+        "run2-04"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "Checked by hand in a normal Chrome on a clean instance: after opening the notification and pressing Back, the list row is removed (Unread 0) but the bell in the header still shows 1 until reload. The finding is half right: the row goes, the count stays stale.",
+      "evidence": [
+        "run2-04/frame-3.jpg",
+        "run2-04/frame-4.jpg",
+        "run2-04/shot-1.png"
+      ],
+      "source": [
+        "web_src/js/features/notification.ts (initNotificationsTable: pageshow with e.persisted removes .notifications-item[data-remove=\"true\"] and decrements .notifications-unread-count)",
+        "modules/httpcache/httpcache.go (no-cache instead of no-store, so a non-bfcache Back re-shows the stored HTML)"
+      ]
+    }
+  ]
+}

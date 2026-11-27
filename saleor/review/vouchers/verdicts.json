@@ -1,0 +1,232 @@
+{
+  "area": "vouchers",
+  "bugs": [
+    {
+      "id": "vouchers-1",
+      "title": "Column picker puts a (re-)enabled column at the first position of the vouchers table",
+      "findings": [
+        "run1-11",
+        "run3-03"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Works as designed. useColumns has an explicit option newColumnPosition = \"start\" (default) and onToggle prepends the added column ([columnId, ...selectedColumns]); the voucher grid uses that default and lets the user reorder by dragging headers (onColumnMoved={handlers.onMove}), so table order is not meant to mirror the picker list. Persisting the order is the intended list-settings behaviour. The extra claims of run3-03 are contradicted by its own evidence: after a toggle every column is persisted at 200 px (PersistedColumn.withDefaultWidth), 6 columns = 1200 px in a ~1000 px grid, so Redemptions is only scrolled off to the right (shot-3/shot-4 show exactly 5 columns of 200 px with the toggle still on; the agent never scrolled horizontally). Empty Min. Spent cells are the channel-dependent column with no channel selected (datagrid.ts min-spent case renders moneyCell(null) when no listing matches selectedChannelId).",
+      "evidence": [
+        "run1-11/shot-3.png",
+        "run1-11/shot-4.png",
+        "run1-11/shot-5.png",
+        "run3-03/shot-2.png",
+        "run3-03/shot-3.png",
+        "run3-03/shot-4.png"
+      ],
+      "source": [
+        "https://github.com/saleor/saleor-dashboard/blob/a6e7bee68ab183147ec680e03e86c29f717a11d5/src/components/Datagrid/ColumnPicker/useColumns.ts#L45-L55",
+        "https://github.com/saleor/saleor-dashboard/blob/a6e7bee68ab183147ec680e03e86c29f717a11d5/src/components/Datagrid/ColumnPicker/useColumns.ts#L155-L170",
+        "https://github.com/saleor/saleor-dashboard/blob/a6e7bee68ab183147ec680e03e86c29f717a11d5/src/discounts/components/VoucherListDatagrid/VoucherListDatagrid.tsx#L128",
+        "https://github.com/saleor/saleor-dashboard/blob/a6e7bee68ab183147ec680e03e86c29f717a11d5/src/components/Datagrid/persistance/persistedColumn.ts#L19-L21",
+        "https://github.com/saleor/saleor-dashboard/blob/a6e7bee68ab183147ec680e03e86c29f717a11d5/src/discounts/components/VoucherListDatagrid/datagrid.ts#L284-L290"
+      ]
+    },
+    {
+      "id": "vouchers-2",
+      "title": "\"Clear filters\" also clears the list search term",
+      "findings": [
+        "run1-13"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "the \"Clear filters\" button lives in the Filters panel but also wipes the separate search box; nothing on the button says the search is part of it, so the person loses the typed search without expecting it. Deliberate in code, but the label promises less than it does.",
+      "evidence": [
+        "run1-13/shot-2.png",
+        "run1-13/shot-3.png",
+        "run1-13/shot-4.png"
+      ],
+      "source": [
+        "https://github.com/saleor/saleor-dashboard/blob/a6e7bee68ab183147ec680e03e86c29f717a11d5/src/components/ConditionalFilter/ValueProvider/useUrlValueProvider.ts#L145-L175",
+        "https://github.com/saleor/saleor-dashboard/blob/a6e7bee68ab183147ec680e03e86c29f717a11d5/src/components/ConditionalFilter/hasActiveListFilters.ts#L14-L16",
+        "https://github.com/saleor/saleor-dashboard/blob/a6e7bee68ab183147ec680e03e86c29f717a11d5/src/components/ConditionalFilter/ConditionalFilters.tsx#L45-L49"
+      ]
+    },
+    {
+      "id": "vouchers-3",
+      "title": "\"Code Quantity (max 50)\" ignores keystrokes that would exceed 50",
+      "findings": [
+        "run1-18"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Deliberate input mask. handleChange drops any change whose value is not a number, contains \".\" or is > MAX_VOUCHER_CODES (50), exactly like the letters it also ignores; the limit is printed in the field label \"Code Quantity (max 50)\". Typing 51 therefore leaves the visible value 5 (shot-1), and Confirm generates the 5 codes that the field shows (shot-2), not a hidden different number. The \"fill 51 in one step leaves it empty\" variant is the same rule applied to a programmatic fill, not a user path.",
+      "evidence": [
+        "run1-18/shot-1.png",
+        "run1-18/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/saleor/saleor-dashboard/blob/a6e7bee68ab183147ec680e03e86c29f717a11d5/src/discounts/components/VoucherCodesGenerateDialog/VoucherCodesGenerateDialog.tsx#L27",
+        "https://github.com/saleor/saleor-dashboard/blob/a6e7bee68ab183147ec680e03e86c29f717a11d5/src/discounts/components/VoucherCodesGenerateDialog/VoucherCodesGenerateDialog.tsx#L36-L49",
+        "https://github.com/saleor/saleor-dashboard/blob/a6e7bee68ab183147ec680e03e86c29f717a11d5/src/discounts/components/VoucherCodesGenerateDialog/VoucherCodesGenerateDialog.tsx#L75-L86"
+      ]
+    },
+    {
+      "id": "vouchers-4",
+      "title": "Filter field picker: typing a field name and pressing Enter selects nothing but leaves the typed text looking like a chosen field",
+      "findings": [
+        "run1-20",
+        "run2-15"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "Real, reproduced independently in two runs. After typing in the \"Where\" combobox and pressing Enter the menu closes, the field keeps the typed text (\"Started\" in run1-20/shot-5, identical to the properly selected state in shot-3; \"t\"/\"d\" in run2-15/shot-2 and shot-4) while no field is selected: operator and value stay empty and Apply stays disabled. Cause in source: Row.tsx renders macaw DynamicCombobox and only reacts to onChange; macaw's useHighlightedIndex starts at -1 (\"Initially we don't show any item as highlighted\"), so downshift's Enter selects nothing, and useCombobox never resets the input text when no item was chosen, so the stale text stays even after blur. The field shows a value the filter does not have, and Enter on an exact single match silently does nothing. Low impact (ArrowDown+Enter or a click works), but it is a functional misbehaviour of the control rather than wording/layout, hence 3; a human may prefer 1.",
+      "evidence": [
+        "run1-20/shot-3.png",
+        "run1-20/shot-5.png",
+        "run2-15/shot-2.png",
+        "run2-15/shot-4.png"
+      ],
+      "source": [
+        "https://github.com/saleor/saleor-dashboard/blob/a6e7bee68ab183147ec680e03e86c29f717a11d5/src/components/ConditionalFilter/UI/Row.tsx#L82-L110",
+        "https://github.com/saleor/macaw-ui/blob/v1.4.2/src/components/BaseSelect/useHighlightedIndex.ts",
+        "https://github.com/saleor/macaw-ui/blob/v1.4.2/src/components/Combobox/Common/useCombobox.tsx#L46-L93"
+      ]
+    },
+    {
+      "id": "vouchers-5",
+      "title": "Voucher codes table says \"Selected 1 items\" for a single selected code",
+      "findings": [
+        "run1-21",
+        "run2-23"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "Wording defect confirmed in source and screenshots. AssignableListTable (used by VoucherCodesTable) hardcodes defaultMessage \"Selected {number} items\" with no plural rule, so one selected row reads \"Selected 1 items\" (run1-21/shot-1 on an existing voucher, run2-23/shot-2 on the create page). The app's other selection header, TableHead, uses the correct ICU plural \"Selected {number, plural, one {# item} other {# items}}\", so this is an oversight, not a style choice. The always-plural \"Delete voucher codes / These codes...\" dialog text is the same class of wording issue and does not change the verdict.",
+      "evidence": [
+        "run1-21/shot-1.png",
+        "run2-23/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/saleor/saleor-dashboard/blob/a6e7bee68ab183147ec680e03e86c29f717a11d5/src/components/AssignableListTable/AssignableListTable.tsx#L181-L188",
+        "https://github.com/saleor/saleor-dashboard/blob/a6e7bee68ab183147ec680e03e86c29f717a11d5/src/components/TableHead/TableHead.tsx#L149-L154",
+        "https://github.com/saleor/saleor-dashboard/blob/a6e7bee68ab183147ec680e03e86c29f717a11d5/src/discounts/components/VoucherCodesTable/VoucherCodesTable.tsx#L129-L135"
+      ]
+    },
+    {
+      "id": "vouchers-6",
+      "title": "Generated code with a 229-character prefix is rejected at Save by the 255-character limit",
+      "findings": [
+        "run1-22"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "The app handles the input correctly, just late. The generator builds `${prefix}-${uuid}` (229 + 1 + 36 = 266), the API rejects it, and the dashboard shows the API message inline in the Codes card (\"Ensure this value has at most 255 characters (it has 266).\") plus the toast \"Couldn't save voucher - Fix the codes section and try again.\" (shot-3, shot-4). Nothing is saved wrongly, nothing is lost, and the oversized code is the only Draft row, pinned at the top of the list, so it is not hard to find. A missing client-side maxlength on an optional prefix, exercised only with an artificial 229-character paste, is an enhancement request, not a defect; the message is a readable validation sentence, not a raw technical error.",
+      "evidence": [
+        "run1-22/shot-3.png",
+        "run1-22/shot-4.png"
+      ],
+      "source": [
+        "https://github.com/saleor/saleor-dashboard/blob/a6e7bee68ab183147ec680e03e86c29f717a11d5/src/discounts/components/VoucherCreatePage/utils.ts#L11-L15",
+        "https://github.com/saleor/saleor-dashboard/blob/a6e7bee68ab183147ec680e03e86c29f717a11d5/src/discounts/components/VoucherCodesCard/voucherCodesErrors.ts#L14-L39",
+        "https://github.com/saleor/saleor-dashboard/blob/a6e7bee68ab183147ec680e03e86c29f717a11d5/src/discounts/components/VoucherCodesGenerateDialog/VoucherCodesGenerateDialog.tsx#L87-L98"
+      ]
+    },
+    {
+      "id": "vouchers-7",
+      "title": "Country list of a former free-shipping voucher is kept (hidden) after switching to Entire order",
+      "findings": [
+        "run1-27"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "The premise that a hidden restriction still applies is wrong. In the API the country check exists only in the shipping-voucher path (_get_shipping_voucher_discount_for_checkout: \"if voucher.countries and address.country.code not in voucher.countries\"); get_voucher_discount_for_checkout never looks at countries for ENTIRE_ORDER or SPECIFIC_PRODUCT. The dashboard accordingly shows the Countries section only for the shipping type (showCountries: data.discountType === SHIPPING). The stored list is inert for an entire-order voucher and simply comes back if the type is switched to Free shipping again (shot-4, unsaved). No customer-facing effect, no data loss: works as designed.",
+      "evidence": [
+        "run1-27/shot-4.png"
+      ],
+      "source": [
+        "https://github.com/saleor/saleor/blob/44dd076f00584c0660449e4e238f60ffcb32e691/saleor/checkout/utils.py#L437-L461",
+        "https://github.com/saleor/saleor/blob/44dd076f00584c0660449e4e238f60ffcb32e691/saleor/checkout/utils.py#L492-L523",
+        "https://github.com/saleor/saleor-dashboard/blob/a6e7bee68ab183147ec680e03e86c29f717a11d5/src/discounts/components/VoucherSectionNav/useVoucherSectionNavItems.ts#L54-L59"
+      ]
+    },
+    {
+      "id": "vouchers-8",
+      "title": "Ended voucher is labelled \"Inactive\" in the detail header but \"Ended\" in the Schedule card and the list",
+      "findings": [
+        "run2-19",
+        "run3-18"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "Wording inconsistency confirmed in source and screenshots. For the same computed state (getPromotionStatus === \"finished\") VoucherDetailsTitle picks messages.statusInactive (\"Inactive\"), while the list (datagrid.ts statusEnded), DiscountScheduleCard (statusEnded) and the availability card all say \"Ended\". run2-19/shot-1 and run3-18/shot-1 show header \"Inactive - N days ago\" next to a Schedule card reading \"Ended\" on the same screen; run2-19/shot-2 and run3-18/shot-2 show \"Ended - N days ago\" in the list. One state, two names on one page: cosmetic.",
+      "evidence": [
+        "run2-19/shot-1.png",
+        "run2-19/shot-2.png",
+        "run3-18/shot-1.png",
+        "run3-18/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/saleor/saleor-dashboard/blob/a6e7bee68ab183147ec680e03e86c29f717a11d5/src/discounts/components/VoucherDetailsTitle/VoucherDetailsTitle.tsx#L43-L53",
+        "https://github.com/saleor/saleor-dashboard/blob/a6e7bee68ab183147ec680e03e86c29f717a11d5/src/discounts/components/VoucherDetailsTitle/messages.ts#L38-L41",
+        "https://github.com/saleor/saleor-dashboard/blob/a6e7bee68ab183147ec680e03e86c29f717a11d5/src/discounts/components/VoucherListDatagrid/datagrid.ts#L95-L115",
+        "https://github.com/saleor/saleor-dashboard/blob/a6e7bee68ab183147ec680e03e86c29f717a11d5/src/discounts/components/DiscountScheduleCard/DiscountScheduleCard.tsx#L52-L58"
+      ]
+    },
+    {
+      "id": "vouchers-9",
+      "title": "Schedule error \"End date cannot be before the start date.\" stays after the dates are corrected",
+      "findings": [
+        "run3-06"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "rejected for consistency with the benchmark's rule that API errors stay on the form until the next save (same as retained discount feedback).",
+      "evidence": [
+        "run3-06/shot-3.png",
+        "run3-06/shot-4.png",
+        "run3-06/shot-5.png"
+      ],
+      "source": [
+        "https://github.com/saleor/saleor-dashboard/blob/a6e7bee68ab183147ec680e03e86c29f717a11d5/src/discounts/components/DiscountDates/DiscountDates.tsx#L43",
+        "https://github.com/saleor/saleor-dashboard/blob/a6e7bee68ab183147ec680e03e86c29f717a11d5/src/discounts/components/DiscountDates/DiscountDates.tsx#L144-L157",
+        "https://github.com/saleor/saleor-dashboard/blob/a6e7bee68ab183147ec680e03e86c29f717a11d5/src/discounts/views/VoucherDetails/VoucherDetails.tsx#L701-L705",
+        "https://github.com/saleor/saleor-dashboard/blob/a6e7bee68ab183147ec680e03e86c29f717a11d5/src/utils/errors/common.ts#L33-L57"
+      ]
+    },
+    {
+      "id": "vouchers-10",
+      "title": "Vouchers list shows the error page for a hand-typed sort value (?sort=name, ?sort=status)",
+      "findings": [
+        "run3-12"
+      ],
+      "verdict": "accept",
+      "severity": 5,
+      "reason": "Unknown ?sort value makes the vouchers list throw and show the full-page error (findValueInEnum). Counted under the rule for addresses the app does not generate.",
+      "evidence": [
+        "run3-12/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/saleor/saleor-dashboard/blob/a6e7bee68ab183147ec680e03e86c29f717a11d5/src/discounts/urls.ts#L74-L82",
+        "https://github.com/saleor/saleor-dashboard/blob/a6e7bee68ab183147ec680e03e86c29f717a11d5/src/utils/sort.ts#L43-L57",
+        "https://github.com/saleor/saleor-dashboard/blob/a6e7bee68ab183147ec680e03e86c29f717a11d5/src/misc.ts#L431-L442",
+        "https://github.com/saleor/saleor-dashboard/blob/a6e7bee68ab183147ec680e03e86c29f717a11d5/src/discounts/views/VoucherList/sort.ts#L8-L22",
+        "https://github.com/saleor/saleor-dashboard/blob/a6e7bee68ab183147ec680e03e86c29f717a11d5/src/discounts/index.tsx#L53-L59"
+      ]
+    },
+    {
+      "id": "vouchers-11",
+      "title": "Voucher with unfinished setup is listed and filtered as \"Active\"",
+      "findings": [
+        "run3-22"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Deliberate definition, not a contradiction. \"Active / Scheduled / Ended\" is the schedule phase: the dashboard derives it from start/end date only (getPromotionStatus), the Schedule card on the same page says so (\"Outside this range, the voucher cannot be redeemed\"), and the API's status filter is date/usage based as well (filter_status -> VoucherQueryset.active: start_date <= now, end_date null or >= now, usage limit not reached). Channel assignment and discount value are a separate axis that the page reports explicitly through the setup checklist (\"Customers can't redeem this voucher until the required steps are done\") and the Availability card (\"Voucher in 0 of 2 channels\") in shot-1. Both statements are true at once.",
+      "evidence": [
+        "run3-22/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/saleor/saleor-dashboard/blob/a6e7bee68ab183147ec680e03e86c29f717a11d5/src/discounts/utils.ts#L33-L55",
+        "https://github.com/saleor/saleor-dashboard/blob/a6e7bee68ab183147ec680e03e86c29f717a11d5/src/discounts/components/VoucherListDatagrid/datagrid.ts#L95-L115",
+        "https://github.com/saleor/saleor/blob/44dd076f00584c0660449e4e238f60ffcb32e691/saleor/graphql/discount/filters.py#L56-L69",
+        "https://github.com/saleor/saleor/blob/44dd076f00584c0660449e4e238f60ffcb32e691/saleor/discount/models.py#L53-L68"
+      ]
+    }
+  ]
+}

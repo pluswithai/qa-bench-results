@@ -1,0 +1,139 @@
+{
+  "bugs": [
+    {
+      "name": "Assignees picker: ticks, unticks and \"Clear assignees\" are only sent when the picker closes (reload with it open loses them)",
+      "summary": "The tick disappears only in the browser's copy of the list: no request is sent at all (no /issues/assignee call, nothing in the network log), the sidebar Assignees row keeps showing alex and maya, no unassign timeline entry is created, and after a reload both are still assigned exactly as before. (on /eval/harbor-handbook/issues/2)",
+      "expected": "Clicking a checked assignee in the dropdown sends the unassignment to the server, the person disappears from the Assignees sidebar row, an \\\"alex was unassigned by eval\\\" entry appears in the timeline, and the change survives a reload — as it does when an assignee is added.",
+      "actual": "The tick disappears only in the browser's copy of the list: no request is sent at all (no /issues/assignee call, nothing in the network log), the sidebar Assignees row keeps showing alex and maya, no unassign timeline entry is created, and after a reload both are still assigned exactly as before.",
+      "reproSteps": [
+        "Sign in as eval and open /eval/harbor-handbook/issues/2 (issue \"Clarify release ownership\"). It is assigned to eval, alex and maya.",
+        "In the right-hand sidebar click the \"Assignees\" heading to open its dropdown (Filter Assignee / Clear assignees / eval / alex / maya).",
+        "Click the \"alex\" row. The tick next to alex disappears and the row looks unchecked.",
+        "Reload the page (or navigate away and back).",
+        "Open the Assignees dropdown again and look at the sidebar list: alex is still assigned, the tick is back, and the timeline still shows only \"alex was assigned by eval\" with no unassign entry.",
+        "Same with maya: click her row (tick disappears), reload, maya is still assigned."
+      ],
+      "reason": "Gitea documents that multi-select sidebar pickers defer the update until the dropdown is hidden; every video reloads the page while the picker is still open, so nothing had been submitted yet. Closing the picker (click outside) does send POST /issues/assignee, as run1-10 and run3-10 themselves report."
+    },
+    {
+      "name": "Issue search for an emoji that is in a title returns no results",
+      "summary": "The search answers \\\"No results / Try adjusting your search filters\\\" and the counters show 0 Open / 0 Closed. Searching the same title for \\\"probe\\\" (Exact), \\\"café\\\" (Exact), \\\"مرحبا\\\"/Cyrillic text (repo list) all work, so only the 4-byte emoji cannot be found in either the global or the repository search box. (on /issues and /eval/harbor-handbook/issues)",
+      "expected": "The search finds issue #13, whose title contains 🚀, just as it finds it when searching for \\\"probe\\\" or \\\"café\\\" from the same title.",
+      "actual": "The search answers \\\"No results / Try adjusting your search filters\\\" and the counters show 0 Open / 0 Closed. Searching the same title for \\\"probe\\\" (Exact), \\\"café\\\" (Exact), \\\"مرحبا\\\"/Cyrillic text (repo list) all work, so only the 4-byte emoji cannot be found in either the global or the repository search box.",
+      "reproSteps": [
+        "Sign in as eval and open /eval/harbor-handbook/issues/new",
+        "Create an issue titled \"agent15-café über 🚀 search probe\" with body \"Bodyword quinquereme zebra.\"",
+        "Open the issue: its title contains the rocket emoji and is shown on screen (issue #13)",
+        "Go to /issues and type the rocket emoji 🚀 in the \"Search issues...\" box, press Enter (mode Exact)",
+        "The result is \"No results\"; the same happens in the repository list search box at /eval/harbor-handbook/issues with q=🚀"
+      ],
+      "reason": "The default issue indexer (bleve) is a word index built with the unicode word tokenizer, which emits letters and numbers only; emoji and other symbols are not indexed, so an emoji-only query matches nothing. A limitation of the chosen full-text design, not a malfunction."
+    },
+    {
+      "name": "\"Words\" search mode needs all words in the same field (title, body or comments)",
+      "summary": "The page shows \\\"No results / Try adjusting your search filters.\\\" and 0 results. The same words match when they are not split: \\\"verifies published\\\" (both in one issue body) returns #2, \\\"ownership proposal\\\" returns #4, \\\"captain merging\\\" returns #4. Also tried \\\"clarify verifies\\\" (title word of #2 + body word of #2) and \\\"rotation proposal\\\" (body word of #4 + title word of #4): both return \\\"No results\\\". (on /issues)",
+      "expected": "Issue #2 \\\"Clarify release ownership\\\" is listed, because it contains both words — \\\"ownership\\\" in its title and \\\"verifies\\\" in its body (\\\"Document who coordinates a release and who verifies the published tag.\\\").",
+      "actual": "The page shows \\\"No results / Try adjusting your search filters.\\\" and 0 results. The same words match when they are not split: \\\"verifies published\\\" (both in one issue body) returns #2, \\\"ownership proposal\\\" returns #4, \\\"captain merging\\\" returns #4. Also tried \\\"clarify verifies\\\" (title word of #2 + body word of #2) and \\\"rotation proposal\\\" (body word of #4 + title word of #4): both return \\\"No results\\\".",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-ioyiuw0ebjuremypnxaoz.e2b.app/issues?q=verifies&state=open&search_mode=words — the one-word search \"verifies\" lists eval/harbor-handbook#2 \"Clarify release ownership\", whose body contains \"who verifies the published tag\".",
+        "Change the query to ownership verifies, keep the search mode on \"Words\", submit.",
+        "The page shows \"No results\" (\"Try adjusting your search filters.\"), although #2 contains \"ownership\" in its title and \"verifies\" in its body.",
+        "Same for q=clarify+verifies&search_mode=words (#2 title + #2 body) and q=rotation+proposal&search_mode=words (#4 body + #4 title): both show \"No results\"."
+      ],
+      "reason": "Every indexer backend builds the Words query as \"all words in the title\" OR \"all words in the body\" OR \"all words in the comments\" (bleve, database and Elasticsearch alike), so words split across title and body do not match. Consistent, explicit search semantics rather than a defect."
+    },
+    {
+      "name": "Time Tracker sidebar block shows only its heading and gear when no time is tracked",
+      "summary": "The Time Tracker block shows only its heading and gear icon, with nothing under it: no \\\"Set estimated time\\\", no \\\"Start timer\\\", no \\\"Add Time\\\", and no text such as \\\"No time tracked\\\". Every other sidebar block on the same page states its empty value (\\\"No Label\\\", \\\"No Milestone\\\", \\\"No project\\\", \\\"No Assignees\\\", \\\"No due date set.\\\", \\\"No dependencies set.\\\"). Same blank block on eval/harbor-handbook#5 viewed as alex (seen earlier in this hunt as eval on that page, the block listed \\\"Set estimated time / Start timer / Add Time\\\"). (on /alex/agent11-empty-repo/issues/1)",
+      "expected": "The Time Tracker block shows its controls (Set estimated time, Start timer, Add Time) for a user who may track time, as it does for the repo owner, or at minimum a line saying no time is tracked — not an empty area under the heading.",
+      "actual": "The Time Tracker block shows only its heading and gear icon, with nothing under it: no \\\"Set estimated time\\\", no \\\"Start timer\\\", no \\\"Add Time\\\", and no text such as \\\"No time tracked\\\". Every other sidebar block on the same page states its empty value (\\\"No Label\\\", \\\"No Milestone\\\", \\\"No project\\\", \\\"No Assignees\\\", \\\"No due date set.\\\", \\\"No dependencies set.\\\"). Same blank block on eval/harbor-handbook#5 viewed as alex (seen earlier in this hunt as eval on that page, the block listed \\\"Set estimated time / Start timer / Add Time\\\").",
+      "reproSteps": [
+        "Sign in as alex (username alex, password momentic-contributor-1) and open https://5503-itj9npss7825cqyyppxe0.e2b.app/alex/agent11-empty-repo/issues/1 (the repo has \"Enable Time Tracking\" checked in its settings).",
+        "Scroll the right sidebar down past Notifications to the \"Time Tracker\" heading.",
+        "Look at what is under the \"Time Tracker\" heading.",
+        "For comparison, open https://5503-itj9npss7825cqyyppxe0.e2b.app/eval/harbor-handbook/issues/5 as the same account and scroll to the same block."
+      ],
+      "reason": "By template the block is a heading-plus-gear dropdown: Set estimated time, Start timer and Add Time live inside the gear menu, and nothing else is rendered until an estimate or tracked time exists. The controls are there (click the gear); a missing empty-state line is a preference."
+    },
+    {
+      "name": "Long line in a fenced code block is clipped at the block edge; page claimed to scroll sideways",
+      "summary": "The long code line is clipped at the edge of the comment box with the rest of it unreachable, and the whole issue page becomes 1706px wide on a 1280px viewport (426px of horizontal scrolling). The same measurement on issue #4 (no long code line) returns 1280/1280, so the overflow comes from the rendered comment content. (on /eval/harbor-handbook/issues/29)",
+      "expected": "The comment should keep the page at the viewport width: a long code line should either wrap or scroll inside the code block, the rest of the line must stay reachable, and the issue page should not gain a horizontal scrollbar.",
+      "actual": "The long code line is clipped at the edge of the comment box with the rest of it unreachable, and the whole issue page becomes 1706px wide on a 1280px viewport (426px of horizontal scrolling). The same measurement on issue #4 (no long code line) returns 1280/1280, so the overflow comes from the rendered comment content.",
+      "reproSteps": [
+        "Go to /eval/harbor-handbook/issues/new",
+        "Title: agent12-longtext wrap test. In the comment box paste: a line of ~130 'A' characters, then a fenced code block whose single line is: <?php echo \"a very long code line that should scroll inside its block rather than stretch the page AAAA...A\"; ?> (about 180 characters) followed by a small markdown table and 'مرحبا بالعالم 🚀 José'",
+        "Click Create Issue (opens /eval/harbor-handbook/issues/29)",
+        "Look at the rendered comment: the text inside the grey code block stops at the right edge of the comment box mid-word (no ellipsis, no scrollbar inside the block), while the normal paragraph above it wraps correctly",
+        "Compare the page width with any other issue (e.g. /eval/harbor-handbook/issues/4): the document of #29 is 1706px wide while the viewport is 1280px, so the page scrolls horizontally into empty space"
+      ],
+      "reason": "Markdown code blocks are rendered as code-overflow-scroll (overflow-x: auto), so a long line scrolls inside the block by design, and .markup has overflow hidden so it cannot widen the page. No screenshot or frame shows the page scrolled sideways; the layout is the normal 1280px one, the 1706px figure is only asserted."
+    },
+    {
+      "name": "New-issue link ignores ?labels= and ?assignee= parameters",
+      "summary": "The Milestone sidebar is prefilled with \\\"Handbook 1.1\\\", but the Labels sidebar still reads \\\"No Label\\\" (the hidden label_ids input is empty) and Assignees still reads \\\"No Assignees\\\". An issue created from such a link would carry no label and no assignee, silently. (on /eval/harbor-handbook/issues/new)",
+      "expected": "The new issue form is prefilled with the given label and assignee, as it already is for title, body and milestone (?title=, ?body=, ?milestone=1).",
+      "actual": "The Milestone sidebar is prefilled with \\\"Handbook 1.1\\\", but the Labels sidebar still reads \\\"No Label\\\" (the hidden label_ids input is empty) and Assignees still reads \\\"No Assignees\\\". An issue created from such a link would carry no label and no assignee, silently.",
+      "reproSteps": [
+        "Sign in as eval (username eval).",
+        "Open https://5503-izxouzvjflo86mc67ty9v.e2b.app/eval/harbor-handbook/issues/new?labels=1&milestone=1&assignee=alex — label id 1 is \"documentation\" in this repository, milestone id 1 is \"Handbook 1.1\".",
+        "Look at the sidebar on the right of the create form: Labels, Milestone, Assignees.",
+        "Repeat with only ?labels=1: Labels still reads \"No Label\"."
+      ],
+      "reason": "In 1.24.7 the new-issue page reads only title, body, milestone, project and template (plus field:*) from the query string; labels/assignee prefill is a feature Gitea does not offer or document here, not one that misbehaves."
+    },
+    {
+      "name": "Double-clicking the bulk \"Close\" button: second request reported to answer 500 (intermittent)",
+      "summary": "The first POST /issues/status returns 200, the second returns 500 (Internal Server Error) and the console logs \\\"Failed to load resource: 500\\\" plus \\\"Error: Failed to update issues meta\\\". The issue does end up closed with a single \\\"closed this issue\\\" entry. On a second try of the same steps both requests returned 200 and nothing failed, so this is intermittent (1 of 2 attempts). (on /eval/harbor-handbook/issues)",
+      "expected": "A quick second click on the bulk \\\"Close\\\" button is ignored or handled cleanly: the issue is closed once and no request fails.",
+      "actual": "The first POST /issues/status returns 200, the second returns 500 (Internal Server Error) and the console logs \\\"Failed to load resource: 500\\\" plus \\\"Error: Failed to update issues meta\\\". The issue does end up closed with a single \\\"closed this issue\\\" entry. On a second try of the same steps both requests returned 200 and nothing failed, so this is intermittent (1 of 2 attempts).",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-izxouzvjflo86mc67ty9v.e2b.app/eval/harbor-handbook/issues?q=agent10-bulk-b&state=open (my issue \"agent10-bulk-b\" #12, open).",
+        "Tick the checkbox of the row \"agent10-bulk-b\" so the bulk bar with \"Close\" appears.",
+        "Click the bulk button \"Close\" twice as fast as possible.",
+        "Watch the network/console: the second POST to /eval/harbor-handbook/issues/status answers 500 and the console reports \"Failed to update issues meta\"."
+      ],
+      "reason": "The screenshots and video only show the correct end state (issue closed once, no error on screen); the 500 and the console error are asserted from the network log and happened in 1 of 2 tries. The source makes it plausible (a concurrent second close hits ErrIssueAlreadyChanged and is returned as a 500, which the client swallows), so a human should check the run's network/console log and decide whether an invisible, intermittent 500 on a duplicate request counts (severity 3 if accepted)."
+    },
+    {
+      "name": "Search mode picked in the dropdown (Fuzzy) is lost when another dashboard section is clicked",
+      "summary": "The dropdown falls back to \"Exact\" on its own. The address after the switch is https://.../issues?type=created_by&sort=recentupdate&state=open&q=agent12 — the chosen mode is not carried in it at all, so it is lost on every section/tab switch, filter change and reload, and the list is searched with Exact again without any notice. (on /issues)",
+      "expected": "The chosen search mode should stay selected (and be part of the address) when the ownership section, the Open/Closed tab or a filter changes, so the list keeps being searched the way the person chose.",
+      "actual": "The dropdown falls back to \"Exact\" on its own. The address after the switch is https://.../issues?type=created_by&sort=recentupdate&state=open&q=agent12 — the chosen mode is not carried in it at all, so it is lost on every section/tab switch, filter change and reload, and the list is searched with Exact again without any notice.",
+      "reproSteps": [
+        "Go to /issues?q=agent12 (three issues match, the search-mode dropdown in the search bar reads \"Exact\")",
+        "Open the search-mode dropdown (left of the magnifier) and choose \"Fuzzy\" — the dropdown now reads \"Fuzzy\", the URL stays /issues?q=agent12",
+        "Click \"Created by you\" (or \"Assigned to you\", or any other entry) in the left filter menu",
+        "Look at the search-mode dropdown: it reads \"Exact\" again, with the query agent12 still in the box, and the address contains type=created_by&q=agent12 but no search-mode parameter"
+      ],
+      "reason": "The tester changed the mode dropdown but never submitted the search (the address stayed /issues?q=agent12), then followed a server-rendered link, which cannot know an unsubmitted form value. Once the search is submitted the mode is in the address and the template carries search_mode in every section and state link."
+    },
+    {
+      "name": "Back to the new-issue form restores the body but not the Title",
+      "summary": "The body editor still holds the typed text (\"agent7 body kept through Back\") but the Title field is empty; the page shows no message about what was kept or lost. Seen twice: once pressing Back from the just-created issue #22 (title \\\"agent7-reload-back-test\\\" gone, body \\\"Body for the reload/back test (agent7).\\\" still there) and once pressing Back from the repo issue list (title \\\"agent7-back-title\\\" gone, body \\\"agent7 body kept through Back\\\" still there). The title input is rendered with autocomplete=\\\"off\\\", the body is a textarea that the browser restores. (on /eval/agent14-paging/issues/new)",
+      "expected": "Going Back to the half-filled new-issue form should restore the whole draft (title and body) or lose it as a whole and say so; the title must not disappear while the body is kept.",
+      "actual": "The body editor still holds the typed text (\"agent7 body kept through Back\") but the Title field is empty; the page shows no message about what was kept or lost. Seen twice: once pressing Back from the just-created issue #22 (title \\\"agent7-reload-back-test\\\" gone, body \\\"Body for the reload/back test (agent7).\\\" still there) and once pressing Back from the repo issue list (title \\\"agent7-back-title\\\" gone, body \\\"agent7 body kept through Back\\\" still there). The title input is rendered with autocomplete=\\\"off\\\", the body is a textarea that the browser restores.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-ioyiuw0ebjuremypnxaoz.e2b.app/eval/agent14-paging/issues/new",
+        "Type agent7-back-title into the Title field and agent7 body kept through Back into the \"Leave a comment\" editor",
+        "Navigate to https://5503-ioyiuw0ebjuremypnxaoz.e2b.app/eval/agent14-paging/issues (answer the browser's leave-page prompt)",
+        "Press the browser's Back button to return to the new-issue form",
+        "Compare the Title field and the body editor"
+      ],
+      "reason": "The tester left a dirty form after confirming the app's leave-page warning, so the draft was announced as lost; the body coming back is the browser's own form restore, and the title input carries autocomplete=\"off\" on purpose, which excludes it from that restore. Gitea does not promise draft recovery here."
+    },
+    {
+      "name": "Dashboard/org Issues: left-hand section counters do not follow the Author and Assignee filters",
+      "summary": "The left counters keep the unfiltered numbers: \\\"In your repositories 2\\\" and \\\"Created by you 2\\\" while the Open tab reads \\\"1 Open\\\" and only issue #1 is listed (Assignee filter); with Author=alex the list says \\\"No results\\\" and the tab reads \\\"0 Open\\\", yet the counters still say \\\"In your repositories 2\\\" / \\\"Created by you 2\\\". A keyword search does update the counters, so only the Author/Assignee filters are ignored. (on /org/agent15-org/issues)",
+      "expected": "The counters and the state tab show the same totals as the list they describe: 1 for the Assignee=alex filter and 0 for Author=alex.",
+      "actual": "The left counters keep the unfiltered numbers: \\\"In your repositories 2\\\" and \\\"Created by you 2\\\" while the Open tab reads \\\"1 Open\\\" and only issue #1 is listed (Assignee filter); with Author=alex the list says \\\"No results\\\" and the tab reads \\\"0 Open\\\", yet the counters still say \\\"In your repositories 2\\\" / \\\"Created by you 2\\\". A keyword search does update the counters, so only the Author/Assignee filters are ignored.",
+      "reproSteps": [
+        "Open https://5503-ioyiuw0ebjuremypnxaoz.e2b.app/org/agent15-org/issues (signed in as eval; org agent15-org, repo agent15-repo with 2 open and 1 closed issue).",
+        "Click \"Assignee\", type alex in \"Search users\" and pick alex. The list shows exactly one issue (agent15-org-issue-one) and the state tab reads \"1 Open\".",
+        "Look at the counters on the left: \"In your repositories 2\" and \"Created by you 2\".",
+        "Clear the filter and instead click \"Author\", type alex and pick alex: the list shows \"No results\" and the tab reads \"0 Open\", while the left counters still read \"In your repositories 2\" and \"Created by you 2\"."
+      ],
+      "reason": "The code explicitly clears poster and assignee before computing the left-hand counters (\"Below stats are for the left sidebar\"), and the section links drop those two filters as well, so each counter equals what its link opens; the Open/Closed tabs do follow the filters. Intended, if debatable, design."
+    }
+  ]
+}

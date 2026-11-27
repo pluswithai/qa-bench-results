@@ -1,0 +1,166 @@
+{
+  "bugs": [
+    {
+      "name": "Sort panel \"Descending\" selector does not flip an existing sort",
+      "summary": "Nothing changes: the chip keeps showing \"↑Name\" and the rows stay in ascending name order (all v1 rows first, the v2 row last). Reopening the Sort panel shows the direction selector back at \"Ascending\". Only flipping the direction from the sort chip's own small menu (clicking the \"↑Name\" chip and choosing \"Sort\") actually reverses the list and its arrow. Happened 2 times out of 2 tries. (on /objects/workflowVersions)",
+      "expected": "The list should be re-sorted by name in descending order (v2 rows first, v1 rows last) and the sort chip should show the descending arrow \"↓Name\", as it does when the direction is flipped from the sort chip's own menu.",
+      "actual": "Nothing changes: the chip keeps showing \"↑Name\" and the rows stay in ascending name order (all v1 rows first, the v2 row last). Reopening the Sort panel shows the direction selector back at \"Ascending\". Only flipping the direction from the sort chip's own small menu (clicking the \"↑Name\" chip and choosing \"Sort\") actually reverses the list and its arrow. Happened 2 times out of 2 tries.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open /objects/workflowVersions (the \"Versions\" list).",
+        "Click the \"Sort\" button at the top right of the list.",
+        "In the opened Sort panel, click the field \"Name\" to sort by Name. The chip above the list then reads \"↑Name\" and the rows are ordered by the version name ascending (v1 rows first, the v2 row(s) last).",
+        "With the Sort panel still open, click the direction selector that reads \"Ascending\" and choose \"Descending\".",
+        "Close the panel (Escape) and look at the list and at the sort chip."
+      ],
+      "reason": "Designed behaviour. In the Sort dropdown the Ascending/Descending select only stores a pending direction (handleSortDirectionClick sets selectedRecordSortDirection and nothing else); a sort is written only when a field row is clicked (handleAddSort -> upsertRecordSort with that direction), and the pending direction is reset to ASC every time the dropdown opens or closes (useResetSortDropdown). The agent chose \"Descending\" and pressed Escape without picking a field (shot-1/shot-3 show the panel open on \"Descending\" with the chip still \"↑ Name\"), so no sort change was ever requested; the reset to \"Ascending\" on reopen is the same coded reset. Flipping an existing sort is done from the sort chip, which the agent confirms works."
+    },
+    {
+      "name": "Schedule trigger said to accept hour 25 and activate with it",
+      "summary": "Hour 25 is accepted with no error message; the \\\"Schedule\\\" and \\\"Upcoming execution time (UTC)\\\" blocks disappear entirely, leaving no indication that the value is invalid, and \\\"Activate\\\" succeeds — the workflow turns Active with the out-of-range hour saved as its schedule. (on /object/workflow/fff88a6e-a714-42e5-863b-51748a3907fb)",
+      "expected": "The hour field should refuse a value outside 0–23 with a validation message next to it (its own placeholder states the limit), and the workflow should not be activateable with an invalid schedule; the schedule preview should stay consistent.",
+      "actual": "Hour 25 is accepted with no error message; the \\\"Schedule\\\" and \\\"Upcoming execution time (UTC)\\\" blocks disappear entirely, leaving no indication that the value is invalid, and \\\"Activate\\\" succeeds — the workflow turns Active with the out-of-range hour saved as its schedule.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open /objects/workflows",
+        "Click \"+ New Workflow\", name it \"agent9-schedule\", click the Trigger node \"Add a Trigger\" and choose \"On a schedule\"",
+        "In the trigger panel note the fields: Trigger interval \"Days\", Days between triggers 1, Trigger at hour (UTC) 0 with placeholder \"Enter number between 0 and 23\", Trigger at minute (UTC) 0; the panel shows \"Schedule: at 00:00 UTC every day\" and three \"Upcoming execution time (UTC)\" entries",
+        "Type 25 into \"Trigger at hour (UTC)\"",
+        "Add an action with the \"+\" under the trigger and pick \"Create Record\", then click \"Activate\" in the header"
+      ],
+      "reason": "The evidence contradicts the claim. The agent's own video ends (t=196 s, same state as frame-6) by reopening the trigger of the now Active workflow: \"Trigger at hour (UTC)\" is 0 and the schedule reads \"at 00:00 UTC every day\" - 25 was never saved. That matches the source: the hour onChange rejects values outside 0-23, stores the message \"Invalid hour value '25'. Should be integer between 0 and 23\" and returns before onTriggerUpdate, and the schedule preview is hidden while an error is pending (isVisible). The message is rendered only after the field loses focus (onBlur -> setErrorMessagesVisible(true)); shot-2/shot-5 were taken while the field was still focused, and the agent's next click (the \"+\" under the trigger) replaced the panel with the action picker, so the inline error was never on screen. Validation on blur, not a missing validation."
+    },
+    {
+      "name": "Test runs of a workflow with a Form step stay \"Running\" when the form is not submitted",
+      "summary": "Each Test click creates a new workflow run immediately (RunWorkflowVersion fires on the click, before Submit), and closing the panel without submitting leaves the run at status \\\"Running\\\". Runs #4, #5 and #6 - Quick Lead were still \\\"Running\\\" in /objects/workflowRuns after 5+ minutes (checked at 1440 px after a reload), while runs of the same workflow completed normally in under a second. Nothing in the run list or the run record offers a way to cancel or finish them. (on /object/workflow/c95c78b4-48d2-56f6-8e15-36ff8572f1d8 (Quick Lead) and /objects/workflowRuns)",
+      "expected": "A test run that is abandoned before the form is submitted should be ended (cancelled/failed) when the test panel is closed, and clicking Test again while a test is pending should reuse or not duplicate the run — a workflow run should never stay \"Running\" indefinitely, since a Quick Lead run normally finishes in under a second.",
+      "actual": "Each Test click creates a new workflow run immediately (RunWorkflowVersion fires on the click, before Submit), and closing the panel without submitting leaves the run at status \\\"Running\\\". Runs #4, #5 and #6 - Quick Lead were still \\\"Running\\\" in /objects/workflowRuns after 5+ minutes (checked at 1440 px after a reload), while runs of the same workflow completed normally in under a second. Nothing in the run list or the run record offers a way to cancel or finish them.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open the workflow editor /object/workflow/c95c78b4-48d2-56f6-8e15-36ff8572f1d8 (Quick Lead).",
+        "Click the \"Test\" button at the top right of the editor: the test side panel opens on the right with the \"Quick Lead Form\" (First name, Last Name, Email, Job title, Company name, Company domain, all empty).",
+        "Without filling anything and without clicking \"Submit\", close the panel with the \"X\" (Close side panel) button at the top right of the panel.",
+        "Click \"Test\" again, close the panel again without submitting (I did this a second time).",
+        "Open /objects/workflowRuns and use See Runs from the editor, or the filter Workflow = Quick Lead, and watch the new runs (#4, #5, #6 - Quick Lead) for several minutes."
+      ],
+      "reason": "Designed behaviour. Quick Lead contains a Form action (shot-1). The form action is a human-input step: its executor returns `pendingEvent: true`, the step is recorded as PENDING and the run stays RUNNING until someone submits the form; the run can be reopened later and submitted. Each Test click starting a new run of the draft is what Test does. The claim that nothing can end such a run is wrong: a pinned \"Stop\" command exists for workflow runs whose status is NOT_STARTED, ENQUEUED or RUNNING (shown on record selection); the agent never selected a run row (shot-4/shot-5 show no selection). Runs #1-#3 completed because their form was submitted."
+    },
+    {
+      "name": "Workflow Version \"Version trigger\" field shows truncated raw JSON",
+      "summary": "The field prints the raw serialized trigger config, cut off at the panel edge with no ellipsis and no way to read the rest: '{\"name\":\"Launch manually\",\"typ'. Hovering the value shows no tooltip and clicking it does not expand it, so the rest of the value (type, position, settings) cannot be read at any width (390, 768 and 1280 all show the same clipped string). (on /object/workflowVersion/9848f20a-e657-4c65-8020-086617bce3e7)",
+      "expected": "The Version trigger field should show a readable value (for example the trigger name 'Launch manually'), or the full text should be reachable (expand on click or a tooltip) so the configured trigger can be read from the version record.",
+      "actual": "The field prints the raw serialized trigger config, cut off at the panel edge with no ellipsis and no way to read the rest: '{\"name\":\"Launch manually\",\"typ'. Hovering the value shows no tooltip and clicking it does not expand it, so the rest of the value (type, position, settings) cannot be read at any width (390, 768 and 1280 all show the same clipped string).",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open /objects/workflowVersions.",
+        "Click the 'v1' name of any version row (for example the version whose Workflow column is 'agent15-a11y') to open the version record.",
+        "On the Home tab, read the 'Version trigger' field in the General section: it shows {\"name\":\"Launch manually\",\"typ and the rest is cut off.",
+        "Repeat at 768 and at 390 width: the same clipped string is shown, and hovering or clicking the value does not reveal the full text."
+      ],
+      "reason": "Designed behaviour of the generic JSON field. `trigger` on workflowVersion is declared as a RAW_JSON field labelled \"Version trigger\" with isUIEditable: false, and every RAW_JSON field is displayed as the stringified value on one truncated line (JsonFieldDisplay -> JsonDisplay). The claim that the rest cannot be read is contradicted by the source: a read-only JSON field opens an expandable JSON tree viewer on click (handleClick -> ExpandedFieldDisplay + JsonTree), and isUIEditable: false makes the field read-only. The video does not show any click on the value (the only clicks are on navigation and \"New chat\"; the value is only pointed at), so the \"click does not expand\" statement is unsupported. The trigger is also shown readably on the Flow canvas of the same page (\"Launch manually\" node in shot-1). The missing ellipsis glyph at the cut is a trivial styling nit, not enough for a defect."
+    },
+    {
+      "name": "Failed run shows \"Workflow run started at\" as its own label and the workflow name as \"Executed by\"",
+      "summary": "On the failed run, \\\"Workflow run started at\\\" shows the literal field label \\\"Workflow run started at\\\" instead of a date, and \\\"Executed by\\\" shows the workflow name \\\"Create company when adding a…\\\" instead of a person. The same fields are correct on the Completed run \\\"#1 - Quick Lead\\\" (Nov 24, 2026 5:40 AM / Tim Apple). (on /objects/workflowRuns and /object/workflowRun/c347a4ec-35f3-4d0c-b25e-f81152a4c808)",
+      "expected": "\\\"Workflow run started at\\\" shows the run's start date/time, and \\\"Executed by\\\" names the person (Tim Apple), like the Completed run \\\"#1 - Quick Lead\\\" does.",
+      "actual": "On the failed run, \\\"Workflow run started at\\\" shows the literal field label \\\"Workflow run started at\\\" instead of a date, and \\\"Executed by\\\" shows the workflow name \\\"Create company when adding a…\\\" instead of a person. The same fields are correct on the Completed run \\\"#1 - Quick Lead\\\" (Nov 24, 2026 5:40 AM / Tim Apple).",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open /objects/workflowRuns",
+        "In the list, click the row \"#1 - Create company when adding a new person\" with status Failed (it opens in the right side panel)",
+        "Read the record fields on the Home tab of the panel",
+        "Click \"Open\" at the bottom right of the panel to see the same record as a full page and read the Fields column"
+      ],
+      "reason": "Misread of two designed displays. (1) The grey text \"Workflow run started at\" in shot-1/shot-2 is the empty-field placeholder, not a value: an empty inline cell renders its own label as placeholder (`emptyPlaceHolder = label ?? 'Empty'`), exactly like the grey \"Job Title\"/\"Phones\" placeholders elsewhere. The field is empty because this run never started: the run job builds the Code steps before it calls startWorkflowRun (the only place startedAt is written), and in this instance logic functions are not configured, so the build throws (\"Logic function ... is disabled\", visible as State {\"workflowRunError\":\"Logic fun...) and the catch ends the run as FAILED with only endedAt (the Nov 24 5:40 AM value shown). The Completed Quick Lead run has no Code step, so it started normally. Environment-driven and coherent: a run that never started has no start time. (2) \"Executed by\" is an actor field; a run launched by a database-event trigger is created with actor source WORKFLOW and the workflow's name, which is what the chip with the workflow icon shows. The manually launched Quick Lead run shows Tim Apple for the same reason."
+    },
+    {
+      "name": "Clearing the schedule trigger's cron expression is saved in the draft without an inline error",
+      "summary": "Clearing the field saves it immediately (the trigger update request returns 200), no validation message appears, and the 'at … UTC' description and 'Upcoming execution time (UTC)' list simply disappear. After a reload the expression is still empty (grey placeholder only), so an 'On a schedule' trigger is stored with no cron at all; the panel still says 'Cron will be triggered at UTC time'. (on /object/workflow/0cf3e241-eb48-4c94-9dde-7c1b15fd370b)",
+      "expected": "An empty cron expression should be refused with an error message next to the field (as an invalid pattern like 99 99 * * * is), and the previously saved schedule should stay; the trigger should never be saved with no schedule.",
+      "actual": "Clearing the field saves it immediately (the trigger update request returns 200), no validation message appears, and the 'at … UTC' description and 'Upcoming execution time (UTC)' list simply disappear. After a reload the expression is still empty (grey placeholder only), so an 'On a schedule' trigger is stored with no cron at all; the panel still says 'Cron will be triggered at UTC time'.",
+      "reproSteps": [
+        "Open https://5500-inb17rqkl0j8zj8qvdtvb.e2b.app/objects/workflows and click '+ New Workflow' (a new editor opens).",
+        "Click the 'Trigger / Add a Trigger' node and choose 'On a schedule' in the right-hand Trigger Type panel.",
+        "Set Trigger interval to 'Cron (Custom)' and type 30 2 * * * in Expression — the panel shows 'at 02:30 UTC' and an 'Upcoming execution time (UTC)' list.",
+        "Select the whole Expression and clear it (empty field), then click the 'Expression' label to leave the field.",
+        "Reload the page and click the trigger node again to reopen the panel."
+      ],
+      "reason": "An incomplete draft, not a schedule that can go live. The video shows the whole test on a Draft workflow (yellow Draft chip throughout) and the agent never pressed Activate. Draft edits are autosaved field by field, and the form deliberately handles an empty pattern (the schedule helper is hidden while `!trigger.settings.pattern`). The claim that a trigger is \"left with no schedule\" is contradicted by the server: activation runs assertCronTriggerSettingsAreValid, which throws \"No pattern provided in CUSTOM cron trigger\" (with that text as the user-facing message) when the pattern is empty, so such a trigger can never be enabled. What remains is the absence of an inline hint on an emptied field of a draft, which is a wish, not a defect. (The accepted, different failure of this field - a malformed but non-empty expression being accepted and scheduled - is workflows-16.)"
+    },
+    {
+      "name": "Mailbox banner \"Reconnect\" said to lead to a blank page with no message",
+      "summary": "The browser goes to /verify?errorMessage=Google+apis+auth+is+not+enabled and shows a completely blank white page: no message, no navigation, no way back except the browser's Back button. The only trace of the reason is the raw text in the address bar (\"Google apis auth is not enabled\"). (on /object/workflow/2aedbf10-cc03-4437-acbf-112d63d200fc → /verify)",
+      "expected": "Reconnect either opens the account/mailbox connection screen, or the page says in words why the reconnect cannot happen (e.g. \"Google API auth is not enabled\") with a way back to the workflows.",
+      "actual": "The browser goes to /verify?errorMessage=Google+apis+auth+is+not+enabled and shows a completely blank white page: no message, no navigation, no way back except the browser's Back button. The only trace of the reason is the raw text in the address bar (\"Google apis auth is not enabled\").",
+      "reproSteps": [
+        "Open any page of the Workflows area, e.g. /objects/workflows or a workflow editor page such as /object/workflow/2aedbf10-cc03-4437-acbf-112d63d200fc, signed in as tim@apple.dev.",
+        "In the banner 'Sync lost with mailbox tim@apple.dev. Please reconnect for updates:' click the 'Reconnect' button.",
+        "Observe the page that opens: it is blank white."
+      ],
+      "reason": "The agent's own video contradicts the claim, and the cause is the test instance's configuration. After the click the video shows the transition (\"Verifying your login token\"), then the app shell loading again with a red toast at the bottom right reading \"Google apis auth is not enabled\" (final seconds of video.webm) - so there is a message, in the app, and the user is back in the app. shot-2/shot-4 are blank because they were captured during the redirect on an overloaded instance (the video shows skeleton loaders for many seconds before and after). The behaviour matches the source: the OAuth guard throws 'Google apis auth is not enabled' when neither MESSAGING_PROVIDER_GMAIL_ENABLED nor CALENDAR_PROVIDER_GOOGLE_ENABLED is set (evidently the case in this test instance) and redirects with ?errorMessage=..., and ErrorMessageEffect turns that query value into an error toast and removes it from the address. Environment (Google not configured) plus a screenshot taken mid-redirect."
+    },
+    {
+      "name": "Command menu said not to find existing workflows by name",
+      "summary": "The command menu answers \\\"Fallback → Search → No results found\\\" for each of these names, although every one of them exists in the workflows list behind the panel (visible at /objects/workflows): \\\"agent10-list-test\\\", \\\"agent13\\\", \\\"repro-form-test\\\". Only older records are found — typing \\\"agent7\\\" returns \\\"agent7-status\\\" and \\\"Quick Lead\\\" returns Quick Lead, so the record search itself works, it is the recently created/renamed workflows that are missing. (on /objects/workflows)",
+      "expected": "Typing the name (or a prefix) of an existing workflow should list that workflow as a record result and let the person open it.",
+      "actual": "The command menu answers \\\"Fallback → Search → No results found\\\" for each of these names, although every one of them exists in the workflows list behind the panel (visible at /objects/workflows): \\\"agent10-list-test\\\", \\\"agent13\\\", \\\"repro-form-test\\\". Only older records are found — typing \\\"agent7\\\" returns \\\"agent7-status\\\" and \\\"Quick Lead\\\" returns Quick Lead, so the record search itself works, it is the recently created/renamed workflows that are missing.",
+      "reproSteps": [
+        "Go to /objects/workflows (signed in as tim@apple.dev).",
+        "Open the command menu with the \"...\" button at the top right of the page.",
+        "Type the exact name of a workflow that exists in the list, e.g. \"agent10-list-test\" (a workflow created a couple of minutes earlier), or \"agent13\" (the row \"agent13-nav\" is in the list), or \"repro-form-test\".",
+        "Read the results area on the right."
+      ],
+      "reason": "No record search was ever run. The \"Type anything...\" box of the command menu filters the list of commands, not records: SidePanelCommandMenuItemDisplayPage filters commandMenuItems by label/shortcut and, when no command matches, shows the group \"Fallback\" with the command \"Search\" (searchRecordsFallback) - exactly what shot-1 and shot-5 show (\"Fallback / Search / No results found\"). The agent never clicked that \"Search\" entry (nor the Search command / the magnifier), so the record search page was not opened; the video only shows typing. The names that did \"work\" confirm it: agent7-status and Quick Lead are listed in the menu before any typing (video, menu opened with an empty box) because active manually-launched workflows are commands, so typing \"agent7\" matched a command, not a record. \"No results found\" refers to commands. Designed behaviour, test misread."
+    },
+    {
+      "name": "\"Add a Node\" adds an unconnected step and Activate accepts it",
+      "summary": "The \\\"Delay\\\" node is added as an isolated node on the canvas — the only edge in the graph still joins Trigger to \\\"Create Record\\\" — and the status chip goes from Draft to Active after \\\"Activate\\\" with no warning. The workflow is now published with a step that is not reachable from the trigger, so it never runs. (on /object/workflow/179e33c9-9502-40a8-8eca-a5aaf3bb94ee)",
+      "expected": "The step added from the toolbar should become part of the workflow (connected to the previous step, or the user should be told to connect it), and activation should refuse or warn about a step that is not reachable from the trigger.",
+      "actual": "The \\\"Delay\\\" node is added as an isolated node on the canvas — the only edge in the graph still joins Trigger to \\\"Create Record\\\" — and the status chip goes from Draft to Active after \\\"Activate\\\" with no warning. The workflow is now published with a step that is not reachable from the trigger, so it never runs.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev, open /objects/workflows and open the workflow \"agent2-name-test\" (Active, trigger \"Record is created\" + action \"Create Record\").",
+        "In the editor toolbar click \"Add a Node\" (top right of the canvas).",
+        "In the \"Select Action\" side panel click \"Delay\" (Flow section).",
+        "Look at the canvas: the new \"Action Delay\" node is drawn at the bottom left with no line joining it to the previous \"Create Record\" node.",
+        "Click \"Activate\" in the toolbar, then look at the canvas again."
+      ],
+      "reason": "Designed behaviour of the free-form canvas. The toolbar command \"Add a Node\" only opens the step picker for the workflow with no parent step (openWorkflowCreateStepInSidePanel(workflowId)), the same as the canvas right-click \"Add node\", which creates the node with `parentStepId: undefined`; nodes are then linked by dragging between handles (onConnect on the editable canvas). To append to a step the user uses the \"+\" under that step. shot-3 shows exactly that: Delay as a free node with its own \"+\". Activation validates the trigger, that steps exist and each step's settings (assertVersionIsValid) and has no reachability rule, so publishing a flow with a spare node is allowed; the connected part (Trigger -> Create Record) keeps running. A warning for unreachable nodes would be a feature request."
+    },
+    {
+      "name": "\"Duplicate Workflow\" on a draft with no trigger is refused with \"Workflow version does not contain trigger\"",
+      "summary": "Nothing is created: the row count stays the same, and a toast at the bottom right says \\\"Workflow version does not contain trigger\\\". No confirmation dialog and no explanation of what is missing. The same happens on a workflow that has never had a trigger configured (the state every workflow created with \\\"Add New\\\" starts in). (on /objects/workflows)",
+      "expected": "A copy of the workflow should be created and appear in the list (named e.g. \\\"agent10-list-test (Duplicate)\\\"), or the app should say in the person's words why a draft without a trigger cannot be duplicated.",
+      "actual": "Nothing is created: the row count stays the same, and a toast at the bottom right says \\\"Workflow version does not contain trigger\\\". No confirmation dialog and no explanation of what is missing. The same happens on a workflow that has never had a trigger configured (the state every workflow created with \\\"Add New\\\" starts in).",
+      "reproSteps": [
+        "Go to /objects/workflows and filter the list: Filter > Name > Contains > agent10-list-test, so only the workflow \"agent10-list-test\" (a draft created with the \"Add New\" row, never given a trigger) is shown.",
+        "Right-click the \"agent10-list-test\" row.",
+        "Choose \"Duplicate Workflow\" in the row context menu.",
+        "Look at the list count and at the bottom-right of the window."
+      ],
+      "reason": "A coded rule with its own user-facing message, not a raw error. duplicateWorkflow asserts that the source version has a trigger (assertWorkflowVersionTriggerIsDefined) and steps before copying, and the exception carries `userFriendlyMessage: msg`Workflow version does not contain trigger``, which is the toast in shot-3; nothing is created, as intended (shot-2/shot-3: count stays 1). The message does say what is missing (the trigger), so the user can act on it. The workflow tested (agent10-list-test) was an empty draft made with \"Add New\". The only weakness is that the menu offers the command for a workflow that cannot be duplicated yet (its availability rule checks only that a current version exists) - a polish point, not a defect."
+    },
+    {
+      "name": "Workflow page opened by a member without access shows \"Untitled (0/0)\" and a bare lock icon, with no explanation",
+      "summary": "The page renders the full workflow editor shell with the breadcrumb \\\"Workflows / Untitled (0/0)\\\" and a blank canvas with a small lock icon, and no message at all. The name shown is \\\"Untitled\\\", not the workflow's real name, and \\\"(0/0)\\\" suggests an existing empty workflow, so the user cannot tell they were denied access. The console and network show no error. (on /object/workflow/a0fd3d2e-dbce-4fbe-aaa3-c2403d241e19)",
+      "expected": "The editor should explain the denial the way the Workflows list does — an \\\"Object not shared / You don't have access to this object\\\" state (or an error), not an editor UI.",
+      "actual": "The page renders the full workflow editor shell with the breadcrumb \\\"Workflows / Untitled (0/0)\\\" and a blank canvas with a small lock icon, and no message at all. The name shown is \\\"Untitled\\\", not the workflow's real name, and \\\"(0/0)\\\" suggests an existing empty workflow, so the user cannot tell they were denied access. The console and network show no error.",
+      "reproSteps": [
+        "Sign in at /welcome as jony.ive@apple.dev with password tim@apple.dev (workspace member, no access to the Workflows object).",
+        "Open /objects/workflows — it correctly shows the lock illustration and \"Object not shared / You don't have access to this object.\"",
+        "Now open the workflow editor by address: /object/workflow/a0fd3d2e-dbce-4fbe-aaa3-c2403d241e19 (the workflow \"agent15-Shared Check Flow\" created by tim@apple.dev).",
+        "Wait for the page to load."
+      ],
+      "reason": "shot-1: signed in as jony.ive@apple.dev (no access to Workflows), the address of an existing workflow renders the record header \"Workflows / Untitled (0/0)\" with navigation arrows and an empty body holding one small grey lock; shot-3 shows the list page for the same member with the proper \"Object not shared / You don't have access to this object\" state. Access itself is correctly denied (no data shown), so this is only about the missing explanation. Source shows the explanation exists but cannot appear here: WidgetCardShell renders the \"Not shared\" label with the tooltip \"You do not have permission to access the ... object\" only inside the widget header, and for a solo widget the header is hidden unless the widget publishes header info (`presentation === 'solo' ? hasWidgetHeaderInfo : ...`), which a forbidden widget never does - leaving the bare IconLock; the title falls back to \"Untitled\". Different cause from workflows-1 (there the record does not exist; here it exists and is forbidden). The address was typed, but it is a real record address that the app generates for other members, i.e. what a shared link opens - not an invented id. Cosmetic/wording only: severity 1."
+    },
+    {
+      "name": "A deleted Active workflow comes back \"Deactivated\" after Restore",
+      "summary": "The workflow comes back with status \"Deactivated\": the editor shows a grey \"Deactivated\" chip where \"Active\" was before deletion, and on /objects/workflowVersions the row for this workflow (v1) shows \"Deactivated\" where it showed \"Active\" before the delete. The workflow therefore no longer runs its trigger after a restore, and nothing tells the user it lost its activation. (on /object/workflow/42c238c1-0b0e-4d86-88b1-eea6f1553038)",
+      "expected": "The restored workflow comes back exactly as it was before deletion, including its status: the editor chip reads \"Active\" and the Workflow Versions list shows the version's Version status as \"Active\", so its trigger still runs.",
+      "actual": "The workflow comes back with status \"Deactivated\": the editor shows a grey \"Deactivated\" chip where \"Active\" was before deletion, and on /objects/workflowVersions the row for this workflow (v1) shows \"Deactivated\" where it showed \"Active\" before the delete. The workflow therefore no longer runs its trigger after a restore, and nothing tells the user it lost its activation.",
+      "reproSteps": [
+        "Open /objects/workflows and click \"+ New Workflow\".",
+        "Type the name \"agent11-Delete Me Flow\", press Enter.",
+        "Click the \"Add a Trigger\" node, choose \"Launch manually\"; click the \"Add a step\" (+) button, choose \"Code - Logic Function\", then click \"Activate\" in the header (chip shows \"Active\").",
+        "Open the \"Command Menu\" button (⋯ at top right of the editor) and click \"Delete Workflow\" — the record shows the red banner \"This record has been deleted\" and a \"Restore\" button.",
+        "Click \"Restore\" in the banner and confirm in the dialog with \"Restore Workflow\".",
+        "Reload the page."
+      ],
+      "reason": "Designed behaviour, written explicitly in the server. Deleting a workflow runs deactivateVersionOnDelete: the workflow status ACTIVE is replaced by DEACTIVATED and every ACTIVE version is set to DEACTIVATED, so a deleted workflow stops triggering. Restore brings back the versions, runs and automated triggers, and the same function returns early for any operation other than 'delete' (`if (operation !== 'delete') return;`) - it does not switch automation back on by itself. shot-4 shows the restored workflow as \"Deactivated\" with the \"Activate\" button one click away, which is the intended, safe outcome (a restored automation does not start firing without the user asking). Nothing is lost: trigger and steps are intact."
+    }
+  ]
+}

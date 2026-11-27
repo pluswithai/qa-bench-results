@@ -1,0 +1,321 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "metabase/areas/admin",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "02e1fd9b544967c495c81e4f3fa84472b513715a6c4a05829148435f06040178",
+    "known_invalid_sha256": "8df704a6459f7851a7057ea37631c06a3edca31f244d2780c5d69f87bdcacc22",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "123",
+    "bugs": "26",
+    "flags": "0",
+    "known_hits": "12",
+    "extra_known_hits": "0",
+    "unverified": "11",
+    "outside_area_known_hits": "0",
+    "outside_area_known_invalid": "0",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "",
+    "outside_area_ground_truth_sha256": "18765609374b28bc9ff8c4d574f183a1cec470472e42a7e8bae343da32e17da8",
+    "outside_area_known_invalid_sha256": "bda5fa1dae2abd3dbc884c784d0bd82ccd854fe93bc63cc4126be5e14c0b4c18",
+    "duplicates": "0",
+    "duplicate_known_hits": "0",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "3",
+    "known_misses": "3",
+    "precision": "0.8",
+    "recall": "0.0975609756097561",
+    "findings_per_minute": "0.9446432972410966",
+    "correct_findings_per_minute": "0.4359892141112754",
+    "severity_1": "5",
+    "severity_3": "5",
+    "severity_5": "2",
+    "severity_sum": "30",
+    "score": "27",
+    "duration_seconds": "1651.417",
+    "partial": "false",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 50,
+        "reproStepsIndex": 0,
+        "findingIndex": 1,
+        "reason": "Matches the display-name-only Sample Database edit failing with the H2 unsupported error and leaving the name unchanged."
+      },
+      {
+        "groundTruthIndex": 7,
+        "reproStepsIndex": 0,
+        "findingIndex": 3,
+        "reason": "Matches Redirect to HTTPS displaying the Site URL explanation instead of its own help text."
+      },
+      {
+        "groundTruthIndex": 3,
+        "reproStepsIndex": 0,
+        "findingIndex": 4,
+        "reason": "Explicitly reproduces the duplicated Anonymous tracking description; the additional Site URL example does not change that match."
+      },
+      {
+        "groundTruthIndex": 22,
+        "reproStepsIndex": 0,
+        "findingIndex": 5,
+        "reason": "Matches saving not-an-email as the help-request address and confirming persistence after refresh."
+      },
+      {
+        "groundTruthIndex": 64,
+        "reproStepsIndex": null,
+        "findingIndex": 6,
+        "reason": "Same silent rejection of a whitespace-only segment name, but during creation rather than editing an existing segment."
+      },
+      {
+        "groundTruthIndex": 18,
+        "reproStepsIndex": 0,
+        "findingIndex": 7,
+        "reason": "Matches Clear reporting success while retaining unsaved SMTP host, port, and validation errors after a failed save."
+      },
+      {
+        "groundTruthIndex": 38,
+        "reproStepsIndex": 0,
+        "findingIndex": 8,
+        "reason": "Matches task-detail dismissal removing task=sync from the URL, with refresh then losing the filter."
+      },
+      {
+        "groundTruthIndex": 2,
+        "reproStepsIndex": 0,
+        "findingIndex": 9,
+        "reason": "Matches opening a sync task and seeing literal null in Task details."
+      },
+      {
+        "groundTruthIndex": 8,
+        "reproStepsIndex": null,
+        "findingIndex": 10,
+        "reason": "The General settings example matches content squeezed beside the fixed sidebar at 390×844; that page is not a listed reproduction case."
+      },
+      {
+        "groundTruthIndex": 9,
+        "reproStepsIndex": null,
+        "findingIndex": 17,
+        "reason": "Matches a fixed permission-navigation pane hiding access controls at 390×844, but uses the group-focused database list rather than a listed case."
+      },
+      {
+        "groundTruthIndex": 24,
+        "reproStepsIndex": 0,
+        "findingIndex": 22,
+        "reason": "Matches a whitespace-only database display name producing only Failed without a validation explanation."
+      },
+      {
+        "groundTruthIndex": 57,
+        "reproStepsIndex": 0,
+        "findingIndex": 24,
+        "reason": "Matches dismissing Customize log levels dropping the log-filter query parameter, then refresh clearing the filter."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 6,
+        "reproStepsIndex": null,
+        "findingIndex": 0,
+        "reason": "Same whitespace-only group-name rejection with a generic error dialog, but reached through group creation and Enter rather than renaming."
+      },
+      {
+        "knownInvalidIndex": 4,
+        "reproStepsIndex": 0,
+        "findingIndex": 2,
+        "reason": "Matches saving malformed map-tile-server text on blur and retaining it after reload."
+      },
+      {
+        "knownInvalidIndex": 39,
+        "reproStepsIndex": 0,
+        "findingIndex": 18,
+        "reason": "Matches Enter leaving a table-name draft unsaved while blur saves it and reload restores the previous name."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 11,
+        "reason": "Oversized-duration rejection is distinct from the empty adaptive-field failure and the known-invalid large-number rounding claim."
+      },
+      {
+        "findingIndex": 12,
+        "reason": "No supplied entry describes the missing H2 engine label on database details."
+      },
+      {
+        "findingIndex": 13,
+        "reason": "Long-name layout overflow differs from the known-invalid overlong group-name SQL error."
+      },
+      {
+        "findingIndex": 14,
+        "reason": "Duplicate membership submission from a stale tab is not the supplied stale People-row or stale-editor membership-restoration bug."
+      },
+      {
+        "findingIndex": 15,
+        "reason": "No supplied entry covers missing retirement status in a retired segment's own editor."
+      },
+      {
+        "findingIndex": 16,
+        "reason": "Desktop field-preview panel overflow is distinct from mobile settings clipping and the scrollable calendar-preview claim."
+      },
+      {
+        "findingIndex": 19,
+        "reason": "Whitespace-only API-key creation is rejected here, unlike the supplied edit bug that persists an unnamed key."
+      },
+      {
+        "findingIndex": 20,
+        "reason": "A phone-width map dialog overflowing its viewport is not the fixed-sidebar settings-page clipping bug."
+      },
+      {
+        "findingIndex": 21,
+        "reason": "No supplied entry covers unmatched Semantic type search text remaining as the displayed selection."
+      },
+      {
+        "findingIndex": 23,
+        "reason": "The unresolved SSH-host exception differs from the supplied out-of-range-port null error and integer-port assertion failures."
+      },
+      {
+        "findingIndex": 25,
+        "reason": "No supplied entry describes an existing database's help drawer using the Add PostgreSQL title."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 3,
+        "reason": "Enter bypasses the disabled submission control and triggers a failing request."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "The finding describes a persisted configuration that prevents map tiles from rendering."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 5,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 3,
+        "reason": "Submission fails without actionable validation and leaves the form dirty."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 1,
+        "reason": "Missing informational text has no described functional impact."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 1,
+        "reason": "The layout requires horizontal scrolling, but the count and actions remain reachable."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 3,
+        "reason": "The membership action fails silently and leaves the displayed state incorrect."
+      },
+      {
+        "findingIndex": 15,
+        "severity": 1,
+        "reason": "The described defect is missing status and explanatory feedback; the edit receives a successful response."
+      },
+      {
+        "findingIndex": 16,
+        "severity": 3,
+        "reason": "Preview controls extend outside the viewport and cannot be reached by scrolling."
+      },
+      {
+        "findingIndex": 17,
+        "severity": 5,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 18,
+        "severity": 3,
+        "reason": "The finding describes a rename not being committed and subsequently being lost."
+      },
+      {
+        "findingIndex": 19,
+        "severity": 1,
+        "reason": "The server rejects the invalid name with field feedback; the complaint concerns button gating and wording."
+      },
+      {
+        "findingIndex": 20,
+        "severity": 1,
+        "reason": "The finding describes clipped labels and inputs, but no specific failed operation; Cancel remains available."
+      },
+      {
+        "findingIndex": 21,
+        "severity": 3,
+        "reason": "The closed control displays a semantic type that was never selected or saved."
+      },
+      {
+        "findingIndex": 22,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 23,
+        "severity": 1,
+        "reason": "The expected connection failure is labeled in an error panel; the described defect is technical, unhelpful error wording."
+      },
+      {
+        "findingIndex": 24,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 25,
+        "severity": 1,
+        "reason": "The drawer has misleading copy, with no described functional failure."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

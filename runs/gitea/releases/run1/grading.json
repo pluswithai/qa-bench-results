@@ -1,0 +1,308 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "findings": 28,
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 27,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Same invalid-tag validation message exposing form.TagName instead of the readable field label."
+      },
+      {
+        "groundTruthIndex": 55,
+        "reproStepsIndex": 0,
+        "findingIndex": 1,
+        "reason": "Same literal tag searches incorrectly interpreting percent signs and underscores as wildcards."
+      },
+      {
+        "groundTruthIndex": 42,
+        "reproStepsIndex": 0,
+        "findingIndex": 2,
+        "reason": "Same Draft badge clipping beside a wrapping title at tablet width; the exact clipped text differs."
+      },
+      {
+        "groundTruthIndex": 5,
+        "reproStepsIndex": null,
+        "findingIndex": 3,
+        "reason": "The primary claim matches the mobile Pre-Release checkbox overlapping its label. Its principal reproduction uses Edit Release rather than New Release; it also bundles the tag-message checkbox defect."
+      },
+      {
+        "groundTruthIndex": 12,
+        "reproStepsIndex": 0,
+        "findingIndex": 4,
+        "reason": "Same mobile tag-row clipping that hides Delete Tag and truncates New Release without usable horizontal scrolling."
+      },
+      {
+        "groundTruthIndex": 19,
+        "reproStepsIndex": 0,
+        "findingIndex": 6,
+        "reason": "Same deleted-draft record remaining readable with its title, notes and Draft badge after deletion reports success."
+      },
+      {
+        "groundTruthIndex": 28,
+        "reproStepsIndex": null,
+        "findingIndex": 7,
+        "reason": "Same empty-title error exposing form.Title. This reproduction submits a draft with Save Draft rather than using Update Release."
+      },
+      {
+        "groundTruthIndex": 53,
+        "reproStepsIndex": 0,
+        "findingIndex": 9,
+        "reason": "Same draft title-validation error replacing Save Draft and Publish Release with Update Release. Actual unintended publication is not demonstrated."
+      },
+      {
+        "groundTruthIndex": 29,
+        "reproStepsIndex": null,
+        "findingIndex": 11,
+        "reason": "Same tag-validation re-render silently clearing the tag-message choice. This uses Create Tag Only rather than the reviewed case's Publish Release."
+      },
+      {
+        "groundTruthIndex": 0,
+        "reproStepsIndex": null,
+        "findingIndex": 13,
+        "reason": "Same singular-count heading incorrectly reading 1 Tags. This reaches a count of one through filtering rather than a repository containing exactly one tag."
+      },
+      {
+        "groundTruthIndex": 26,
+        "reproStepsIndex": null,
+        "findingIndex": 15,
+        "reason": "Same unwrapped long tag widening the Releases list and pushing release cards out of view. This uses Save Draft rather than publishing."
+      },
+      {
+        "groundTruthIndex": 36,
+        "reproStepsIndex": null,
+        "findingIndex": 17,
+        "reason": "Same whitespace-only title passing validation and being stored as an invisible heading. This edits an existing draft rather than creating a release."
+      },
+      {
+        "groundTruthIndex": 6,
+        "reproStepsIndex": null,
+        "findingIndex": 20,
+        "reason": "Same misleading released-this attribution for something never published. This reaches it through a saved draft rather than a standalone tag without a release."
+      },
+      {
+        "groundTruthIndex": 26,
+        "reproStepsIndex": null,
+        "findingIndex": 22,
+        "reason": "Same long tag expanding its column and squeezing the release card into a narrow strip. This uses a draft rather than a published release."
+      },
+      {
+        "groundTruthIndex": 45,
+        "reproStepsIndex": 0,
+        "findingIndex": 24,
+        "reason": "Same browser-Back restoration leaving the search field inconsistent with the restored filtered results. Replacing the query instead of clearing it is an insignificant input variation."
+      },
+      {
+        "groundTruthIndex": 48,
+        "reproStepsIndex": null,
+        "findingIndex": 5,
+        "reason": "Same out-of-range pagination failure showing no releases despite a nonzero count. This uses a manually entered page number and retains a misleading pager, unlike the reviewed deletion case."
+      },
+      {
+        "groundTruthIndex": 30,
+        "reproStepsIndex": null,
+        "findingIndex": 8,
+        "reason": "Matches Create Tag Only disappearing on the form re-rendered after a duplicate-release error. The reviewed case instead starts from an existing tag and changes it to an unused name."
+      },
+      {
+        "groundTruthIndex": 22,
+        "reproStepsIndex": 0,
+        "findingIndex": 12,
+        "reason": "Same mobile detail-header overlap between the Tags tab and RSS Feed button. The claimed tap layering differs, but the observed overlap matches."
+      }
+    ],
+    "invalidMatches": [],
+    "unverified": [
+      {
+        "findingIndex": 10,
+        "reason": "No reviewed entry describes a missing edit control specifically on published release cards."
+      },
+      {
+        "findingIndex": 14,
+        "reason": "No reviewed entry covers a deleted tag's archive URL returning a raw repository-reference error."
+      },
+      {
+        "findingIndex": 16,
+        "reason": "No reviewed entry covers an ordinary existing tag being incorrectly identified by the helper as a new tag."
+      },
+      {
+        "findingIndex": 18,
+        "reason": "No reviewed entry describes escaped HTML markup or double-escaped tag names in activity-feed titles."
+      },
+      {
+        "findingIndex": 19,
+        "reason": "No reviewed entry covers draft edits changing the displayed release date and list ordering."
+      },
+      {
+        "findingIndex": 21,
+        "reason": "No reviewed entry covers an empty Releases RSS feed despite a claimed published release; the reviewed feed bugs concern different failures."
+      },
+      {
+        "findingIndex": 23,
+        "reason": "No reviewed entry covers an edit form for a standalone tag accepting input and then returning 404 on update."
+      },
+      {
+        "findingIndex": 25,
+        "reason": "No reviewed entry covers a release-list tag-name link pointing to a nonfunctional hash destination."
+      },
+      {
+        "findingIndex": 26,
+        "reason": "No reviewed entry covers mobile Markdown-table content being clipped without horizontal scrolling."
+      },
+      {
+        "findingIndex": 27,
+        "reason": "No reviewed entry covers Enter in the title field unexpectedly invoking Create Tag Only and discarding release input."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 3,
+        "reason": "Editing is unavailable through the expected UI control and requires a manually entered URL."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 5,
+        "reason": "Navigation displays an unlabeled raw error on an otherwise blank page."
+      },
+      {
+        "findingIndex": 15,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 16,
+        "severity": 3,
+        "reason": "The form displays an incorrect tag-existence state, including after submission."
+      },
+      {
+        "findingIndex": 17,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 18,
+        "severity": 1,
+        "reason": "Feed-title text is incorrectly presented; no navigation or feed-processing failure is described."
+      },
+      {
+        "findingIndex": 19,
+        "severity": 3,
+        "reason": "Saving edits changes the displayed timestamp and sorting state."
+      },
+      {
+        "findingIndex": 20,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 21,
+        "severity": 3,
+        "reason": "The feed omits release items that the report says should be present."
+      },
+      {
+        "findingIndex": 22,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 23,
+        "severity": 5,
+        "reason": "Submitting the offered editor ends on a full-page 404 and loses entered content."
+      },
+      {
+        "findingIndex": 24,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 25,
+        "severity": 3,
+        "reason": "An interactive navigation link does not perform its expected action."
+      },
+      {
+        "findingIndex": 26,
+        "severity": 1,
+        "reason": "Release-note table presentation clips content without a described submission or control failure."
+      },
+      {
+        "findingIndex": 27,
+        "severity": 3,
+        "reason": "Keyboard submission performs the wrong creation operation and loses entered release information."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

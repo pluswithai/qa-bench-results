@@ -1,0 +1,15 @@
+{
+  "fixture": "twenty/areas/record-pages-activities",
+  "run": 2,
+  "started_at": "2026-11-24T04:56:00.478Z",
+  "duration_seconds": 1799.976,
+  "time_limit_seconds": 1800,
+  "stop_reason": "time_limit",
+  "credits": {
+    "total": 1505,
+    "testing_team": 1259,
+    "verification": 246,
+    "findings_verified": 41
+  },
+  "team_container_errors": 0
+}

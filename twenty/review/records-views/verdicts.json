@@ -1,0 +1,272 @@
+{
+  "area": "records-views",
+  "bugs": [
+    {
+      "id": "records-views-1",
+      "title": "Sort panel's direction dropdown does not re-sort the existing sort",
+      "findings": [
+        "run1-02",
+        "run2-06",
+        "run3-01"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Works as designed; the agent stopped half-way. The Sort panel is an \"add a sort\" picker: the direction dropdown only sets the direction for the field chosen next (handleSortDirectionClick just stores selectedRecordSortDirection, L138-L141; it is applied when a field row is clicked: `direction: selectedRecordSortDirection`, L127). The agent picked \"Descending\" and pressed Escape without choosing a field (run1-02/shot-4.png shows the field list still waiting), so no sort was changed, and closing the panel resets the picker to Ascending by design (useResetSortDropdown L16-L17). An existing sort is flipped from its chip, not from this panel.",
+      "evidence": [
+        "run1-02/shot-4.png",
+        "run1-02/shot-5.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/object-sort-dropdown/components/ObjectSortDropdownButton.tsx#L120-L141",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/object-sort-dropdown/hooks/useResetSortDropdown.ts#L16-L17"
+      ]
+    },
+    {
+      "id": "records-views-2",
+      "title": "Filter \"Created by contains Tim Apple\" returns 0 companies although the column shows Tim Apple on every row",
+      "findings": [
+        "run1-09"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "Real: the filter contradicts the column it filters. run1-09/shot-3.png shows 599 companies with Created by = \"Tim Apple\"; run1-09/shot-2.png shows the single filter \"Created by: Tim Apple\" giving \"All Companies - 0 / No Company found\". Cause in source: the cell does not show the stored actor name, it resolves the live workspace member through createdBy.workspaceMemberId and prints \"firstName lastName\" (useActorFieldDisplay L33-L51), while the filter matches the stored snapshot `createdBy.name ilike %value%` (turnRecordFilterIntoGqlOperationFilter L1338-L1347). The two diverge in this workspace because all 600 seeded companies store createdByName \"Tim A\" for member Tim Apple (company-data-seeds L648 ff.); in production the same divergence appears whenever a member is renamed. So \"Tim\" or \"Tim A\" would match, but the name the user actually reads does not. Not caused by another agent (single filter, own tab). Caveats: the report's side claims are wrong - \"J\"/\"Jony\" correctly return 0 (no company was created by Jony Ive; that name is in the Account Owner column), and shot-5 carries an unrelated extra filter \"Address: NotEmpty\", so it is not used as evidence. A plain-text operator instead of a people picker is by design and not part of the defect.",
+      "evidence": [
+        "run1-09/shot-2.png",
+        "run1-09/shot-3.png",
+        "run1-09/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-shared/src/utils/filter/turnRecordFilterIntoGqlOperationFilter.ts#L1331-L1360",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/record-field/ui/meta-types/hooks/useActorFieldDisplay.ts#L33-L51",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/engine/workspace-manager/dev-seeder/data/constants/company-data-seeds.constant.ts#L646-L648"
+      ]
+    },
+    {
+      "id": "records-views-3",
+      "title": "Kanban columns come back in alphabetical order after changing the Group by field",
+      "findings": [
+        "run1-10",
+        "run3-10"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "Real client-side defect. run1-10/shot-2.png and shot-3.png show By Stage as Customer, Meeting, New, Proposal, Screening, while the Stage field defines New, Screening, Meeting, Proposal, Customer (option order visible in run1-10/shot-1.png). Source: on a group-field change the server recreates the view groups in option order (computeFlatViewGroupsOnViewCreate: `position: index`, called from handle-flat-view-update-side-effect L52), but the front end then overwrites its state with groups it builds itself, sorted by option VALUE: `.sort((a, b) => a.value.localeCompare(b.value))` with fresh uuids (useHandleRecordGroupField L80-L96, L116-L121). The board therefore shows an order that matches neither the field definition, nor what a newly created kanban view shows, nor what the server just stored. Losing a hand-made column order when the group field is switched away is expected (old groups are deleted); the defect is the alphabetical fallback. Severity 1 because nothing is lost and, per source, a reload should bring back the option order (not verified at runtime; raise to 3 if a reload keeps the alphabetical order). There is no \"before\" screenshot of the board; the original order is taken from the report and the seeded field definition.",
+      "evidence": [
+        "run1-10/shot-2.png",
+        "run1-10/shot-3.png",
+        "run1-10/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/record-index/hooks/useHandleRecordGroupField.ts#L74-L121",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/engine/metadata-modules/flat-view-group/utils/compute-flat-view-groups-on-view-create.util.ts#L37-L50",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-server/src/engine/metadata-modules/flat-view/utils/handle-flat-view-update-side-effect.util.ts#L30-L58"
+      ]
+    },
+    {
+      "id": "records-views-4",
+      "title": "Companies list is blank when the address is hand-edited to carry a Tasks view id",
+      "findings": [
+        "run1-11"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Input no real link produces. The address /objects/companies?viewId=<id of the Tasks \"By Status\" view> was assembled by hand by copying a view id from another object; the app never generates a link that pairs an object with a foreign view id. run1-11/shot-2.png shows the resulting blank list under a \"By Status - 599\" header, which is ugly, but it is reachable only through a crafted address.",
+      "evidence": [
+        "run1-11/shot-2.png"
+      ],
+      "source": []
+    },
+    {
+      "id": "records-views-5",
+      "title": "Row selection is dropped when the Filter, Sort or Options panel (or a column-header menu) is opened",
+      "findings": [
+        "run2-01",
+        "run3-02"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Designed behaviour: in Twenty a table selection is transient and any click outside the table body deselects. RecordTableBodyFocusClickOutsideEffect listens for clicks outside the table and calls leaveTableFocus (L28-L50), which runs resetTableRowSelection (useLeaveTableFocus L44-L57); only the header action bar, the command menu, the side panel and modals are excluded (L29-L35), i.e. exactly the places where bulk actions live. The Filter / Sort / Options buttons sit in the view bar outside the table, so the click that opens them clears the selection (run2-01/frame-2.jpg -> frame-3.jpg; run3-02/shot-4.png -> shot-3.png). run3-02 also reports the same when sorting from the Name column header: the video shows the selection already gone when the header menu opens, before Sort is clicked (run3-02/shot-1.png -> shot-5.png); that exact path is not pinned down in source, but it is the same transient-selection behaviour and no bulk action was run on a wrong set. No data loss; a UX preference, not a defect.",
+      "evidence": [
+        "run2-01/frame-2.jpg",
+        "run2-01/frame-3.jpg",
+        "run3-02/shot-4.png",
+        "run3-02/shot-3.png",
+        "run3-02/shot-1.png",
+        "run3-02/shot-5.png",
+        "run3-02/video.webm"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/record-table/record-table-body/components/RecordTableBodyFocusClickOutsideEffect.tsx#L28-L50",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/record-table/hooks/internal/useLeaveTableFocus.ts#L44-L57"
+      ]
+    },
+    {
+      "id": "records-views-6",
+      "title": "Hand-typed record address with an invented id shows an empty record page (and a raw UUID error for the all-zero id)",
+      "findings": [
+        "run2-03"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "A record id that does not exist renders an empty record skeleton, with a raw UUID error for a malformed id. Counted under the rule for addresses the app does not generate.",
+      "evidence": [
+        "run2-03/shot-1.png"
+      ],
+      "source": []
+    },
+    {
+      "id": "records-views-7",
+      "title": "\"599 selected\" (select all) is wiped while scrolling the Companies list to rows that are still loading",
+      "findings": [
+        "run2-04"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Checked the same behaviour by hand earlier on a clean single-user instance (wheel scroll only): the selection stays. Not reproduced outside the shared, parallel test.",
+      "evidence": [
+        "run2-04/shot-4.png",
+        "run2-04/shot-3.png",
+        "run2-04/shot-5.png",
+        "run2-04/frame-5.jpg",
+        "run2-04/frame-6.jpg"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/record-table/virtualization/hooks/useLoadRecordsToVirtualRows.ts#L46-L80",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/record-table/hooks/internal/useResetTableRowSelection.ts#L47-L61",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/record-table/record-table-header/components/RecordTableHeaderCheckboxColumn.tsx#L52-L77"
+      ]
+    },
+    {
+      "id": "records-views-8",
+      "title": "Advanced filter popup is a fixed 650 px wide: at 390 px the value input is off-screen",
+      "findings": [
+        "run2-05"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "Real layout defect at phone width. run2-05/shot-1.png and shot-4.png (390 px) show the rule row cut after \"Where | Name | Contains\": the \"Enter value\" input and the row menu are outside the popup, while the same row at 1280 px shows them (run2-05/shot-2.png). Source: the popup content has a hard-coded width of 650 px (ADVANCED_FILTER_DROPDOWN_CONTENT_WIDTH L1, applied as `width: ${widthInPixels}px` in DropdownContent L12) and is only wrapped in a ScrollWrapper (AdvancedFilterRootRecordFilterGroup L45-L48); nothing wraps or shrinks on mobile, although the app ships a mobile layout (bottom navigation bar visible in the same screenshots). Severity 1, not 3: as the report itself says, the input can still be reached by scrolling the popup sideways, so the filter is usable; the title's \"cannot be typed\" is overstated. The side remark that the popup overlaps the list is normal for a dropdown and not part of the defect.",
+      "evidence": [
+        "run2-05/shot-1.png",
+        "run2-05/shot-4.png",
+        "run2-05/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/advanced-filter/constants/AdvancedFilterDropdownContentWidth.ts#L1",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/advanced-filter/components/AdvancedFilterRootRecordFilterGroup.tsx#L45-L48",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/ui/layout/dropdown/components/DropdownContent.tsx#L5-L13"
+      ]
+    },
+    {
+      "id": "records-views-9",
+      "title": "Sort chip is truncated at 390 px so its remove \"x\" is not visible",
+      "findings": [
+        "run2-11"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "The claim that the sort cannot be removed is not shown and is contradicted by source. run2-11/shot-2.png (390 px) shows the chip cut to \"Name - Firs\" next to \"Add filter | Reset | Save as new view\"; the desktop chip with its x is in run2-11/shot-3.png. The chips live in a horizontal scroll area by design: ViewBarDetails wraps the chip container in a ScrollWrapper with vertical scrolling turned off (L224-L271) inside a container with overflow-x hidden (L74-L80), so the rest of the chip, including the x, is reached by swiping the chip strip, which is the standard overflow handling for this bar at any width once chips do not fit. The agent never tried to scroll the strip or tap the chip; it only looked at a static screenshot. Cramped on a phone, but no control is dead.",
+      "evidence": [
+        "run2-11/shot-2.png",
+        "run2-11/shot-3.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/views/components/ViewBarDetails.tsx#L221-L271",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/views/components/ViewBarDetails.tsx#L74-L80"
+      ]
+    },
+    {
+      "id": "records-views-10",
+      "title": "Calendar week view: many tasks at the same time are drawn as a cascade of narrow overlapping chips",
+      "findings": [
+        "run3-04"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Designed layout pushed to an extreme by seed data. run3-04/shot-1.png shows 11 tasks due at the same minute (seeded 6:05 AM due dates) in one ~140 px day column, each visible as a ~13 px sliver. That cascade is the intended algorithm: concurrent events get one column each (computeRecordCalendarWeekEventLayouts L13-L43) and every event starts at its column and spans to the right edge (`columnSpan = columnCount - columnIndex`, L33-L42), stacked by z-index, with the hovered or focused chip raised above the others so it can be read (`hoverStackingOrder`, L52; RecordCalendarWeekEvent L64-L81). The claim that Day mode uses a different, side-by-side layout is wrong: Day and Week render the same RecordCalendarTimeGrid with the same layout function and event component (RecordCalendarTimeGrid L298, L406); Day only looks readable because its single column is seven times wider. Nothing is lost or broken; a denser-overlap design would be an improvement request.",
+      "evidence": [
+        "run3-04/shot-1.png",
+        "run3-04/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/record-calendar/week/utils/getRecordCalendarWeekEventHorizontalPosition.ts#L29-L57",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/record-calendar/week/utils/computeRecordCalendarWeekEventLayouts.ts#L13-L43",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/record-calendar/week/components/RecordCalendarWeekEvent.tsx#L64-L81",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/record-calendar/time-grid/components/RecordCalendarTimeGrid.tsx#L298"
+      ]
+    },
+    {
+      "id": "records-views-11",
+      "title": "\"Reset\" needs two clicks while the advanced filter panel is open",
+      "findings": [
+        "run3-05"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Designed dropdown behaviour: the first click was swallowed by the open panel. The advanced filter panel is a Dropdown, and every open dropdown treats a click outside itself as \"close me\": its click-outside handler calls event.stopImmediatePropagation() and event.preventDefault() in the capture phase and then closes the dropdown (DropdownInternalContainer L102-L116), so the element under the pointer never receives that click. The agent's first click on Reset was made with the panel open, so it only closed the panel (run3-05/frame-5.jpg -> frame-6.jpg: panel gone, \"1 advanced rule\" and 309 rows still there); the second click, with nothing open, reached Reset and cleared the filter as it should (handleCancelClick, ViewBarDetails L180-L186). Reset itself works; the same happens with any control clicked while any dropdown is open.",
+      "evidence": [
+        "run3-05/frame-5.jpg",
+        "run3-05/frame-6.jpg",
+        "run3-05/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/ui/layout/dropdown/components/internal/DropdownInternalContainer.tsx#L102-L118",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/views/components/ViewBarDetails.tsx#L180-L186"
+      ]
+    },
+    {
+      "id": "records-views-12",
+      "title": "Empty state button reads \"Add a Opportunity\" (wrong article)",
+      "findings": [
+        "run3-08"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "Real copy defect. run3-08/shot-1.png shows the filtered-empty state of Opportunities with the button \"Add a Opportunity\". Source: the label is built with a fixed article, t`Add a ${objectLabelSingular}` (RecordTableEmptyStateNoRecordFoundForFilter L21; the same pattern is in RecordTableEmptyStateNoGroupNoRecordAtAll L22 and RecordTableEmptyStateReadOnly L12), so every object whose name starts with a vowel gets \"Add a ...\". Cosmetic only.",
+      "evidence": [
+        "run3-08/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/record-table/empty-state/components/RecordTableEmptyStateNoRecordFoundForFilter.tsx#L21",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/record-table/empty-state/components/RecordTableEmptyStateNoGroupNoRecordAtAll.tsx#L22"
+      ]
+    },
+    {
+      "id": "records-views-13",
+      "title": "Kanban column headers show \"-\" instead of the record count when the column aggregate is the default count",
+      "findings": [
+        "run3-11"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "Real, and explained by source. run3-11/shot-3.png (new view agent4-counts) and shot-1.png (second new view) show \"To do -\", \"In progress -\", \"Done -\", \"No Value -\" on a Tasks board holding 1,802 records. Cause: for a plain count there is no aggregate field; the query is still made with `totalCount` (useAggregateGqlFieldsFromRecordIndexGroupAggregates L27-L31), but the effect that stores the per-column value only does so inside `if (isDefined(recordIndexGroupAggregateFieldMetadataItem))` (RecordIndexGroupAggregateQueryEffect L73-L102), and nothing else writes that state. The header then falls back to a dash: `isDefined(value) ? value.toString() : '-'` (RecordBoardColumnHeaderAggregateDropdownButton L40). So a board whose aggregate is \"count\" without a field, which is what a freshly created Kanban view has, can never show its column counts; boards with a field-based aggregate do show values (the Opportunities board in run3-10/shot-4.png shows 21 / 36 / 30 / 39 / 25). Not load related: it survives a reload and is deterministic in code. Severity 3: the column counter, a core piece of the board header, shows nothing.",
+      "evidence": [
+        "run3-11/shot-3.png",
+        "run3-11/shot-1.png",
+        "run3-10/shot-4.png"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/record-index/components/RecordIndexGroupAggregateQueryEffect.tsx#L57-L103",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/record-index/hooks/useAggregateGqlFieldsFromRecordIndexGroupAggregates.ts#L27-L31",
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/record-board/record-board-column/components/RecordBoardColumnHeaderAggregateDropdownButton.tsx#L40"
+      ]
+    },
+    {
+      "id": "records-views-14",
+      "title": "Header checkbox clears a partial selection instead of selecting all rows",
+      "findings": [
+        "run3-13"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Designed tri-state checkbox. With one row ticked the header checkbox is in its indeterminate \"-\" state (run3-13/shot-1.png, \"1 selected\"), and source treats that state as checked: `checked = allRowsSelectedStatus === 'all' || allRowsSelectedStatus === 'some'`, `indeterminate = ... === 'some'`, and `onChange` calls resetTableRowSelection() when checked, selectAllRows() otherwise (RecordTableHeaderCheckboxColumn L52-L77). So clicking the indeterminate box deselects everything on purpose (the same convention as Gmail and similar lists), and a second click selects all. The \"Select all rows\" aria-label is static (L93), which is why the agent expected otherwise.",
+      "evidence": [
+        "run3-13/shot-1.png",
+        "run3-13/frame-4.jpg",
+        "run3-13/frame-5.jpg"
+      ],
+      "source": [
+        "https://github.com/twentyhq/twenty/blob/35c645064f72bc4e3180a2c6c506cbbfee170007/packages/twenty-front/src/modules/object-record/record-table/record-table-header/components/RecordTableHeaderCheckboxColumn.tsx#L52-L77"
+      ]
+    }
+  ]
+}

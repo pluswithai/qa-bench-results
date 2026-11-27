@@ -1,0 +1,111 @@
+{
+  "bugs": [
+    {
+      "name": "Sort panel's direction dropdown does not re-sort the existing sort",
+      "summary": "The list stays A to Z (Aaron Griffin first, Andrew King last) and the chip keeps the up arrow '↑ Name · First name'. Only the dropdown inside the panel displays 'Descending'; after closing the panel and reopening it, the dropdown is back to 'Ascending'. The choice never reaches the list. (on /objects/people)",
+      "expected": "The list should be re-sorted Z to A, the sort chip should show a down arrow, and reopening the Sort panel should show 'Descending' as the current direction.",
+      "actual": "The list stays A to Z (Aaron Griffin first, Andrew King last) and the chip keeps the up arrow '↑ Name · First name'. Only the dropdown inside the panel displays 'Descending'; after closing the panel and reopening it, the dropdown is back to 'Ascending'. The choice never reaches the list.",
+      "reproSteps": [
+        "Open /objects/people (People in the sidebar).",
+        "Click the Name column header, then 'Sort' in the small menu, so the list is sorted by Name ascending (rows start Aaron Griffin, Aaron Mccarty…, chip shows an up arrow '↑ Name · First name').",
+        "Click the 'Sort' button at the top right to open the Sort panel.",
+        "Open the direction dropdown at the top of the panel (it shows 'Ascending') and choose 'Descending'.",
+        "Close the panel with Escape and look at the list and the sort chip."
+      ],
+      "reason": "Works as designed; the agent stopped half-way. The Sort panel is an \"add a sort\" picker: the direction dropdown only sets the direction for the field chosen next (handleSortDirectionClick just stores selectedRecordSortDirection, L138-L141; it is applied when a field row is clicked: `direction: selectedRecordSortDirection`, L127). The agent picked \"Descending\" and pressed Escape without choosing a field (run1-02/shot-4.png shows the field list still waiting), so no sort was changed, and closing the panel resets the picker to Ascending by design (useResetSortDropdown L16-L17). An existing sort is flipped from its chip, not from this panel."
+    },
+    {
+      "name": "Companies list is blank when the address is hand-edited to carry a Tasks view id",
+      "summary": "The Companies page opens with the header \\\"By Status · 599\\\" but the list area below it is completely blank: no columns, no table rows, no kanban columns, no cards and no error or empty-state message. Reloading the same address keeps the blank page. The address is left as is (no fallback to /objects/companies and no 404 page). (on /objects/companies)",
+      "expected": "Either the app rejects the foreign view id and shows the default \\\"All Companies\\\" table (or the 404 page), or it renders the view it accepted. A page whose header claims 599 records must show them, and a list must never be silently blank.",
+      "actual": "The Companies page opens with the header \\\"By Status · 599\\\" but the list area below it is completely blank: no columns, no table rows, no kanban columns, no cards and no error or empty-state message. Reloading the same address keeps the blank page. The address is left as is (no fallback to /objects/companies and no 404 page).",
+      "reproSteps": [
+        "In the address bar open https://5500-id2u1yqyeed69abiadw0w.e2b.app/objects/tasks and select the saved Kanban view \"By Status\" (address becomes /objects/tasks?viewId=6a13dcfa-71e4-4036-b9cc-5edc84561a38).",
+        "Copy that viewId and open the same view id on another object: https://5500-id2u1yqyeed69abiadw0w.e2b.app/objects/companies?viewId=6a13dcfa-71e4-4036-b9cc-5edc84561a38",
+        "Wait for the page to finish loading (about 20 seconds).",
+        "Reload the page (F5) and wait again."
+      ],
+      "reason": "Input no real link produces. The address /objects/companies?viewId=<id of the Tasks \"By Status\" view> was assembled by hand by copying a view id from another object; the app never generates a link that pairs an object with a foreign view id. run1-11/shot-2.png shows the resulting blank list under a \"By Status - 599\" header, which is ugly, but it is reachable only through a crafted address."
+    },
+    {
+      "name": "Row selection is dropped when the Filter, Sort or Options panel (or a column-header menu) is opened",
+      "summary": "Every row checkbox goes back to empty and the row highlight disappears as soon as the Filter panel opens; the same happens with the Sort panel. The selection is lost silently — the app shows no count of selected rows and no notice that the selection was dropped. (on /objects/companies)",
+      "expected": "The selected row stays selected while the Filter panel is open (the selection is independent of the filter panel), so the person can select records and then refine the list without losing their selection.",
+      "actual": "Every row checkbox goes back to empty and the row highlight disappears as soon as the Filter panel opens; the same happens with the Sort panel. The selection is lost silently — the app shows no count of selected rows and no notice that the selection was dropped.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open /objects/companies (any width, tried at 768px).",
+        "Tick the checkbox at the start of the first data row (Google): the checkbox and the row turn blue/selected.",
+        "Click the Filter button in the view toolbar to the right of the view name.",
+        "Look at the row checkboxes in the list behind the panel."
+      ],
+      "reason": "Designed behaviour: in Twenty a table selection is transient and any click outside the table body deselects. RecordTableBodyFocusClickOutsideEffect listens for clicks outside the table and calls leaveTableFocus (L28-L50), which runs resetTableRowSelection (useLeaveTableFocus L44-L57); only the header action bar, the command menu, the side panel and modals are excluded (L29-L35), i.e. exactly the places where bulk actions live. The Filter / Sort / Options buttons sit in the view bar outside the table, so the click that opens them clears the selection (run2-01/frame-2.jpg -> frame-3.jpg; run3-02/shot-4.png -> shot-3.png). run3-02 also reports the same when sorting from the Name column header: the video shows the selection already gone when the header menu opens, before Sort is clicked (run3-02/shot-1.png -> shot-5.png); that exact path is not pinned down in source, but it is the same transient-selection behaviour and no bulk action was run on a wrong set. No data loss; a UX preference, not a defect."
+    },
+    {
+      "name": "\"599 selected\" (select all) is wiped while scrolling the Companies list to rows that are still loading",
+      "summary": "The selection is silently wiped: the header goes back to \"Companies\" with no \"N selected\", the bulk action bar (Update) disappears, and the newly loaded rows are unticked while the ones already on screen are unticked too. (on /objects/companies)",
+      "expected": "The selection survives scrolling: the header keeps showing \"599 selected\", the bulk action bar stays, and all rows (already loaded and newly loaded) stay ticked.",
+      "actual": "The selection is silently wiped: the header goes back to \"Companies\" with no \"N selected\", the bulk action bar (Update) disappears, and the newly loaded rows are unticked while the ones already on screen are unticked too.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open /objects/companies.",
+        "Reload the page so only the first rows are loaded.",
+        "Click the 'Select all rows' checkbox in the table header - the header shows '599 selected' and the rows are ticked.",
+        "Scroll the records list down quickly (a few thousand pixels) so the next page of records loads (loading placeholder rows appear).",
+        "Wait for the new rows to load and look at the header and the checkboxes."
+      ],
+      "reason": "The wipe is real on screen but its cause could not be tied to the product. Evidence: run2-04/shot-4.png shows \"599 selected\"; after a long scroll run2-04/shot-3.png and shot-5.png show the header back to \"Companies\" with every row unticked (two occurrences). Source says this should not happen: select-all sets a flag and every newly loaded page is ticked again (useLoadRecordsToVirtualRows L46, L74-L80), and the only code that clears a selection is driven by input (click outside the table, Escape, the header checkbox, drag-select start, column resize: useResetTableRowSelection L47-L61 and its callers). In the video a first shorter scroll keeps \"599 selected\" on the newly loaded rows (run2-04/frame-5.jpg); in the second, longer one the selection disappears while the rows are still skeletons, at the instant the agent's scroll gesture ends, with the pointer parked on the \"Select all rows\" checkbox (a click there with everything selected clears the selection by design). A stray pointer event from the scroll tool is therefore as likely as a product fault. A human must check: on /objects/companies click \"Select all rows\" (599 selected), then scroll with a real mouse wheel or trackpad about 3,000-6,000 px so placeholder rows appear, without clicking or pressing any key, and see whether \"599 selected\" and the ticks survive once the rows load. If the selection is lost: accept, severity 3. If it stays: reject as a test artifact."
+    },
+    {
+      "name": "Sort chip is truncated at 390 px so its remove \"x\" is not visible",
+      "summary": "The chip shows only \"↑ Name · Fir…\" and no × button is painted at its right end, so the sort cannot be removed from the chip; the only way back is the \"Reset\" button, which also discards every other change (filters, advanced rules) on the view. (on /objects/people)",
+      "expected": "The sort chip keeps its remove \"×\" button at the right end, as it does at desktop width, so the sort can be removed on a phone.",
+      "actual": "The chip shows only \"↑ Name · Fir…\" and no × button is painted at its right end, so the sort cannot be removed from the chip; the only way back is the \"Reset\" button, which also discards every other change (filters, advanced rules) on the view.",
+      "reproSteps": [
+        "Set the browser viewport to 390 x 844 (phone).",
+        "Open https://5500-i6ealdtlbctm7qodvu2we.e2b.app/objects/people.",
+        "Click Sort at the top right of the list and choose the Name field in the Sort panel.",
+        "Look at the sort chip that appears at the left of the view bar, next to \"+ Add filter\"."
+      ],
+      "reason": "The claim that the sort cannot be removed is not shown and is contradicted by source. run2-11/shot-2.png (390 px) shows the chip cut to \"Name - Firs\" next to \"Add filter | Reset | Save as new view\"; the desktop chip with its x is in run2-11/shot-3.png. The chips live in a horizontal scroll area by design: ViewBarDetails wraps the chip container in a ScrollWrapper with vertical scrolling turned off (L224-L271) inside a container with overflow-x hidden (L74-L80), so the rest of the chip, including the x, is reached by swiping the chip strip, which is the standard overflow handling for this bar at any width once chips do not fit. The agent never tried to scroll the strip or tap the chip; it only looked at a static screenshot. Cramped on a phone, but no control is dead."
+    },
+    {
+      "name": "Calendar week view: many tasks at the same time are drawn as a cascade of narrow overlapping chips",
+      "summary": "All 11 chips are drawn on top of each other in a diagonal cascade: each chip starts 13 px to the right of the previous one and ends at the same right edge, so only a ~13 px sliver of every chip is visible. The column shows a row of single letters \\\"P P P P P P P P P P P\\\" and, under them, a row of dots where the time should be. No title or time can be read in Week mode for concurrent tasks. The same day in Day mode draws the 11 chips side by side (readably truncated), so the two modes disagree. (on /objects/tasks (calendar view \"agent8-calendar\", Week mode))",
+      "expected": "The 11 tasks due Nov 26, 2026 at 6:05 AM are laid out side by side so each one is readable (title + time), as the Day mode does for the same day.",
+      "actual": "All 11 chips are drawn on top of each other in a diagonal cascade: each chip starts 13 px to the right of the previous one and ends at the same right edge, so only a ~13 px sliver of every chip is visible. The column shows a row of single letters \\\"P P P P P P P P P P P\\\" and, under them, a row of dots where the time should be. No title or time can be read in Week mode for concurrent tasks. The same day in Day mode draws the 11 chips side by side (readably truncated), so the two modes disagree.",
+      "reproSteps": [
+        "Open https://5500-iqh0wqmhiiadae58emvlq.e2b.app/objects/tasks",
+        "Click the view name button \"All Tasks · 1,800\" at the top left of the list and pick the calendar view \"agent8-calendar\" (Date field = Due Date). Alternatively create it with \"Add view\" → View type Calendar → Date field Due Date.",
+        "In the calendar toolbar set the mode dropdown to \"Week\" and make sure the period is Nov 22 – 28, 2026 (the date range dropdown next to it).",
+        "Look at the Thu 26 column in the 6:00 AM row."
+      ],
+      "reason": "Designed layout pushed to an extreme by seed data. run3-04/shot-1.png shows 11 tasks due at the same minute (seeded 6:05 AM due dates) in one ~140 px day column, each visible as a ~13 px sliver. That cascade is the intended algorithm: concurrent events get one column each (computeRecordCalendarWeekEventLayouts L13-L43) and every event starts at its column and spans to the right edge (`columnSpan = columnCount - columnIndex`, L33-L42), stacked by z-index, with the hovered or focused chip raised above the others so it can be read (`hoverStackingOrder`, L52; RecordCalendarWeekEvent L64-L81). The claim that Day mode uses a different, side-by-side layout is wrong: Day and Week render the same RecordCalendarTimeGrid with the same layout function and event component (RecordCalendarTimeGrid L298, L406); Day only looks readable because its single column is seven times wider. Nothing is lost or broken; a denser-overlap design would be an improvement request."
+    },
+    {
+      "name": "\"Reset\" needs two clicks while the advanced filter panel is open",
+      "summary": "The first click on \\\"Reset\\\" while the filter panel is open only closes the panel: the filter stays applied (\\\"All Companies · 309\\\", chip \\\"1 advanced rule\\\", 309 filtered rows), and the Reset button turns grey/disabled. A second click on Reset is needed to actually clear the filter. (on /objects/companies)",
+      "expected": "Clicking \\\"Reset\\\" clears the active filters at once, independently of whether the advanced-filter panel is open: the filter chip disappears, the view goes back to \\\"All Companies · 599\\\" and all rows are listed again.",
+      "actual": "The first click on \\\"Reset\\\" while the filter panel is open only closes the panel: the filter stays applied (\\\"All Companies · 309\\\", chip \\\"1 advanced rule\\\", 309 filtered rows), and the Reset button turns grey/disabled. A second click on Reset is needed to actually clear the filter.",
+      "reproSteps": [
+        "Open https://5500-iqh0wqmhiiadae58emvlq.e2b.app/objects/companies (signed in as tim@apple.dev).",
+        "Click \"Filter\" in the view toolbar, then click \"Advanced filter\" in the dropdown — the filter panel opens under the toolbar and the view is labelled \"All Companies · 599\".",
+        "Type o in the rule's \"Enter value\" field — the list narrows to 309 rows and the chip \"1 advanced rule\" appears.",
+        "With the filter panel still open, click the \"Reset\" button at the right end of the filter bar.",
+        "Look at the view label and the rows: it still says \"All Companies · 309\", the chip \"1 advanced rule\" is still there and the same 309 rows are shown; the panel merely closed and \"Reset\" is now shown greyed out.",
+        "Click \"Reset\" a second time (panel now closed) — only now the filter clears and the view returns to 599."
+      ],
+      "reason": "Designed dropdown behaviour: the first click was swallowed by the open panel. The advanced filter panel is a Dropdown, and every open dropdown treats a click outside itself as \"close me\": its click-outside handler calls event.stopImmediatePropagation() and event.preventDefault() in the capture phase and then closes the dropdown (DropdownInternalContainer L102-L116), so the element under the pointer never receives that click. The agent's first click on Reset was made with the panel open, so it only closed the panel (run3-05/frame-5.jpg -> frame-6.jpg: panel gone, \"1 advanced rule\" and 309 rows still there); the second click, with nothing open, reached Reset and cleared the filter as it should (handleCancelClick, ViewBarDetails L180-L186). Reset itself works; the same happens with any control clicked while any dropdown is open."
+    },
+    {
+      "name": "Header checkbox clears a partial selection instead of selecting all rows",
+      "summary": "The list is emptied of selection instead: the single selected row is unticked, the header goes back to 'Companies' with no selection counter, and no row is selected. (on /objects/companies)",
+      "expected": "All rows of the list get selected: every row checkbox is ticked and the header shows 'Companies → 12 selected' (with no filter: 599 selected).",
+      "actual": "The list is emptied of selection instead: the single selected row is unticked, the header goes back to 'Companies' with no selection counter, and no row is selected.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev and open /objects/companies (table view 'All Companies').",
+        "Click the checkbox at the start of any one data row (e.g. the row 'nCino, Inc.') — the header changes to 'Companies → 1 selected'.",
+        "Click the 'Select all rows' checkbox in the table header row (first column header, left of 'Name')."
+      ],
+      "reason": "Designed tri-state checkbox. With one row ticked the header checkbox is in its indeterminate \"-\" state (run3-13/shot-1.png, \"1 selected\"), and source treats that state as checked: `checked = allRowsSelectedStatus === 'all' || allRowsSelectedStatus === 'some'`, `indeterminate = ... === 'some'`, and `onChange` calls resetTableRowSelection() when checked, selectAllRows() otherwise (RecordTableHeaderCheckboxColumn L52-L77). So clicking the indeterminate box deselects everything on purpose (the same convention as Gmail and similar lists), and a second click selects all. The \"Select all rows\" aria-label is static (L93), which is why the agent expected otherwise."
+    }
+  ]
+}

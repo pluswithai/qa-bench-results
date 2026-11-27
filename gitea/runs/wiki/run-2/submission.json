@@ -1,0 +1,331 @@
+{
+  "fixture": "gitea/areas/wiki",
+  "run": 2,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 345,
+      "name": "Wide markdown table in a wiki page makes the whole page scroll sideways at 390px (table has no own scroll area)",
+      "summary": "The table overflows the wiki content card: at rest the fifth column is clipped at the viewport edge ('Colur five'), and sideways scrolling moves the WHOLE document (the card's left border and the first column's text 'umn one' are cut off on the left, the header and footer shift with it). The table has no inner scroll container, so it cannot be scrolled on its own (unlike the code block on the same page, which does scroll inside itself). (on /eval/harbor-handbook/wiki/agent15-mobile-rich)",
+      "expected": "The markdown table scrolls inside its own container, or fits the card: the page itself never scrolls horizontally, and all column text stays readable within the 390px viewport.",
+      "actual": "The table overflows the wiki content card: at rest the fifth column is clipped at the viewport edge ('Colur five'), and sideways scrolling moves the WHOLE document (the card's left border and the first column's text 'umn one' are cut off on the left, the header and footer shift with it). The table has no inner scroll container, so it cannot be scrolled on its own (unlike the code block on the same page, which does scroll inside itself).",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and set the browser viewport to 390x844.",
+        "Open https://5503-ixlrdcr4kwxgn019fmdah.e2b.app/eval/harbor-handbook/wiki?action=_new",
+        "Title: agent15-mobile-rich. Content: a markdown table with 5 columns (headers 'Column one with a very long heading' … 'Column five'), two data rows.",
+        "Click Save Page, then open the page /eval/harbor-handbook/wiki/agent15-mobile-rich and scroll to the table.",
+        "Look at the right edge: the last column is cut off mid-word ('Colur five', cells cut) at the viewport edge.",
+        "Scroll the page to the right (trackpad/touch sideways scroll over the table)."
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 384,
+      "name": "Long wiki page name makes the whole page scroll sideways at desktop width (Page: selector overflows the viewport)",
+      "summary": "The selected entry inside the 'Page:' dropdown grows to 1848 px wide (text element 'Page: create-agent1-xxxx…'), stretching past the right screen edge; the document scrollWidth is 1863 px against a 1280 px viewport, so the whole wiki page scrolls sideways at desktop width. The dropdown's caret is pushed off-screen. (on /eval/harbor-handbook/wiki/<240-char page name>.-)",
+      "expected": "The long page name is truncated or wrapped inside the 'Page:' selector so the page stays within the window width and does not scroll sideways.",
+      "actual": "The selected entry inside the 'Page:' dropdown grows to 1848 px wide (text element 'Page: create-agent1-xxxx…'), stretching past the right screen edge; the document scrollWidth is 1863 px against a 1280 px viewport, so the whole wiki page scrolls sideways at desktop width. The dropdown's caret is pushed off-screen.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-ixlrdcr4kwxgn019fmdah.e2b.app/eval/harbor-handbook/wiki?action=_new",
+        "In 'Page title' type a 240-character name: create-agent1- followed by 228 x characters",
+        "In 'Page content' type: long title test agent1",
+        "Click 'Save Page'",
+        "On the saved page look at the top-left 'Page:' selector and the horizontal scrollbar"
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 396,
+      "name": "New Page: duplicate page-name error discards the content and note the person typed",
+      "summary": "The error banner 'A wiki page with the same name already exists.' is shown, but the editor content is reset to the default 'Welcome to the Wiki.' and the note field is emptied — everything the person typed in the body and the note is lost (only the title survives). Repeated twice with different content: content lost both times. (on /eval/harbor-handbook/wiki?action=_new)",
+      "expected": "The page refuses the save with 'A wiki page with the same name already exists.' next to the title field and keeps the title, the typed page content and the note so the person can just change the name.",
+      "actual": "The error banner 'A wiki page with the same name already exists.' is shown, but the editor content is reset to the default 'Welcome to the Wiki.' and the note field is emptied — everything the person typed in the body and the note is lost (only the title survives). Repeated twice with different content: content lost both times.",
+      "reproSteps": [
+        "Sign in as eval (or alex) and open https://5503-ixlrdcr4kwxgn019fmdah.e2b.app/eval/harbor-handbook/wiki?action=_new (Wiki ▸ New Page).",
+        "In 'Page title' type an existing page name: agent13-team-renamed.",
+        "In the 'Page content' editor replace 'Welcome to the Wiki.' with 'SECOND ATTEMPT CONTENT - long body that I typed before saving.' and in the note field type 'agent13 second attempt note'.",
+        "Click 'Save Page'."
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 401,
+      "name": "Renaming a wiki page to an existing page name silently overwrites that page and destroys its content",
+      "summary": "The save succeeds with no warning and no confirmation. The rename lands on /wiki/agent6-rename-new.- and that page now shows 'rev two content' instead of its own content. The commit 'r2 rename to existing' (b113b8d932) shows 2 changed files, 1 addition and 8 deletions: agent6-r2-old.-.md was deleted and agent6-rename-new.-.md lost all 7 of its lines (the Agent6 Rename Test heading, the EDITED line and the three list items). The original page's content is silently gone and the wiki never tells the user. (on /eval/harbor-handbook/wiki)",
+      "expected": "The save is refused (or at least clearly warns) because a wiki page named agent6-rename-new already exists; the existing page keeps its text 'Second revision content - EDITED.' and its own history.",
+      "actual": "The save succeeds with no warning and no confirmation. The rename lands on /wiki/agent6-rename-new.- and that page now shows 'rev two content' instead of its own content. The commit 'r2 rename to existing' (b113b8d932) shows 2 changed files, 1 addition and 8 deletions: agent6-r2-old.-.md was deleted and agent6-rename-new.-.md lost all 7 of its lines (the Agent6 Rename Test heading, the EDITED line and the three list items). The original page's content is silently gone and the wiki never tells the user.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-ixlrdcr4kwxgn019fmdah.e2b.app/eval/harbor-handbook/wiki",
+        "Click 'New Page', set the title to agent6-rename-new, set the content to 'Second revision content - EDITED.', click 'Save Page'",
+        "Click 'New Page' again, set the title to agent6-r2-old, set the content to 'rev two content', click 'Save Page'",
+        "Open https://5503-ixlrdcr4kwxgn019fmdah.e2b.app/eval/harbor-handbook/wiki/agent6-r2-old.- and click 'Edit'",
+        "Change the Page title field from agent6-r2-old to agent6-rename-new and click 'Save Page'"
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 433,
+      "name": "Revision history at 390px gives no reachable link to the revision diff",
+      "summary": "The revision row shows only Author / Message / Date and a copy-hash icon. The short commit id '950a8e483c', which is the only link to /wiki/commit/<sha> (the diff page), is not displayed at this width (the element resolves but is hidden). Clicking the message text or anywhere else in the row does nothing, so a diff cannot be opened at all from the revision history on a phone-width screen. (on /eval/harbor-handbook/wiki/agent15-mobile-rich.-?action=_revision)",
+      "expected": "The revision row offers a visible, tappable link that opens the revision's diff page (as the commit-id link does at desktop width).",
+      "actual": "The revision row shows only Author / Message / Date and a copy-hash icon. The short commit id '950a8e483c', which is the only link to /wiki/commit/<sha> (the diff page), is not displayed at this width (the element resolves but is hidden). Clicking the message text or anywhere else in the row does nothing, so a diff cannot be opened at all from the revision history on a phone-width screen.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1, set the viewport to 390x844.",
+        "Open the wiki page /eval/harbor-handbook/wiki/agent15-mobile-rich.- (page 'agent15-mobile-rich').",
+        "Click the revision counter '1' next to the page title to open 'Wiki Page Revisions'.",
+        "Look at the single revision row: no commit-id link is shown, only 'eval', the message, '1 minute ago' and a copy-hash icon.",
+        "Click the commit message text 'Add agent15-mobile-rich' - nothing happens; there is no way to reach the diff page."
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 470,
+      "name": "Renaming a wiki page wipes its revision history: earlier revisions are no longer listed",
+      "summary": "The renamed page shows '1 Commits' and its only entry is an auto-generated 'Update agent6-h2' commit. The two earlier revisions 'h rev1' and 'h rev2' are no longer listed anywhere for the page (the badge in the page header also drops from 2 to 1), so the user cannot see, compare or revert to the content the page had before it was renamed. The same happened earlier on agent6-rename-old (2 revisions before the rename, 1 after). (on /eval/harbor-handbook/wiki/agent6-h2.-?action=_revision)",
+      "expected": "The renamed page keeps its full revision history: 'Wiki Page Revisions' still lists h rev2 and h rev1 (plus the rename), and the old revisions can still be opened and diffed.",
+      "actual": "The renamed page shows '1 Commits' and its only entry is an auto-generated 'Update agent6-h2' commit. The two earlier revisions 'h rev1' and 'h rev2' are no longer listed anywhere for the page (the badge in the page header also drops from 2 to 1), so the user cannot see, compare or revert to the content the page had before it was renamed. The same happened earlier on agent6-rename-old (2 revisions before the rename, 1 after).",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-ixlrdcr4kwxgn019fmdah.e2b.app/eval/harbor-handbook/wiki",
+        "Click 'New Page', title agent6-h1, content 'h1 rev one', note 'h rev1', click 'Save Page'",
+        "Click 'Edit', content 'h1 rev two', note 'h rev2', click 'Save Page' — the page now shows 2 revisions",
+        "Open https://5503-ixlrdcr4kwxgn019fmdah.e2b.app/eval/harbor-handbook/wiki/agent6-h1.-?action=_revision : it lists '2 Commits' (h rev2, h rev1)",
+        "Open https://5503-ixlrdcr4kwxgn019fmdah.e2b.app/eval/harbor-handbook/wiki/agent6-h1.-?action=_edit, change the Page title to agent6-h2, click 'Save Page'",
+        "Open https://5503-ixlrdcr4kwxgn019fmdah.e2b.app/eval/harbor-handbook/wiki/agent6-h2.-?action=_revision"
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 475,
+      "name": "Wiki commit diff/patch download mangles non-ASCII: file path percent-encoded and accented text stripped",
+      "summary": "The .diff (and .patch, and the HTML commit view) contains `diff --git a/agent10-%C3%BCn%C3%AFcode-p%C3%A1gina.-.md b/agent10-%C3%BCn%C3%AFcode-p%C3%A1gina.-.md` — the path is URL-percent-encoded, so applying the patch would target a literal file named `agent10-%C3%BCn%C3%AFcode-p%C3%A1gina.-.md`. The hunk lines read `-Unicode rev one - hello world.` and `+Unicode rev two - goodbye world.`: ü/ï/á/ô/ÿ and the em dash were replaced by plain ASCII, while the same page displays `Ünïcode rev two — gôodbÿe wörld.` on screen. So the downloaded diff neither names the right file nor shows the real content change. (on /eval/harbor-handbook/wiki/commit/{sha}.diff (reached from /eval/harbor-handbook/wiki/agent10-ünïcode-página.-?action=_revision))",
+      "expected": "The downloaded diff/patch should be a valid git diff of what was really saved: header paths `a/agent10-ünïcode-página.-.md` / `b/agent10-ünïcode-página.-.md` (git's own quoting of non-ASCII names at most) and the hunks should contain exactly the entered text `-Ünïcode rev one — héllo wörld.` / `+Ünïcode rev two — gôodbÿe wörld.`, identical to what the wiki page displays and to the content the person typed.",
+      "actual": "The .diff (and .patch, and the HTML commit view) contains `diff --git a/agent10-%C3%BCn%C3%AFcode-p%C3%A1gina.-.md b/agent10-%C3%BCn%C3%AFcode-p%C3%A1gina.-.md` — the path is URL-percent-encoded, so applying the patch would target a literal file named `agent10-%C3%BCn%C3%AFcode-p%C3%A1gina.-.md`. The hunk lines read `-Unicode rev one - hello world.` and `+Unicode rev two - goodbye world.`: ü/ï/á/ô/ÿ and the em dash were replaced by plain ASCII, while the same page displays `Ünïcode rev two — gôodbÿe wörld.` on screen. So the downloaded diff neither names the right file nor shows the real content change.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-ixlrdcr4kwxgn019fmdah.e2b.app/eval/harbor-handbook/wiki",
+        "Click New Page, set Page title to `agent10-ünïcode-página` and Page content to `Ünïcode rev one — héllo wörld.`, then click Save Page",
+        "On the saved page click Edit, change the content to `Ünïcode rev two — gôodbÿe wörld.` and click Save Page",
+        "Click the revision count `2` next to the page title to open 'Wiki Page Revisions'",
+        "Open the newest commit (SHA 20b721de0c) — the diff already shows folded text; open its ... 'Diff Options' menu and choose 'Download Diff File' (URL /eval/harbor-handbook/wiki/commit/20b721de0cdc6517a11e55b4b021fa731e9d93bc.diff)",
+        "Compare the downloaded diff body with the page text shown at /eval/harbor-handbook/wiki/agent10-%C3%BCn%C3%AFcode-p%C3%A1gina.-"
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 483,
+      "name": "A long page name on the Pages list stretches the table: \"Last updated\" is pushed off-screen and the list scrolls sideways",
+      "summary": "One long page name widens the table to 1908px: the page-name column grows to 1850px, all rows become 92px tall, the \\\"Last updated ...\\\" column is pushed to x≈1862 (outside the 1280px viewport) and is squeezed to ~50px so its text wraps one word per line; the whole list scrolls sideways. The same happens with the 245-character name create-agent1-xxxx (not mine). (on /eval/harbor-handbook/wiki?action=_pages)",
+      "expected": "The Pages list keeps its two-column layout at any name length: the page-name cell wraps or truncates (word-break/ellipsis) and the \\\"Last updated ...\\\" text stays visible in a normal-width right column, with no sideways scrolling.",
+      "actual": "One long page name widens the table to 1908px: the page-name column grows to 1850px, all rows become 92px tall, the \\\"Last updated ...\\\" column is pushed to x≈1862 (outside the 1280px viewport) and is squeezed to ~50px so its text wraps one word per line; the whole list scrolls sideways. The same happens with the 245-character name create-agent1-xxxx (not mine).",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-ixlrdcr4kwxgn019fmdah.e2b.app/eval/harbor-handbook/wiki?action=_new",
+        "In \"Page title\" enter a long name without spaces: agent5-long- followed by 190 'z' characters (about 202 characters, the page agent5-long-zzz...zzz in the list) and save with \"Save Page\"",
+        "Open https://5503-ixlrdcr4kwxgn019fmdah.e2b.app/eval/harbor-handbook/wiki?action=_pages",
+        "Look at the list: every row is about 92px tall, the whole page scrolls sideways (document width 1917px against a 1280px viewport) and no \"Last updated\" text is visible",
+        "Scroll to the right: the Last updated values are squeezed into a ~50px column at the far right, one word per line"
+      ]
+    },
+    {
+      "index": 8,
+      "reported_at_seconds": 668,
+      "name": "Wiki revision list says \"1 Commits\" for a single revision",
+      "summary": "The list header reads '1 Commits' above a single revision row ('Add agent15-mobile-rich'). The singular form is never used, so a one-revision page is described with a plural count. (on /eval/harbor-handbook/wiki/agent15-mobile-rich.-?action=_revision)",
+      "expected": "'1 Commit' for a single revision ('2 Commits', '3 Commits' … for more).",
+      "actual": "The list header reads '1 Commits' above a single revision row ('Add agent15-mobile-rich'). The singular form is never used, so a one-revision page is described with a plural count.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 (any viewport).",
+        "Create the wiki page 'agent15-mobile-rich' with one save, or open any page that has exactly one revision.",
+        "Click the revision counter '1' next to the page title.",
+        "Read the header of the revision table: it says '1 Commits'."
+      ]
+    },
+    {
+      "index": 9,
+      "reported_at_seconds": 711,
+      "name": "Saving an edit form opened before the page was renamed silently re-creates the old page name",
+      "summary": "The save is accepted with no warning and the old page comes back: https://5503-ixlrdcr4kwxgn019fmdah.e2b.app/eval/harbor-handbook/wiki/agent6-spacey.- exists again with the same content, and the Pages list shows two separate pages, 'agent6-spacey' and 'agent6-spacey-renamed', both containing 'h1 rev two'. Nothing tells the user that the page they were editing had been renamed, so the page is silently duplicated and the two copies can now diverge. (on /eval/harbor-handbook/wiki/agent6-spacey.-?action=_edit)",
+      "expected": "The app notices that the page was renamed in the meantime: it either saves into the renamed page or refuses with a message, and no second page appears in the Pages list.",
+      "actual": "The save is accepted with no warning and the old page comes back: https://5503-ixlrdcr4kwxgn019fmdah.e2b.app/eval/harbor-handbook/wiki/agent6-spacey.- exists again with the same content, and the Pages list shows two separate pages, 'agent6-spacey' and 'agent6-spacey-renamed', both containing 'h1 rev two'. Nothing tells the user that the page they were editing had been renamed, so the page is silently duplicated and the two copies can now diverge.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1, open https://5503-ixlrdcr4kwxgn019fmdah.e2b.app/eval/harbor-handbook/wiki and create a page named agent6-spacey with content 'h1 rev two'",
+        "Open https://5503-ixlrdcr4kwxgn019fmdah.e2b.app/eval/harbor-handbook/wiki/agent6-spacey.-?action=_edit",
+        "Open the same edit URL in a second tab",
+        "In the second tab change the Page title to agent6-spacey-renamed and click 'Save Page' — the page is renamed to /wiki/agent6-spacey-renamed.-",
+        "Switch back to the first tab, whose Page title field still says agent6-spacey, and click 'Save Page'",
+        "Open https://5503-ixlrdcr4kwxgn019fmdah.e2b.app/eval/harbor-handbook/wiki/?action=_pages"
+      ]
+    },
+    {
+      "index": 10,
+      "reported_at_seconds": 717,
+      "name": "Wiki page content that starts with a --- line renders as a completely empty page",
+      "summary": "The page body renders completely empty: no horizontal rule and no \"Footer text\" paragraph appear. The Preview tab shows nothing at all, and on the saved wiki page of _Footer the content card is blank (and the footer strip drawn at the bottom of every other wiki page is blank too). The same text without the leading --- renders normally. (on /eval/harbor-handbook/wiki/_Footer)",
+      "expected": "The page should show a horizontal rule followed by the paragraph \"Footer text: maintained by agent3. See the wiki index.\" (as it does when the same text is placed after a paragraph instead of at the very top).",
+      "actual": "The page body renders completely empty: no horizontal rule and no \"Footer text\" paragraph appear. The Preview tab shows nothing at all, and on the saved wiki page of _Footer the content card is blank (and the footer strip drawn at the bottom of every other wiki page is blank too). The same text without the leading --- renders normally.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-ixlrdcr4kwxgn019fmdah.e2b.app/eval/harbor-handbook/wiki?action=_new",
+        "Set the page title to _Footer",
+        "In the content editor type exactly: a line with only --- then an empty line then the paragraph 'Footer text: maintained by agent3. See [the wiki index](/eval/harbor-handbook/wiki).'",
+        "Click \"Preview\": the preview area is blank",
+        "Click \"Save Page\" and look at the saved page: the content card is empty and the footer strip at the bottom of other wiki pages (e.g. /eval/harbor-handbook/wiki/md-agent3-plain.-) is an empty box"
+      ]
+    },
+    {
+      "index": 11,
+      "reported_at_seconds": 728,
+      "name": "\\\"View original Git file\\\" link on a Pages-list row opens the rendered page instead of the raw Markdown",
+      "summary": "The address /eval/harbor-handbook/wiki/agent5-alpha.-.md opens the normal rendered wiki page: site header and repo navigation, \\\"Page: agent5-alpha\\\", the Edit / New Page / Delete Page buttons, the Table of Contents and the rendered heading and body — not the original Git file. /eval/harbor-handbook/wiki/Home.md behaves the same, so the raw view is never reachable through this control. (on /eval/harbor-handbook/wiki?action=_pages)",
+      "expected": "The original Git file is shown — the raw Markdown source of the page (for agent5-alpha: \\\"# agent5-alpha\\\" and \\\"Content for alpha page.\\\") — as the tooltip promises.",
+      "actual": "The address /eval/harbor-handbook/wiki/agent5-alpha.-.md opens the normal rendered wiki page: site header and repo navigation, \\\"Page: agent5-alpha\\\", the Edit / New Page / Delete Page buttons, the Table of Contents and the rendered heading and body — not the original Git file. /eval/harbor-handbook/wiki/Home.md behaves the same, so the raw view is never reachable through this control.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-ixlrdcr4kwxgn019fmdah.e2b.app/eval/harbor-handbook/wiki?action=_pages",
+        "Hover the row of the page \"agent5-alpha\" so its chevron appears",
+        "Click the chevron \">\" right of the page name (its tooltip is \"View original Git file instead of using friendly link.\")",
+        "The browser lands on https://5503-ixlrdcr4kwxgn019fmdah.e2b.app/eval/harbor-handbook/wiki/agent5-alpha.-.md",
+        "Repeat with https://5503-ixlrdcr4kwxgn019fmdah.e2b.app/eval/harbor-handbook/wiki/Home.md (the same link on the Home row)"
+      ]
+    },
+    {
+      "index": 12,
+      "reported_at_seconds": 764,
+      "name": "Sidebar (_Sidebar) box falls out of the right column on short wiki pages at 768px",
+      "summary": "At 768px on this short page the \"Navigation\" (_Sidebar) box is not in the right column: it is drawn at x≈452–600, indented into/below the page-content column and left of the right-hand column, so it is not aligned with the \"Table of Contents\" box above it (which sits at x≈617–737) and it hangs half under the content card. The footer box below it starts again at the left edge (x=16) and spans the full width. The same wiki at the same width, on the longer Home page, places the sidebar correctly under the Table of Contents in the right column — so the sidebar/footer layout depends on the page's content length and breaks on short pages. (on /eval/harbor-handbook/wiki/agent14-renamed-short.-)",
+      "expected": "The _Sidebar box should stay in the right-hand column, aligned under the Table of Contents box, on every wiki page at 768px width, as it does on the Home page.",
+      "actual": "At 768px on this short page the \"Navigation\" (_Sidebar) box is not in the right column: it is drawn at x≈452–600, indented into/below the page-content column and left of the right-hand column, so it is not aligned with the \"Table of Contents\" box above it (which sits at x≈617–737) and it hangs half under the content card. The footer box below it starts again at the left edge (x=16) and spans the full width. The same wiki at the same width, on the longer Home page, places the sidebar correctly under the Table of Contents in the right column — so the sidebar/footer layout depends on the page's content length and breaks on short pages.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and set the window to about 768 × 1024 (tablet width).",
+        "Open the wiki page /eval/harbor-handbook/wiki/agent14-renamed-short.- (a page with a short body — mine has one heading and one line of text; the wiki has a _Sidebar page, so the \"Navigation\" box is shown).",
+        "Compare the position of the \"Navigation\" (_Sidebar) box with the \"Table of Contents\" box above it and with the footer box below.",
+        "Reload the page and look again.",
+        "For comparison, open /eval/harbor-handbook/wiki (Home, longer body) at the same width."
+      ]
+    },
+    {
+      "index": 13,
+      "reported_at_seconds": 820,
+      "name": "Commit diff summary says \"1 changed files with 1 additions and 1 deletions\"",
+      "summary": "The summary line above the diff reads \"1 changed files with 1 additions and 1 deletions\" — both the file count and the additions count are ungrammatical for a value of one (the deletions count is worded correctly right next to them). (on /eval/harbor-handbook/wiki/commit/{sha})",
+      "expected": "The summary should read \"1 changed file with 1 addition and 1 deletion\" — singular wording when the count is one, as the same line already does for \"1 deletions\"… i.e. correctly for every count.",
+      "actual": "The summary line above the diff reads \"1 changed files with 1 additions and 1 deletions\" — both the file count and the additions count are ungrammatical for a value of one (the deletions count is worded correctly right next to them).",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open a wiki page with revisions, e.g. https://5503-ixlrdcr4kwxgn019fmdah.e2b.app/eval/harbor-handbook/wiki/agent10-dl1.-?action=_revision",
+        "Open the newest commit (SHA 600610c1f8) so the commit diff page shows",
+        "Read the green/red summary line just above the file header"
+      ]
+    },
+    {
+      "index": 14,
+      "reported_at_seconds": 830,
+      "name": "Title '.' is silently saved as a page named 'unnamed' instead of being rejected",
+      "summary": "The page is saved under the name 'unnamed' (URL /eval/harbor-handbook/wiki/unnamed, header and 'Page:' selector say 'unnamed') without any message; what was typed in 'Page title' is silently replaced. Saving the same '.' a second time is then refused with 'A wiki page with the same name already exists.', which confirms the substitution. The empty title, by contrast, is properly refused with 'Title cannot be empty'. (on /eval/harbor-handbook/wiki?action=_new)",
+      "expected": "A title that does not produce a usable page name ('.') is refused with a message next to the 'Page title' field, and what the person typed stays in the field - as happens for an empty title ('Title cannot be empty') or a spaces-only title.",
+      "actual": "The page is saved under the name 'unnamed' (URL /eval/harbor-handbook/wiki/unnamed, header and 'Page:' selector say 'unnamed') without any message; what was typed in 'Page title' is silently replaced. Saving the same '.' a second time is then refused with 'A wiki page with the same name already exists.', which confirms the substitution. The empty title, by contrast, is properly refused with 'Title cannot be empty'.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-ixlrdcr4kwxgn019fmdah.e2b.app/eval/harbor-handbook/wiki?action=_new",
+        "In 'Page title' type a single dot: .",
+        "Leave the prefilled 'Welcome to the Wiki.' content as it is and click 'Save Page'",
+        "The app saves the page under the name 'unnamed' and opens /eval/harbor-handbook/wiki/unnamed - no message about the changed name",
+        "Repeat from step 2: typing '.' again and saving now answers 'A wiki page with the same name already exists.' (the name was mapped to 'unnamed')"
+      ]
+    },
+    {
+      "index": 15,
+      "reported_at_seconds": 837,
+      "name": "Saving an editor left open on a page that was deleted meanwhile silently recreates the page",
+      "summary": "The stale editor's Save silently recreates the page: del-race comes back with the text \"race content v2 edited after delete\" and the header shows \"Code 3\". No notice, warning or conflict message appears anywhere. The same silent resurrection happened when \"del-reborn\" was re-saved from an editor left open after its deletion (its revision history then also listed the old pre-deletion commit). (on /eval/harbor-handbook/wiki/del-race.-)",
+      "expected": "The app notices that the page was deleted while the person was editing it and says so (e.g. \"this page was deleted in the meantime\") instead of silently bringing a deleted page back.",
+      "actual": "The stale editor's Save silently recreates the page: del-race comes back with the text \"race content v2 edited after delete\" and the header shows \"Code 3\". No notice, warning or conflict message appears anywhere. The same silent resurrection happened when \"del-reborn\" was re-saved from an editor left open after its deletion (its revision history then also listed the old pre-deletion commit).",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1, open the wiki, create a page \"del-race\" with content \"race content v1\" (New Page, title and content, Save Page).",
+        "Open a second tab on the editor of the same page: /eval/harbor-handbook/wiki/del-race.-?action=_edit and leave it open.",
+        "In the first tab, on /eval/harbor-handbook/wiki/del-race.- click \"Delete Page\" and confirm with \"Yes\"; the wiki redirects to Home and del-race is gone.",
+        "Switch to the second tab (it still shows \"race content v1\"), replace the content with \"race content v2 edited after delete\" and click \"Save Page\"."
+      ]
+    },
+    {
+      "index": 16,
+      "reported_at_seconds": 900,
+      "name": "RSS feed item titles contain escaped HTML link markup instead of plain text",
+      "summary": "Every item title contains escaped HTML anchor markup: for example <title>eval commented on issue &lt;a href=&#34;https://…/issues/4&#34;&gt;eval/harbor-handbook#4&lt;/a&gt;</title> and <title>eval pushed to &lt;a href=&#34;…&#34;&gt;docs/release-owners&lt;/a&gt; at &lt;a href=&#34;…&#34;&gt;eval/harbor-handbook&lt;/a&gt;</title>. A feed reader therefore shows the title as literal text: eval commented on issue <a href=\"https://…/issues/4\">eval/harbor-handbook#4</a>. The description text is properly HTML and CDATA encoded; only the titles carry the markup. (on /eval/harbor-handbook.rss)",
+      "expected": "Feed item titles should be plain text, e.g. \"eval commented on issue eval/harbor-handbook#4\", with the link in <link>, so a feed reader displays a readable title.",
+      "actual": "Every item title contains escaped HTML anchor markup: for example <title>eval commented on issue &lt;a href=&#34;https://…/issues/4&#34;&gt;eval/harbor-handbook#4&lt;/a&gt;</title> and <title>eval pushed to &lt;a href=&#34;…&#34;&gt;docs/release-owners&lt;/a&gt; at &lt;a href=&#34;…&#34;&gt;eval/harbor-handbook&lt;/a&gt;</title>. A feed reader therefore shows the title as literal text: eval commented on issue <a href=\"https://…/issues/4\">eval/harbor-handbook#4</a>. The description text is properly HTML and CDATA encoded; only the titles carry the markup.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1",
+        "Open https://5503-ixlrdcr4kwxgn019fmdah.e2b.app/eval/harbor-handbook/wiki and click the \"RSS Feed\" button in the repository header (its address is /eval/harbor-handbook.rss)",
+        "Read the <title> elements of the first feed items"
+      ]
+    },
+    {
+      "index": 17,
+      "reported_at_seconds": 920,
+      "name": "A wiki page address containing %00 returns a blank white page instead of an error message",
+      "summary": "The server answers HTTP 400 with an empty body: the browser shows a completely blank white page — no site header, no error message, no link back to the wiki or anywhere else. Navigating away with the browser's Back button is the only way out. (on /eval/harbor-handbook/wiki/agent5-alpha%00.-)",
+      "expected": "A clean error state: an error page saying the page address is not valid (404/400 state) with the usual Gitea header and a way back to the wiki, like other wrong wiki addresses.",
+      "actual": "The server answers HTTP 400 with an empty body: the browser shows a completely blank white page — no site header, no error message, no link back to the wiki or anywhere else. Navigating away with the browser's Back button is the only way out.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1",
+        "Open the address https://5503-ixlrdcr4kwxgn019fmdah.e2b.app/eval/harbor-handbook/wiki/agent5-alpha%00.- (a wiki page address with an encoded NUL character %00 in the page name)",
+        "The response is HTTP 400 and the tab is a blank white page"
+      ]
+    },
+    {
+      "index": 18,
+      "reported_at_seconds": 1027,
+      "name": "Table of Contents links in a wiki page point at anchors that do not exist, so they never reach their heading",
+      "summary": "The address gains #code-block, but the page does not go to the \"Code block\" heading: it scrolls to the bottom of the page and the heading sits about 200px down the viewport, with the \"Long URL\" section and footer filling the rest. The anchors have no target at all: the TOC links point to #code-block / #wide-table / #long-word-test / #long-url while the headings' real ids are user-content-code-block, user-content-wide-table, user-content-long-word-test and user-content-long-url — no element with id=\"code-block\" (or name=\"code-block\") exists. Same on Home (/wiki): the TOC links are #harbor-handbook and #sections, the heading ids are user-content-harbor-handbook and user-content-sections, and clicking \"Sections\" only scrolls to the bottom of the page with the heading still ~275px down. Opening a deep link such as /wiki/agent15-mobile-rich.-#code-block in a fresh tab also lands mid-page, not on the heading. The rest of the page works and no error is shown in the console. (on /eval/harbor-handbook/wiki/agent15-mobile-rich.-)",
+      "expected": "Clicking a Table of Contents entry scrolls the page so that heading is at the top of the viewport (and an #code-block address opened directly loads the page at that heading), because the anchor target equals the heading's id.",
+      "actual": "The address gains #code-block, but the page does not go to the \"Code block\" heading: it scrolls to the bottom of the page and the heading sits about 200px down the viewport, with the \"Long URL\" section and footer filling the rest. The anchors have no target at all: the TOC links point to #code-block / #wide-table / #long-word-test / #long-url while the headings' real ids are user-content-code-block, user-content-wide-table, user-content-long-word-test and user-content-long-url — no element with id=\"code-block\" (or name=\"code-block\") exists. Same on Home (/wiki): the TOC links are #harbor-handbook and #sections, the heading ids are user-content-harbor-handbook and user-content-sections, and clicking \"Sections\" only scrolls to the bottom of the page with the heading still ~275px down. Opening a deep link such as /wiki/agent15-mobile-rich.-#code-block in a fresh tab also lands mid-page, not on the heading. The rest of the page works and no error is shown in the console.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open the wiki page https://5503-ixlrdcr4kwxgn019fmdah.e2b.app/eval/harbor-handbook/wiki/agent15-mobile-rich.- (a page with four headings and a Table of Contents).",
+        "In the \"Table of Contents\" box on the right, click the entry \"Code block\".",
+        "Look at the address bar (it now ends with #code-block) and at the page: the \"Code block\" heading is not brought to the top, the page has jumped to the bottom.",
+        "Repeat on the wiki Home page /eval/harbor-handbook/wiki: click \"Sections\" in its Table of Contents.",
+        "Open a fresh tab on /eval/harbor-handbook/wiki/agent15-mobile-rich.-#code-block: the page opens mid-page instead of at the heading."
+      ]
+    },
+    {
+      "index": 19,
+      "reported_at_seconds": 1139,
+      "name": "A note made only of spaces creates a revision with a blank message",
+      "summary": "The commit is created with an empty Message: the newest row of 'Wiki Page Revisions' shows a blank Message cell, while a save with an untouched (empty) note gets the automatic message 'Update agent6-mobile-renamed'. The history ends up with a revision whose message is whitespace only, so the page's history no longer says anything about that change. (on /eval/harbor-handbook/wiki/agent6-mobile-renamed.-?action=_revision)",
+      "expected": "A note made only of spaces is treated like an empty note: the commit gets the automatic message (e.g. 'Update agent6-mobile-renamed') instead of a blank one.",
+      "actual": "The commit is created with an empty Message: the newest row of 'Wiki Page Revisions' shows a blank Message cell, while a save with an untouched (empty) note gets the automatic message 'Update agent6-mobile-renamed'. The history ends up with a revision whose message is whitespace only, so the page's history no longer says anything about that change.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-ixlrdcr4kwxgn019fmdah.e2b.app/eval/harbor-handbook/wiki/agent6-mobile-renamed.-?action=_edit (any page you own)",
+        "Change the content to 'h1 rev three (spaces-only note)'",
+        "Type five spaces into the 'Write a note about this page update (optional).' field",
+        "Click 'Save Page'",
+        "Open https://5503-ixlrdcr4kwxgn019fmdah.e2b.app/eval/harbor-handbook/wiki/agent6-mobile-renamed.-?action=_revision and read the Message column of the newest commit"
+      ]
+    },
+    {
+      "index": 20,
+      "reported_at_seconds": 1298,
+      "name": "At 390px a markdown table cell with a long inline code span is clipped and unreadable, with no way to scroll to it",
+      "summary": "The row is cut at the card's right edge: only about 65 of the 100 characters are shown (\"...CCCCCCCCCCDDDDDDDDDDEEEEEE\") and the rest cannot be reached — the text does not wrap, the table has no scroll container of its own, and the page itself does not scroll sideways (swiping/panning right does nothing). A reader on a phone simply cannot read that cell. A second table on the same page with an empty cell (\"empty cell | value\" / \"|  | x |\") renders correctly, so it is the long unbroken inline code span that overflows. (on /eval/harbor-handbook/wiki/agent9-nest-1.-)",
+      "expected": "The code span either wraps inside its cell, or the table scrolls inside its own container, so the whole value stays readable; nothing is cut off.",
+      "actual": "The row is cut at the card's right edge: only about 65 of the 100 characters are shown (\"...CCCCCCCCCCDDDDDDDDDDEEEEEE\") and the rest cannot be reached — the text does not wrap, the table has no scroll container of its own, and the page itself does not scroll sideways (swiping/panning right does nothing). A reader on a phone simply cannot read that cell. A second table on the same page with an empty cell (\"empty cell | value\" / \"|  | x |\") renders correctly, so it is the long unbroken inline code span that overflows.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1, open https://5503-ixlrdcr4kwxgn019fmdah.e2b.app/eval/harbor-handbook/wiki/agent9-nest-1.- (page already contains the nested tables and code fences)",
+        "Set the window to 390x844 (phone width) and scroll down past the first tables, to the table whose single header cell reads \"long code span\".",
+        "Look at that table's body cell, which contains one long inline code span of 100 characters (AAA...KKK): the text stops mid-letter at the right edge of the card and there is no way to see the rest.",
+        "Reload the page and scroll back to the same table: the cell is cut off again."
+      ]
+    },
+    {
+      "index": 21,
+      "reported_at_seconds": 1524,
+      "name": "A wiki page re-created after deletion inherits the deleted page's revision history and count (5 commits, including the delete commit)",
+      "summary": "The new page's header badge and the revision history page say \"5\" / \"5 Commits\", listing the whole life of the deleted page: \"Add recyc-14\" (the original), \"Update recyc-14\", \"Update recyc-14\", \"Delete page \\\"recyc-14.-\\\"\" and the new \"Add recyc-14\". The re-created page contains only the new content, yet it inherits the deleted page's revisions — including the deletion commit — and the count is 5 for a page that was just created, directly contradicting the delete dialog's \"cannot be undone\". (on /eval/harbor-handbook/wiki/recyc-14.-?action=_revision)",
+      "expected": "A page created again under a name whose earlier page was deleted should start with a fresh history: 1 revision (\"Add recyc-14\") and one commit, matching the \"Deleting the wiki page … cannot be undone\" promise — or, if old history is kept deliberately, the deleted page's revisions should not be presented as the new page's own revisions/count.",
+      "actual": "The new page's header badge and the revision history page say \"5\" / \"5 Commits\", listing the whole life of the deleted page: \"Add recyc-14\" (the original), \"Update recyc-14\", \"Update recyc-14\", \"Delete page \\\"recyc-14.-\\\"\" and the new \"Add recyc-14\". The re-created page contains only the new content, yet it inherits the deleted page's revisions — including the deletion commit — and the count is 5 for a page that was just created, directly contradicting the delete dialog's \"cannot be undone\".",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1, open /eval/harbor-handbook/wiki?action=_new, enter the page title \"recyc-14\", put \"Content A for recycle test\" in the body and click \"Save Page\".",
+        "Edit the page twice, changing the body to \"Content B for recycle test\" and then \"Content C for recycle test\", saving each time (the page now shows the revision badge \"3\").",
+        "On the page click the red \"Delete Page\" button, then \"Yes\" in the \"Deleting the wiki page \"recyc-14\" cannot be undone. Continue?\" dialog (the app returns to the wiki Home page).",
+        "Open /eval/harbor-handbook/wiki?action=_new again, use exactly the same title \"recyc-14\", put \"Content D for recycle test\" in the body and click \"Save Page\".",
+        "Look at the revision badge next to the page name and click it to open the revision history."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,308 @@
+{
+  "fixture": "metabase/areas/dashboards",
+  "run": 3,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 217,
+      "name": "Dashboard Info panel: \"undefined modified this.\" in History, and \"Creator and last editor\" left blank for a member",
+      "summary": "The \\\"Creator and last editor\\\" section is empty (only the heading is shown, no names), and the History tab shows the raw text \\\"undefined modified this.\\\" with nobody named. A 403 is returned for GET /api/user/13371338 when the panel opens. (on /dashboard/1)",
+      "expected": "The Overview tab names who created and who last edited the dashboard, and the History tab says something like \\\"<User name> modified this. a few seconds ago\\\".",
+      "actual": "The \\\"Creator and last editor\\\" section is empty (only the heading is shown, no names), and the History tab shows the raw text \\\"undefined modified this.\\\" with nobody named. A 403 is returned for GET /api/user/13371338 when the panel opens.",
+      "reproSteps": [
+        "Sign in as maya@example.test / momentic-eval-1 (Member account).",
+        "Open /dashboard/1 (E-commerce Insights).",
+        "Click the info icon (\"More info\") in the dashboard toolbar, top right, next to the bookmark icon.",
+        "In the Info panel, read the \"Creator and last editor\" section on the Overview tab.",
+        "Click the \"History\" tab in the same panel."
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 251,
+      "name": "Chart tooltip on \"Revenue and orders over time\" shows extra metrics that are not in the chart (Sum of Discount, Count)",
+      "summary": "The tooltip lists two extra rows below the series: \\\"Sum of Discount\\\" ($521.01 for Q3 2026, $738.56 for Q4 2026) and \\\"Count\\\" (1,004 / 1,166) — values that are not part of the chart and whose names are raw aggregation labels. The browser console also logs, on every dashboard load, \\\"Error getting setting graph.tooltip_columns TypeError: Cannot read properties of undefined (reading 'column')\\\", so the card's tooltip column configuration fails and the tooltip falls back to all query columns. (on /dashboard/1)",
+      "expected": "The tooltip shows the two series drawn in the chart (Revenue and Orders) with their values for the hovered quarter, as the legend and the card's own configuration state.",
+      "actual": "The tooltip lists two extra rows below the series: \\\"Sum of Discount\\\" ($521.01 for Q3 2026, $738.56 for Q4 2026) and \\\"Count\\\" (1,004 / 1,166) — values that are not part of the chart and whose names are raw aggregation labels. The browser console also logs, on every dashboard load, \\\"Error getting setting graph.tooltip_columns TypeError: Cannot read properties of undefined (reading 'column')\\\", so the card's tooltip column configuration fails and the tooltip falls back to all query columns.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open /dashboard/1 (E-commerce Insights, Overview tab).",
+        "Hover the mouse over the bar above the \"Q3 2026\" label in the \"Revenue and orders over time\" card.",
+        "Read the tooltip that appears.",
+        "Hover the bar above \"Q4 2026\" and read the tooltip again."
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 274,
+      "name": "A dashboard address with a non-numeric id (/dashboard/abc) shows an endless \"Loading…\" spinner and never resolves",
+      "summary": "The page stays forever on a spinner with the text \"Loading…\" and never shows an error or a not-found message. No API request is even made (nothing in the network log for /dashboard/abc), so the spinner never ends. /dashboard/999999 (numeric, non-existent) does show the proper \"We're a little lost…\" page, so the two invalid-address cases behave differently. (on /dashboard/abc)",
+      "expected": "The app shows a not-found page in words, like the one it shows for /dashboard/999999 (\"We're a little lost… The page you asked for couldn't be found.\"), with a way on.",
+      "actual": "The page stays forever on a spinner with the text \"Loading…\" and never shows an error or a not-found message. No API request is even made (nothing in the network log for /dashboard/abc), so the spinner never ends. /dashboard/999999 (numeric, non-existent) does show the proper \"We're a little lost…\" page, so the two invalid-address cases behave differently.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1",
+        "In the browser address bar, navigate directly to https://5501-i6mbgjuu6h6owsro2smz3.e2b.app/dashboard/abc",
+        "Wait several seconds and watch the page"
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 280,
+      "name": "Phone width: dashboard text card body is cut off (\"Business KPIs…\" loses its last line)",
+      "summary": "Only two and a half lines are shown. The last line is chopped horizontally in the middle of the glyphs (\"growth in the number of orders\" is half cut) and the rest is hidden behind the card below, so the sentence cannot be read. On the desktop layout the same text is fully visible. (on /dashboard/1)",
+      "expected": "The whole text of the text card is readable: \"Business KPIs look strong based on the consistent MoM revenue growth following the growth in the number of orders\".",
+      "actual": "Only two and a half lines are shown. The last line is chopped horizontally in the middle of the glyphs (\"growth in the number of orders\" is half cut) and the rest is hidden behind the card below, so the sentence cannot be read. On the desktop layout the same text is fully visible.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open /dashboard/1 (E-commerce Insights, Overview tab).",
+        "Set the browser viewport to 390x844 (phone size).",
+        "Look at the text under the heading \"Overall Business Health\"."
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 318,
+      "name": "Text card cuts off most of the text the user typed; the rest is not reachable",
+      "summary": "The card shows only the first three blocks — the heading, the bold/italic line and \\\"item one\\\". \\\"item two\\\", the emoji line (\\\"Emoji: 🎉 José Müller مرحبا\\\"), the long word and \\\"Last line\\\" are missing. The card has no scrollbar and no expand control, so the rest of the typed text cannot be seen at all; the same after a page reload. (on /dashboard/5-agent5-text-link-cards)",
+      "expected": "The saved text card shows all of the text that was entered (as it does in the editor, where the whole text is present), or at least scrolls so the rest can be read.",
+      "actual": "The card shows only the first three blocks — the heading, the bold/italic line and \\\"item one\\\". \\\"item two\\\", the emoji line (\\\"Emoji: 🎉 José Müller مرحبا\\\"), the long word and \\\"Last line\\\" are missing. The card has no scrollbar and no expand control, so the rest of the typed text cannot be seen at all; the same after a page reload.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai, then go to /dashboard/1 and click New > Dashboard, name it \"agent5-text-link-cards\", Create.",
+        "In the empty dashboard's edit mode click the text-card icon (\"Add a heading or text box\") and choose Text.",
+        "Type this text into the text card editor: \"## agent5 heading\" / blank line / \"**bold** and *italic* and `code`\" / blank line / \"- item one\" / \"- item two\" / blank line / \"Emoji: 🎉 José Müller مرحبا\" / blank line / a very long word / blank line / \"Last line\".",
+        "Click the empty grid area outside the card to leave the editor, then click Save.",
+        "Look at the saved text card in view mode; then reload the page."
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 348,
+      "name": "In fullscreen, the \"More info\" (i) button does not show the Info panel",
+      "summary": "Nothing appears. The \\\"i\\\" button turns into its pressed/active state and becomes disabled (so the app thinks the panel is open), but no panel is rendered anywhere in the page — the text \\\"Creator and last editor\\\" is not in the DOM. Clicking the \\\"Exit fullscreen\\\" button immediately afterwards makes the Info panel appear at once, which shows the panel was opened but not displayed while in fullscreen. Reproduced twice from a fresh page load. (on /dashboard/1)",
+      "expected": "The Info panel (Overview / History / Insights with description, creator and last editor, saved in) slides in from the right, as it does outside fullscreen.",
+      "actual": "Nothing appears. The \\\"i\\\" button turns into its pressed/active state and becomes disabled (so the app thinks the panel is open), but no panel is rendered anywhere in the page — the text \\\"Creator and last editor\\\" is not in the DOM. Clicking the \\\"Exit fullscreen\\\" button immediately afterwards makes the Info panel appear at once, which shows the panel was opened but not displayed while in fullscreen. Reproduced twice from a fresh page load.",
+      "reproSteps": [
+        "Open https://5501-i6mbgjuu6h6owsro2smz3.e2b.app/dashboard/1 (E-commerce Insights), signed in as eval@momentic.ai.",
+        "Click the ellipsis button \"Move, trash, and more…\" in the dashboard header (top right).",
+        "Click \"Enter fullscreen\" in the menu; the address becomes …/dashboard/1?…#fullscreen and the top navigation disappears.",
+        "Click the \"i\" button (\"More info\") at the far right of the fullscreen header, next to the bookmark icon."
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 554,
+      "name": "Text card renders a malformed URL as a link, and clicking it throws the reader to the home page",
+      "summary": "The text is turned into a blue underlined clickable link labelled \\\"invalid\\\", and clicking it silently leaves the dashboard and lands on the Metabase home page (address becomes https://5501-i6mbgjuu6h6owsro2smz3.e2b.app/). The link has an empty href and goes somewhere the author never pointed it at. (on /dashboard/5-agent5-text-link-cards)",
+      "expected": "A malformed/invalid URL in a text card is either shown as plain text or the link is refused; a click must never send the reader to a page the author did not set.",
+      "actual": "The text is turned into a blue underlined clickable link labelled \\\"invalid\\\", and clicking it silently leaves the dashboard and lands on the Metabase home page (address becomes https://5501-i6mbgjuu6h6owsro2smz3.e2b.app/). The link has an empty href and goes somewhere the author never pointed it at.",
+      "reproSteps": [
+        "Signed in as eval@momentic.ai, open the dashboard /dashboard/5-agent5-text-link-cards (New > Dashboard > name it agent5-text-link-cards).",
+        "Click Edit dashboard, then click the text card and put this markdown in it: [invalid](htp://x)",
+        "Click outside the card to commit and click Save.",
+        "In view mode, click the blue word \"invalid\" inside the text card."
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 591,
+      "name": "With Date Range \\\"Today\\\" the card \\\"Revenue by product category\\\" says \\\"No results!\\\" while \\\"Total orders by product category\\\" counts 16 orders",
+      "summary": "The same filter gives two different answers: \\\"Total orders by product category\\\" counts 16 orders split over Doohickey 31%, Gadget 25%, Gizmo 13%, Widget 31% (and \\\"Revenue and orders over time\\\" shows 914.52 revenue / 43 orders for today), while the neighbouring card \\\"Revenue by product category\\\" shows the sailboat and \\\"No results!\\\". One card claims there is no data at all for the period while the card next to it counts orders in that same period. (on /dashboard/1)",
+      "expected": "Both cards describe the same filtered data set: if there are 16 orders and 914.52 revenue today, \\\"Revenue by product category\\\" shows that revenue broken down by category instead of \\\"No results!\\\".",
+      "actual": "The same filter gives two different answers: \\\"Total orders by product category\\\" counts 16 orders split over Doohickey 31%, Gadget 25%, Gizmo 13%, Widget 31% (and \\\"Revenue and orders over time\\\" shows 914.52 revenue / 43 orders for today), while the neighbouring card \\\"Revenue by product category\\\" shows the sailboat and \\\"No results!\\\". One card claims there is no data at all for the period while the card next to it counts orders in that same period.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open /dashboard/1 (E-commerce Insights, Overview tab).",
+        "Click the Date Range filter and choose \"Today\" (URL becomes /dashboard/1?date_range=thisday).",
+        "Leave Product Category at its default (all four: Doohickey, Gadget, Gizmo, Widget).",
+        "Scroll down to the \"Deeper Dive\" section and compare the cards \"Total orders by product category\" and \"Revenue by product category\"."
+      ]
+    },
+    {
+      "index": 8,
+      "reported_at_seconds": 597,
+      "name": "Whitespace-only dashboard title fails to save with a silent 400 and leaves the header with no title",
+      "summary": "The header loses its title completely (empty area left of the action icons) and nothing is saved: PUT /api/dashboard/7 answers 400 Bad Request. No error message is shown to the user; the console logs \\\"Request entities,dashboards,7,update failed: {status: 400, ...}\\\" plus an uncaught page error. After a reload the old title comes back, so the page had shown a title that does not exist. (on /dashboard/7-agent11-title-edit-b-bold-b-quoted-ampersand-e)",
+      "expected": "The app either refuses a whitespace-only title with a visible message and keeps the previous title (as it does for a completely empty title, which reverts), or saves it and shows what was saved.",
+      "actual": "The header loses its title completely (empty area left of the action icons) and nothing is saved: PUT /api/dashboard/7 answers 400 Bad Request. No error message is shown to the user; the console logs \\\"Request entities,dashboards,7,update failed: {status: 400, ...}\\\" plus an uncaught page error. After a reload the old title comes back, so the page had shown a title that does not exist.",
+      "reproSteps": [
+        "Open https://5501-i6mbgjuu6h6owsro2smz3.e2b.app/collection/root and open the dashboard named \"agent11-title-edit <b>bold</b> \"quoted\" & ampersand é\" (address /dashboard/7-agent11-title-edit-b-bold-b-quoted-ampersand-e).",
+        "Click the dashboard title in the page header (\"agent11-title-edit ...\"); it turns into an editable field.",
+        "Select the whole title and replace it with two or three spaces only.",
+        "Press Enter."
+      ]
+    },
+    {
+      "index": 9,
+      "reported_at_seconds": 603,
+      "name": "\"Revenue goal for this quarter\" gauge is drawn 100% full while its value is 0 of a goal of 250,000",
+      "summary": "The gauge bar under the title \"Revenue goal for this quarter\" is drawn completely filled (solid green all the way to \"Goal 250,000\") while the value marker sits at 0 and the value label reads \"0\". With real data (no filter) the same bar is only filled about 27% for 67,863 of 250,000, so a 0 value is shown as 100% of the goal. The neighbouring \"Revenue per quarter\" card is also blank apart from a sailboat icon while the chart card correctly says \"No results!\". (on /dashboard/1)",
+      "expected": "The gauge should show an empty (0%) bar for a value of 0 out of a goal of 250,000, consistent with the number shown and with how it renders when the value is 67,863.",
+      "actual": "The gauge bar under the title \"Revenue goal for this quarter\" is drawn completely filled (solid green all the way to \"Goal 250,000\") while the value marker sits at 0 and the value label reads \"0\". With real data (no filter) the same bar is only filled about 27% for 67,863 of 250,000, so a 0 value is shown as 100% of the goal. The neighbouring \"Revenue per quarter\" card is also blank apart from a sailboat icon while the chart card correctly says \"No results!\".",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1",
+        "Open https://5501-i6mbgjuu6h6owsro2smz3.e2b.app/dashboard/1?product_category=Nonexistent&tab=1-overview (a direct dashboard address whose Product Category filter value matches no data)",
+        "Look at the two cards on the right of the \"Overall Business Health\" section",
+        "Reload the page and look again"
+      ]
+    },
+    {
+      "index": 10,
+      "reported_at_seconds": 610,
+      "name": "Link card accepts a URL without https:// and the finished link leads to a 404 inside the app",
+      "summary": "The card is saved unchanged with the text \\\"example.com/agent5\\\" as a clickable link, whose href stays relative (\\\"example.com/agent5\\\"). Clicking it navigates to https://5501-i6mbgjuu6h6owsro2smz3.e2b.app/example.com/agent5 and shows \\\"We're a little lost… The page you asked for couldn't be found.\\\" — the link leads to a 404 inside the app instead of to example.com. (on /dashboard/5-agent5-text-link-cards)",
+      "expected": "A URL typed without a scheme should be normalised to https://example.com/agent5 (or refused with a message next to the field), so the finished link card opens the site the author meant.",
+      "actual": "The card is saved unchanged with the text \\\"example.com/agent5\\\" as a clickable link, whose href stays relative (\\\"example.com/agent5\\\"). Clicking it navigates to https://5501-i6mbgjuu6h6owsro2smz3.e2b.app/example.com/agent5 and shows \\\"We're a little lost… The page you asked for couldn't be found.\\\" — the link leads to a 404 inside the app instead of to example.com.",
+      "reproSteps": [
+        "Signed in as eval@momentic.ai, open /dashboard/5-agent5-text-link-cards (created via New > Dashboard, named agent5-text-link-cards).",
+        "Click Edit dashboard, then click the link card's URL field and type the address without a protocol: example.com/agent5",
+        "Click an empty area of the grid to leave the field and click Save.",
+        "In view mode click the link card text \"example.com/agent5\"."
+      ]
+    },
+    {
+      "index": 11,
+      "reported_at_seconds": 649,
+      "name": "\"Product breakdown\" card ignores the dashboard Product Category filter and keeps showing all four categories",
+      "summary": "The 'Product breakdown' donut keeps listing all four categories with the same percentages and the same centre total (2,852) whatever the filter is set to: Doohickey 23.88%, Gadget 26.54%, Gizmo 15.85%, Widget 33.73%. The figures are identical with 'Gadget' selected and with 'Doohickey' selected, so the card is not filtered at all while the rest of the tab is, and the reader sees two contradictory numbers side by side. (on /dashboard/1 (Portfolio Performance tab))",
+      "expected": "The pill reads 'Product Category: Gadget' and every card on the tab shows only Gadget data, as the neighbouring 'Total order amount vs. discount given' card does (its legend shows only Gadget).",
+      "actual": "The 'Product breakdown' donut keeps listing all four categories with the same percentages and the same centre total (2,852) whatever the filter is set to: Doohickey 23.88%, Gadget 26.54%, Gizmo 15.85%, Widget 33.73%. The figures are identical with 'Gadget' selected and with 'Doohickey' selected, so the card is not filtered at all while the rest of the tab is, and the reader sees two contradictory numbers side by side.",
+      "reproSteps": [
+        "Open https://5501-i6mbgjuu6h6owsro2smz3.e2b.app/dashboard/1 and sign in as eval@momentic.ai if needed.",
+        "On the Overview tab click the 'Product Category' filter pill, untick 'Select all' and tick only 'Gadget', then click 'Update filter'.",
+        "Click the 'Portfolio Performance' tab.",
+        "Look at the 'Product breakdown' donut card (left) and its legend, and compare it with the 'Total order amount vs. discount given' card next to it.",
+        "Repeat with only 'Doohickey' selected instead of 'Gadget'."
+      ]
+    },
+    {
+      "index": 12,
+      "reported_at_seconds": 706,
+      "name": "Multi-line dashboard description is displayed as one run-on line in the Info panel",
+      "summary": "The panel shows the three lines run together on one line: \\\"agent11 line one agent11 line two agent11 line three\\\". The stored value keeps the line breaks (the paragraph's HTML contains them) but it is rendered with white-space: normal, so they collapse into spaces. (on /dashboard/7-agent11-title-edit-b-bold-b-quoted-ampersand-e)",
+      "expected": "The three lines are shown as three lines, or at least with their line breaks respected, the way they were typed in the description field.",
+      "actual": "The panel shows the three lines run together on one line: \\\"agent11 line one agent11 line two agent11 line three\\\". The stored value keeps the line breaks (the paragraph's HTML contains them) but it is rendered with white-space: normal, so they collapse into spaces.",
+      "reproSteps": [
+        "Open the dashboard \"agent11-title-edit <b>bold</b> \"quoted\" & ampersand é\" at /dashboard/7-agent11-title-edit-b-bold-b-quoted-ampersand-e.",
+        "Click the \"More info\" (i) button in the header to open the Info panel; its Overview tab shows a Description block.",
+        "Click the description text so it becomes an editable box and type three lines: \"agent11 line one\", \"agent11 line two\", \"agent11 line three\".",
+        "Press Tab (or click outside the box) to leave the field and save it."
+      ]
+    },
+    {
+      "index": 13,
+      "reported_at_seconds": 770,
+      "name": "New dashboard dialog enables Create for a whitespace-only name and shows the raw server error \"Value must be a non-blank string.\" (button becomes \"Failed\")",
+      "summary": "The Create button is enabled for a name that is only spaces. Clicking it sends POST /api/dashboard, which fails with 400, and the dialog then shows the raw server message \"Value must be a non-blank string.\" under the field while the primary button's label changes to \"Failed\" (it stays \"Failed\" instead of returning to \"Create\"). No client-side check stops the whitespace-only name. (on /dashboard/1 (New dashboard dialog))",
+      "expected": "A name that is only whitespace is refused before submitting (Create stays disabled or a friendly message appears under the field), no request is sent, and the button keeps its normal label.",
+      "actual": "The Create button is enabled for a name that is only spaces. Clicking it sends POST /api/dashboard, which fails with 400, and the dialog then shows the raw server message \"Value must be a non-blank string.\" under the field while the primary button's label changes to \"Failed\" (it stays \"Failed\" instead of returning to \"Create\"). No client-side check stops the whitespace-only name.",
+      "reproSteps": [
+        "Open https://5501-i6mbgjuu6h6owsro2smz3.e2b.app/dashboard/1 signed in as eval@momentic.ai.",
+        "Click the blue \"New\" button at the top right and choose \"Dashboard\" in the menu.",
+        "In the \"New dashboard\" dialog, type only spaces into the Name field (5 spaces).",
+        "Click \"Create\"."
+      ]
+    },
+    {
+      "index": 14,
+      "reported_at_seconds": 817,
+      "name": "Fixed date range field accepts a non-existent date (April 31, February 30) and silently applies a different one",
+      "summary": "The field keeps the text \\\"April 31, 2027\\\" while the calendar jumps to May 2027 and highlights May 1; no message says the date is invalid. Clicking \\\"Update filter\\\" applies the range \\\"March 2, 2027 – May 1, 2027\\\" (URL date_range=2027-03-02~2027-05-01), so a filter is run for a completely different date than the one typed. The same happens with \\\"February 30, 2027\\\", which is applied as March 2, 2027. (on /dashboard/1)",
+      "expected": "A date that does not exist is refused, with a message next to the Start date field, and no filter is applied; or at least the field shows the date that is actually applied.",
+      "actual": "The field keeps the text \\\"April 31, 2027\\\" while the calendar jumps to May 2027 and highlights May 1; no message says the date is invalid. Clicking \\\"Update filter\\\" applies the range \\\"March 2, 2027 – May 1, 2027\\\" (URL date_range=2027-03-02~2027-05-01), so a filter is run for a completely different date than the one typed. The same happens with \\\"February 30, 2027\\\", which is applied as March 2, 2027.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai, open /dashboard/1 (E-commerce Insights, Overview tab).",
+        "Click the Date Range filter, click \"<\" (Back) if the relative editor opens, then choose \"Fixed date range…\".",
+        "Click the first field (Start date) and replace its value with \"April 31, 2027\" (a date that does not exist).",
+        "Look at the field and at the calendar, then click \"Update filter\".",
+        "Read the Date Range pill and the address: both say March 2, 2027 – May 1, 2027."
+      ]
+    },
+    {
+      "index": 15,
+      "reported_at_seconds": 862,
+      "name": "Saving a stale dashboard in a second tab silently overwrites the change saved in the other tab",
+      "summary": "Tab A had no warning of a newer version and its save silently overwrote tab B's work: after the save, the text card again reads \\\"Var test {{like_this}} and {{date}}\\\" and the dashboard title is \\\"agent5-title-A2\\\" — the saved card text \\\"agent5-B-content\\\" is gone for good (confirmed after a full page reload). Earlier, tab B's save likewise overwrote tab A's saved title \\\"agent5-title-A\\\" with its own stale title \\\"agent5-title-B\\\". Neither tab showed any \\\"someone else changed this\\\" message. (on /dashboard/5-agent5-text-link-cards)",
+      "expected": "The app should notice that the dashboard changed since tab A loaded it — warn before saving, or refuse the save and let the person reload/reconcile — instead of silently discarding the change saved from the other tab.",
+      "actual": "Tab A had no warning of a newer version and its save silently overwrote tab B's work: after the save, the text card again reads \\\"Var test {{like_this}} and {{date}}\\\" and the dashboard title is \\\"agent5-title-A2\\\" — the saved card text \\\"agent5-B-content\\\" is gone for good (confirmed after a full page reload). Earlier, tab B's save likewise overwrote tab A's saved title \\\"agent5-title-A\\\" with its own stale title \\\"agent5-title-B\\\". Neither tab showed any \\\"someone else changed this\\\" message.",
+      "reproSteps": [
+        "Signed in as eval@momentic.ai, open /dashboard/5-agent5-text-link-cards and open the same address in a second browser tab (tabs A and B both show title agent5-text-link-cards and a text card \"Var test {{like_this}} and {{date}}\").",
+        "In tab B: Edit dashboard, click that text card and replace its text with \"agent5-B-content\", click outside the card, click Save.",
+        "In tab A (still showing the old card text): Edit dashboard, change the dashboard title to \"agent5-title-A2\", click Save.",
+        "Reload tab A: the title is agent5-title-A2 but the card content is back to \"Var test {{like_this}} and {{date}}\" — the text saved from tab B has been overwritten.",
+        "Also seen the other way round: tab A saved the title \"agent5-title-A\", then a stale tab B's save silently replaced it with \"agent5-title-B\"."
+      ]
+    },
+    {
+      "index": 16,
+      "reported_at_seconds": 864,
+      "name": "A \\\"Didn't find anything\\\" autocomplete dropdown opens over the dashboard by itself on entering edit mode and Escape does not close it",
+      "summary": "As soon as edit mode opens, the dashboard scrolls to the link card and its URL autocomplete popup is open by itself, showing a magnifier and the text \\\"Didn't find anything\\\" (and \\\"Recently viewed\\\" plus a list of other dashboards when the field is empty). The popup is about 360x190 px and covers the cards under it (the gauge card and the cards in the right column). Pressing Escape while it is open does not close it: it stays open across repeated Escape presses (screenshot s26 taken after Escape), and only a Save/Cancel or a click inside the page gets rid of it. (on /dashboard/6-agent4-dash)",
+      "expected": "Entering edit mode should not open an unrelated dropdown over the dashboard content; if a dropdown does open, Escape must close it (as it closes the app's other popovers and dialogs).",
+      "actual": "As soon as edit mode opens, the dashboard scrolls to the link card and its URL autocomplete popup is open by itself, showing a magnifier and the text \\\"Didn't find anything\\\" (and \\\"Recently viewed\\\" plus a list of other dashboards when the field is empty). The popup is about 360x190 px and covers the cards under it (the gauge card and the cards in the right column). Pressing Escape while it is open does not close it: it stays open across repeated Escape presses (screenshot s26 taken after Escape), and only a Save/Cancel or a click inside the page gets rid of it.",
+      "reproSteps": [
+        "Sign in with eval@momentic.ai / momentic-eval-1 and open https://5501-i6mbgjuu6h6owsro2smz3.e2b.app/dashboard/6-agent4-dash (a dashboard of mine containing a link card whose URL is example.com/agent4-noproto)",
+        "Click the pencil button (\"Edit dashboard\") at the top right",
+        "Watch the middle of the page: a white dropdown containing a magnifier and \"Didn't find anything\" opens by itself and covers the cards",
+        "Press Escape"
+      ]
+    },
+    {
+      "index": 17,
+      "reported_at_seconds": 927,
+      "name": "\"Best selling products\" card shows the same Gadget products while the filter is Widget",
+      "summary": "The card keeps listing the same nine products with the same counts (Aerodynamic Copper Knife 120, Heavy-Duty Silk Chair 119, Enormous Wool Car 118, Mediocre Wool Toucan 117, Small Cotton Chair 117, … Lightweight Wool Plate 110) whatever the Product Category filter is, and the bar tooltip of 'Lightweight Wool Plate' still reads 'Product → Category: Gadget' while the pill says 'Product Category: Widget'. Only the bar colour changes. The card therefore shows data that contradicts the applied dashboard filter. (on /dashboard/1 (Portfolio Performance tab))",
+      "expected": "With only 'Widget' selected the 'Best selling products' card lists Widget products only, as the 'Total order amount vs. discount given' card next to it shows only the Widget series.",
+      "actual": "The card keeps listing the same nine products with the same counts (Aerodynamic Copper Knife 120, Heavy-Duty Silk Chair 119, Enormous Wool Car 118, Mediocre Wool Toucan 117, Small Cotton Chair 117, … Lightweight Wool Plate 110) whatever the Product Category filter is, and the bar tooltip of 'Lightweight Wool Plate' still reads 'Product → Category: Gadget' while the pill says 'Product Category: Widget'. Only the bar colour changes. The card therefore shows data that contradicts the applied dashboard filter.",
+      "reproSteps": [
+        "Open https://5501-i6mbgjuu6h6owsro2smz3.e2b.app/dashboard/1 and sign in as eval@momentic.ai if needed.",
+        "On the Overview tab set the 'Product Category' filter to a single value 'Gadget' (untick Select all, tick Gadget, click 'Update filter').",
+        "Click the 'Portfolio Performance' tab and scroll to the 'Best selling products' card; note the nine products and their counts, and hover a bar to read its tooltip ('Product → Category: Gadget').",
+        "Back on the same tab, set 'Product Category' to 'Widget' only and click 'Update filter'.",
+        "Compare the 'Best selling products' card with what it showed for Gadget: same products, same counts, and the tooltip still says the product's category is Gadget although the filter pill reads 'Product Category: Widget'."
+      ]
+    },
+    {
+      "index": 18,
+      "reported_at_seconds": 987,
+      "name": "Long heading card wraps onto a second line that is clipped in half and unreadable",
+      "summary": "The heading renders on two lines, but the card is only one grid row tall and the second line is clipped horizontally through the middle of the characters: the digits (\\\"012345…\\\") are sliced in half and the ending (\\\"…6789 end\\\") is not visible at all. It stays like this after a reload, in view mode, with no scroll or expand control. (on /dashboard/5-agent5-text-link-cards)",
+      "expected": "A heading card that wraps to a second line grows to fit, or the whole heading stays readable; the text should not be sliced through in the middle of the glyphs.",
+      "actual": "The heading renders on two lines, but the card is only one grid row tall and the second line is clipped horizontally through the middle of the characters: the digits (\\\"012345…\\\") are sliced in half and the ending (\\\"…6789 end\\\") is not visible at all. It stays like this after a reload, in view mode, with no scroll or expand control.",
+      "reproSteps": [
+        "Signed in as eval@momentic.ai, open /dashboard/5-agent5-text-link-cards and click Edit dashboard.",
+        "Click the text-card icon in the toolbar and choose Heading (the heading editor appears at the bottom of the grid).",
+        "Type a long heading: \"agent5 heading **bold** #hash [link](https://example.org) 0123456789012345678901234567890123456789012345678901234567890123456789 end\"",
+        "Click an empty area of the grid to commit it and click Save; look at the heading card in view mode and reload the page."
+      ]
+    },
+    {
+      "index": 19,
+      "reported_at_seconds": 1263,
+      "name": "Cancelling \"Discard your changes?\" after Back leaves the unsaved dashboard on screen while the address stays on the collection page",
+      "summary": "The dashboard draft stays on screen (edit bar, the added card, the data sidebar) but the browser address stays at /collection/root: the browser's Back was not undone. Reading location.href gives .../collection/root while the unsaved dashboard is displayed. After that, a reload lands on Our analytics and the draft is gone without any further warning. (on /dashboard/17-agent14-draft-interrupt)",
+      "expected": "Cancelling \"Discard your changes?\" should keep the person on the unsaved dashboard draft with the address matching it (/dashboard/17-agent14-draft-interrupt), so the address and the screen agree.",
+      "actual": "The dashboard draft stays on screen (edit bar, the added card, the data sidebar) but the browser address stays at /collection/root: the browser's Back was not undone. Reading location.href gives .../collection/root while the unsaved dashboard is displayed. After that, a reload lands on Our analytics and the draft is gone without any further warning.",
+      "reproSteps": [
+        "Sign in and open https://5501-i6mbgjuu6h6owsro2smz3.e2b.app/collection/root (Our analytics).",
+        "Click New → Dashboard, type the name 'agent14-draft-interrupt' and click Create: the new dashboard opens in edit mode (address ends with #edit).",
+        "Click 'Add a chart' in the middle of the empty dashboard and click the saved question 'Release requests' in the right-hand sidebar so the card is added to the still-unsaved draft.",
+        "Press the browser's Back button: the 'Discard your changes?' dialog opens.",
+        "Click 'Cancel' in that dialog.",
+        "The dashboard draft is still on screen in edit mode, but the browser address is now /collection/root instead of the dashboard's address."
+      ]
+    },
+    {
+      "index": 20,
+      "reported_at_seconds": 1547,
+      "name": "Reverting a dashboard version while standing on a tab that the revert removes leaves a ghost selected tab showing 'There's nothing here, yet'",
+      "summary": "The tab that was removed by the revert stays 'selected' as a ghost: the tab bar shows only Overview / Portfolio Performance / Website Analysis with none of them highlighted, the whole filter bar is gone, and the body shows the empty state 'There's nothing here, yet' with 'Add a chart'. Clicking the Overview tab brings the filters, the text card and all cards back. (on /dashboard/20-agent14-history-revert)",
+      "expected": "After the revert the dashboard should show one of the remaining tabs (e.g. Overview) with its filters and cards, so the person sees the restored dashboard instead of an empty state.",
+      "actual": "The tab that was removed by the revert stays 'selected' as a ghost: the tab bar shows only Overview / Portfolio Performance / Website Analysis with none of them highlighted, the whole filter bar is gone, and the body shows the empty state 'There's nothing here, yet' with 'Add a chart'. Clicking the Overview tab brings the filters, the text card and all cards back.",
+      "reproSteps": [
+        "Open https://5501-i6mbgjuu6h6owsro2smz3.e2b.app/dashboard/20-agent14-history-revert (a copy of E-commerce Insights with 3 tabs, 4 filters and a text card) from Our analytics / Examples.",
+        "Click the pencil 'Edit dashboard' button, then the '+' next to the last tab to create an extra tab, and click 'Save' — the dashboard is now on the new empty tab with 4 tabs.",
+        "Click the i 'More info' button in the dashboard header and switch the side panel to the 'History' tab.",
+        "Click the circular 'Revert to this version' icon on the second History row ('You edited this. … added a tab').",
+        "Close the Info panel with its X and look at the dashboard."
+      ]
+    }
+  ]
+}

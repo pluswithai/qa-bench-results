@@ -1,0 +1,268 @@
+{
+  "bugs": [
+    {
+      "name": "Tag pattern error shows raw translation key \"form.NamePattern\" instead of a field label",
+      "summary": "The banner reads \"form.NamePattern glob pattern is invalid: unexpected end of input.\" — the raw translation key form.NamePattern is printed on screen. (on /eval/harbor-handbook/settings/tags)",
+      "expected": "The error names the field in readable words, e.g. \"glob pattern is invalid: unexpected end of input.\" (the field is labelled 'Tag Pattern').",
+      "actual": "The banner reads \"form.NamePattern glob pattern is invalid: unexpected end of input.\" — the raw translation key form.NamePattern is printed on screen.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-imv8yr62nz49o7qx2vsk0.e2b.app/eval/harbor-handbook/settings/tags",
+        "In the 'Tag Pattern' field type a single opening bracket: [",
+        "Click 'Protect Tag'",
+        "Read the red error banner at the top of the page"
+      ]
+    },
+    {
+      "name": "Invalid Website shows raw translation key: form.Website\"Url\" is not a valid URL.",
+      "summary": "A red banner shows the untranslated string: form.Website\\\"Url\\\" is not a valid URL. (on /eval/agent1-basic/settings)",
+      "expected": "A readable validation message next to the Website field, e.g. 'Website is not a valid URL.'",
+      "actual": "A red banner shows the untranslated string: form.Website\\\"Url\\\" is not a valid URL.",
+      "reproSteps": [
+        "Sign in as eval, open https://5503-imv8yr62nz49o7qx2vsk0.e2b.app/eval/agent1-basic/settings",
+        "In the Basic Settings card, type javascript:alert(1) into the Website field",
+        "Click Update Settings"
+      ]
+    },
+    {
+      "name": "Same tag pattern can be protected twice, creating two identical rows",
+      "summary": "A second identical rule is created and the success banner \"The repository settings have been updated.\" appears; the table then lists two identical rows \"agent10-v* — No One\" with identical Edit/Remove buttons, and both persist after a reload. Removing one of them still leaves the other rule protecting the same tags, so the owner cannot tell which row protects what. (on /eval/harbor-handbook/settings/tags)",
+      "expected": "The duplicate pattern is refused with an error next to the field (as an invalid pattern is), and only one protection rule per pattern exists.",
+      "actual": "A second identical rule is created and the success banner \"The repository settings have been updated.\" appears; the table then lists two identical rows \"agent10-v* — No One\" with identical Edit/Remove buttons, and both persist after a reload. Removing one of them still leaves the other rule protecting the same tags, so the owner cannot tell which row protects what.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-imv8yr62nz49o7qx2vsk0.e2b.app/eval/harbor-handbook/settings/tags",
+        "In the 'Tag Pattern' field type agent10-v* and click 'Protect Tag' → one row appears in the Tag Pattern table",
+        "Type the same pattern agent10-v* in the 'Tag Pattern' field again and click 'Protect Tag'",
+        "Read the banner and the Tag Pattern table, then reload the page"
+      ]
+    },
+    {
+      "name": "A tag pattern of only spaces is accepted and creates a blank protection row",
+      "summary": "A new rule is created: the success banner \"The repository settings have been updated.\" appears and the table gets an extra row whose Tag Pattern cell is empty (only \"No One\" and the Edit/Remove buttons), so a protection rule exists that the owner cannot identify or match against any tag name. (on /eval/harbor-handbook/settings/tags)",
+      "expected": "A pattern made only of spaces is treated as empty and refused with an error (as an empty submit is), so no rule is created.",
+      "actual": "A new rule is created: the success banner \"The repository settings have been updated.\" appears and the table gets an extra row whose Tag Pattern cell is empty (only \"No One\" and the Edit/Remove buttons), so a protection rule exists that the owner cannot identify or match against any tag name.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-imv8yr62nz49o7qx2vsk0.e2b.app/eval/harbor-handbook/settings/tags",
+        "In the 'Tag Pattern' field type three spaces (no visible text)",
+        "Click 'Protect Tag'",
+        "Scroll down to the Tag Pattern table: a new row appears whose Tag Pattern cell is blank, with 'No One' in the Allowed column"
+      ]
+    },
+    {
+      "name": "\\\"Update Avatar\\\" with no file chosen shows a raw Go error: Avatar.Open: open : no such file or directory",
+      "summary": "A red banner shows the raw internal error \"Avatar.Open: open : no such file or directory\" — a Go file-system error with the field name and OS message, instead of a plain instruction to choose a file. (on /eval/agent1-dot./settings)",
+      "expected": "A readable message such as \"Please choose an image file for the avatar\", or the button does nothing until a file is chosen.",
+      "actual": "A red banner shows the raw internal error \"Avatar.Open: open : no such file or directory\" — a Go file-system error with the field name and OS message, instead of a plain instruction to choose a file.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-imv8yr62nz49o7qx2vsk0.e2b.app/eval/agent1-dot./settings (any repo you own, its Repository settings page)",
+        "Leave the \"Choose new avatar\" file picker untouched (\"No file chosen\")",
+        "Click the \"Update Avatar\" button"
+      ]
+    },
+    {
+      "name": "A long tag pattern widens the table past the window and cuts off the row's Allowed/Edit/Remove controls",
+      "summary": "The rule is created and the long pattern is printed on one unwrapped line, so the table grows to ~1494 px inside the 1280 px window: the page gains a horizontal scrollbar (document scrollWidth 1502 vs 1280) and the Allowed value plus the Edit and Remove buttons of the other rows are pushed off the right edge — the long row's own Allowed/Edit/Remove controls cannot be seen without scrolling sideways. (on /eval/harbor-handbook/settings/tags)",
+      "expected": "The pattern is either refused for length or wraps inside the Tag Pattern cell, so the table keeps the page width and every row's Allowed value and Edit/Remove buttons stay visible.",
+      "actual": "The rule is created and the long pattern is printed on one unwrapped line, so the table grows to ~1494 px inside the 1280 px window: the page gains a horizontal scrollbar (document scrollWidth 1502 vs 1280) and the Allowed value plus the Edit and Remove buttons of the other rows are pushed off the right edge — the long row's own Allowed/Edit/Remove controls cannot be seen without scrolling sideways.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-imv8yr62nz49o7qx2vsk0.e2b.app/eval/harbor-handbook/settings/tags",
+        "In the 'Tag Pattern' field paste a long pattern: agent10- followed by about 200 'a' characters and then *",
+        "Click 'Protect Tag'",
+        "Scroll down to the Tag Pattern table and look at the page width and the row"
+      ]
+    },
+    {
+      "name": "Invalid glob in Protected Branch Name Pattern saves the rule and answers with a 500 panic page",
+      "summary": "The POST /eval/harbor-handbook/settings/branches/edit returns 500 and the browser shows a raw \"500 Internal Server Error\" page with a Go stack trace (PANIC: unexpected end of input, github.com/gobwas/glob glob.go:57, models/git/protected_branch_list.go:71). Going back to Settings > Branches shows the rule with the invalid pattern agent9-[ was nevertheless saved and listed. (on /eval/harbor-handbook/settings/branches/edit)",
+      "expected": "The malformed glob pattern is refused with a field error next to \"Protected Branch Name Pattern\" and nothing is saved, like other invalid input on this form.",
+      "actual": "The POST /eval/harbor-handbook/settings/branches/edit returns 500 and the browser shows a raw \"500 Internal Server Error\" page with a Go stack trace (PANIC: unexpected end of input, github.com/gobwas/glob glob.go:57, models/git/protected_branch_list.go:71). Going back to Settings > Branches shows the rule with the invalid pattern agent9-[ was nevertheless saved and listed.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /eval/harbor-handbook/settings/branches",
+        "Click \"Add New Rule\" (opens /eval/harbor-handbook/settings/branches/edit)",
+        "Type agent9-[ into \"Protected Branch Name Pattern\"",
+        "Click \"Save Rule\""
+      ]
+    },
+    {
+      "name": "A Private repository keeps \"Anonymous Read\" on Code and shows both \"Private\" and \"Public Access\" badges",
+      "summary": "The repository is Private but the Code unit still has \\\"Anonymous Read\\\" selected, and the page states \\\"Anonymous Read: users who are not logged in can access the unit with read permission\\\" — i.e. the code of a private repository is declared readable by visitors who are not logged in. The repository header simultaneously shows a \\\"Private\\\" badge and an orange \\\"Public Access\\\" badge. Saving the same override directly on the private repository is accepted with \\\"The repository settings have been updated.\\\" and no warning. (on /eval/agent5-vis-probe/settings/public_access)",
+      "expected": "A private repository is reachable by allowed members only: the Danger Zone says making it private will \\\"make the repo visible to only allowed members\\\", so the public-visitor permissions should be refused, cleared, or warned about, and the repository should read as Private only — not also advertise \\\"Public Access\\\".",
+      "actual": "The repository is Private but the Code unit still has \\\"Anonymous Read\\\" selected, and the page states \\\"Anonymous Read: users who are not logged in can access the unit with read permission\\\" — i.e. the code of a private repository is declared readable by visitors who are not logged in. The repository header simultaneously shows a \\\"Private\\\" badge and an orange \\\"Public Access\\\" badge. Saving the same override directly on the private repository is accepted with \\\"The repository settings have been updated.\\\" and no warning.",
+      "reproSteps": [
+        "Sign in as eval, open https://5503-imv8yr62nz49o7qx2vsk0.e2b.app/eval/agent5-vis-probe/settings/public_access (public repo I created, agent5-vis-probe).",
+        "In the row for unit \"Code\" select the \"Anonymous Read\" radio button and click \"Update Settings\" (message: \"The repository settings have been updated.\").",
+        "Open /eval/agent5-vis-probe/settings, scroll to the \"Danger Zone\", click \"Make Private\" and confirm with \"Yes\" (message: \"Repository visibility changed.\").",
+        "Go back to /eval/agent5-vis-probe/settings/public_access."
+      ]
+    },
+    {
+      "name": "Delete Wiki Data succeeds on an archived repository that is supposed to be read-only",
+      "summary": "The purge runs on the archived repository: the page answers \\\"The repository wiki data has been deleted.\\\", the repository's wiki data is deleted, and the Wiki tab disappears from the repo navigation (the wiki is switched off) — a destructive data operation and a settings change on a repository the app calls read-only. Only the wiki editor itself (POST of a new wiki page) is blocked, with a bare 404. (on /eval/agent12-renamed/settings)",
+      "expected": "Archiving promises the repo is \\\"entirely read-only\\\" (\\\"Nobody (not even you!) will be able to make new commits, or open any issues or pull requests\\\"), so a destructive wiki purge should be refused with a message saying the repository is archived and read-only.",
+      "actual": "The purge runs on the archived repository: the page answers \\\"The repository wiki data has been deleted.\\\", the repository's wiki data is deleted, and the Wiki tab disappears from the repo navigation (the wiki is switched off) — a destructive data operation and a settings change on a repository the app calls read-only. Only the wiki editor itself (POST of a new wiki page) is blocked, with a bare 404.",
+      "reproSteps": [
+        "Sign in as eval, create a repository with a wiki page, then in its Settings > Danger Zone click \"Archive Repo\" and confirm \"Yes\" (header now shows the Archived label).",
+        "On the same archived repository open Settings and scroll to Danger Zone.",
+        "Click \"Delete Wiki Data\", type the repository name (agent12-renamed) in the confirmation field and click \"Delete Wiki Data\".",
+        "Repeat steps 2-3 to check it is repeatable."
+      ]
+    },
+    {
+      "name": "Escape does not close the \"Delete Branch Protection\" confirm dialog (other Danger Zone dialogs do)",
+      "summary": "The \\\"Delete Branch Protection\\\" dialog stays open after Escape (pressed twice); the only way out is clicking \\\"No\\\". Focus moves to \\\"No\\\" and then \\\"Yes\\\" with Tab, and no console error is logged. (on /eval/harbor-handbook/settings/branches)",
+      "expected": "Escape closes the confirm dialog and nothing is deleted, the way Escape closes the other confirmation dialogs in the same settings area (e.g. \\\"Delete This Repository\\\" and \\\"Archive This Repo\\\" on /eval/harbor-handbook/settings, and the \\\"Visibility\\\" dialog).",
+      "actual": "The \\\"Delete Branch Protection\\\" dialog stays open after Escape (pressed twice); the only way out is clicking \\\"No\\\". Focus moves to \\\"No\\\" and then \\\"Yes\\\" with Tab, and no console error is logged.",
+      "reproSteps": [
+        "Open https://5503-imv8yr62nz49o7qx2vsk0.e2b.app/eval/harbor-handbook/settings/branches while signed in as eval.",
+        "If no branch protection rule is listed, click \"Add New Rule\", type pattern agent15-eval-* in \"Protected Branch Name Pattern\" and click \"Save Rule\".",
+        "Click \"Delete Rule\" next to the rule to open the \"Delete Branch Protection\" dialog.",
+        "Press the Escape key once, then a second time."
+      ]
+    },
+    {
+      "name": "Archived repository still offers the wiki editor and saving it ends on a bare 404 page",
+      "summary": "The archived repository still serves the full wiki page editor (page title field, markdown toolbar, \\\"Save Page\\\") with no warning that the repo is read-only, and clicking \\\"Save Page\\\" answers the generic \\\"404 Not Found — The page you are trying to reach either does not exist or you are not authorized to view it.\\\" page: the typed page is lost and nothing says the repository is archived. The POST /eval/agent12-renamed/wiki answers 404 (seen twice). (on /eval/agent12-renamed/wiki?action=_new)",
+      "expected": "The app says archiving makes the repository entirely read-only, so either the wiki editor should not be offered in an archived repository, or saving should be refused with a message that the repository is archived (not a bare 404).",
+      "actual": "The archived repository still serves the full wiki page editor (page title field, markdown toolbar, \\\"Save Page\\\") with no warning that the repo is read-only, and clicking \\\"Save Page\\\" answers the generic \\\"404 Not Found — The page you are trying to reach either does not exist or you are not authorized to view it.\\\" page: the typed page is lost and nothing says the repository is archived. The POST /eval/agent12-renamed/wiki answers 404 (seen twice).",
+      "reproSteps": [
+        "Sign in as eval, archive a repository you own: Settings > Danger Zone > \"Archive Repo\" > \"Yes\" (the header shows the Archived label).",
+        "Open the repository's Wiki tab, then the new-page address /eval/agent12-renamed/wiki?action=_new.",
+        "Type any text in the page content box (\"agent12 archived write attempt two\") and click \"Save Page\".",
+        "Repeat once from step 2 to confirm."
+      ]
+    },
+    {
+      "name": "Private repo's code is readable by a logged-in user with no rights on it when Code is set to Anonymous Read",
+      "summary": "Signed in as alex (a normal user who is NOT a collaborator of that repository), the whole private repository opens: commit list, README content, branch \\\"main\\\", commit ffe47e2763 and \\\"Go to file\\\". Only the Settings tab and Add File are missing. The header still shows the \\\"Private\\\" badge, so the page knows it is private. agent5's report is about the badge on the settings page; this is the access itself: a non-member reads the private repository's source code. (on /eval/agent14-probe-access)",
+      "expected": "The private repository stays closed for alex, who has no rights on it: /eval/agent14-probe-access should answer 404 for him, as the Visibility text promises (\\\"Only the owner or the organization members if they have rights, will be able to see it.\\\").",
+      "actual": "Signed in as alex (a normal user who is NOT a collaborator of that repository), the whole private repository opens: commit list, README content, branch \\\"main\\\", commit ffe47e2763 and \\\"Go to file\\\". Only the Settings tab and Add File are missing. The header still shows the \\\"Private\\\" badge, so the page knows it is private. agent5's report is about the badge on the settings page; this is the access itself: a non-member reads the private repository's source code.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-imv8yr62nz49o7qx2vsk0.e2b.app/repo/create. Create the repository \"agent14-probe-access\" with \"Make repository private\" ticked and \"Initialize Repository\" ticked (owner eval).",
+        "Open https://5503-imv8yr62nz49o7qx2vsk0.e2b.app/eval/agent14-probe-access/settings/public_access, set the \"Code\" row to \"Anonymous Read\" and click \"Update Settings\".",
+        "Leave the Collaborators page empty - alex is not added.",
+        "Sign out in the top-right profile menu and sign in as alex / momentic-contributor-1.",
+        "Open https://5503-imv8yr62nz49o7qx2vsk0.e2b.app/eval/agent14-probe-access and read the page: the README, commit, branch and file browser are all shown."
+      ]
+    },
+    {
+      "name": "Unticking \"Enable Repository Wiki\" silently wipes the saved External Wiki URL and wiki mode",
+      "summary": "After the save, the saved External Wiki URL is empty and neither \\\"Use Built-In Wiki\\\" nor \\\"Use External Wiki\\\" is selected. The configuration was discarded with no warning — only \\\"The repository settings have been updated.\\\" Re-enabling the wiki later silently falls back to the built-in wiki instead of the external one the owner had configured. (on /eval/agent4-units/settings)",
+      "expected": "Disabling the wiki unit keeps the wiki configuration that was saved (external wiki URL and the built-in/external choice), or at least warns that the configuration will be discarded; re-enabling the wiki brings back the same mode and URL.",
+      "actual": "After the save, the saved External Wiki URL is empty and neither \\\"Use Built-In Wiki\\\" nor \\\"Use External Wiki\\\" is selected. The configuration was discarded with no warning — only \\\"The repository settings have been updated.\\\" Re-enabling the wiki later silently falls back to the built-in wiki instead of the external one the owner had configured.",
+      "reproSteps": [
+        "Open /eval/agent4-units/settings and scroll to Advanced Settings.",
+        "Tick \"Use External Wiki\", type https://5503-imv8yr62nz49o7qx2vsk0.e2b.app/explore/repos into \"External Wiki URL\" and click the Update Settings button at the bottom of Advanced Settings — the page says \"The repository settings have been updated.\" and the Wiki tab now opens the external URL.",
+        "Reload the settings page: the external wiki URL is still shown, \"Use External Wiki\" is still selected.",
+        "Now untick \"Enable Repository Wiki\" (leave \"Use External Wiki\" selected and its URL filled) and click Update Settings again — again \"The repository settings have been updated.\"",
+        "Reload /eval/agent4-units/settings and scroll to Advanced Settings."
+      ]
+    },
+    {
+      "name": "A rejected Add New Rule save wipes every protection value just entered",
+      "summary": "The page reloads with the banner \"No valid status check patterns.\" but the rule form is reset to its defaults: \"Protected Branch Name Pattern\" is empty (even though the address is .../branches/edit?rule_name=main), both file pattern fields are empty, Push is back to \"Disable Push\", \"Require Signed Commits\" unticked, Required approvals back to 0, \"Dismiss stale approvals\" and \"Enable Status Check\" unticked. The whole rule configuration has to be typed again. (on /eval/harbor-handbook/settings/branches/edit)",
+      "expected": "The rule is refused with the message and the entered pattern, file patterns, push mode, signed-commit flag and approval count stay in the form so only the status check patterns need fixing.",
+      "actual": "The page reloads with the banner \"No valid status check patterns.\" but the rule form is reset to its defaults: \"Protected Branch Name Pattern\" is empty (even though the address is .../branches/edit?rule_name=main), both file pattern fields are empty, Push is back to \"Disable Push\", \"Require Signed Commits\" unticked, Required approvals back to 0, \"Dismiss stale approvals\" and \"Enable Status Check\" unticked. The whole rule configuration has to be typed again.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /eval/harbor-handbook/settings/branches",
+        "Click \"Add New Rule\"",
+        "Fill \"Protected Branch Name Pattern\" with main, \"Protected file patterns\" with docs/**; *.md, \"Unprotected file patterns\" with README.md, select \"Enable Push\", tick \"Require Signed Commits\", set Required approvals to 2, tick \"Dismiss stale approvals\"",
+        "Tick \"Enable Status Check\" and leave \"Status check patterns\" empty",
+        "Click \"Save Rule\""
+      ]
+    },
+    {
+      "name": "After signing out, the browser's Back button shows the repository Settings page again in full",
+      "summary": "Back after sign-out re-displays the whole repository Settings page of the signed-out account, including the Repository Name, Description and Danger Zone controls, with the signed-in navigation bar. The page is served from the browser's back cache (the navigation answers 200 without asking the server), so only a manual Reload replaces it with the Sign In page. Seen twice out of two tries (once on the settings page of eval/harbor-handbook, once more after signing out and going Back again). (on /eval/harbor-handbook/settings)",
+      "expected": "After signing out, going Back must not show the account's repository settings page again — the sign-out should invalidate the page so Back lands on the sign-in page (as a reload of the same address does).",
+      "actual": "Back after sign-out re-displays the whole repository Settings page of the signed-out account, including the Repository Name, Description and Danger Zone controls, with the signed-in navigation bar. The page is served from the browser's back cache (the navigation answers 200 without asking the server), so only a manual Reload replaces it with the Sign In page. Seen twice out of two tries (once on the settings page of eval/harbor-handbook, once more after signing out and going Back again).",
+      "reproSteps": [
+        "Sign in as eval (username eval, password momentic-eval-1).",
+        "Open https://5503-imv8yr62nz49o7qx2vsk0.e2b.app/eval/harbor-handbook/settings.",
+        "Click the avatar in the top-right corner and choose \"Sign Out\". You land on the public home page, signed out (the header offers \"Sign In\").",
+        "Press the browser's Back button.",
+        "The full Repository settings page appears again with its forms filled in (Repository Name \"harbor-handbook\", Description \"Engineering handbook and release planning for the Harbor team.\", the Danger Zone buttons below) and with the signed-in header chrome (notification bell, avatar menu).",
+        "Press Reload: only then does the site redirect to the Sign In page."
+      ]
+    },
+    {
+      "name": "A spaces-only branch name pattern is accepted and creates a blank rule row",
+      "summary": "The branch rule is saved: the page says \"Branch protection for rule \\\" \\\" has been updated.\" and Settings > Branches now lists a second protected-branch row whose pattern chip is completely blank, so nobody can tell which branch it protects. (on /eval/harbor-handbook/settings/branches/edit)",
+      "expected": "A pattern of only spaces is treated as empty and refused with a message next to \"Protected Branch Name Pattern\", as the required marker promises.",
+      "actual": "The branch rule is saved: the page says \"Branch protection for rule \\\" \\\" has been updated.\" and Settings > Branches now lists a second protected-branch row whose pattern chip is completely blank, so nobody can tell which branch it protects.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /eval/harbor-handbook/settings/branches",
+        "Click \"Add New Rule\"",
+        "Type three spaces into \"Protected Branch Name Pattern\"",
+        "Click \"Save Rule\""
+      ]
+    },
+    {
+      "name": "Collaborator user search treats _ and % as wildcards and suggests every user",
+      "summary": "Typing \\\"__\\\" (and \\\"%%\\\") lists all three matching-anything users, alex, eval and maya, as if the search term matched them. The underline/percent signs are treated as SQL wildcards, so the search does not filter at all, while a genuine term like \\\"ale\\\" correctly shows only alex. (on /eval/harbor-handbook/settings/collaboration)",
+      "expected": "No user is suggested, because no username or full name contains \\\"__\\\" (or \\\"%%\\\"); the list should stay empty, as it does for other non-matching input such as '' .",
+      "actual": "Typing \\\"__\\\" (and \\\"%%\\\") lists all three matching-anything users, alex, eval and maya, as if the search term matched them. The underline/percent signs are treated as SQL wildcards, so the search does not filter at all, while a genuine term like \\\"ale\\\" correctly shows only alex.",
+      "reproSteps": [
+        "Sign in as eval and open /eval/harbor-handbook/settings/collaboration.",
+        "Click the \"Search users...\" box and type \"__\" (two underscores).",
+        "Watch the suggestion list that opens under the box.",
+        "Repeat with \"%%\" (two percent signs) in the same box."
+      ]
+    },
+    {
+      "name": "Creating a new branch protection rule reports \"Branch protection for rule ... has been updated\"",
+      "summary": "The page shows \"Branch protection for rule \\\"agent5-branch\\\" has been updated.\" although I had just created the rule and never edited an existing one. (on /eval/agent5-vis-probe/settings/branches)",
+      "expected": "After creating a new protection rule the message tells the person the rule was created (e.g. \"has been added\"), not that an existing rule was updated.",
+      "actual": "The page shows \"Branch protection for rule \\\"agent5-branch\\\" has been updated.\" although I had just created the rule and never edited an existing one.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-imv8yr62nz49o7qx2vsk0.e2b.app/eval/agent5-vis-probe/settings/branches (repo I created, agent5-vis-probe).",
+        "Click \"Add New Rule\" (the page had \"There are no protected branches.\").",
+        "Type agent5-branch into \"Protected Branch Name Pattern\" and click \"Save Rule\"."
+      ]
+    },
+    {
+      "name": "Malformed push-mirror URL answers \\\"You are not allowed to import local repositories.\\\"",
+      "summary": "The page reloads with an error banner reading \\\"You are not allowed to import local repositories.\\\" — no word that the address is malformed — even though the server setting and permissions were never involved; the same address type given a scheme is answered correctly with \\\"The provided URL is invalid. Only http(s):// or git:// locations can be used for mirroring.\\\" (on /eval/agent8-mirror-probe/settings)",
+      "expected": "The message says that the address is not a valid repository URL (or the same \\\"The provided URL is invalid...\\\" message), so the person knows to fix the address rather than thinking a permission blocks them.",
+      "actual": "The page reloads with an error banner reading \\\"You are not allowed to import local repositories.\\\" — no word that the address is malformed — even though the server setting and permissions were never involved; the same address type given a scheme is answered correctly with \\\"The provided URL is invalid. Only http(s):// or git:// locations can be used for mirroring.\\\"",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-imv8yr62nz49o7qx2vsk0.e2b.app/eval/agent8-mirror-probe/settings (Mirror Settings block).",
+        "Type \"not a url\" into \"Git Remote Repository URL\" and click \"Add Push Mirror\"."
+      ]
+    },
+    {
+      "name": "Tag protection \\\"Allowed users\\\" picker cannot find the existing user alex — \\\"No results found.\\\"",
+      "summary": "For \\\"alex\\\" (and \\\"ale\\\") the dropdown answers \\\"No results found.\\\", so the user alex can never be added to a tag rule's Allowed users. The same box does find \\\"maya\\\" when that is typed, so the picker works for some users but not for alex, who is an existing collaborator of this repository (shown on /eval/harbor-handbook/settings/collaboration as alex (Alex Rivera) — Write). No request is sent; the candidate list is simply missing alex. (on /eval/harbor-handbook/settings/tags)",
+      "expected": "Typing \\\"alex\\\" (or the prefix \\\"ale\\\") lists the existing user alex in the dropdown, as typing \\\"maya\\\" lists maya, so alex can be picked as an allowed user of the tag rule.",
+      "actual": "For \\\"alex\\\" (and \\\"ale\\\") the dropdown answers \\\"No results found.\\\", so the user alex can never be added to a tag rule's Allowed users. The same box does find \\\"maya\\\" when that is typed, so the picker works for some users but not for alex, who is an existing collaborator of this repository (shown on /eval/harbor-handbook/settings/collaboration as alex (Alex Rivera) — Write). No request is sent; the candidate list is simply missing alex.",
+      "reproSteps": [
+        "Sign in as eval and open /eval/harbor-handbook/settings/tags (Tag Protection form; the repo's collaborators are alex and maya — visible on /eval/harbor-handbook/settings/collaboration).",
+        "Click into the \"Search users...\" box under \"Allowed users\".",
+        "Type alex (or just ale) and look at the dropdown that opens.",
+        "For comparison, retype maya in the same box: the dropdown then lists maya."
+      ]
+    },
+    {
+      "name": "Archived repo's issue page still shows a blue \"New Issue\" button that ends on a raw 404",
+      "summary": "The issue detail page of the archived repository still shows an active blue 'New Issue' button; clicking it navigates to /eval/agent3-archfull/issues/new which returns the raw 404 'Page Not Found' page (GET /eval/agent3-archfull/issues/new → 404). (on /eval/agent3-archfull/issues/1)",
+      "expected": "The archive banner says the repo cannot open issues, and the issues list correctly hides the create control, so the issue detail page should not offer a 'New Issue' button (or the button should be disabled/hidden); clicking it should never land on a raw 404.",
+      "actual": "The issue detail page of the archived repository still shows an active blue 'New Issue' button; clicking it navigates to /eval/agent3-archfull/issues/new which returns the raw 404 'Page Not Found' page (GET /eval/agent3-archfull/issues/new → 404).",
+      "reproSteps": [
+        "Sign in as eval and open eval/agent3-archfull/issues/1 (a repo I archived; it shows the Archived badge and the banner 'This repository has been archived ... cannot push or open issues or pull requests').",
+        "On that issue page, click the blue 'New Issue' button at the top right (the issue list page /eval/agent3-archfull/issues and the releases page hide their create buttons in this state).",
+        "The browser goes to /eval/agent3-archfull/issues/new and shows the raw '404 Not Found - The page you are trying to reach either does not exist or you are not authorized to view it.' page."
+      ]
+    },
+    {
+      "name": "An invalid Regular Expression Pattern (\\\"[\\\") is saved with a success message in External Issue Tracker settings",
+      "summary": "The settings save succeeds and the page says \\\"The repository settings have been updated.\\\", and the broken pattern \\\"[\\\" is stored and shown again on reload. Nothing is compiled or checked, so the repository is left with a Regular Expression pattern that can never match and the {index} placeholder of the External Issue Tracker can never be filled from it. (on /eval/agent13-tpl-all2/settings (Advanced Settings → Issues → Use External Issue Tracker))",
+      "expected": "The page should refuse an invalid regular expression with a message next to Regular Expression Pattern (the field's own help says its first captured group is used in place of {index}), and keep the previously saved valid pattern rather than storing text that cannot be compiled.",
+      "actual": "The settings save succeeds and the page says \\\"The repository settings have been updated.\\\", and the broken pattern \\\"[\\\" is stored and shown again on reload. Nothing is compiled or checked, so the repository is left with a Regular Expression pattern that can never match and the {index} placeholder of the External Issue Tracker can never be filled from it.",
+      "reproSteps": [
+        "Sign in as eval and open /eval/agent13-tpl-all2/settings (a repository of mine, agent13-tpl-all2).",
+        "In Advanced Settings, under Issues, tick \"Enable Repository Issue Tracker\", select \"Use External Issue Tracker\", fill External Issue Tracker URL with https://example.com/issues and External Issue Tracker URL Format with https://example.com/{user}/{repo}/issues/{index}.",
+        "Under \"External Issue Tracker Number Format\", choose \"Regular Expression (ISSUE-\\d+)\" and type a single \"[\" into \"Regular Expression Pattern\".",
+        "Click the \"Update Settings\" button of the Advanced Settings form.",
+        "The page reloads with the message \"The repository settings have been updated.\" — the invalid pattern \"[\" is accepted, saved and shown again in the field, with no error."
+      ]
+    }
+  ]
+}

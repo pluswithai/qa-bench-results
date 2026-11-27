@@ -1,0 +1,222 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "twenty/areas/settings-data-model",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "c0df0972e38c61339922395fdda732c577f554e092949e03fd6be91b45100fb1",
+    "known_invalid_sha256": "0403ec9bfbd7220b5c60153fc357d29d18cf11f47f6259cd7dce12bd83cb8b08",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "91",
+    "bugs": "17",
+    "flags": "0",
+    "known_hits": "4",
+    "extra_known_hits": "0",
+    "unverified": "11",
+    "outside_area_known_hits": "0",
+    "outside_area_known_invalid": "0",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "",
+    "outside_area_ground_truth_sha256": "f3456299419b269b88f0ddc32ec53ab80fbf3ec14a32ac6ae1366aa22bd3a43a",
+    "outside_area_known_invalid_sha256": "e51afd4a5be9203d46a29a1087513447454829f8cacf9feb7379d606574f27e1",
+    "duplicates": "0",
+    "duplicate_known_hits": "0",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "2",
+    "known_misses": "2",
+    "precision": "0.6666666666666666",
+    "recall": "0.04395604395604396",
+    "findings_per_minute": "0.5927430813226073",
+    "correct_findings_per_minute": "0.13946896031120173",
+    "severity_1": "2",
+    "severity_3": "2",
+    "severity_5": "0",
+    "severity_sum": "8",
+    "score": "6",
+    "duration_seconds": "1720.813",
+    "partial": "false",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 32,
+        "reproStepsIndex": 0,
+        "findingIndex": 2,
+        "reason": "Matches the mobile Fields table's collapsed Name column hiding labels beside application badges. Opening People instead of Companies is an insignificant object difference; the finding also reports affected Relations rows."
+      },
+      {
+        "groundTruthIndex": 57,
+        "reproStepsIndex": 0,
+        "findingIndex": 8,
+        "reason": "Matches Name sorting using hidden API names, specifically placing Word Documents and Excel & Spreadsheets incorrectly in both directions."
+      },
+      {
+        "groundTruthIndex": 13,
+        "reproStepsIndex": 0,
+        "findingIndex": 16,
+        "reason": "Matches saving a malformed navigation URL containing spaces without validation, then opening a browser error tab."
+      },
+      {
+        "groundTruthIndex": 15,
+        "reproStepsIndex": 0,
+        "findingIndex": 13,
+        "reason": "The fresh desktop diagram reproduction matches overlapping object cards obscuring names and field lists. The additional phone-edge clipping is not established by this match."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 24,
+        "reproStepsIndex": null,
+        "findingIndex": 1,
+        "reason": "Matches the rejected behavior of empty folders being hidden in ordinary navigation but retained in customization. This folder starts empty rather than becoming empty after moving its last child."
+      },
+      {
+        "knownInvalidIndex": 1,
+        "reproStepsIndex": 0,
+        "findingIndex": 7,
+        "reason": "Matches the rejected combined-name draft: clearing First Name prevents both name changes from saving, and reload restores the previous names."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 0,
+        "reason": "No reviewed entry concerns Lorem ipsum sample text in the object Settings preview."
+      },
+      {
+        "findingIndex": 3,
+        "reason": "No reviewed entry concerns Escape failing to dismiss the workspace-deletion dialog after typing."
+      },
+      {
+        "findingIndex": 4,
+        "reason": "An arbitrary nonexistent Settings URL lacking error handling is distinct from the offered Domains Settings command opening an empty destination."
+      },
+      {
+        "findingIndex": 5,
+        "reason": "Clipped Fields and Records columns in the object catalog do not match the reviewed field-name clipping or inaccurate record-count claims."
+      },
+      {
+        "findingIndex": 6,
+        "reason": "Empty Skills Type cells are distinct from the reviewed Type-sorting crash and incorrect Name sorting."
+      },
+      {
+        "findingIndex": 9,
+        "reason": "A role dropdown that never opens is distinct from the reviewed API-key editor displaying the wrong role after applicability is disabled."
+      },
+      {
+        "findingIndex": 10,
+        "reason": "No reviewed entry covers webhook filter removal leaving an invalid, unremovable row that blocks Save."
+      },
+      {
+        "findingIndex": 11,
+        "reason": "No reviewed entry concerns duplicated helper copy beneath webhook Description."
+      },
+      {
+        "findingIndex": 12,
+        "reason": "No reviewed entry concerns default-model indication or model selection. The report does not establish that these informational-looking rows support selection."
+      },
+      {
+        "findingIndex": 14,
+        "reason": "No reviewed entry covers Admin Panel version discrepancies or allegedly incorrect upgrade status."
+      },
+      {
+        "findingIndex": 15,
+        "reason": "Initial relative expiration text being one day lower does not establish the reviewed cumulative shortening of persisted expiration after regeneration."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 1,
+        "reason": "Describes placeholder presentation without a failed settings or record operation."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 1,
+        "reason": "Only an empty folder's visibility is affected; no destination or stored configuration is lost."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 3,
+        "reason": "The keyboard dismissal action stops working, although Cancel remains available."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 5,
+        "reason": "The destination remains entirely blank after waiting and reloading."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 1,
+        "reason": "Responsive layout hides informational columns without a described functional failure."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 1,
+        "reason": "Reports missing column content, not a failed operation."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 3,
+        "reason": "As reported, the Last Name edit fails to persist; the reviewed entry explains that the combined draft is invalid."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 3,
+        "reason": "Role selection is nonfunctional on creation and editing forms."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 3,
+        "reason": "Removing a filter leaves the form unable to save until an entity is selected again."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 1,
+        "reason": "This is a copy defect without described functional consequences."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 3,
+        "reason": "The claimed impact is inability to change the workspace default model."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 3,
+        "reason": "Claims an incorrect operational status, beyond a cosmetic version-label difference."
+      },
+      {
+        "findingIndex": 15,
+        "severity": 1,
+        "reason": "Only a relative-date display discrepancy is demonstrated, not an actual reduction in key validity."
+      },
+      {
+        "findingIndex": 16,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

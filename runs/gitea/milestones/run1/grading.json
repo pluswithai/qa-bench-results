@@ -1,0 +1,198 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "findings": 15,
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 6,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Same whitespace-only title acceptance, successful creation, and blank milestone name."
+      },
+      {
+        "groundTruthIndex": 11,
+        "reproStepsIndex": 0,
+        "findingIndex": 1,
+        "reason": "Same saved 0001-01-01 deadline rendering as '-' while the edit form retains the date."
+      },
+      {
+        "groundTruthIndex": 2,
+        "reproStepsIndex": 0,
+        "findingIndex": 2,
+        "reason": "Same search submission dropping the previously selected sort. Using Name rather than Latest due date exercises the same failure."
+      },
+      {
+        "groundTruthIndex": 20,
+        "reproStepsIndex": 0,
+        "findingIndex": 3,
+        "reason": "Same literal '%' and '_' searches being interpreted as database wildcards and returning unrelated milestones."
+      },
+      {
+        "groundTruthIndex": 5,
+        "reproStepsIndex": 0,
+        "findingIndex": 4,
+        "reason": "Same Close redirect using state=close instead of state=closed. Existing open milestones explain the populated wrong list rather than an empty one."
+      },
+      {
+        "groundTruthIndex": 14,
+        "reproStepsIndex": 0,
+        "findingIndex": 5,
+        "reason": "Same repository milestone Name sort producing reverse alphabetical order without a direction label."
+      },
+      {
+        "groundTruthIndex": 7,
+        "reproStepsIndex": 0,
+        "findingIndex": 7,
+        "reason": "Same accented search listing matching milestones while both counters read zero. Using an open milestone and José instead of a closed café milestone is equivalent."
+      },
+      {
+        "groundTruthIndex": 0,
+        "reproStepsIndex": null,
+        "findingIndex": 8,
+        "reason": "Same long milestone title overlapping its repository label on the global list. The 768px tablet layout differs materially from the recorded 390px reproduction."
+      },
+      {
+        "groundTruthIndex": 1,
+        "reproStepsIndex": 1,
+        "findingIndex": 9,
+        "reason": "Same organization milestone Name sort dropping repos, resetting repository selection, and restoring excluded milestones."
+      },
+      {
+        "groundTruthIndex": 8,
+        "reproStepsIndex": 0,
+        "findingIndex": 10,
+        "reason": "Same long unbroken title segment overflowing the milestone detail heading at 390px. The surrounding hyphens do not change the failing behavior."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 7,
+        "reproStepsIndex": 0,
+        "findingIndex": 6,
+        "reason": "Same click on the already-selected Open tab toggling to state=all. The reference rejects this as intended toggle behavior."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 11,
+        "reason": "No reference describes Enter submission triggering an unsaved-changes confirmation while mouse submission succeeds."
+      },
+      {
+        "findingIndex": 12,
+        "reason": "No reference describes repository-path duplication in a milestone description's root-relative Markdown link."
+      },
+      {
+        "findingIndex": 13,
+        "reason": "No reference describes an out-of-range global milestone page showing an empty list and an inconsistent current-page indicator."
+      },
+      {
+        "findingIndex": 14,
+        "reason": "No reference describes stale milestone edit forms overwriting newer changes saved in another tab."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 3,
+        "reason": "As reported, the selected Open control displays closed issues, which describes functional filtering misbehavior."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 3,
+        "reason": "Keyboard submission is interrupted and canceling the unexpected confirmation prevents creation."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 5,
+        "reason": "Following the rendered link lands on an unusable 404 destination instead of the issue list."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 1,
+        "reason": "For an invalid page number, the described impact is missing empty-state guidance and misleading pager presentation."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 3,
+        "reason": "Saving stale form values silently overwrites previously saved title and due-date changes."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [],
+    "knownInvalid": [
+      {
+        "findingIndex": 12,
+        "reference": {
+          "name": "Root-relative links in issue Markdown are prefixed with the repository path",
+          "summary": "An issue body link written with a site-root path is rendered with the repository path added in front, so it points to a nonexistent page and returns 404.",
+          "expected": "A Markdown link to /eval/D-from-template/wiki/Home should render as that same site-root path and open the repository's Wiki Home page.",
+          "actual": "Issue eval/D-from-template#1 was saved with [Wiki Home](/eval/D-from-template/wiki/Home). Its rendered link href became /eval/D-from-template/eval/D-from-template/wiki/Home. Clicking it opened a 404 Page Not Found. The editor Preview also produced a doubled path (and used the localhost origin).",
+          "reproSteps": [
+            [
+              "Sign in as eval and open a repository with a Wiki Home page, such as eval/harbor-handbook.",
+              "Create an issue containing [Wiki Home](/eval/harbor-handbook/wiki/Home).",
+              "Save the issue and click Wiki Home in the rendered body.",
+              "Observe that the repository path is prepended again, resulting in /eval/harbor-handbook/eval/harbor-handbook/wiki/Home and a 404."
+            ]
+          ],
+          "reason": "Gitea intentionally changed leading-slash Markdown paths to be relative to the current render context from 1.23 onward. Merged PR #34114 documents this policy and introduces /:root/path-relative-to-root for links relative to ROOT_URL."
+        },
+        "reason": "Matches the rejected repository-prefixing claim for leading-slash Markdown links. Gitea intentionally resolves these relative to the render context. The milestone-description reproduction differs from the reviewed issue-body case."
+      }
+    ],
+    "duplicates": []
+  }
+}

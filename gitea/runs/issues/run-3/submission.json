@@ -1,0 +1,240 @@
+{
+  "fixture": "gitea/areas/issues",
+  "run": 3,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 277,
+      "name": "\"Assigned to you\" filter combined with a keyword search returns no results although a matching assigned issue exists",
+      "summary": "The page shows \\\"No results / Try adjusting your search filters.\\\" with \\\"Assigned to you 0\\\", although the same keyword search without the Assigned filter lists #2 (assigned to eval) and #2 alone without the keyword is listed under \\\"Assigned to you\\\". The same happens with q=clarify. (on /issues)",
+      "expected": "The result list keeps issue #2 \\\"Clarify release ownership\\\" (it is assigned to eval and its title contains the keyword), and \\\"Assigned to you\\\" shows 1.",
+      "actual": "The page shows \\\"No results / Try adjusting your search filters.\\\" with \\\"Assigned to you 0\\\", although the same keyword search without the Assigned filter lists #2 (assigned to eval) and #2 alone without the keyword is listed under \\\"Assigned to you\\\". The same happens with q=clarify.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-ioyiuw0ebjuremypnxaoz.e2b.app/issues?type=assigned&sort=recentupdate&state=open (Issues → \"Assigned to you\"). The list shows \"Assigned to you 1\" and the issue eval/harbor-handbook#2 \"Clarify release ownership\" (assigned to eval).",
+        "Type ownership into the \"Search issues...\" box and press Enter.",
+        "The list becomes empty: \"No results\" / \"Try adjusting your search filters.\" and the sidebar count drops to \"Assigned to you 0\"."
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 408,
+      "name": "\"Add dependency\" dropdown: Escape keeps the first issue selected and \"+\" adds it although nothing was ever chosen",
+      "summary": "After Escape the first issue of the list stays selected in the field, and one click on \\\"+\\\" adds it as a real dependency of #4: the timeline shows \\\"eval added a new dependency + #10 agent9-sort-zebra\\\" (1st attempt, an issue from eval/harbor-handbook) and \\\"+ agent15-org/agent15-repo#1 - agent15-org-issue-one\\\" (2nd attempt, an issue of a completely different repository). An issue the person never picked becomes a dependency of #4 and the relation also appears on that other issue. (on /eval/harbor-handbook/issues/4)",
+      "expected": "Escape cancels the dropdown and leaves the field empty on \\\"Add dependency…\\\"; clicking \\\"+\\\" with nothing chosen adds nothing (when the dropdown was never opened at all, the page correctly answers \\\"Dependent issue does not exist.\\\")",
+      "actual": "After Escape the first issue of the list stays selected in the field, and one click on \\\"+\\\" adds it as a real dependency of #4: the timeline shows \\\"eval added a new dependency + #10 agent9-sort-zebra\\\" (1st attempt, an issue from eval/harbor-handbook) and \\\"+ agent15-org/agent15-repo#1 - agent15-org-issue-one\\\" (2nd attempt, an issue of a completely different repository). An issue the person never picked becomes a dependency of #4 and the relation also appears on that other issue.",
+      "reproSteps": [
+        "Sign in as eval (username eval / password momentic-eval-1) and open https://5503-ioyiuw0ebjuremypnxaoz.e2b.app/eval/harbor-handbook/issues/4",
+        "Scroll down to the right-hand sidebar panel labelled \"Dependencies\" and click the \"Add dependency…\" search box; a list of issues opens and the field is still empty (nothing chosen)",
+        "Press the Escape key to close the list without picking anything",
+        "Look at the field: it now shows a chosen issue although nothing was clicked (1st attempt: \"#10 agent9-sort-zebra / eval/harbor-handbook\"; 2nd attempt: \"#1 agent15-org-issue-one / agent15-org/agent15-repo\")",
+        "Click the \"+\" button to the right of that field",
+        "Scroll down to the timeline: a new entry \"eval added a new dependency\" appears with the issue that was never selected"
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 412,
+      "name": "\\\"Words\\\" search mode finds nothing when the words are split between the issue title and its body",
+      "summary": "The page shows \\\"No results / Try adjusting your search filters.\\\" and 0 results. The same words match when they are not split: \\\"verifies published\\\" (both in one issue body) returns #2, \\\"ownership proposal\\\" returns #4, \\\"captain merging\\\" returns #4. Also tried \\\"clarify verifies\\\" (title word of #2 + body word of #2) and \\\"rotation proposal\\\" (body word of #4 + title word of #4): both return \\\"No results\\\". (on /issues)",
+      "expected": "Issue #2 \\\"Clarify release ownership\\\" is listed, because it contains both words — \\\"ownership\\\" in its title and \\\"verifies\\\" in its body (\\\"Document who coordinates a release and who verifies the published tag.\\\").",
+      "actual": "The page shows \\\"No results / Try adjusting your search filters.\\\" and 0 results. The same words match when they are not split: \\\"verifies published\\\" (both in one issue body) returns #2, \\\"ownership proposal\\\" returns #4, \\\"captain merging\\\" returns #4. Also tried \\\"clarify verifies\\\" (title word of #2 + body word of #2) and \\\"rotation proposal\\\" (body word of #4 + title word of #4): both return \\\"No results\\\".",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-ioyiuw0ebjuremypnxaoz.e2b.app/issues?q=verifies&state=open&search_mode=words — the one-word search \"verifies\" lists eval/harbor-handbook#2 \"Clarify release ownership\", whose body contains \"who verifies the published tag\".",
+        "Change the query to ownership verifies, keep the search mode on \"Words\", submit.",
+        "The page shows \"No results\" (\"Try adjusting your search filters.\"), although #2 contains \"ownership\" in its title and \"verifies\" in its body.",
+        "Same for q=clarify+verifies&search_mode=words (#2 title + #2 body) and q=rotation+proposal&search_mode=words (#4 body + #4 title): both show \"No results\"."
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 567,
+      "name": "Tracked-time summary keeps the whole repo's total when the issue search matches nothing",
+      "summary": "The list says \\\"0 Open 0 Closed\\\" and \\\"No results - Try adjusting your search filters.\\\", but the clock chip still shows \\\"2 hours 31 minutes\\\" - the tracked time of the issues the search excluded (issue #2 has the tracked time; with q=bulk, which also excludes #2, no chip is shown). Seen 2 times: once with state=all and once with state=open; the value grows as agents log time, so it is the unfiltered repo total. (on /eval/harbor-handbook/issues?type=all&state=open&q=zzznomatch)",
+      "expected": "The clock chip in the toolbar is documented (its tooltip/aria-label) as \\\"Summary of tracked time based on filters of issue list\\\". With a search that matches no issue (0 Open, 0 Closed, \\\"No results\\\"), the summary should show 0 time or be hidden, like it is hidden when a non-empty result set contains no tracked time (e.g. q=bulk shows no clock chip).",
+      "actual": "The list says \\\"0 Open 0 Closed\\\" and \\\"No results - Try adjusting your search filters.\\\", but the clock chip still shows \\\"2 hours 31 minutes\\\" - the tracked time of the issues the search excluded (issue #2 has the tracked time; with q=bulk, which also excludes #2, no chip is shown). Seen 2 times: once with state=all and once with state=open; the value grows as agents log time, so it is the unfiltered repo total.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-ioyiuw0ebjuremypnxaoz.e2b.app/eval/harbor-handbook/issues",
+        "In the issue search box type zzznomatch and press Enter (or the magnifier button)",
+        "Look at the toolbar row next to the \"0 Open\" / \"0 Closed\" tabs and at the list below"
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 587,
+      "name": "Adding time with a negative number of hours shows a raw developer error \"form.Hours: RangeError: Range\"",
+      "summary": "A red toast appears reading \"form.Hours: RangeError: Range\" — an untranslated internal error key and JavaScript error name shown to the user. The dialog stays open with -1 still in Hours. (on /eval/harbor-handbook/issues/2)",
+      "expected": "A readable validation message in the user's language, e.g. \"Time must be a positive number of hours and minutes\", next to the dialog fields.",
+      "actual": "A red toast appears reading \"form.Hours: RangeError: Range\" — an untranslated internal error key and JavaScript error name shown to the user. The dialog stays open with -1 still in Hours.",
+      "reproSteps": [
+        "Sign in as eval (password momentic-eval-1) and open https://5503-ioyiuw0ebjuremypnxaoz.e2b.app/eval/harbor-handbook/issues/2",
+        "Scroll to the right sidebar and click the gear/arrow of the \"Time Tracker\" section",
+        "Click \"Add Time\" in the menu to open the \"Manually Add Time\" dialog",
+        "Type -1 in the \"Hours\" field and 0 in the \"Minutes\" field",
+        "Click \"Add Time\""
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 587,
+      "name": "Issue sidebar says \"1 Participants\" for a single participant",
+      "summary": "The sidebar reads '1 Participants' (a single avatar is shown for it). The same wrong plural appears on every issue with exactly one participant, e.g. issues #2, #3, #4 and #9 of eval/harbor-handbook, while issue #1 with two participants shows '2 Participants'. (on /eval/harbor-handbook/issues/2)",
+      "expected": "A count of one should be singular, and the app pluralizes correctly elsewhere on the same page ('0 comments' / '1 comment'): the sidebar should read '1 Participant'.",
+      "actual": "The sidebar reads '1 Participants' (a single avatar is shown for it). The same wrong plural appears on every issue with exactly one participant, e.g. issues #2, #3, #4 and #9 of eval/harbor-handbook, while issue #1 with two participants shows '2 Participants'.",
+      "reproSteps": [
+        "Sign in as eval (username eval, password momentic-eval-1).",
+        "Open https://5503-ioyiuw0ebjuremypnxaoz.e2b.app/eval/harbor-handbook/issues/2",
+        "Look at the right-hand sidebar: the row under 'Assignees' shows '1 Participants' with a single avatar beneath it.",
+        "Compare with the issue header line on the same page, which correctly reads '0 comments'."
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 595,
+      "name": "On the blocking issue the timeline says \"added a new dependency #15\" while the sidebar on the same page says \"Blocks #15\"",
+      "summary": "The same page says both things: the timeline at the top reads \"eval added a new dependency\" followed by \"+ #15 agent7-dep-alpha\", while the sidebar panel \"Blocks\" on the right lists \"#15 agent7-dep-alpha\". The timeline entry copies the wording of the dependent side, so on the blocking issue it states the opposite direction of the relation shown in the sidebar of the same page. Seen the same way on #1 after #4 was made to depend on it (timeline \"added a new dependency + #4 Review the release ownership proposal\", sidebar \"Blocks #4\"). (on /eval/harbor-handbook/issues/17)",
+      "expected": "The timeline entry on the blocking issue should state the relation in its real direction (that the other issue was made to depend on this one), the same direction as the \"Blocks\" section of the sidebar; it should not read as if this issue had just been given a new dependency.",
+      "actual": "The same page says both things: the timeline at the top reads \"eval added a new dependency\" followed by \"+ #15 agent7-dep-alpha\", while the sidebar panel \"Blocks\" on the right lists \"#15 agent7-dep-alpha\". The timeline entry copies the wording of the dependent side, so on the blocking issue it states the opposite direction of the relation shown in the sidebar of the same page. Seen the same way on #1 after #4 was made to depend on it (timeline \"added a new dependency + #4 Review the release ownership proposal\", sidebar \"Blocks #4\").",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-ioyiuw0ebjuremypnxaoz.e2b.app/eval/harbor-handbook/issues/15 (agent7-dep-alpha)",
+        "In the sidebar panel \"Dependencies\" click the \"Add dependency…\" box, type agent7-dep-beta, pick \"#17 agent7-dep-beta\" and click \"+\"",
+        "Open https://5503-ioyiuw0ebjuremypnxaoz.e2b.app/eval/harbor-handbook/issues/17 (agent7-dep-beta)",
+        "Read the timeline near the top and then the \"Blocks\" panel in the right sidebar of the same page"
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 613,
+      "name": "Due date changed to 0001-01-01 is shown as \"-\" in the activity entry while the sidebar shows January 1, 1",
+      "summary": "The activity entry reads \"eval modified the due date from November 23, 2026 to - now\" — the new date is shown as a bare \"-\" — while the same page's Due Date box in the right sidebar shows \"January 1, 1\" in red for the very same issue. The \"-\" stays after reloading the page. (on /eval/harbor-handbook/issues/14)",
+      "expected": "The activity entry should name the new due date the same way the sidebar does, e.g. \"eval modified the due date from November 23, 2026 to January 1, 1\". Other changes to the same field are rendered correctly (e.g. \"modified the due date from January 1, 9000 to November 23, 2026\").",
+      "actual": "The activity entry reads \"eval modified the due date from November 23, 2026 to - now\" — the new date is shown as a bare \"-\" — while the same page's Due Date box in the right sidebar shows \"January 1, 1\" in red for the very same issue. The \"-\" stays after reloading the page.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-ioyiuw0ebjuremypnxaoz.e2b.app/eval/harbor-handbook/issues/14 (issue \"agent6-duedate-sentinel-check\").",
+        "In the right sidebar under \"Due Date\" click the pencil (edit) icon next to the shown date; a date field opens with the current date.",
+        "Type 01010001 into the date field (it becomes 01/01/0001) and click the pencil button next to the field to save.",
+        "The Due Date box now shows \"January 1, 1\" in red, and the activity list in the middle of the page shows the entry \"eval modified the due date from November 23, 2026 to - now\".",
+        "Reload the page: the sidebar still shows \"January 1, 1\" and the activity entry still ends with \"to -\"."
+      ]
+    },
+    {
+      "index": 8,
+      "reported_at_seconds": 743,
+      "name": "Escape does not close the Assignees picker once a person has been ticked",
+      "summary": "After a user has been clicked in the picker, Escape does nothing: the picker stays open (with the tick marks) and repeated Escape presses do not close it. Escape only works if no user was clicked yet. Because the choice is only applied when the picker loses focus, a person who ticks a user and then presses Escape expecting to cancel or close is left with the picker open and a pending, unsaved change. (on /eval/harbor-handbook/issues/4)",
+      "expected": "Escape closes the assignee picker, as it closes the other dropdowns and dialogs of the app; the picker is a listbox that captures the keyboard, so Escape is the normal way out without a mouse.",
+      "actual": "After a user has been clicked in the picker, Escape does nothing: the picker stays open (with the tick marks) and repeated Escape presses do not close it. Escape only works if no user was clicked yet. Because the choice is only applied when the picker loses focus, a person who ticks a user and then presses Escape expecting to cancel or close is left with the picker open and a pending, unsaved change.",
+      "reproSteps": [
+        "Open /eval/harbor-handbook/issues/4 and sign in as eval if needed.",
+        "In the right sidebar click \"Assignees\" (the gear row) to open the assignee picker.",
+        "Click the user \"maya\" in the picker so that her row gets a tick.",
+        "Press the Escape key.",
+        "Look at the picker: it is still open; press Escape a second time and it is still open. The same happens on issue #2 and while the picker's \"Filter Assignee\" box contains text after a tick.",
+        "Only a click somewhere else on the page closes the picker."
+      ]
+    },
+    {
+      "index": 9,
+      "reported_at_seconds": 812,
+      "name": "Tick in the Assignees picker is saved only when the picker is closed by clicking elsewhere; reloading loses it",
+      "summary": "The tick is only a pending state: no request is sent when the user is clicked (the network shows the assignee POST only later, when the picker is closed by clicking elsewhere). If the person reloads, navigates or leaves the page while the picker is still open, the change is silently lost: the picked user never appears in the \"Assignees\" sidebar, the issue list shows no avatar for them and the \"Assignee\" filter does not find the issue for that user. Ticking maya on issue #1 and on issue #4 and then reloading left both issues with alex only, and filtering /issues by maya still lists only issue #9. (on /eval/harbor-handbook/issues/4)",
+      "expected": "A ticked user is saved (or the picker says \"not saved yet\") so that reloading the page shows the user in the sidebar Assignees and in the issue list avatars; the POST is sent as soon as the user is picked, as it is for labels, milestone and the other sidebar pickers.",
+      "actual": "The tick is only a pending state: no request is sent when the user is clicked (the network shows the assignee POST only later, when the picker is closed by clicking elsewhere). If the person reloads, navigates or leaves the page while the picker is still open, the change is silently lost: the picked user never appears in the \"Assignees\" sidebar, the issue list shows no avatar for them and the \"Assignee\" filter does not find the issue for that user. Ticking maya on issue #1 and on issue #4 and then reloading left both issues with alex only, and filtering /issues by maya still lists only issue #9.",
+      "reproSteps": [
+        "Open /eval/harbor-handbook/issues/4 (signed in as eval; issue already has assignee alex).",
+        "In the right sidebar click \"Assignees\" to open the picker.",
+        "Click the user \"maya\": her row gets a tick next to alex's tick, and the sidebar/list are still covered by the picker.",
+        "Without clicking anywhere else, reload the page (F5).",
+        "The reloaded issue shows only alex under Assignees; maya is not assigned. The same happened on issue #1: tick maya, reload, only alex remains.",
+        "Check /issues?type=all&state=open&assignee=3 (maya): only issue #9 is listed, so neither #1 nor #4 got maya."
+      ]
+    },
+    {
+      "index": 10,
+      "reported_at_seconds": 903,
+      "name": "Pressing Back to the new-issue form restores the body but silently empties the Title field",
+      "summary": "The body editor still holds the typed text (\"agent7 body kept through Back\") but the Title field is empty; the page shows no message about what was kept or lost. Seen twice: once pressing Back from the just-created issue #22 (title \\\"agent7-reload-back-test\\\" gone, body \\\"Body for the reload/back test (agent7).\\\" still there) and once pressing Back from the repo issue list (title \\\"agent7-back-title\\\" gone, body \\\"agent7 body kept through Back\\\" still there). The title input is rendered with autocomplete=\\\"off\\\", the body is a textarea that the browser restores. (on /eval/agent14-paging/issues/new)",
+      "expected": "Going Back to the half-filled new-issue form should restore the whole draft (title and body) or lose it as a whole and say so; the title must not disappear while the body is kept.",
+      "actual": "The body editor still holds the typed text (\"agent7 body kept through Back\") but the Title field is empty; the page shows no message about what was kept or lost. Seen twice: once pressing Back from the just-created issue #22 (title \\\"agent7-reload-back-test\\\" gone, body \\\"Body for the reload/back test (agent7).\\\" still there) and once pressing Back from the repo issue list (title \\\"agent7-back-title\\\" gone, body \\\"agent7 body kept through Back\\\" still there). The title input is rendered with autocomplete=\\\"off\\\", the body is a textarea that the browser restores.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-ioyiuw0ebjuremypnxaoz.e2b.app/eval/agent14-paging/issues/new",
+        "Type agent7-back-title into the Title field and agent7 body kept through Back into the \"Leave a comment\" editor",
+        "Navigate to https://5503-ioyiuw0ebjuremypnxaoz.e2b.app/eval/agent14-paging/issues (answer the browser's leave-page prompt)",
+        "Press the browser's Back button to return to the new-issue form",
+        "Compare the Title field and the body editor"
+      ]
+    },
+    {
+      "index": 11,
+      "reported_at_seconds": 1009,
+      "name": "Switching the Open/Closed tab on the organization Issues dashboard silently drops the Author/Assignee filter",
+      "summary": "The state tab navigates to ?type=your_repositories&sort=oldest&state=closed with no poster/assignee parameter: the filter is gone, the Author/Assignee dropdowns reset to their default, and the list shows closed issue #2 which was opened by eval and has no assignee. The same happens for the Author filter (it showed \\\"No results\\\", then the Closed tab listed eval's issue #2). (on /org/agent15-org/issues)",
+      "expected": "The Closed tab keeps the active Author/Assignee filter, so with Author=alex or Assignee=alex the closed list stays empty (no closed issue was authored by or assigned to alex).",
+      "actual": "The state tab navigates to ?type=your_repositories&sort=oldest&state=closed with no poster/assignee parameter: the filter is gone, the Author/Assignee dropdowns reset to their default, and the list shows closed issue #2 which was opened by eval and has no assignee. The same happens for the Author filter (it showed \\\"No results\\\", then the Closed tab listed eval's issue #2).",
+      "reproSteps": [
+        "Open https://5503-ioyiuw0ebjuremypnxaoz.e2b.app/org/agent15-org/issues (signed in as eval). The org has repo agent15-org/agent15-repo with issue #1 \"agent15-org-issue-one\" (open, assigned to alex, author eval), #2 \"agent15-org-issue-two\" (closed, author eval) and #3 \"agent15-org-issue-three\" (open, author eval).",
+        "In the filter row click \"Assignee\", type alex in \"Search users\" and pick alex: the list narrows to #1 and the tabs read \"1 Open\" / \"0 Closed\".",
+        "Click the \"0 Closed\" tab.",
+        "Repeat with the Author filter instead (click Author, pick alex -> \"No results\"), then click the \"Closed\" tab."
+      ]
+    },
+    {
+      "index": 12,
+      "reported_at_seconds": 1017,
+      "name": "Org Issues dashboard counters ignore the Author and Assignee filters and disagree with the Open tab and the list",
+      "summary": "The left counters keep the unfiltered numbers: \\\"In your repositories 2\\\" and \\\"Created by you 2\\\" while the Open tab reads \\\"1 Open\\\" and only issue #1 is listed (Assignee filter); with Author=alex the list says \\\"No results\\\" and the tab reads \\\"0 Open\\\", yet the counters still say \\\"In your repositories 2\\\" / \\\"Created by you 2\\\". A keyword search does update the counters, so only the Author/Assignee filters are ignored. (on /org/agent15-org/issues)",
+      "expected": "The counters and the state tab show the same totals as the list they describe: 1 for the Assignee=alex filter and 0 for Author=alex.",
+      "actual": "The left counters keep the unfiltered numbers: \\\"In your repositories 2\\\" and \\\"Created by you 2\\\" while the Open tab reads \\\"1 Open\\\" and only issue #1 is listed (Assignee filter); with Author=alex the list says \\\"No results\\\" and the tab reads \\\"0 Open\\\", yet the counters still say \\\"In your repositories 2\\\" / \\\"Created by you 2\\\". A keyword search does update the counters, so only the Author/Assignee filters are ignored.",
+      "reproSteps": [
+        "Open https://5503-ioyiuw0ebjuremypnxaoz.e2b.app/org/agent15-org/issues (signed in as eval; org agent15-org, repo agent15-repo with 2 open and 1 closed issue).",
+        "Click \"Assignee\", type alex in \"Search users\" and pick alex. The list shows exactly one issue (agent15-org-issue-one) and the state tab reads \"1 Open\".",
+        "Look at the counters on the left: \"In your repositories 2\" and \"Created by you 2\".",
+        "Clear the filter and instead click \"Author\", type alex and pick alex: the list shows \"No results\" and the tab reads \"0 Open\", while the left counters still read \"In your repositories 2\" and \"Created by you 2\"."
+      ]
+    },
+    {
+      "index": 13,
+      "reported_at_seconds": 1114,
+      "name": "The \\\"Open\\\" tab on the repository issue list shows closed issues too",
+      "summary": "The browser goes to /eval/harbor-handbook/issues?type=all&state=all and the list now also contains closed issues mixed in with the open ones, e.g. rows with the red closed icon: \\\"agent7-dep-beta — #17 by eval was closed 8 minutes ago\\\", \\\"agent7-dep-alpha — #15 by eval was closed 7 minutes ago\\\" and \\\"agent8-bulk-3 — #8 by eval was closed 2 minutes ago\\\". The tab still reads \\\"19 Open\\\", so the list labelled Open shows 22+ issues. Seen twice out of two tries. (on /eval/harbor-handbook/issues)",
+      "expected": "The Open tab should filter the list to open issues only (the address should get state=open) and no closed issue should be listed, exactly as the tab's own label and its open count say.",
+      "actual": "The browser goes to /eval/harbor-handbook/issues?type=all&state=all and the list now also contains closed issues mixed in with the open ones, e.g. rows with the red closed icon: \\\"agent7-dep-beta — #17 by eval was closed 8 minutes ago\\\", \\\"agent7-dep-alpha — #15 by eval was closed 7 minutes ago\\\" and \\\"agent8-bulk-3 — #8 by eval was closed 2 minutes ago\\\". The tab still reads \\\"19 Open\\\", so the list labelled Open shows 22+ issues. Seen twice out of two tries.",
+      "reproSteps": [
+        "Sign in as eval (username eval, password momentic-eval-1).",
+        "Open https://5503-ioyiuw0ebjuremypnxaoz.e2b.app/eval/harbor-handbook/issues — the tab row shows \"19 Open\" and \"4 Closed\" and the list contains only open issues.",
+        "Click the \"19 Open\" tab in that tab row.",
+        "Look at the address bar and scroll down the list: closed issues (red closed icon, \"by eval was closed ...\") appear among the open ones."
+      ]
+    },
+    {
+      "index": 14,
+      "reported_at_seconds": 1275,
+      "name": "The Teams filter on the organization Issues dashboard offers no teams, only \\\"All\\\"",
+      "summary": "The dropdown lists only \\\"All\\\": the organization's teams (Owners and agent15-team, the latter with write access to agent15-repo and alex as member) never appear, so there is no way to filter the organization's issues by team. Checked as the organization owner (eval) and as the team member (alex): both see only \\\"All\\\". (on /org/agent15-org/issues)",
+      "expected": "The \\\"Teams\\\" menu opens with a header \\\"Filter by team repositories\\\" and lists the organization's teams (agent15-team, Owners) so picking one narrows the issue list to that team's repositories.",
+      "actual": "The dropdown lists only \\\"All\\\": the organization's teams (Owners and agent15-team, the latter with write access to agent15-repo and alex as member) never appear, so there is no way to filter the organization's issues by team. Checked as the organization owner (eval) and as the team member (alex): both see only \\\"All\\\".",
+      "reproSteps": [
+        "Sign in as eval, open https://5503-ioyiuw0ebjuremypnxaoz.e2b.app/org/agent15-org/teams: the organization has two teams, Owners and agent15-team (agent15-team includes all repositories, Issues = Write, 1 member alex).",
+        "Open https://5503-ioyiuw0ebjuremypnxaoz.e2b.app/org/agent15-org/issues and click \"Teams\" in the organization header.",
+        "The menu \"Filter by team repositories\" contains only the item \"All\" - no team is offered.",
+        "Sign out, sign in as alex (member of agent15-team), open the same page and the Teams menu again: still only \"All\"."
+      ]
+    },
+    {
+      "index": 15,
+      "reported_at_seconds": 1539,
+      "name": "Issue tracker settings accept an invalid regular expression in the external number format and report success",
+      "summary": "The settings are saved: the green banner \\\"The repository settings have been updated.\\\" appears and after a reload the Regular Expression radio is still selected with \\\"(\\\" in the \\\"Regular Expression Pattern\\\" field. No error is shown anywhere, so the number format is silently broken. (In the same form an empty or non-http URL is refused: \\\"The external issue tracker URL is not a valid URL.\\\") (on /eval/harbor-handbook/settings)",
+      "expected": "The form should refuse a pattern that is not a valid regular expression, with a message next to the field, the way it refuses an invalid External Issue Tracker URL in the same form, instead of reporting the settings as updated.",
+      "actual": "The settings are saved: the green banner \\\"The repository settings have been updated.\\\" appears and after a reload the Regular Expression radio is still selected with \\\"(\\\" in the \\\"Regular Expression Pattern\\\" field. No error is shown anywhere, so the number format is silently broken. (In the same form an empty or non-http URL is refused: \\\"The external issue tracker URL is not a valid URL.\\\")",
+      "reproSteps": [
+        "Sign in as eval, open /eval/harbor-handbook/settings and scroll to Advanced Settings.",
+        "Select the \"Use External Issue Tracker\" radio and put any valid URL in \"External Issue Tracker URL\" (I used https://example.org/issues).",
+        "Under \"External Issue Tracker Number Format\" select \"Regular Expression (ISSUE-\\d+) , ISSUE-(\\d+)\".",
+        "Type a pattern that is not a valid regular expression, a single \"(\" , into \"Regular Expression Pattern\".",
+        "Click the Update Settings button of the Advanced Settings section.",
+        "The page answers \"The repository settings have been updated.\" ; after a reload the Regex radio is still selected and the field still contains \"(\"."
+      ]
+    }
+  ]
+}

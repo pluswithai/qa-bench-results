@@ -1,0 +1,273 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "twenty/areas/record-pages-activities",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "c0514808669213daa424c21242586fe11c34c86360e84c6d5d94e97d92a25116",
+    "known_invalid_sha256": "cdd23b97fb4f73ab42c34dedf1842427d79e0b5001967ab83cefec3a8f68e85d",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "64",
+    "bugs": "22",
+    "flags": "0",
+    "known_hits": "7",
+    "extra_known_hits": "0",
+    "unverified": "13",
+    "outside_area_known_hits": "0",
+    "outside_area_known_invalid": "0",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "",
+    "outside_area_ground_truth_sha256": "f3456299419b269b88f0ddc32ec53ab80fbf3ec14a32ac6ae1366aa22bd3a43a",
+    "outside_area_known_invalid_sha256": "e51afd4a5be9203d46a29a1087513447454829f8cacf9feb7379d606574f27e1",
+    "duplicates": "1",
+    "duplicate_known_hits": "1",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "1",
+    "known_misses": "1",
+    "precision": "0.8888888888888888",
+    "recall": "0.109375",
+    "findings_per_minute": "0.7333431112414832",
+    "correct_findings_per_minute": "0.23333644448592647",
+    "severity_1": "2",
+    "severity_3": "5",
+    "severity_5": "0",
+    "severity_sum": "17",
+    "score": "15",
+    "duration_seconds": "1799.976",
+    "partial": "true",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 18,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Matches decimal-separator removal that inflates the saved Annual Revenue, including incorrect field and Timeline values."
+      },
+      {
+        "groundTruthIndex": 3,
+        "reproStepsIndex": 0,
+        "findingIndex": 4,
+        "reason": "Matches successful related-Note deletion leaving the company Notes total unchanged until reload."
+      },
+      {
+        "groundTruthIndex": 23,
+        "reproStepsIndex": 0,
+        "findingIndex": 6,
+        "reason": "Matches the restricted Description displaying the raw permission constant. The different account and event are test-data variations."
+      },
+      {
+        "groundTruthIndex": 26,
+        "reproStepsIndex": 0,
+        "findingIndex": 13,
+        "reason": "Matches Escape saving a pending Address edit instead of cancelling it; editing City rather than Address 1 is an insignificant variation."
+      },
+      {
+        "groundTruthIndex": 13,
+        "reproStepsIndex": 0,
+        "findingIndex": 16,
+        "reason": "Matches slash-menu selection failing to consume the trigger and persisting it in formatted content. Leading versus trailing placement does not change the failure."
+      },
+      {
+        "groundTruthIndex": 8,
+        "reproStepsIndex": null,
+        "findingIndex": 17,
+        "reason": "Matches selecting an already-linked target from stale relation-picker state creating persisted duplicate links and cards. The stale second-tab trigger differs from attachment deletion."
+      },
+      {
+        "groundTruthIndex": 16,
+        "reproStepsIndex": 0,
+        "findingIndex": 19,
+        "reason": "Matches browser Back clearing the tab fragment without updating the selected tab or content. Different default and selected tabs are equivalent variations."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 7,
+        "reproStepsIndex": 0,
+        "findingIndex": 20,
+        "reason": "Matches the rejected claim that record CSV/PDF export actions do nothing. Missing requests or prompts do not establish failure; CSV blobs were generated in review."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 1,
+        "reason": "No reference describes a vertically offscreen Body editor rendering completely blank. The mobile popup reference concerns horizontal clipping."
+      },
+      {
+        "findingIndex": 2,
+        "reason": "Due-date clipping and disappearing relation chips differ from the referenced narrow Tasks rows truncating task titles."
+      },
+      {
+        "findingIndex": 3,
+        "reason": "No reference describes the side-panel Body preview overflowing its container. Referenced preview omissions concern inline content processing instead."
+      },
+      {
+        "findingIndex": 5,
+        "reason": "No reference describes company-created Notes remaining absent from the All Notes list while available elsewhere."
+      },
+      {
+        "findingIndex": 7,
+        "reason": "No reference describes nonexistent record URLs presenting editable shells and optimistic values before reporting that the record is missing."
+      },
+      {
+        "findingIndex": 8,
+        "reason": "No reference covers repeated raw UUID errors when opening an all-zero record identifier."
+      },
+      {
+        "findingIndex": 9,
+        "reason": "Clipping a Domain update-value chip is distinct from the referenced clipping of Timeline activity narratives or related-activity names."
+      },
+      {
+        "findingIndex": 10,
+        "reason": "No reference addresses immediate creation of an empty Task that remains after dismissing its creation panel."
+      },
+      {
+        "findingIndex": 11,
+        "reason": "No reference describes responsive layouts removing the record heading and all title-editing access."
+      },
+      {
+        "findingIndex": 12,
+        "reason": "Describes desktop header actions disappearing, unlike groundTruth[49]'s mobile counter overlap where the command menu remains usable."
+      },
+      {
+        "findingIndex": 15,
+        "reason": "No reference describes ordinary words breaking across lines in embedded Note-card previews."
+      },
+      {
+        "findingIndex": 18,
+        "reason": "No reference addresses the capitalization of the Linkedin field label."
+      },
+      {
+        "findingIndex": 21,
+        "reason": "No reference describes sender-name clipping in record Emails rows; the referenced Emails defect concerns ordering across loaded pages."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 3,
+        "reason": "The editor accepts changes without displaying existing or newly typed content."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 1,
+        "reason": "Describes responsive presentation defects without incorrect saved data or failed actions."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 1,
+        "reason": "The preview is visually clipped; no editing or persistence failure is described."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 3,
+        "reason": "Saved records allegedly remain missing from their primary list."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 3,
+        "reason": "Allows an unsavable edit and temporarily displays it as saved."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 5,
+        "reason": "Displays repeated raw server errors instead of a usable not-found response."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 1,
+        "reason": "The saved value is visually clipped without described data corruption."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 3,
+        "reason": "Creates and retains an unwanted record despite entering no content."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 3,
+        "reason": "Removes the ability to rename the record at tablet and phone widths."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 3,
+        "reason": "Makes record navigation and command actions unavailable."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 3,
+        "reason": "Displays an incorrect Tasks total despite correctly removing the task."
+      },
+      {
+        "findingIndex": 15,
+        "severity": 1,
+        "reason": "Describes a text-wrapping readability defect only."
+      },
+      {
+        "findingIndex": 16,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 17,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 18,
+        "severity": 1,
+        "reason": "A branding capitalization issue with no functional impact."
+      },
+      {
+        "findingIndex": 19,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 20,
+        "severity": 3,
+        "reason": "The described impact is nonworking export actions, although the claim was rejected."
+      },
+      {
+        "findingIndex": 21,
+        "severity": 1,
+        "reason": "Sender names are visually truncated without an ellipsis."
+      }
+    ],
+    "duplicates": [
+      {
+        "findingIndex": 14,
+        "canonicalFindingIndex": 4,
+        "reason": "Matches the same stale activity-total bug as finding 4, demonstrated for Tasks. Its setup counts are less consistent."
+      }
+    ]
+  },
+  "outsideArea": {
+    "knownHits": [],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

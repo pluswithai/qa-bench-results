@@ -1,0 +1,200 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "twenty/areas/settings-data-model",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "c0df0972e38c61339922395fdda732c577f554e092949e03fd6be91b45100fb1",
+    "known_invalid_sha256": "0403ec9bfbd7220b5c60153fc357d29d18cf11f47f6259cd7dce12bd83cb8b08",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "91",
+    "bugs": "15",
+    "flags": "0",
+    "known_hits": "3",
+    "extra_known_hits": "0",
+    "unverified": "11",
+    "outside_area_known_hits": "0",
+    "outside_area_known_invalid": "0",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "",
+    "outside_area_ground_truth_sha256": "f3456299419b269b88f0ddc32ec53ab80fbf3ec14a32ac6ae1366aa22bd3a43a",
+    "outside_area_known_invalid_sha256": "e51afd4a5be9203d46a29a1087513447454829f8cacf9feb7379d606574f27e1",
+    "duplicates": "0",
+    "duplicate_known_hits": "0",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "1",
+    "known_misses": "1",
+    "precision": "0.75",
+    "recall": "0.03296703296703297",
+    "findings_per_minute": "0.502916637097031",
+    "correct_findings_per_minute": "0.10058332741940622",
+    "severity_1": "2",
+    "severity_3": "0",
+    "severity_5": "1",
+    "severity_sum": "7",
+    "score": "6",
+    "duration_seconds": "1789.561",
+    "partial": "false",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 28,
+        "reproStepsIndex": null,
+        "findingIndex": 0,
+        "reason": "Matches the empty main content at /settings/domains. The finding reaches it by direct navigation rather than the command-menu action."
+      },
+      {
+        "groundTruthIndex": 32,
+        "reproStepsIndex": 0,
+        "findingIndex": 1,
+        "reason": "The Companies Fields portion matches the mobile Name-column collapse that obscures field labels beside Standard badges."
+      },
+      {
+        "groundTruthIndex": 50,
+        "reproStepsIndex": 0,
+        "findingIndex": 14,
+        "reason": "The Last Name portion matches a cleared required Last Name remaining blank without validation or save feedback, then returning after reload."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 22,
+        "reproStepsIndex": 0,
+        "findingIndex": 2,
+        "reason": "Matches the rejected zero-record-count claim: the Data model column intentionally uses planner estimates that can remain zero for fresh objects."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 3,
+        "reason": "No reviewed entry covers clearing retention days and persisting zero. The decimal-input and accessibility entries describe different failures."
+      },
+      {
+        "findingIndex": 4,
+        "reason": "Blank Skills Type cells are distinct from the reviewed crash caused by sorting that column."
+      },
+      {
+        "findingIndex": 5,
+        "reason": "An initial 30-day key displaying 29 days is not the reviewed cumulative expiration shortening caused by regeneration."
+      },
+      {
+        "findingIndex": 6,
+        "reason": "No reviewed entry covers the misleading empty-Domain message; the domain-length boundary and malformed-email claims are different."
+      },
+      {
+        "findingIndex": 7,
+        "reason": "No reviewed entry describes a saved long workspace name overflowing the welcome-page greeting."
+      },
+      {
+        "findingIndex": 8,
+        "reason": "No reviewed entry covers literal Markdown asterisks in the REST playground introduction."
+      },
+      {
+        "findingIndex": 9,
+        "reason": "No reviewed entry describes empty Domain cells in the communication-channel table."
+      },
+      {
+        "findingIndex": 10,
+        "reason": "No reviewed entry covers the fallback Sender name title and missing sender-name section on channel details."
+      },
+      {
+        "findingIndex": 11,
+        "reason": "No reviewed entry covers navigation-link favicons rendering as broken images without a fallback."
+      },
+      {
+        "findingIndex": 12,
+        "reason": "No reviewed entry covers empty folder-name validation during layout saving. The folder-name dismissal claim concerns a different interaction."
+      },
+      {
+        "findingIndex": 13,
+        "reason": "This concerns stale deactivation copy on a field with an Activate button, not the reviewed inactive-object page that still offers Deactivate."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 5,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "The claimed impact is an incorrect record count, not lost or inaccessible records."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 3,
+        "reason": "An unintended retention setting reportedly persists; actual immediate record erasure was not demonstrated."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 1,
+        "reason": "This describes missing table text without a failed skill operation."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 3,
+        "reason": "The expiration summary reportedly shows an incorrect duration, although actual lifetime shortening is not established."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 1,
+        "reason": "The described defect is validation wording, not acceptance of invalid data."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 1,
+        "reason": "The reported impact is clipped text and horizontal overflow, without a failed sign-in action."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 1,
+        "reason": "This is a text-formatting artifact, not a raw error dump or functional failure."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 1,
+        "reason": "Informational table text is missing; no channel operation is reported to fail."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 1,
+        "reason": "The report establishes labeling and presentation problems, but no failed editing or communication operation."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 1,
+        "reason": "The sidebar icon is broken, but link navigation is not reported to fail."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 1,
+        "reason": "The invalid draft is rejected with a toast; the described defect is missing field-specific validation rather than loss of saved layout."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 1,
+        "reason": "The state description is misleading, but the available activation action is not reported to malfunction."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

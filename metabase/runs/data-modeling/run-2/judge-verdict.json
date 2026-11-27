@@ -1,0 +1,395 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "metabase/areas/data-modeling",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "8f1679af7b62acc177a410f419ceb8657f12ad4ecb69edd82f64f9504f3fcaf9",
+    "known_invalid_sha256": "82b6192aa124b29a30d795070102fc5485f2d38e00f3837f2c18e439983f6000",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "115",
+    "bugs": "33",
+    "flags": "0",
+    "known_hits": "10",
+    "extra_known_hits": "0",
+    "unverified": "21",
+    "outside_area_known_hits": "1",
+    "outside_area_known_invalid": "0",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "1",
+    "outside_area_ground_truth_sha256": "18765609374b28bc9ff8c4d574f183a1cec470472e42a7e8bae343da32e17da8",
+    "outside_area_known_invalid_sha256": "bda5fa1dae2abd3dbc884c784d0bd82ccd854fe93bc63cc4126be5e14c0b4c18",
+    "duplicates": "1",
+    "duplicate_known_hits": "1",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "0",
+    "known_misses": "0",
+    "precision": "1",
+    "recall": "0.08695652173913043",
+    "findings_per_minute": "1.1784185147403492",
+    "correct_findings_per_minute": "0.3570965196182876",
+    "severity_1": "7",
+    "severity_3": "3",
+    "severity_5": "0",
+    "severity_sum": "16",
+    "score": "15",
+    "duration_seconds": "1680.218",
+    "partial": "false",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 92,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Matches the seeded Orders + People model history displaying an undefined actor through the same Info → History flow."
+      },
+      {
+        "groundTruthIndex": 0,
+        "reproStepsIndex": 0,
+        "findingIndex": 8,
+        "reason": "Matches the Actions breadcrumb incorrectly showing Our analytics instead of the saved collection; the collection name is incidental."
+      },
+      {
+        "groundTruthIndex": 108,
+        "reproStepsIndex": null,
+        "findingIndex": 11,
+        "reason": "Matches metadata saves adding FK helper fields and inflating Overview's count. This finding changes the default view rather than a column display name."
+      },
+      {
+        "groundTruthIndex": 47,
+        "reproStepsIndex": null,
+        "findingIndex": 14,
+        "reason": "Matches browser Back replacing a saved model with an unsaved question. It is reached through Overview → Based on rather than Relationships → Linked tables."
+      },
+      {
+        "groundTruthIndex": 73,
+        "reproStepsIndex": 0,
+        "findingIndex": 15,
+        "reason": "Matches raw internal type keywords in conversion history, using the explicitly covered metric-to-model variant."
+      },
+      {
+        "groundTruthIndex": 5,
+        "reproStepsIndex": 0,
+        "findingIndex": 17,
+        "reason": "Matches saving a metric without starting data exposing the DATABASE_ID constraint error and SQL INSERT statement."
+      },
+      {
+        "groundTruthIndex": 36,
+        "reproStepsIndex": 0,
+        "findingIndex": 18,
+        "reason": "Matches duplication opening an unsaved-looking question view with an active Save button despite the duplicate already being saved."
+      },
+      {
+        "groundTruthIndex": 9,
+        "reproStepsIndex": 0,
+        "findingIndex": 28,
+        "reason": "Matches overlapping Field type/Data type headings and clipped values through the same narrow-viewport Fields-list flow."
+      },
+      {
+        "groundTruthIndex": 38,
+        "reproStepsIndex": 0,
+        "findingIndex": 30,
+        "reason": "Matches whitespace-only column display names saving successfully and persisting as blank headers after reload."
+      },
+      {
+        "groundTruthIndex": 27,
+        "reproStepsIndex": 0,
+        "findingIndex": 27,
+        "reason": "Matches title/description-only edits producing History entries that falsely claim pin-position changes."
+      }
+    ],
+    "invalidMatches": [],
+    "unverified": [
+      {
+        "findingIndex": 1,
+        "reason": "No entry covers nonexistent reference IDs rendering empty details. The rejected hidden-metadata claim has a materially different precondition."
+      },
+      {
+        "findingIndex": 2,
+        "reason": "No entry covers overflowing table-list cards; the documented field-schema overlap concerns different content and layout."
+      },
+      {
+        "findingIndex": 3,
+        "reason": "No entry describes the Questions page omitting the main sidebar. The rejected Questions-page claim describes a full-page error instead."
+      },
+      {
+        "findingIndex": 4,
+        "reason": "No entry covers /metric/new opening a question-creation editor instead of metric creation."
+      },
+      {
+        "findingIndex": 5,
+        "reason": "No entry describes clipping or horizontal displacement in the collection picker."
+      },
+      {
+        "findingIndex": 7,
+        "reason": "No entry covers the Models catalog displaying 'A model' for an absent description."
+      },
+      {
+        "findingIndex": 9,
+        "reason": "New-metric save validation differs from both the blank inline rename and the duplicate form resetting after failure."
+      },
+      {
+        "findingIndex": 10,
+        "reason": "No entry covers the saved metric's notebook Editor creating a separate question rather than updating the metric."
+      },
+      {
+        "findingIndex": 12,
+        "reason": "No entry covers Enter failing to commit an Info description. The rejected multiline-description claim concerns saved text rendering instead."
+      },
+      {
+        "findingIndex": 13,
+        "reason": "No entry covers an overlength auto-generated name disabling the model save dialog without explanation."
+      },
+      {
+        "findingIndex": 16,
+        "reason": "No entry covers the Move dialog using a heading about saving."
+      },
+      {
+        "findingIndex": 19,
+        "reason": "No entry covers empty Last edited by and Last edited at columns in collection listings."
+      },
+      {
+        "findingIndex": 20,
+        "reason": "No entry covers unnecessary discard confirmation on a new metric or cancellation returning Home instead of Metrics."
+      },
+      {
+        "findingIndex": 21,
+        "reason": "No entry covers the database-reference landing page overflowing at phone width."
+      },
+      {
+        "findingIndex": 22,
+        "reason": "No entry covers missing deletion attribution and timestamps for trashed collections."
+      },
+      {
+        "findingIndex": 23,
+        "reason": "No entry covers global search interpreting percent and underscore as wildcards."
+      },
+      {
+        "findingIndex": 24,
+        "reason": "No entry covers overlapping table-reference titles and buttons at phone width."
+      },
+      {
+        "findingIndex": 25,
+        "reason": "No entry covers a stale tab retaining active controls and accepting edits after another tab trashes the model."
+      },
+      {
+        "findingIndex": 26,
+        "reason": "No entry covers unreachable model Filter and Summarize controls at phone width; the metric header wrapping bug is a different failure."
+      },
+      {
+        "findingIndex": 29,
+        "reason": "No entry covers a Contains filter treating underscore as a wildcard and returning nonmatching rows."
+      },
+      {
+        "findingIndex": 31,
+        "reason": "No entry covers a nonnumeric model ID opening the creation data picker instead of a not-found page."
+      },
+      {
+        "findingIndex": 32,
+        "reason": "No entry covers rename history calling a metric a Card. Raw conversion type keywords and false pin-change claims are separate issues."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 3,
+        "reason": "Missing entities incorrectly render as normal detail pages instead of a not-found state."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 1,
+        "reason": "Clipped descriptions and card borders are presentation defects."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 1,
+        "reason": "The described failure is a missing navigation sidebar and shifted layout, not a broken page or failed action."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 3,
+        "reason": "The metric route opens the wrong editor and save workflow."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 1,
+        "reason": "Collection icons and names are visually clipped; selection failure is not described."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 1,
+        "reason": "Field-type and data-type text collide, reducing readability."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 1,
+        "reason": "The claimed defect concerns placeholder copy and its presentation."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 3,
+        "reason": "Invalid input enables submission and produces a failed, disabled save state."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 3,
+        "reason": "Saving creates the wrong entity and leaves the intended metric unchanged."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 3,
+        "reason": "The described keyboard save does not persist the edit, which is lost after reload."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 3,
+        "reason": "The prefilled name prevents saving until the user discovers and corrects its length."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 15,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 16,
+        "severity": 1,
+        "reason": "This is inconsistent dialog copy without described functional impact."
+      },
+      {
+        "findingIndex": 17,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 18,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 19,
+        "severity": 1,
+        "reason": "Audit information is missing from the displayed table; no functional failure is described."
+      },
+      {
+        "findingIndex": 20,
+        "severity": 3,
+        "reason": "Besides the unnecessary warning, cancellation reportedly navigates to the wrong destination."
+      },
+      {
+        "findingIndex": 21,
+        "severity": 1,
+        "reason": "The described impact is clipped text, truncated navigation labels, and horizontal overflow."
+      },
+      {
+        "findingIndex": 22,
+        "severity": 1,
+        "reason": "The Trash row omits displayed audit information without a described action failure."
+      },
+      {
+        "findingIndex": 23,
+        "severity": 3,
+        "reason": "Search returns unrelated items instead of the claimed literal-character matches."
+      },
+      {
+        "findingIndex": 24,
+        "severity": 1,
+        "reason": "The header overlaps and overflows, but the finding does not describe a failed action."
+      },
+      {
+        "findingIndex": 25,
+        "severity": 3,
+        "reason": "The page displays a stale active state and permits a write without reflecting the model's trashed status."
+      },
+      {
+        "findingIndex": 26,
+        "severity": 3,
+        "reason": "Essential filtering and summarization actions become unreachable."
+      },
+      {
+        "findingIndex": 27,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 28,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 29,
+        "severity": 3,
+        "reason": "The applied filter returns incorrect results."
+      },
+      {
+        "findingIndex": 30,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 31,
+        "severity": 3,
+        "reason": "An invalid saved-model address opens the wrong application workflow."
+      },
+      {
+        "findingIndex": 32,
+        "severity": 1,
+        "reason": "The defect is inconsistent user-facing terminology in History."
+      }
+    ],
+    "duplicates": [
+      {
+        "findingIndex": 6,
+        "canonicalFindingIndex": 28,
+        "reason": "Matches the field-schema columns clipping and running together, reached through the same table Fields view with different table data."
+      }
+    ]
+  },
+  "outsideArea": {
+    "knownHits": [
+      {
+        "findingIndex": 29,
+        "reference": {
+          "name": "Category Contains '_' returns all 200 Products including categories without underscores",
+          "summary": "Category Contains '_' returns all 200 Products including categories without underscores.",
+          "expected": "Contains '_' should match category text containing a literal underscore, not categories such as Gizmo, Gadget, Widget or Doohickey.",
+          "actual": "The applied Category contains _ filter returns 200 rows. Visible rows include Gizmo, Doohickey, Gadget and Widget, none containing an underscore.",
+          "reproSteps": [
+            [
+              "Start a new question in the notebook using Sample Database > Products.",
+              "Add a Category filter, select Contains, enter a single underscore (_) and leave Case sensitive unchecked.",
+              "Add the filter and click Visualize.",
+              "Observe 200 returned rows including categories Gizmo, Gadget, Doohickey and Widget."
+            ]
+          ],
+          "severity": 3
+        },
+        "reason": "Matches Contains treating a literal underscore as a wildcard and returning nonmatching rows. Applying it through an existing model's result toolbar differs from the reviewed notebook reproduction."
+      }
+    ],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

@@ -1,0 +1,337 @@
+{
+  "area": "site-administration",
+  "bugs": [
+    {
+      "id": "site-administration-1",
+      "title": "Unknown queue id (/-/admin/monitor/queue/<id>) answers 404 with a completely blank page",
+      "findings": [
+        "run1-02",
+        "run2-06",
+        "run3-04"
+      ],
+      "verdict": "accept",
+      "severity": 5,
+      "reason": "QueueManage answers an unknown queue id with ctx.Status(404) and no body, so the browser shows an empty white page with no layout, message or way back, while other unknown addresses render the site's '404 Not Found' page.",
+      "evidence": [
+        "run3-04/shot-1.png",
+        "run1-02/frame-3.jpg"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/admin/queue.go (QueueManage: ctx.Status(http.StatusNotFound))"
+      ]
+    },
+    {
+      "id": "site-administration-2",
+      "title": "Admin sidebar collapses 'Monitoring' and loses the 'Queues' highlight on a queue detail page",
+      "findings": [
+        "run1-06",
+        "run3-07"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "QueueManage sets the flag PageIsAdminMonitor, but the sidebar template only opens/highlights on PageIsAdminMonitorQueue, so the section collapses on the detail page; upstream main later changed the handler to PageIsAdminMonitorQueue, which confirms it was a slip.",
+      "evidence": [
+        "run1-06/frame-1.jpg",
+        "run1-01/frame-1.jpg",
+        "run1-01/frame-2.jpg"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/admin/queue.go (QueueManage: ctx.Data[\"PageIsAdminMonitor\"])",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/admin/navbar.tmpl (Monitoring <details> opens on PageIsAdminMonitorQueue)",
+        "https://github.com/go-gitea/gitea/blob/main/routers/web/admin/queue.go (now PageIsAdminMonitorQueue)"
+      ]
+    },
+    {
+      "id": "site-administration-3",
+      "title": "Statistics summary reports Release 1 while the instance has 0 releases (a tag is counted as a release)",
+      "findings": [
+        "run1-07",
+        "run3-08"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "The Release counter is an unfiltered row count of the release table, which also stores tag-only rows, so one pushed tag shows as 'Release 1' while the repository's own Releases tab says '0 Releases | 1 Tag'. Nothing in the source marks counting tags as releases as intended (the neighbouring Tags counter is filtered, Release is not).",
+      "evidence": [
+        "run1-07/shot-1.png",
+        "run1-07/frame-1.jpg",
+        "run3-08/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/models/activities/statistic.go (stats.Counter.Release = e.Count(new(repo_model.Release)))",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/admin/stats.tmpl"
+      ]
+    },
+    {
+      "id": "site-administration-4",
+      "title": "Admin user search treats % and _ as SQL wildcards ('%' lists every account, '_lex' finds alex)",
+      "findings": [
+        "run1-11",
+        "run2-04",
+        "run3-02"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "The keyword goes unescaped into builder.Like, so '%' and '_' act as LIKE wildcards and the list returns accounts that do not contain the typed text; an ordinary no-match term gives the empty state. No doc or code presents wildcard search as a feature.",
+      "evidence": [
+        "run3-02/shot-1.png",
+        "run3-02/shot-2.png",
+        "run1-11/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/models/user/search.go (builder.Like{\"lower_name\", lowerKeyword})"
+      ]
+    },
+    {
+      "id": "site-administration-5",
+      "title": "Admin repository search treats % and _ as SQL wildcards and returns every repository",
+      "findings": [
+        "run2-02"
+      ],
+      "verdict": "accept",
+      "severity": 3,
+      "reason": "Same class of defect as the user search but on a different page and code path: the repo keyword is passed unescaped to builder.Like, so '%' and '_' match harbor-handbook although 'zzzznomatch' correctly shows 'No results found.'",
+      "evidence": [
+        "run2-02/shot-1.png",
+        "run2-02/shot-2.png",
+        "run2-02/shot-3.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/models/repo/repo_list.go (builder.Like{\"lower_name\", strings.ToLower(v)})"
+      ]
+    },
+    {
+      "id": "site-administration-6",
+      "title": "After sign-out, browser Back re-displays the cached admin User Accounts page",
+      "findings": [
+        "run1-09",
+        "run2-14",
+        "run3-10"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Deliberate: Gitea's cache-control code states that 'max-age=0 + must-revalidate' is preferred over 'no-store' so that browsers can restore pages on navigate-back; the page comes from the browser's back-forward cache with no request, and the server refuses it on reload (redirect to sign-in).",
+      "evidence": [
+        "run1-09/shot-3.png",
+        "run1-09/shot-4.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/modules/httpcache/httpcache.go (comment in SetCacheControlInHeader)"
+      ]
+    },
+    {
+      "id": "site-administration-7",
+      "title": "Queue pool settings accept -1 as 'Max Number of workers'",
+      "findings": [
+        "run1-01"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Deliberate: the handler explicitly keeps -1 as the lowest valid value (anything below is clamped to -1) and the worker group handles a max of 0 or less by still running one worker, so -1 is an accepted sentinel, not an unchecked sign.",
+      "evidence": [
+        "run1-01/frame-4.jpg"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/admin/queue.go (QueueSet: if maxNumber < -1 { maxNumber = -1 })",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/modules/queue/workergroup.go (q.workerMaxNum <= 0 branch)"
+      ]
+    },
+    {
+      "id": "site-administration-8",
+      "title": "Submitting an empty 'Max Number of workers' shows 'Settings Updated' and keeps the value",
+      "findings": [
+        "run2-11"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Deliberate: the handler has an explicit branch for an empty field that re-applies the current value (the placeholder reads 'Currently N'), then confirms the save; no data is lost or changed.",
+      "evidence": [
+        "run2-11/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/admin/queue.go (QueueSet: else { maxNumber = mq.GetWorkerMaxNumber() })"
+      ]
+    },
+    {
+      "id": "site-administration-9",
+      "title": "Admin tables are clipped at 768 px with no visible scrollbar (queue detail table, repository list)",
+      "findings": [
+        "run1-08",
+        "run3-19"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Deliberate and not shown as unreachable: admin table panels have 'overflow-x: auto' precisely so wide tables scroll sideways inside the panel on small screens (the finding's own expected alternative); the screenshots only show the unscrolled state, and automated headless Chromium hides scrollbars.",
+      "evidence": [
+        "run1-08/shot-1.png",
+        "run3-19/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/web_src/css/admin.css (.admin .ui.table.segment { overflow-x: auto; /* ... many wide tables (eg: user list) need scroll bars */ })"
+      ]
+    },
+    {
+      "id": "site-administration-10",
+      "title": "Queue detail table on phone widths lists all labels first and all values after, detaching each value from its label",
+      "findings": [
+        "run1-17",
+        "run3-12"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "Below 768 px the table stacks into one column (seven captions, then seven bare values such as 1, 0, 1, 0), so the worker counts cannot be told apart. It is the only data table in the admin area without the 'unstackable' class that the Queues list and all other admin tables carry, so it reads as an omission, not a design.",
+      "evidence": [
+        "run3-12/shot-1.png",
+        "run1-17/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/admin/queue_manage.tmpl (table without 'unstackable')",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/admin/queue.tmpl (table ... unstackable)",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/web_src/css/modules/table.css (@media max-width: 767.98px .ui.table:not(.unstackable))"
+      ]
+    },
+    {
+      "id": "site-administration-11",
+      "title": "'Update Avatar' with no file chosen reports 'The user's avatar has been updated.'",
+      "findings": [
+        "run1-12"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Deliberate: the same form also saves the avatar source choice ('Use Custom Avatar') and the handler has an explicit path for 'no avatar is uploaded', saving those fields and confirming; a file is optional by design.",
+      "evidence": [
+        "run1-12/shot-1.png",
+        "run1-12/shot-2.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/user/setting/profile.go (UpdateAvatarSetting: 'No avatar is uploaded but setting has been changed')",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/admin/users.go (AvatarPost)"
+      ]
+    },
+    {
+      "id": "site-administration-12",
+      "title": "'admin' badge overlaps the account avatar in the mobile navigation menu",
+      "findings": [
+        "run1-15"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Deliberate: the badge is styled as an absolutely positioned overlay on the navbar avatar (top: -1px; left: 18px) and sits on the avatar the same way at desktop width, as the desktop frames of this same area show; the username stays readable next to it.",
+      "evidence": [
+        "run1-15/shot-1.png",
+        "run1-09/frame-1.jpg"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/web_src/css/modules/navbar.css (#navbar .ui.dropdown .navbar-profile-admin)",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/base/head_navbar.tmpl"
+      ]
+    },
+    {
+      "id": "site-administration-13",
+      "title": "Pressing Enter on the New Organization form triggers a 'Leave site?' prompt and no validation message",
+      "findings": [
+        "run1-19"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Same automation key-timing artifact as the Enter/leave-page race; not reproducible at human key-hold.",
+      "evidence": [
+        "run1-19/frame-5.jpg",
+        "run1-19/shot-4.png",
+        "run1-19/shot-5.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/web_src/js/vendor/jquery.are-you-sure.ts (fieldEvents include keyup; submit only removes the dirty class; comment in ignoreAreYouSure)",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/org/create.tmpl (form without ignore-dirty)"
+      ]
+    },
+    {
+      "id": "site-administration-14",
+      "title": "Running Processes header counts more processes than the tab lists (e.g. 74 claimed, 48 shown)",
+      "findings": [
+        "run2-13"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "The header number is taken from the full process map before the Running Processes tab filters out system processes, so the count above the list is always larger than the list (a constant 26 here) with no hint that entries are hidden. Rated cosmetic because the total itself is true and nothing is lost; the filter is intended, the mismatched label is not explained anywhere.",
+      "evidence": [
+        "run2-13/shot-4.png",
+        "run2-13/shot-5.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/modules/process/manager_stacktraces.go (processCount = len(pm.processMap), then noSystem filtering)",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/admin/stacktrace.go (showNoSystem := show == \"process\")",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/admin/stacktrace.tmpl"
+      ]
+    },
+    {
+      "id": "site-administration-15",
+      "title": "Dashboard update banner announces 'Gitea 28.4.0' while the instance runs 1.24.7",
+      "findings": [
+        "run2-15",
+        "run3-15"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "External data, not app behaviour: the banner prints whatever the update-check endpoint reports, and https://dl.gitea.com/gitea/version.json returned {\"latest\":{\"version\":\"28.4.0\"}} when fetched during this review (2026-11-23). The app compared and displayed that value as designed.",
+      "evidence": [
+        "run2-15/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/services/cron/tasks_extended.go (update_checker HTTPEndpoint https://dl.gitea.com/gitea/version.json)",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/modules/updatechecker/update_checker.go",
+        "https://dl.gitea.com/gitea/version.json"
+      ]
+    },
+    {
+      "id": "site-administration-16",
+      "title": "A long 'Open with' editor name overflows the clone menu and is cut off at the window edge",
+      "findings": [
+        "run3-14"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "The menu item is rendered as one unbreakable line with no wrap or ellipsis, so an editor name saved in the admin setting runs out of the dropdown box and past the window edge. Cosmetic and only reachable with an unusually long, space-free name typed by an administrator.",
+      "evidence": [
+        "run3-14/shot-1.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/repo/clone_panel.tmpl (repo.open_with_editor .DisplayName)",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/web_src/css/repo/clone.css (.clone-panel-list .item has no overflow/wrap rule)"
+      ]
+    },
+    {
+      "id": "site-administration-17",
+      "title": "Confirming an organization deletion also sends a POST to .../settings/null that fails with 404",
+      "findings": [
+        "run3-18"
+      ],
+      "verdict": "accept",
+      "severity": 1,
+      "reason": "In the delete-button handler the 'data-type=form' branch calls form.submit() and then falls through to POST(btn.getAttribute('data-url')), which is null for this button, so every deletion fires a stray failing request. The deletion still works and the user sees nothing, hence cosmetic; the frames show the dialog only, the request itself is confirmed by the source.",
+      "evidence": [
+        "run3-18/shot-1.png",
+        "run3-18/shot-3.png"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/web_src/js/features/common-button.ts (initGlobalDeleteButton onApprove: no return after form.submit())",
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/templates/org/settings/delete.tmpl (delete-button with data-type=\"form\", no data-url)"
+      ]
+    },
+    {
+      "id": "site-administration-18",
+      "title": "A nonexistent admin user address (/-/admin/users/999) redirects to the user list instead of a Not Found page",
+      "findings": [
+        "run3-20"
+      ],
+      "verdict": "reject",
+      "severity": null,
+      "reason": "Deliberate: the admin user handlers explicitly redirect to /-/admin/users when the user id does not exist, and only other errors produce an error page. A missing message is a preference, not a broken promise.",
+      "evidence": [
+        "run3-20/frame-2.jpg"
+      ],
+      "source": [
+        "https://github.com/go-gitea/gitea/blob/v1.24.7/routers/web/admin/users.go (prepareUserInfo: IsErrUserNotExist -> ctx.Redirect(.../-/admin/users))"
+      ]
+    }
+  ]
+}

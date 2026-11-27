@@ -1,0 +1,275 @@
+{
+  "fixture": "gitea/areas/site-administration",
+  "run": 1,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 215,
+      "name": "Queue pool settings accept a negative maximum number of workers (-1) and report \"Settings Updated\"",
+      "summary": "The page shows the green message 'Settings Updated', the queue table shows 'Max Number of Workers' = -1 and the input placeholder now reads 'Currently -1'. The negative maximum persists after a reload. (The same form correctly rejects 'abc' with 'Max number of workers must be a number', so only the numeric sign goes unchecked.) (on /-/admin/monitor/queue/1)",
+      "expected": "The maximum number of workers must be a non-negative (positive) whole number: the page refuses -1 with a message next to/instead of saving, as it already does for letters ('Max number of workers must be a number').",
+      "actual": "The page shows the green message 'Settings Updated', the queue table shows 'Max Number of Workers' = -1 and the input placeholder now reads 'Currently -1'. The negative maximum persists after a reload. (The same form correctly rejects 'abc' with 'Max number of workers must be a number', so only the numeric sign goes unchecked.)",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /-/admin/monitor/queue",
+        "Click 'Review / Add Workers' on the first row (notification-service) so that /-/admin/monitor/queue/1 opens",
+        "In the 'Pool Settings' panel, type -1 into the 'Max Number of workers' field (placeholder 'Currently 1')",
+        "Click 'Update Settings'"
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 262,
+      "name": "A queue address that does not exist shows a completely blank page instead of a 404 message",
+      "summary": "The browser receives a 404 and renders a completely blank white page: no title, no Gitea navigation or admin menu, no error text and no link back. Identical after a reload (two 404 responses, both blank). (on /-/admin/monitor/queue/14)",
+      "expected": "A not-found page: a message such as 'Page Not Found' with a way back (e.g. to the Queues list), inside the normal page layout.",
+      "actual": "The browser receives a 404 and renders a completely blank white page: no title, no Gitea navigation or admin menu, no error text and no link back. Identical after a reload (two 404 responses, both blank).",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /-/admin/monitor/queue (the list holds 13 queues, numbered 1 to 13)",
+        "Enter the address of a queue that does not exist: /-/admin/monitor/queue/14",
+        "The page loads blank; reload it and it is blank again"
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 264,
+      "name": "Monitoring → Trace opens an empty page: no stacktrace or process list until a tab is clicked",
+      "summary": "The page at /-/admin/monitor/stacktrace renders only the header \\\"172 Goroutines\\\" with an empty panel below; no tab is active and there is no stacktrace or process list. The same URL reloaded still shows the empty panel, while ?show=stacktrace and ?show=process render full lists. (on /-/admin/monitor/stacktrace)",
+      "expected": "The Trace page opened from the Monitoring menu should show content: a default tab (Running Processes or Stacktrace) should be selected and its list of goroutines/processes rendered, as it is after clicking a tab.",
+      "actual": "The page at /-/admin/monitor/stacktrace renders only the header \\\"172 Goroutines\\\" with an empty panel below; no tab is active and there is no stacktrace or process list. The same URL reloaded still shows the empty panel, while ?show=stacktrace and ?show=process render full lists.",
+      "reproSteps": [
+        "Sign in as eval, open the admin panel and choose Monitoring → Trace in the left menu (address /-/admin/monitor/stacktrace, no query string).",
+        "Look at the content panel: only the header \"172 Goroutines\" is rendered, below it the panel is completely empty and neither the Running Processes nor the Stacktrace tab appears active.",
+        "Click the Stacktrace tab (address becomes /-/admin/monitor/stacktrace?show=stacktrace) and the list of stacktraces appears (\"130 Goroutines, 65 Processes\")."
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 352,
+      "name": "At phone width the \"Unadopted Repositories\" button covers the \"Repository Management (Total: N)\" heading",
+      "summary": "At 390px width the 'Unadopted Repositories' button sits on top of the page heading: the heading is cut off and reads only 'Repository Management (Tota', so the repository count in it cannot be read. (on /-/admin/repos)",
+      "expected": "The heading stays readable (wraps to a second line or sits above the button) at phone width, as it does at 768px and 1440px.",
+      "actual": "At 390px width the 'Unadopted Repositories' button sits on top of the page heading: the heading is cut off and reads only 'Repository Management (Tota', so the repository count in it cannot be read.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /-/admin/repos",
+        "Set the browser width to 390 CSS pixels (phone size)",
+        "Look at the panel heading 'Repository Management (Total: 1)' next to the blue 'Unadopted Repositories' button"
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 383,
+      "name": "At phone/tablet width the \"Download diagnosis report\" button covers the \"Stacktrace\" tab on the Trace page",
+      "summary": "The blue \"Download diagnosis report\" button is drawn on top of the \"Stacktrace\" tab, hiding most of it (only \"Stack\" is legible), and the seconds field drops out of its row under the button; the tab row and the toolbar overlap. (on /-/admin/monitor/perftrace)",
+      "expected": "The toolbar wraps so that the tabs, the button and the seconds field each stay fully visible and clickable, as they are at 1440 px.",
+      "actual": "The blue \"Download diagnosis report\" button is drawn on top of the \"Stacktrace\" tab, hiding most of it (only \"Stack\" is legible), and the seconds field drops out of its row under the button; the tab row and the toolbar overlap.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /-/admin/monitor/perftrace",
+        "Narrow the browser window to 390 x 844 (also reproducible at 768 x 1024)",
+        "Look at the toolbar row above the trace list: the 'Running Processes' and 'Stacktrace' tabs are on the left, the 'Download diagnosis report' button and the seconds field on the right"
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 405,
+      "name": "Admin sidebar collapses the Monitoring section and loses the current-page mark on queue detail pages",
+      "summary": "On every queue detail page the 'Monitoring' section in the Admin Settings sidebar is collapsed (no Stats / Cron Tasks / Queues / Trace visible) and no entry is marked as current, so the page the administrator is on is not shown in the menu. On /-/admin/monitor/queue the same menu is expanded and 'Queues' is marked as the current item. Seen on /-/admin/monitor/queue/1, /2, /3, /5 and /9. (on /-/admin/monitor/queue/9)",
+      "expected": "Like on the Queues list page, the sidebar keeps 'Monitoring' expanded and marks 'Queues' as the current page while an individual queue page is open.",
+      "actual": "On every queue detail page the 'Monitoring' section in the Admin Settings sidebar is collapsed (no Stats / Cron Tasks / Queues / Trace visible) and no entry is marked as current, so the page the administrator is on is not shown in the menu. On /-/admin/monitor/queue the same menu is expanded and 'Queues' is marked as the current item. Seen on /-/admin/monitor/queue/1, /2, /3, /5 and /9.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /-/admin/monitor/queue: the Admin Settings sidebar has 'Monitoring' expanded with Stats, Cron Tasks, Queues, Trace, and 'Queues' is marked as the current item",
+        "Open any queue detail page, e.g. /-/admin/monitor/queue/9 (mirror) by its address or through 'Review / Add Workers'",
+        "Look at the Admin Settings sidebar: 'Monitoring' is collapsed (a '>' chevron) and none of its entries is marked as current"
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 465,
+      "name": "Statistics page reports Release 1 but the only repository has 0 releases",
+      "summary": "The Summary table on Statistics reports Release = 1, while the only repository (eval/harbor-handbook) shows '0 Releases' on its Releases tab, its releases RSS feed has no items, and its tag v1.0.0 offers 'New Release' (no release attached). The admin page therefore reports a release that no view of the instance shows. Every other counter I cross-checked agrees with reality (Repo 1, User 3, Org 0, Branches 2, Issue 4 = IssueOpen 3 + IssueClosed 1, Label 2, Milestone 1, Tags 1, Watch 1, Star 0, PublicKey 0 with no SSH keys). (on /-/admin/monitor/stats)",
+      "expected": "The Release counter should match the releases that exist on the instance. There is exactly one repository (Repo 1) and it has no releases, so Release should read 0 and agree with what the repository's Releases tab, its RSS feed and its Tags page show.",
+      "actual": "The Summary table on Statistics reports Release = 1, while the only repository (eval/harbor-handbook) shows '0 Releases' on its Releases tab, its releases RSS feed has no items, and its tag v1.0.0 offers 'New Release' (no release attached). The admin page therefore reports a release that no view of the instance shows. Every other counter I cross-checked agrees with reality (Repo 1, User 3, Org 0, Branches 2, Issue 4 = IssueOpen 3 + IssueClosed 1, Label 2, Milestone 1, Tags 1, Watch 1, Star 0, PublicKey 0 with no SSH keys).",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Open /-/admin/monitor/stats and scroll down the Summary table: the row 'Release' shows 1 (row 'Tags' also shows 1, 'Repo' 1).",
+        "Open /eval/harbor-handbook/releases: the tab reads '0 Releases | 1 Tag' and the release list is empty.",
+        "Open /eval/harbor-handbook/releases.rss: the feed has no release item.",
+        "Open /eval/harbor-handbook/tags: the only tag v1.0.0 offers a 'New Release' action, i.e. no release is attached to it.",
+        "Reload /-/admin/monitor/stats: 'Release' still shows 1."
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 490,
+      "name": "Queue detail table is cut off at tablet width: worker counts and \"Remove all\" are unreachable",
+      "summary": "The queue row is cut off at the right edge of the content area: 'Number of Workers' is cut mid-header ('Number of'), and the 'Active Workers', 'Max Number of Workers', 'Number in Queue' columns and the 'Remove all' button are not visible and cannot be reached — no horizontal scrollbar appears. This is a different table from the queue list (the list's table is cut at 390 px and has the 'Review / Add Workers' link; this one is the single-queue table on the detail page, cut at 768 px where it does not stack even though it stacks at 390 px), and the Pool Settings panel below it is unaffected. (on /-/admin/monitor/queue/4)",
+      "expected": "The queue's detail row (name, type, exemplar type, worker counts, queue length) and the 'Remove all' button are all readable and reachable at tablet width, e.g. by stacking the row as it already does at 390 px.",
+      "actual": "The queue row is cut off at the right edge of the content area: 'Number of Workers' is cut mid-header ('Number of'), and the 'Active Workers', 'Max Number of Workers', 'Number in Queue' columns and the 'Remove all' button are not visible and cannot be reached — no horizontal scrollbar appears. This is a different table from the queue list (the list's table is cut at 390 px and has the 'Review / Add Workers' link; this one is the single-queue table on the detail page, cut at 768 px where it does not stack even though it stacks at 390 px), and the Pool Settings panel below it is unaffected.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1",
+        "Set the browser viewport to 768 x 1024 (tablet)",
+        "Open a queue detail page, e.g. /-/admin/monitor/queue/4 (repo_license_updater)",
+        "Look at the queue's row above 'Pool Settings' and try to reach the worker counts and the 'Remove all' button"
+      ]
+    },
+    {
+      "index": 8,
+      "reported_at_seconds": 545,
+      "name": "After signing out, Back re-displays the cached admin User Accounts page with all users' email addresses",
+      "summary": "The browser shows the full admin \"User Account Management (Total: 3)\" page again, with the ID, username, email address, Activated/Restricted/2FA and last sign-in columns of alex, eval and maya, and the signed-in \"admin\" avatar in the top bar. No request to /-/admin/users is made: the page is restored from the browser's back-forward cache, so the signed-out person sees the administrator inventory again. Reloading that address does redirect to the sign-in page, so only the cached copy is exposed. (on /-/admin/users)",
+      "expected": "After signing out, pressing Back must not show the administrator's page again: the address should go back to the sign-in page (or a signed-out error), never re-display the admin user inventory with the accounts' email addresses.",
+      "actual": "The browser shows the full admin \"User Account Management (Total: 3)\" page again, with the ID, username, email address, Activated/Restricted/2FA and last sign-in columns of alex, eval and maya, and the signed-in \"admin\" avatar in the top bar. No request to /-/admin/users is made: the page is restored from the browser's back-forward cache, so the signed-out person sees the administrator inventory again. Reloading that address does redirect to the sign-in page, so only the cached copy is exposed.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 (administrator) at https://5503-i4ts0quf2p9cd8sm9ts9s.e2b.app/user/login.",
+        "Open https://5503-i4ts0quf2p9cd8sm9ts9s.e2b.app/-/admin/users — the User Account Management list of 3 accounts is shown.",
+        "Open the avatar menu at the top right and click 'Sign Out'. The anonymous home page appears.",
+        "Press the browser's Back button once.",
+        "Observe: the User Accounts admin page with all accounts and their email addresses is displayed again (no request is sent for it)."
+      ]
+    },
+    {
+      "index": 9,
+      "reported_at_seconds": 588,
+      "name": "Choosing a Filter silently discards the chosen Sort order",
+      "summary": "The list comes back in alphabetical order (alex then maya, header arrow on Username ▲) and 'sort=newest' / 'sort=reversealphabetically' is gone from the address. The chosen sort order is silently discarded. The reverse is not true: changing Sort keeps the Filter in the address, so the two controls behave inconsistently. (on /-/admin/users)",
+      "expected": "The rows stay in the sort order the person chose (Newest: maya, alex; Reverse alphabetically: maya, alex) and the Sort menu / header arrow still show that order, exactly as the Filter survives when the Sort is changed.",
+      "actual": "The list comes back in alphabetical order (alex then maya, header arrow on Username ▲) and 'sort=newest' / 'sort=reversealphabetically' is gone from the address. The chosen sort order is silently discarded. The reverse is not true: changing Sort keeps the Filter in the address, so the two controls behave inconsistently.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-i4ts0quf2p9cd8sm9ts9s.e2b.app/-/admin/users",
+        "Open the Sort menu and choose 'Newest' (or 'Reverse alphabetically'); the rows are ordered maya (ID 3), alex (ID 2), eval (ID 1) and the ID header shows a down arrow",
+        "Open the Filter menu and click 'Not Admin'",
+        "Look at the rows again: they are alex (ID 2) then maya (ID 3), i.e. alphabetical ascending, and the arrow has moved back to Username"
+      ]
+    },
+    {
+      "index": 10,
+      "reported_at_seconds": 612,
+      "name": "User Accounts search treats % and _ as wildcards: searching \"%\" lists every user",
+      "summary": "Both searches return the whole inventory: the header stays \\\"User Account Management (Total: 3)\\\" and all three rows (alex, eval, maya) are listed, none of which contains % or _. The term is passed into the SQL LIKE pattern unescaped, so a user searching for these characters sees every account as if it matched. (on /-/admin/users)",
+      "expected": "No username or email contains a literal % or _, so the search should return no matching user and say so (the empty-result state), as it does for any other term that matches nothing.",
+      "actual": "Both searches return the whole inventory: the header stays \\\"User Account Management (Total: 3)\\\" and all three rows (alex, eval, maya) are listed, none of which contains % or _. The term is passed into the SQL LIKE pattern unescaped, so a user searching for these characters sees every account as if it matched.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /-/admin/users (Site Administration → Identity & Access → User Accounts). The header reads \"User Account Management (Total: 3)\" with rows alex, eval, maya.",
+        "Type % into the \"Search users...\" box and press Enter.",
+        "Observe the header total and the rows.",
+        "Repeat with _ in the same box and press Enter."
+      ]
+    },
+    {
+      "index": 11,
+      "reported_at_seconds": 616,
+      "name": "\\\"Update Avatar\\\" with no file chosen reports \\\"The user's avatar has been updated.\\\" although nothing changed",
+      "summary": "The form is posted (POST /-/admin/users/1/avatar → 303) and the user detail page shows the green flash message \"The user's avatar has been updated.\" Nothing was uploaded: on reopening /-/admin/users/1/edit the \"Use Custom Avatar\" radio is still unchecked, the file input still says \"No file chosen\", and the avatar image is the same as before the click. No validation message is shown anywhere. (on /-/admin/users/1/edit)",
+      "expected": "The form refuses the empty submit and says a file must be chosen (or the button does nothing), because no avatar was selected to update.",
+      "actual": "The form is posted (POST /-/admin/users/1/avatar → 303) and the user detail page shows the green flash message \"The user's avatar has been updated.\" Nothing was uploaded: on reopening /-/admin/users/1/edit the \"Use Custom Avatar\" radio is still unchecked, the file input still says \"No file chosen\", and the avatar image is the same as before the click. No validation message is shown anywhere.",
+      "reproSteps": [
+        "Sign in at /user/login as eval / momentic-eval-1",
+        "Open https://5503-i4ts0quf2p9cd8sm9ts9s.e2b.app/-/admin/users/1/edit",
+        "Scroll down to the Avatar section: \"Choose new avatar\" shows \"No file chosen\" and no file is picked",
+        "Click the \"Update Avatar\" button",
+        "Read the green message at the top of the page you land on (/-/admin/users/1), then go back to /-/admin/users/1/edit and look at the Avatar section"
+      ]
+    },
+    {
+      "index": 12,
+      "reported_at_seconds": 629,
+      "name": "After Back, the User Accounts search box shows the previous term while the list shows results for another",
+      "summary": "The page at ?q=maya comes back from history with the results for \"maya\" (Total: 1, row maya) while the search box still contains \"agent7-none\" — the field and the list it filters disagree, so the person cannot tell which term is applied. Reloading with the same address (?q=maya) shows \"maya\" in the field, so the shipped markup is right and the field is left with the old typed value on history navigation. Reproduced twice (two separate Back navigations to ?q=maya). (on /-/admin/users)",
+      "expected": "Back returns to the previous result page with the search box showing the term of the results shown (?q=maya), matching the list.",
+      "actual": "The page at ?q=maya comes back from history with the results for \"maya\" (Total: 1, row maya) while the search box still contains \"agent7-none\" — the field and the list it filters disagree, so the person cannot tell which term is applied. Reloading with the same address (?q=maya) shows \"maya\" in the field, so the shipped markup is right and the field is left with the old typed value on history navigation. Reproduced twice (two separate Back navigations to ?q=maya).",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-i4ts0quf2p9cd8sm9ts9s.e2b.app/-/admin/users",
+        "Type maya in \"Search users...\" and press Enter (Total: 1, row maya)",
+        "Type agent7-none in the same box and press Enter (Total: 0, \"No results found.\")",
+        "Press the browser Back button once: the address is .../-/admin/users?q=maya and the table shows maya (Total: 1)"
+      ]
+    },
+    {
+      "index": 13,
+      "reported_at_seconds": 737,
+      "name": "Repository commit and tag list headers say \\\"1 Commits\\\" and \\\"1 Tags\\\" for a single item",
+      "summary": "Both list headers use the plural form with a count of one: the commit list header on /eval/harbor-handbook/commits/branch/main reads \\\"1 Commits\\\" while the tab above it correctly reads \\\"1 Commit\\\", and the tag list header on /eval/harbor-handbook/tags reads \\\"1 Tags\\\" while its tab reads \\\"1 Tag\\\". (on /eval/harbor-handbook/commits/branch/main and /eval/harbor-handbook/tags)",
+      "expected": "With a single item the header should use the singular: \\\"1 Commit\\\" and \\\"1 Tag\\\", as the tabs above them already do.",
+      "actual": "Both list headers use the plural form with a count of one: the commit list header on /eval/harbor-handbook/commits/branch/main reads \\\"1 Commits\\\" while the tab above it correctly reads \\\"1 Commit\\\", and the tag list header on /eval/harbor-handbook/tags reads \\\"1 Tags\\\" while its tab reads \\\"1 Tag\\\".",
+      "reproSteps": [
+        "Sign in as eval and open the repository /eval/harbor-handbook, then click the commit count \"1 Commit\" above the file list (address /eval/harbor-handbook/commits/branch/main).",
+        "Read the header of the commit list: it says \"1 Commits\" while the tab above says \"1 Commit\".",
+        "Open /eval/harbor-handbook/tags (Releases → Tags): the header of the tag list says \"1 Tags\" while the tab above says \"1 Tag\"."
+      ]
+    },
+    {
+      "index": 14,
+      "reported_at_seconds": 782,
+      "name": "At phone width the \\\"admin\\\" role badge covers the account avatar in the mobile navigation menu",
+      "summary": "At 390 px width the blue \"admin\" badge is drawn on top of the account entry in the mobile navigation menu, covering the user's avatar; only a sliver of the avatar is visible at the bottom-left of the badge and the username \"eval\" sits underneath. At desktop width the badge does not hide the account identity this way. (on /-/admin)",
+      "expected": "The role badge should sit next to the avatar/username without covering it, so the administrator recognises their own account entry in the mobile menu.",
+      "actual": "At 390 px width the blue \"admin\" badge is drawn on top of the account entry in the mobile navigation menu, covering the user's avatar; only a sliver of the avatar is visible at the bottom-left of the badge and the username \"eval\" sits underneath. At desktop width the badge does not hide the account identity this way.",
+      "reproSteps": [
+        "Signed in as the administrator eval / momentic-eval-1, open https://5503-i4ts0quf2p9cd8sm9ts9s.e2b.app/-/admin.",
+        "Set the browser window to a phone size (390 x 844).",
+        "Tap the hamburger \"Navigation Menu\" button at the top right to open the navigation menu.",
+        "Look at the account row of the opened menu (above the Admin Settings panel): the \"admin\" badge covers the avatar and the name \"eval\" is squeezed underneath it."
+      ]
+    },
+    {
+      "index": 15,
+      "reported_at_seconds": 978,
+      "name": "Malformed value in the \\\"Open with\\\" editors setting is silently discarded on Save, wiping the stored editors",
+      "summary": "Nothing is saved and nothing is said: no error or confirmation message appears anywhere, and after the save the textarea is empty again (while a value in the documented \"Name = url\" format does persist, so the field itself works). Saving the malformed value also wipes whatever was stored before it without a word: while testing, the custom entry \"Agent5Editor = agent5edit://open?url={url}\" that was saved and shown in the Clone menu was silently removed by the next save of \"vscode\" (the Clone menu went back to the default VS Code / VSCodium / IntelliJ IDEA entries). Reproduced twice; the setting has been restored to its original empty/default state and the Clone menu shows the defaults again. (on /-/admin/config/settings)",
+      "expected": "Either the malformed entry is refused with a message next to the field (and the stored editors stay as they were), or the save is confirmed with feedback; the person must never be left believing a value was stored when it was dropped, and must not lose the previously stored value without warning.",
+      "actual": "Nothing is saved and nothing is said: no error or confirmation message appears anywhere, and after the save the textarea is empty again (while a value in the documented \"Name = url\" format does persist, so the field itself works). Saving the malformed value also wipes whatever was stored before it without a word: while testing, the custom entry \"Agent5Editor = agent5edit://open?url={url}\" that was saved and shown in the Clone menu was silently removed by the next save of \"vscode\" (the Clone menu went back to the default VS Code / VSCodium / IntelliJ IDEA entries). Reproduced twice; the setting has been restored to its original empty/default state and the Clone menu shows the defaults again.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-i4ts0quf2p9cd8sm9ts9s.e2b.app/-/admin/config/settings",
+        "In the Repository section, click the expander \"The \"Open with\" editors for the clone menu...\" to see the default example entries (VS Code / VSCodium / IntelliJ IDEA in \"Name = url\" form); the textarea is empty",
+        "Type \"vscode\" (a value without the \"Name = url\" form) into the textarea",
+        "Press the Save button once",
+        "Look at the page: no message of any kind appears and the textarea is empty again",
+        "Contrast: type \"Agent5Editor = agent5edit://open?url={url}\" and press Save - that value is kept and the repo Clone menu shows \"Open with Agent5Editor\"",
+        "Type \"vscode\" over that saved value and press Save again: it disappears from the field and the stored editor is wiped (Clone menu back to the three defaults)"
+      ]
+    },
+    {
+      "index": 16,
+      "reported_at_seconds": 1005,
+      "name": "Queue detail worker table at 320px loses its column structure: captions and values stack as two lists",
+      "summary": "At 320px the table collapses into a single column: all captions are listed first (Name, Type, Exemplar Type, Number of Workers, Active Workers, Max Number of Workers, Number in Queue) and then all values in a separate block (notification-service, level, uinotification.issueNotificationOpts, 1, 0, 1, 0). The four numbers have no caption of their own, so a reader cannot tell which count is which, and the table cannot be scrolled sideways to restore the columns. (on /-/admin/monitor/queue/1)",
+      "expected": "The table keeps its two-column layout (or scrolls horizontally), so each value is shown next to its caption: Name=notification-service, Type=level, Exemplar Type=uinotification.issueNotificationOpts, Number of Workers=1, Active Workers=0, Max Number of Workers=1, Number in Queue=0.",
+      "actual": "At 320px the table collapses into a single column: all captions are listed first (Name, Type, Exemplar Type, Number of Workers, Active Workers, Max Number of Workers, Number in Queue) and then all values in a separate block (notification-service, level, uinotification.issueNotificationOpts, 1, 0, 1, 0). The four numbers have no caption of their own, so a reader cannot tell which count is which, and the table cannot be scrolled sideways to restore the columns.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and set the browser window to 320x480 CSS pixels.",
+        "Open https://5503-i4ts0quf2p9cd8sm9ts9s.e2b.app/-/admin/monitor/queue/1 (Queue: notification-service).",
+        "Scroll down to the panel titled \"Queue: notification-service\" and look at its table.",
+        "Try to scroll the table sideways (trackpad/mouse wheel horizontally over the table) to bring the columns back."
+      ]
+    },
+    {
+      "index": 17,
+      "reported_at_seconds": 1080,
+      "name": "Maintenance operation and cron task are named \\\"Delete all repositories' archives (ZIP, TAR.GZ, etc..)\\\" with a doubled full stop",
+      "summary": "The maintenance row at /-/admin reads 'Delete all repositories' archives (ZIP, TAR.GZ, etc..)' — two full stops after 'etc' — and the same broken string is used as the cron task name on /-/admin/monitor/cron (row 'Delete all repositories' archives (ZIP, TAR.GZ, etc..)', no schedule, 0 executions). (on /-/admin)",
+      "expected": "'Delete all repositories' archives (ZIP, TAR.GZ, etc.)' — one full stop, so the operation and the cron task it lists read as correct text.",
+      "actual": "The maintenance row at /-/admin reads 'Delete all repositories' archives (ZIP, TAR.GZ, etc..)' — two full stops after 'etc' — and the same broken string is used as the cron task name on /-/admin/monitor/cron (row 'Delete all repositories' archives (ZIP, TAR.GZ, etc..)', no schedule, 0 executions).",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-i4ts0quf2p9cd8sm9ts9s.e2b.app/-/admin",
+        "Read the second row of 'Maintenance Operations'",
+        "Open Monitoring → Cron Tasks (/-/admin/monitor/cron) and find the task with the same name"
+      ]
+    },
+    {
+      "index": 18,
+      "reported_at_seconds": 1420,
+      "name": "Pressing Enter to create an organization triggers a \"Leave site?\" prompt and swallows the validation error",
+      "summary": "Pressing Enter submits the form and the browser then shows a native 'Leave site?' / beforeunload prompt. Dismissing it leaves the person on the New Organization form with their text still in the field and no message at all — the server's answer is never displayed, so it looks as if nothing happened. Clicking the 'Create Organization' button with the same value shows the error normally and no prompt appears. (on /org/create (reached from /-/admin/orgs → \"New Organization\"))",
+      "expected": "Pressing Enter submits the form exactly like clicking 'Create Organization': the validation message 'Organization Name can only contain alphanumeric chars…' appears above the form, the value is kept and no browser 'Leave site?' prompt interrupts the person.",
+      "actual": "Pressing Enter submits the form and the browser then shows a native 'Leave site?' / beforeunload prompt. Dismissing it leaves the person on the New Organization form with their text still in the field and no message at all — the server's answer is never displayed, so it looks as if nothing happened. Clicking the 'Create Organization' button with the same value shows the error normally and no prompt appears.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-i4ts0quf2p9cd8sm9ts9s.e2b.app/-/admin/orgs",
+        "Click 'New Organization' (the form opens at /org/create)",
+        "Type 'my org3' into 'Organization Name *' (a space makes the name invalid, so no organization can be created)",
+        "Press Enter instead of clicking the button",
+        "A native leave-page confirmation appears; dismiss it ('No' / Stay)",
+        "The form is still there with 'my org3' and no error message is shown"
+      ]
+    }
+  ]
+}

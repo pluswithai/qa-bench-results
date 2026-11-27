@@ -1,0 +1,415 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "metabase/areas/data-modeling",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "8f1679af7b62acc177a410f419ceb8657f12ad4ecb69edd82f64f9504f3fcaf9",
+    "known_invalid_sha256": "82b6192aa124b29a30d795070102fc5485f2d38e00f3837f2c18e439983f6000",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "115",
+    "bugs": "35",
+    "flags": "0",
+    "known_hits": "9",
+    "extra_known_hits": "0",
+    "unverified": "22",
+    "outside_area_known_hits": "1",
+    "outside_area_known_invalid": "0",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "1",
+    "outside_area_ground_truth_sha256": "18765609374b28bc9ff8c4d574f183a1cec470472e42a7e8bae343da32e17da8",
+    "outside_area_known_invalid_sha256": "bda5fa1dae2abd3dbc884c784d0bd82ccd854fe93bc63cc4126be5e14c0b4c18",
+    "duplicates": "1",
+    "duplicate_known_hits": "1",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "2",
+    "known_misses": "2",
+    "precision": "0.8333333333333334",
+    "recall": "0.0782608695652174",
+    "findings_per_minute": "1.225144158629332",
+    "correct_findings_per_minute": "0.31503706936182824",
+    "severity_1": "6",
+    "severity_3": "3",
+    "severity_5": "0",
+    "severity_sum": "15",
+    "score": "12",
+    "duration_seconds": "1714.084",
+    "partial": "false",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 92,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Matches the seeded Orders + People model's History displaying “undefined modified this.”"
+      },
+      {
+        "groundTruthIndex": 9,
+        "reproStepsIndex": 0,
+        "findingIndex": 3,
+        "reason": "Matches Field type values clipping and colliding with Data type values in the reference schema; the table and labels differ."
+      },
+      {
+        "groundTruthIndex": 0,
+        "reproStepsIndex": 0,
+        "findingIndex": 6,
+        "reason": "Matches the Actions breadcrumb incorrectly falling back to Our analytics rather than the model's actual collection."
+      },
+      {
+        "groundTruthIndex": 38,
+        "reproStepsIndex": 0,
+        "findingIndex": 7,
+        "reason": "Matches accepting and saving a whitespace-only column display name, leaving a blank header."
+      },
+      {
+        "groundTruthIndex": 112,
+        "reproStepsIndex": 0,
+        "findingIndex": 11,
+        "reason": "Matches the model duplication Name placeholder incorrectly asking for a dashboard name."
+      },
+      {
+        "groundTruthIndex": 27,
+        "reproStepsIndex": null,
+        "findingIndex": 12,
+        "reason": "Matches title-only edits recording unrelated pin-position changes. The listed repro case edits a description rather than renaming through the header."
+      },
+      {
+        "groundTruthIndex": 8,
+        "reproStepsIndex": 0,
+        "findingIndex": 30,
+        "reason": "Matches the metric header collapsing to one character per line at 820×1180; using Revenue instead of Number of Orders is incidental."
+      },
+      {
+        "groundTruthIndex": 10,
+        "reproStepsIndex": 0,
+        "findingIndex": 31,
+        "reason": "Matches clearing a saved Data Reference field description and seeing the previous text restored after Save."
+      },
+      {
+        "groundTruthIndex": 21,
+        "reproStepsIndex": 0,
+        "findingIndex": 33,
+        "reason": "Matches freshly trashed models showing only Move until reload reveals Restore and Delete permanently."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 5,
+        "reproStepsIndex": 0,
+        "findingIndex": 8,
+        "reason": "Matches the rejected expectation that the Models Description header should sort the catalog."
+      },
+      {
+        "knownInvalidIndex": 0,
+        "reproStepsIndex": 0,
+        "findingIndex": 14,
+        "reason": "Matches the rejected inference that extra empty or zero-valued timeline buckets establish that the saved metric's date filter is ignored."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 1,
+        "reason": "No reviewed entry covers overflowing descriptions in the Data Reference table-card list."
+      },
+      {
+        "findingIndex": 2,
+        "reason": "Missing-database URLs rendering an empty detail shell are not covered by the reviewed entries."
+      },
+      {
+        "findingIndex": 4,
+        "reason": "A table referenced under the wrong database is distinct from the rejected claim about intentionally hidden metadata."
+      },
+      {
+        "findingIndex": 5,
+        "reason": "No reviewed entry covers the Questions page automatically collapsing the main sidebar; this is not the rejected Questions-page crash."
+      },
+      {
+        "findingIndex": 10,
+        "reason": "No reviewed entry covers save-oriented wording in the Move dialog heading."
+      },
+      {
+        "findingIndex": 13,
+        "reason": "No reviewed entry covers the Metrics catalog displaying “A metric” for an empty description."
+      },
+      {
+        "findingIndex": 15,
+        "reason": "No reviewed entry covers missing deletion attribution and timestamps for a trashed collection."
+      },
+      {
+        "findingIndex": 16,
+        "reason": "Pin-position wording during trash and restore is not the reviewed title-only or description-only history bug."
+      },
+      {
+        "findingIndex": 17,
+        "reason": "A nonexistent field rendering an empty shell is distinct from the rejected claim concerning intentionally hidden fields."
+      },
+      {
+        "findingIndex": 18,
+        "reason": "No reviewed entry covers the mobile Columns editor losing its column selector."
+      },
+      {
+        "findingIndex": 19,
+        "reason": "No reviewed entry covers silently ignoring an empty database name while saving other database fields."
+      },
+      {
+        "findingIndex": 20,
+        "reason": "No reviewed entry covers Filter and Summarize actions becoming unavailable on a phone."
+      },
+      {
+        "findingIndex": 21,
+        "reason": "Calling a renamed metric “Card” is distinct from conversion history exposing internal type values."
+      },
+      {
+        "findingIndex": 22,
+        "reason": "No reviewed entry covers percent and underscore queries returning all searchable items."
+      },
+      {
+        "findingIndex": 23,
+        "reason": "No reviewed entry covers the Models catalog and Recents displaying “A model” for empty descriptions."
+      },
+      {
+        "findingIndex": 24,
+        "reason": "Conversion allegedly changing the effective date scope is distinct from rejected claims about empty timeline buckets in saved metric results."
+      },
+      {
+        "findingIndex": 25,
+        "reason": "No reviewed entry covers losing a line visualization through metric-to-model-to-question conversion; conversion-history wording is a different claim."
+      },
+      {
+        "findingIndex": 26,
+        "reason": "No reviewed entry covers the mobile Move dialog placing all destination collections off-screen."
+      },
+      {
+        "findingIndex": 27,
+        "reason": "No reviewed entry covers collection names being clipped at the Move dialog's left edge."
+      },
+      {
+        "findingIndex": 28,
+        "reason": "No reviewed entry covers a long reference-field name pushing its Edit control off-screen."
+      },
+      {
+        "findingIndex": 29,
+        "reason": "No reviewed entry covers long search queries causing horizontal page overflow."
+      },
+      {
+        "findingIndex": 32,
+        "reason": "No reviewed entry covers tablet-width reference-table headers overlapping their action buttons."
+      },
+      {
+        "findingIndex": 34,
+        "reason": "No reviewed entry covers a saved foreign-key display name appearing in the editor but not the model table."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 1,
+        "reason": "Descriptions are visually clipped without described functional failure."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "A nonexistent database is incorrectly presented as an existing empty database."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 3,
+        "reason": "The invalid reference renders misleading metadata and links that open an unrelated blank question."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 1,
+        "reason": "Navigation remains available through Toggle sidebar, making this a minor usability issue."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 3,
+        "reason": "As described, clicking an apparent sort control does not perform the expected operation."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 1,
+        "reason": "The described failures concern clipped and overlapping responsive presentation."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 1,
+        "reason": "This is a copy inconsistency; moving is not described as broken."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 1,
+        "reason": "This concerns fallback description text, not a failed data operation."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 3,
+        "reason": "The claim describes an incorrect query result scope, which would be functional misbehavior."
+      },
+      {
+        "findingIndex": 15,
+        "severity": 1,
+        "reason": "Deletion metadata is absent from the displayed row; trash operations are not described as failing."
+      },
+      {
+        "findingIndex": 16,
+        "severity": 1,
+        "reason": "The reported failure is inaccurate history wording, without demonstrated unintended reordering."
+      },
+      {
+        "findingIndex": 17,
+        "severity": 3,
+        "reason": "The application displays a valid-looking field detail state for a field that does not exist."
+      },
+      {
+        "findingIndex": 18,
+        "severity": 3,
+        "reason": "Users cannot select or edit columns other than the first."
+      },
+      {
+        "findingIndex": 19,
+        "severity": 3,
+        "reason": "Submission silently saves only part of the requested edit."
+      },
+      {
+        "findingIndex": 20,
+        "severity": 3,
+        "reason": "The described layout removes access to filtering and summarizing results."
+      },
+      {
+        "findingIndex": 21,
+        "severity": 1,
+        "reason": "This is incorrect user-facing terminology."
+      },
+      {
+        "findingIndex": 22,
+        "severity": 3,
+        "reason": "The claim describes search returning incorrect matches."
+      },
+      {
+        "findingIndex": 23,
+        "severity": 1,
+        "reason": "Only fallback description presentation is disputed."
+      },
+      {
+        "findingIndex": 24,
+        "severity": 3,
+        "reason": "The finding claims conversion changes which data is returned."
+      },
+      {
+        "findingIndex": 25,
+        "severity": 3,
+        "reason": "The finding claims the selected visualization is lost and cannot be restored through the described controls."
+      },
+      {
+        "findingIndex": 26,
+        "severity": 3,
+        "reason": "No destination can be selected, preventing the move operation."
+      },
+      {
+        "findingIndex": 27,
+        "severity": 1,
+        "reason": "Collection labels are partially clipped; selecting them is not described as nonfunctional."
+      },
+      {
+        "findingIndex": 28,
+        "severity": 3,
+        "reason": "The overflow makes the field's Edit action inaccessible."
+      },
+      {
+        "findingIndex": 29,
+        "severity": 1,
+        "reason": "The heading overflows and introduces sideways scrolling without described functional failure."
+      },
+      {
+        "findingIndex": 30,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 31,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 32,
+        "severity": 3,
+        "reason": "The layout makes Edit inaccessible and partially obscures the table-opening control."
+      },
+      {
+        "findingIndex": 33,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 34,
+        "severity": 1,
+        "reason": "The displayed column label is inconsistent; the metadata saves and no data-operation failure is described."
+      }
+    ],
+    "duplicates": [
+      {
+        "findingIndex": 9,
+        "canonicalFindingIndex": 3,
+        "reason": "Matches reference-schema Field type and Data type columns overlapping and clipping at constrained widths; additional sidebar issues are not covered."
+      }
+    ]
+  },
+  "outsideArea": {
+    "knownHits": [
+      {
+        "findingIndex": 16,
+        "reference": {
+          "name": "Renaming a dashboard records an unrelated changed pin position in History",
+          "summary": "Renaming a dashboard records an unrelated changed pin position in History.",
+          "expected": "A title-only rename records only the rename in History.",
+          "actual": "History reads renamed this Dashboard … and changed pin position after only the title was edited.",
+          "reproSteps": [
+            [
+              "Open a dashboard in a collection that has pinned dashboards and choose Duplicate > Only duplicate the dashboard, so the copy shifts the existing pin positions.",
+              "On the copy, rename the dashboard inline, changing only its title.",
+              "Reload, open More info > History, and read the latest entry: it also claims a pin-position change."
+            ]
+          ],
+          "severity": 1
+        },
+        "reason": "History falsely adds a pin-position change to an unrelated operation, matching the reviewed history defect. Model trash/restore differs from the dashboard-rename reproduction."
+      }
+    ],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

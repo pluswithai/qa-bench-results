@@ -1,0 +1,266 @@
+{
+  "fixture": "gitea/areas/wiki",
+  "run": 3,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 489,
+      "name": "Links to wiki pages written as full in-site paths in a page body lead to the Pages list instead of the target page",
+      "summary": "The link points to /eval/harbor-handbook/wiki/eval/harbor-handbook/wiki/Release-Process (the in-site path from the markdown is prefixed a second time) and the browser lands on the wiki 'Pages' list (/eval/harbor-handbook/wiki/?action=_pages) instead of the Release Process page. Same for 'Onboarding' and 'Glossary' in the same list. (on /eval/harbor-handbook/wiki/Home)",
+      "expected": "The link opens the linked wiki page (Release Process), i.e. the same page the Pages list links to at /eval/harbor-handbook/wiki/Release-Process.-",
+      "actual": "The link points to /eval/harbor-handbook/wiki/eval/harbor-handbook/wiki/Release-Process (the in-site path from the markdown is prefixed a second time) and the browser lands on the wiki 'Pages' list (/eval/harbor-handbook/wiki/?action=_pages) instead of the Release Process page. Same for 'Onboarding' and 'Glossary' in the same list.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-is4xaezuej9qas021gzrh.e2b.app/eval/harbor-handbook/wiki/Home",
+        "In the 'Sections' bullet list of the page body, click the link 'Release Process' (same for 'Onboarding' and 'Glossary')",
+        "Observe the address bar and the page that is shown"
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 581,
+      "name": "Saving a stale wiki editor silently deletes a line another tab saved meanwhile",
+      "summary": "Tab 1 saves without any warning or conflict message; the page now contains 'Tab A stale line.' and the line saved from Tab 2 ('Tab B line added in second tab.') is gone. The new commit 4ff2e705b1 shows it as '- Tab B line added in second tab. / + Tab A stale line.' (1 addition, 1 deletion). Nothing on the page tells the user their teammate's saved text was overwritten. (on /eval/harbor-handbook/wiki/agent11-two-accounts.-)",
+      "expected": "The app warns that the page changed since the editor was opened (or refuses/merges), so the line saved from Tab 2 is not lost without notice.",
+      "actual": "Tab 1 saves without any warning or conflict message; the page now contains 'Tab A stale line.' and the line saved from Tab 2 ('Tab B line added in second tab.') is gone. The new commit 4ff2e705b1 shows it as '- Tab B line added in second tab. / + Tab A stale line.' (1 addition, 1 deletion). Nothing on the page tells the user their teammate's saved text was overwritten.",
+      "reproSteps": [
+        "Sign in as alex / momentic-contributor-1 and open /eval/harbor-handbook/wiki/agent11-two-accounts.- (page created for this test).",
+        "Tab 1: open the page editor (Edit button, URL ...wiki/agent11-two-accounts.-?action=_edit) and leave it untouched.",
+        "Tab 2: open the same editor, append the line 'Tab B line added in second tab.' and click Save Page; the page then shows 3 revisions and contains that line.",
+        "Back in Tab 1 (still holding the old body, without Tab B's line), append 'Tab A stale line.' and click Save Page.",
+        "Read the page and then open Wiki Page Revisions and the newest commit 4ff2e705b1."
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 584,
+      "name": "Long wiki page title overflows the \"Page:\" selector at 390px and covers the \"Code\" button",
+      "summary": "The page name is printed in full, runs out of the 'Page:' selector, goes past the right edge of the 390px screen and is cut mid-word with no ellipsis. The blue 'Code' button that normally sits at the top right of that row (x≈282) is covered by the overflowing title and is not visible at all, so it cannot be used. It stays this way after a reload. (on /eval/harbor-handbook/wiki/agent14-very-long-page-title-for-testing-the-mobile-page-selector-and-dropdown-list.-)",
+      "expected": "The page selector shows the current page name shortened to fit its control (ellipsis) and the 'Code' button stays fully visible and clickable at the right of the same row, as it is for shorter page names.",
+      "actual": "The page name is printed in full, runs out of the 'Page:' selector, goes past the right edge of the 390px screen and is cut mid-word with no ellipsis. The blue 'Code' button that normally sits at the top right of that row (x≈282) is covered by the overflowing title and is not visible at all, so it cannot be used. It stays this way after a reload.",
+      "reproSteps": [
+        "Set the browser to a phone size (390 x 844) and sign in as eval.",
+        "Open /eval/harbor-handbook/wiki and click New Page.",
+        "Enter the page title agent14-very-long-page-title-for-testing-the-mobile-page-selector-and-dropdown-list and the body 'Long word test:' and click Save Page.",
+        "Look at the header row under the repo tabs: the 'Page:' selector and the blue '◀▶ Code ▾' button on its right."
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 594,
+      "name": "Renaming a wiki page wipes its revision history (2 commits become 1)",
+      "summary": "After the rename the history lists only '1 Commits' ('Update agent10-hist3') and the badge on the page drops from 2 to 1: the earlier revisions of the page are gone, so no previous version can be viewed, compared or restored. Reproduced twice (agent10-rename -> agent10-renamed also dropped to 1 commit; agent10-hist -> agent10-hist2 -> agent10-hist3). (on /eval/harbor-handbook/wiki/agent10-hist2.-?action=_revision)",
+      "expected": "The renamed page keeps its revision history: the history of agent10-hist3 lists all 3 commits, and the revision badge still counts them, so older revisions can still be opened, compared and diffed.",
+      "actual": "After the rename the history lists only '1 Commits' ('Update agent10-hist3') and the badge on the page drops from 2 to 1: the earlier revisions of the page are gone, so no previous version can be viewed, compared or restored. Reproduced twice (agent10-rename -> agent10-renamed also dropped to 1 commit; agent10-hist -> agent10-hist2 -> agent10-hist3).",
+      "reproSteps": [
+        "Go to https://5503-is4xaezuej9qas021gzrh.e2b.app/eval/harbor-handbook/wiki?action=_new while signed in as eval.",
+        "Enter Page title 'agent10-hist2', Page content 'Revision one content: apple.', click Save Page.",
+        "Click Edit, change the content to 'Revision two content: banana.', click Save Page, then click Edit again, change the content to 'Revision three content: cherry.', click Save Page. The page shows the revision badge '2'.",
+        "Open the revision history: https://5503-is4xaezuej9qas021gzrh.e2b.app/eval/harbor-handbook/wiki/agent10-hist2.-?action=_revision — it lists 2 Commits.",
+        "Click Edit, change only the Page title to 'agent10-hist3' and click Save Page.",
+        "Open https://5503-is4xaezuej9qas021gzrh.e2b.app/eval/harbor-handbook/wiki/agent10-hist3.-?action=_revision."
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 595,
+      "name": "Pages index at tablet width overflows sideways: \"Last updated\" dates pushed off-screen",
+      "summary": "The page list is about 1064 px wide inside the 768 px window: the \\\"Last updated\\\" column sits entirely off-screen to the right and the whole page (including the site navigation and footer) scrolls horizontally to reach it. The long page name \\\"agent1 xxxx…xxx\\\" also runs past the right edge. The date cells are then squeezed to a few characters per line, so each row is 2-3 lines tall. (on /eval/harbor-handbook/wiki/?action=_pages)",
+      "expected": "At 768 px the Pages index should fit the viewport: the page name and its \\\"Last updated\\\" value both visible without sideways scrolling, or at worst only the name column scrolls inside its own box while the header and page stay put.",
+      "actual": "The page list is about 1064 px wide inside the 768 px window: the \\\"Last updated\\\" column sits entirely off-screen to the right and the whole page (including the site navigation and footer) scrolls horizontally to reach it. The long page name \\\"agent1 xxxx…xxx\\\" also runs past the right edge. The date cells are then squeezed to a few characters per line, so each row is 2-3 lines tall.",
+      "reproSteps": [
+        "Set the browser window to 768 x 1024 (tablet).",
+        "Sign in as eval and open the wiki of harbor-handbook: /eval/harbor-handbook/wiki",
+        "Open the page selector (top left) and choose \"Pages\" (or go directly to /eval/harbor-handbook/wiki/?action=_pages).",
+        "Look at the page list: every row shows only the page name; there is no \"Last updated\" column at the right of the screen.",
+        "Scroll the page sideways (trackpad/touch shift-scroll) to the right: the whole page, including the top navigation bar, slides left and the \"Last updated\" column appears at the far right, each date wrapped over three lines (\"Last / updated / 2 minutes ago\")."
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 603,
+      "name": "Escape on the editor's table-size popup throws a script error and does not close it",
+      "summary": "The popup stays open and an uncaught script error fires (pageerror \"Cannot read properties of null (reading 'classList')\" from easymde.609fd356.js, HTMLDocument.documentOnKeyDown). Gitea shows a red banner at the top of the page: 'JavaScript error: Cannot read properties of null (reading 'classList') (…/assets/js/easymde.609fd356.js @ 32:48623). Open browser console to see more details.' The only way to dismiss the popup is with its 'Add' button or a mouse click elsewhere. (on /eval/harbor-handbook/wiki?action=_new)",
+      "expected": "Escape closes the table-size popup without errors.",
+      "actual": "The popup stays open and an uncaught script error fires (pageerror \"Cannot read properties of null (reading 'classList')\" from easymde.609fd356.js, HTMLDocument.documentOnKeyDown). Gitea shows a red banner at the top of the page: 'JavaScript error: Cannot read properties of null (reading 'classList') (…/assets/js/easymde.609fd356.js @ 32:48623). Open browser console to see more details.' The only way to dismiss the popup is with its 'Add' button or a mouse click elsewhere.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-is4xaezuej9qas021gzrh.e2b.app/eval/harbor-handbook/wiki?action=_new",
+        "Click the table icon (last button of the editor toolbar, tooltip 'Add a table') so the small '3 x 3 / Add' popup opens",
+        "Press the Escape key"
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 681,
+      "name": "Whitespace-only wiki revision renders an empty diff while the header still claims \\\"1 additions and 1 deletions\\\"",
+      "summary": "The diff body is completely empty — there is no file row, no lines and no explanation — while the header above it still says \\\"1 changed files with 1 additions and 1 deletions\\\". The reader sees a page claiming one change and showing nothing, so the revision looks empty; the change only appears when the address is edited to add ?whitespace=show-all. (on /eval/harbor-handbook/wiki/commit/cbf19349527acbb296b92762b5a7783266e0a268)",
+      "expected": "The whitespace-only change should be shown (the trailing space added to line 5), or at least the page should say that the change is whitespace-only and hidden, and the header should not count changes that are not displayed.",
+      "actual": "The diff body is completely empty — there is no file row, no lines and no explanation — while the header above it still says \\\"1 changed files with 1 additions and 1 deletions\\\". The reader sees a page claiming one change and showing nothing, so the revision looks empty; the change only appears when the address is edited to add ?whitespace=show-all.",
+      "reproSteps": [
+        "Sign in (username eval) and open https://5503-is4xaezuej9qas021gzrh.e2b.app/eval/harbor-handbook/wiki/agent6-diff.-?action=_revision",
+        "Click the SHA1 link cbf1934952 (commit \"Update agent6-diff\") — on a fresh session the diff shows line 5 as \"- delta line four\" / \"+ delta line four \" (a trailing space was added)",
+        "Click the \"Split View\" toggle at the top right of the diff area; the address becomes ...?style=split&whitespace=ignore-all and the change is no longer shown",
+        "Open the same commit address without query parameters: https://5503-is4xaezuej9qas021gzrh.e2b.app/eval/harbor-handbook/wiki/commit/cbf19349527acbb296b92762b5a7783266e0a268 (or with ?whitespace=ignore-all)"
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 682,
+      "name": "Commit diff summary reads \"1 changed files with 1 additions and 1 deletions\"",
+      "summary": "The line above the diff reads \"1 changed files with 1 additions and 1 deletions\" — three counts of one shown in the plural. Every commit page does this (e.g. also \"1 changed files with 0 additions and 1 deletions\"). (on /eval/harbor-handbook/wiki/commit/cd78ce6dd22df2f087ee212552a7c1b89da37b04)",
+      "expected": "Counts of one are singular: \"1 changed file with 1 addition and 1 deletion\".",
+      "actual": "The line above the diff reads \"1 changed files with 1 additions and 1 deletions\" — three counts of one shown in the plural. Every commit page does this (e.g. also \"1 changed files with 0 additions and 1 deletions\").",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Open the revision history of a page: https://5503-is4xaezuej9qas021gzrh.e2b.app/eval/harbor-handbook/wiki/agent7-rev.-?action=_revision",
+        "Click the newest revision's SHA1 link (cd78ce6dd2) — it opens /eval/harbor-handbook/wiki/commit/cd78ce6dd22df2f087ee212552a7c1b89da37b04, a commit that changed exactly one file, one line added and one line removed.",
+        "Read the summary line between the commit header and the diff."
+      ]
+    },
+    {
+      "index": 8,
+      "reported_at_seconds": 686,
+      "name": "Renaming a wiki page to an existing name silently overwrites that page's content",
+      "summary": "The save succeeds without any warning, and the page named agent10-c2 now holds agent10-c1's content ('PAGE C1 CONTENT (agent10)'). The existing page's own content ('PAGE C2 CONTENT (agent10) - must survive') is silently overwritten and gone; no confirmation, no error, no way back. Seen twice: agent10-renamed -> agent10-hist3 also replaced the existing agent10-hist3 page's content ('Revision three content: cherry.') with the renaming page's body. (on /eval/harbor-handbook/wiki/agent10-c1.-?action=_edit)",
+      "expected": "Renaming a page to a name that is already taken is refused with a message next to the Page title field ('a page with this name already exists'), or at least asks for confirmation before overwriting, and the target page's content stays intact.",
+      "actual": "The save succeeds without any warning, and the page named agent10-c2 now holds agent10-c1's content ('PAGE C1 CONTENT (agent10)'). The existing page's own content ('PAGE C2 CONTENT (agent10) - must survive') is silently overwritten and gone; no confirmation, no error, no way back. Seen twice: agent10-renamed -> agent10-hist3 also replaced the existing agent10-hist3 page's content ('Revision three content: cherry.') with the renaming page's body.",
+      "reproSteps": [
+        "Signed in as eval, open https://5503-is4xaezuej9qas021gzrh.e2b.app/eval/harbor-handbook/wiki?action=_new and create page 'agent10-c1' with content 'PAGE C1 CONTENT (agent10)'; Save Page.",
+        "Create a second page 'agent10-c2' with content 'PAGE C2 CONTENT (agent10) - must survive'; Save Page. Open /eval/harbor-handbook/wiki/agent10-c2.- and note the content.",
+        "Open https://5503-is4xaezuej9qas021gzrh.e2b.app/eval/harbor-handbook/wiki/agent10-c1.-?action=_edit.",
+        "Change only the Page title field to 'agent10-c2' (a name that already exists) and click Save Page."
+      ]
+    },
+    {
+      "index": 9,
+      "reported_at_seconds": 694,
+      "name": "Wiki revision list at 390px has no link to any revision's diff (SHA1 column hidden, no alternative)",
+      "summary": "At 390px the revision table shows only Author, Message and Date plus a 'Copy hash' button; the SHA1 column is gone (it is not in the page at all, not even hidden behind a scroll). No cell of the list links to the commit, so a phone user cannot open a revision's diff or compare two revisions; the only per-row control copies the hash to the clipboard. The same revision list at 1440px has the SHA1 links that open /wiki/commit/<sha>. (on /eval/harbor-handbook/wiki/agent14-mobile-md.-?action=_revision)",
+      "expected": "The revision list keeps a way to open each revision's diff on a phone - either the SHA1 link column or a link on the revision message - so revision history and diffs can be inspected at 390px width.",
+      "actual": "At 390px the revision table shows only Author, Message and Date plus a 'Copy hash' button; the SHA1 column is gone (it is not in the page at all, not even hidden behind a scroll). No cell of the list links to the commit, so a phone user cannot open a revision's diff or compare two revisions; the only per-row control copies the hash to the clipboard. The same revision list at 1440px has the SHA1 links that open /wiki/commit/<sha>.",
+      "reproSteps": [
+        "Set the browser to a phone size (390 x 844) and open https://5503-is4xaezuej9qas021gzrh.e2b.app/eval/harbor-handbook/wiki/agent14-mobile-md.- (a page with 2 revisions) as eval.",
+        "Click the revision counter '2' in the page header to open the revision list (URL ...?action=_revision).",
+        "Look at the 'Wiki Page Revisions' table and try to open one of the two revisions to see its diff.",
+        "Compare with the same page at a desktop size (1440 x 900), where a SHA1 column with links to /wiki/commit/<sha> is present."
+      ]
+    },
+    {
+      "index": 10,
+      "reported_at_seconds": 789,
+      "name": "Page dropdown is wider than the 1440px window because of long page names and makes the page scroll sideways",
+      "summary": "The open dropdown takes the width of the longest page name: the item rows are ~1983 px wide, the panel's right edge is past the window edge (no right border, long page names such as \\\"agent1 yyyy…\\\" cut off) and the whole page becomes horizontally scrollable — scrolling right slides the site's top navigation bar and the wiki content sideways by ~430 px (the nav then reads \\\"lore\\\" instead of \\\"Explore\\\"). The list is also cut off at the bottom line of a row (\\\"agent1/slash\\\" half visible). (on /eval/harbor-handbook/wiki/agent13-tablet.-)",
+      "expected": "The page dropdown should stay within the window: a fixed reasonable width with long page names cut with an ellipsis (or wrapped), the list scrolling inside the panel, and no sideways scrolling of the page itself.",
+      "actual": "The open dropdown takes the width of the longest page name: the item rows are ~1983 px wide, the panel's right edge is past the window edge (no right border, long page names such as \\\"agent1 yyyy…\\\" cut off) and the whole page becomes horizontally scrollable — scrolling right slides the site's top navigation bar and the wiki content sideways by ~430 px (the nav then reads \\\"lore\\\" instead of \\\"Explore\\\"). The list is also cut off at the bottom line of a row (\\\"agent1/slash\\\" half visible).",
+      "reproSteps": [
+        "Set the browser window to 1440 x 900 (desktop) and sign in as eval.",
+        "Open /eval/harbor-handbook/wiki/agent13-tablet.- (or any wiki page of harbor-handbook).",
+        "Click the \"Page: agent13-tablet\" selector at the top left so its list of pages opens.",
+        "Look at the right edge of the window: the white dropdown panel runs past it and the long page names in the list (\"agent1 yyyy…\", \"agent1 xxxx…\", \"agent14-very-long-page-title…\") are cut by the window edge.",
+        "Scroll the page sideways to the right: the whole page, including the top navigation bar and the \"Page:\" selector, slides left, and the page behind the dropdown becomes blank in the scrolled area."
+      ]
+    },
+    {
+      "index": 11,
+      "reported_at_seconds": 792,
+      "name": "ArrowDown in the \"Filter page...\" box empties the box but leaves the page list filtered",
+      "summary": "The \\\"Filter page...\\\" box becomes empty (only its placeholder shows) while the list stays filtered to the old query: the list still starts at \\\"agent1 a-b\\\" and Pages, Home, Onboarding, Release-Process and Team Guide, plus other non-matching pages, stay hidden. There is no visible filter text explaining why these pages are missing; the user has to type something and delete it to get the full list back. (on /eval/harbor-handbook/wiki/Home)",
+      "expected": "The typed filter text stays in the box and the arrow key moves the highlight through the visible entries (or, if the key clears the filter, the full page list including Pages, Home, Onboarding, Release-Process and Team Guide comes back).",
+      "actual": "The \\\"Filter page...\\\" box becomes empty (only its placeholder shows) while the list stays filtered to the old query: the list still starts at \\\"agent1 a-b\\\" and Pages, Home, Onboarding, Release-Process and Team Guide, plus other non-matching pages, stay hidden. There is no visible filter text explaining why these pages are missing; the user has to type something and delete it to get the full list back.",
+      "reproSteps": [
+        "Sign in (eval / momentic-eval-1) and open /eval/harbor-handbook/wiki (Home page).",
+        "Click the \"Page: Home\" dropdown at the top left of the page.",
+        "Click into the \"Filter page...\" box and type \"agent\" — the list now shows only pages whose names contain \"agent\"; Pages, Home, Onboarding, Release-Process and Team Guide disappear.",
+        "Press the ArrowDown key once.",
+        "Look at the filter box and at the first entries of the open list."
+      ]
+    },
+    {
+      "index": 12,
+      "reported_at_seconds": 823,
+      "name": "\"Title cannot be empty\" rejection wipes the wiki page content the person already typed",
+      "summary": "The content editor is reset to its default 'Welcome to the Wiki.' — the text typed ('AGENT9-KEEPME-TEXT line two') is gone; only the title's spaces survive, so the page body has to be retyped. Happened 2 of 2 times. (on /eval/harbor-handbook/wiki?action=_new)",
+      "expected": "The form refuses with the message next to/for the title field and keeps what was already typed, so the person can just fill in a title and save again.",
+      "actual": "The content editor is reset to its default 'Welcome to the Wiki.' — the text typed ('AGENT9-KEEPME-TEXT line two') is gone; only the title's spaces survive, so the page body has to be retyped. Happened 2 of 2 times.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-is4xaezuej9qas021gzrh.e2b.app/eval/harbor-handbook/wiki?action=_new (Wiki -> New Page).",
+        "In the big 'Page content' editor replace the default text with 'AGENT9-KEEPME-TEXT line two'.",
+        "Leave the 'Page title' field holding only spaces (type three spaces).",
+        "Click 'Save Page'.",
+        "The page reloads with the red message 'Title cannot be empty'; look at the 'Page content' editor."
+      ]
+    },
+    {
+      "index": 13,
+      "reported_at_seconds": 927,
+      "name": "Deleting a page that another tab already deleted fails with a 500 error and no message to the user",
+      "summary": "The request POST /eval/harbor-handbook/wiki/agent8-stale.-?action=_delete answers 500 Internal Server Error (console: \"Failed to load resource: the server responded with a status of 500\"), the dialog just closes, and the stale page view stays exactly as it was — the page body \"stale tab test content\" and the Delete Page button are still shown with no error message, although the page no longer exists. Clicking Delete Page → Yes again in the same tab gives the same 500 and the same silent result. (on /eval/harbor-handbook/wiki/agent8-stale.-)",
+      "expected": "Either the delete is detected as already done and the tab tells the user the page was deleted (e.g. \"page does not exist\" and a way back to the wiki), or at worst it reports that the deletion failed. It must not fail with a server error and no message.",
+      "actual": "The request POST /eval/harbor-handbook/wiki/agent8-stale.-?action=_delete answers 500 Internal Server Error (console: \"Failed to load resource: the server responded with a status of 500\"), the dialog just closes, and the stale page view stays exactly as it was — the page body \"stale tab test content\" and the Delete Page button are still shown with no error message, although the page no longer exists. Clicking Delete Page → Yes again in the same tab gives the same 500 and the same silent result.",
+      "reproSteps": [
+        "Sign in as eval and create a wiki page named \"agent8-stale\" with the body \"stale tab test content\" (New Page on /eval/harbor-handbook/wiki).",
+        "Open /eval/harbor-handbook/wiki/agent8-stale.- in two browser tabs (tab A and tab B).",
+        "In tab A click the red \"Delete Page\" button and \"Yes\" in the dialog; the page is deleted and tab A goes back to the wiki Home page.",
+        "Switch to tab B, which still shows the page, click its red \"Delete Page\" button and \"Yes\" in the dialog."
+      ]
+    },
+    {
+      "index": 14,
+      "reported_at_seconds": 1050,
+      "name": "Wiki revision history for a page with one revision says \\\"1 Commits\\\" (wrong plural)",
+      "summary": "The header of the table reads \\\"1 Commits\\\" (a page with more revisions reads \\\"3 Commits\\\", so the plural form is used for one). The single row below it is correct. (on /eval/harbor-handbook/wiki/agent12-welcome-check?action=_revision)",
+      "expected": "The table header uses the singular for one revision, e.g. \\\"1 Commit\\\".",
+      "actual": "The header of the table reads \\\"1 Commits\\\" (a page with more revisions reads \\\"3 Commits\\\", so the plural form is used for one). The single row below it is correct.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /eval/harbor-handbook/wiki/agent12-welcome-check (a page with exactly one revision, created in one save)",
+        "Click the revision counter next to the page title, or open /eval/harbor-handbook/wiki/agent12-welcome-check?action=_revision",
+        "Read the header of the revisions table above the single commit row"
+      ]
+    },
+    {
+      "index": 15,
+      "reported_at_seconds": 1088,
+      "name": "Wide tables in the _Sidebar are clipped: columns are cut off with no way to scroll",
+      "summary": "The _Sidebar column (~229 px at 1280, ~185 px at 768) clips the table with overflow hidden: at 1280 only \\\"Term\\\", \\\"Meaning\\\" and the first two letters of \\\"Owner\\\" are visible (header \\\"Ow\\\", cells \\\"Plat\\\", \\\"tea\\\") and the whole \\\"Status\\\" column disappears; nothing scrolls or wraps to reveal it. At 768 the cells are cut mid-word (\\\"Mean\\\", \\\"The relea coordi who si off eve shippi…\\\"). At 390 px (where the sidebar becomes full width) the table renders completely, so the loss only happens on desktop and tablet. (on /eval/harbor-handbook/wiki/{any page} (sidebar))",
+      "expected": "A table written in _Sidebar either fits the sidebar column (cells wrap, table width limited) or the sidebar/table can be scrolled horizontally, so every cell the author wrote stays readable at desktop and tablet widths.",
+      "actual": "The _Sidebar column (~229 px at 1280, ~185 px at 768) clips the table with overflow hidden: at 1280 only \\\"Term\\\", \\\"Meaning\\\" and the first two letters of \\\"Owner\\\" are visible (header \\\"Ow\\\", cells \\\"Plat\\\", \\\"tea\\\") and the whole \\\"Status\\\" column disappears; nothing scrolls or wraps to reveal it. At 768 the cells are cut mid-word (\\\"Mean\\\", \\\"The relea coordi who si off eve shippi…\\\"). At 390 px (where the sidebar becomes full width) the table renders completely, so the loss only happens on desktop and tablet.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-is4xaezuej9qas021gzrh.e2b.app/eval/harbor-handbook/wiki/_Sidebar?action=_edit",
+        "Set the body to a 4-column markdown table: | Term | Meaning | Owner | Status | with two rows whose Meaning cell is a sentence (e.g. \"The release coordinator who signs off every shipping decision in the quarter\"), then click \"Save Page\"",
+        "Open any normal wiki page in a 1280 px window, e.g. https://5503-is4xaezuej9qas021gzrh.e2b.app/eval/harbor-handbook/wiki/agent15-rev.-, and look at the sidebar box",
+        "Scroll down in the sidebar: the \"Owner\" column is cut to \"Ow\"/\"Plat\" and the \"Status\" column is not rendered at all, with no horizontal scrolling anywhere in the panel",
+        "Repeat at 768 px width: the table is cut mid-word"
+      ]
+    },
+    {
+      "index": 16,
+      "reported_at_seconds": 1330,
+      "name": "A wiki page whose body starts with --- loses its horizontal rules and paragraph breaks",
+      "summary": "The page renders as one run of bare text: the body becomes \"agent15 text right after a leading rule Second paragraph after a --- rule.\" (not wrapped in any <p>) followed by one <p> with the third line, and the rendered HTML contains no <hr> at all (0 horizontal rules). Both '---' lines are swallowed and the blank lines between the first paragraphs are lost, so the first two paragraphs run into each other. Same content saved on a page that does NOT start with '---' (agent15-rule-mid: \"Intro line before the rule. / --- / After the rule.\") renders correctly as <p>, <hr>, <p>. (on /eval/harbor-handbook/wiki/agent15-frontmatter.-)",
+      "expected": "The leading '---' renders as a horizontal rule (or is ignored) and the later '---' between paragraphs renders as a horizontal rule, with each text block kept in its own paragraph — the same as the identical content on a page that does not start with '---'.",
+      "actual": "The page renders as one run of bare text: the body becomes \"agent15 text right after a leading rule Second paragraph after a --- rule.\" (not wrapped in any <p>) followed by one <p> with the third line, and the rendered HTML contains no <hr> at all (0 horizontal rules). Both '---' lines are swallowed and the blank lines between the first paragraphs are lost, so the first two paragraphs run into each other. Same content saved on a page that does NOT start with '---' (agent15-rule-mid: \"Intro line before the rule. / --- / After the rule.\") renders correctly as <p>, <hr>, <p>.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-is4xaezuej9qas021gzrh.e2b.app/eval/harbor-handbook/wiki?action=_new",
+        "Title: agent15-frontmatter; body exactly: --- / agent15 text right after a leading rule / (blank) / Second paragraph after a `---` rule. / (blank) / --- / (blank) / Third paragraph after a horizontal rule.",
+        "Click \"Save Page\" and look at the rendered page",
+        "Observe: no horizontal rules at all and the first two paragraphs merged into one run of text (verified in the page HTML: bare text then a single <p>, zero <hr>)",
+        "For comparison create agent15-rule-mid with body \"Intro line before the rule. / (blank) / --- / (blank) / After the rule.\" — that one renders <p>, <hr>, <p> correctly"
+      ]
+    },
+    {
+      "index": 17,
+      "reported_at_seconds": 1416,
+      "name": "Saving a still-open editor for a page deleted in another tab silently recreates the page",
+      "summary": "The stale editor saves without any warning and the page is back: the address /eval/harbor-handbook/wiki/agent13-race.- now shows the new body \\\"Race v2 after delete\\\" with \\\"3\\\" revisions. The revision history then reads \\\"Update agent13-race\\\" (now) on top of \\\"Delete page \\\"agent13-race.-\\\"\\\" and \\\"Add agent13-race\\\", so a page the person deleted comes back to life with content written after the delete, and nothing told the person editing that the page no longer existed. (on /eval/harbor-handbook/wiki/agent13-race.-?action=_edit)",
+      "expected": "Saving from an editor opened before the page was deleted should either be refused with a clear message (\\\"this page has been deleted in the meantime\\\") or ask the person what to do; it must not silently recreate the deleted page.",
+      "actual": "The stale editor saves without any warning and the page is back: the address /eval/harbor-handbook/wiki/agent13-race.- now shows the new body \\\"Race v2 after delete\\\" with \\\"3\\\" revisions. The revision history then reads \\\"Update agent13-race\\\" (now) on top of \\\"Delete page \\\"agent13-race.-\\\"\\\" and \\\"Add agent13-race\\\", so a page the person deleted comes back to life with content written after the delete, and nothing told the person editing that the page no longer existed.",
+      "reproSteps": [
+        "Sign in as eval and create a wiki page of your own via /eval/harbor-handbook/wiki?action=_new with the title agent13-race and the body \"# Race v1\" (it is saved as /eval/harbor-handbook/wiki/agent13-race.-).",
+        "Open its editor in a second tab: /eval/harbor-handbook/wiki/agent13-race.-?action=_edit and leave it open.",
+        "In the first tab open the page view /eval/harbor-handbook/wiki/agent13-race.- and delete the page with \"Delete Page\" then \"Yes\": the wiki falls back to the Home page.",
+        "Back in the editor tab (still showing the old body) type \"# Race v2 after delete\" and click \"Save Page\".",
+        "The save succeeds with no warning and the page is shown again as \"Race v2 after delete\" with 3 revisions; its history lists \"Update agent13-race\" above \"Delete page \"agent13-race.-\"\"."
+      ]
+    }
+  ]
+}

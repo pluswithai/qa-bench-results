@@ -1,0 +1,186 @@
+{
+  "bugs": [
+    {
+      "name": "Reconnect in the \"Sync lost with mailbox\" banner ends on the home page with \"Google apis auth is not enabled\"",
+      "summary": "The app leaves Settings, goes through /verify?errorMessage=Google+apis+auth+is+not+enabled and lands on the workspace home (Companies) with a red toast reading the raw technical text 'Google apis auth is not enabled'. The sync banner is still there afterwards, so nothing was reconnected and the settings page the person was on is lost. (on /settings/general)",
+      "expected": "Reconnect re-authorises the mailbox and keeps the person on Settings > General (the banner disappears or an explanatory message appears in place).",
+      "actual": "The app leaves Settings, goes through /verify?errorMessage=Google+apis+auth+is+not+enabled and lands on the workspace home (Companies) with a red toast reading the raw technical text 'Google apis auth is not enabled'. The sync banner is still there afterwards, so nothing was reconnected and the settings page the person was on is lost.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev and open Settings > General (/settings/general).",
+        "In the blue banner 'Sync lost with mailbox tim@apple.dev. Please reconnect for updates:' click 'Reconnect'.",
+        "Observe the address bar and the page after the redirect."
+      ],
+      "reason": "Environment. The benchmark instance has no Google OAuth configured, while the seeded workspace contains a Google connected account in a failed state, which is what raises the banner. Reconnect starts the Google OAuth request and the server guard refuses it with exactly this text when the provider is disabled (google-apis-oauth-request-code.guard L65), then redirects through /verify?errorMessage=... to the app (run1-01/shot-3.png). On an instance where a mailbox could really have been connected, the provider is enabled and this path does not occur."
+    },
+    {
+      "name": "Role selector is disabled on the API key create page (only Admin)",
+      "summary": "The Role field is greyed out with a not-allowed cursor and does not react to clicks or keyboard: no list opens. The role is fixed to Admin, so no API key can be created with the Member role and every key gets full Admin permissions, while the API Keys list shows a \\\"Role\\\" column and the help text says the role is selectable. (on /settings/mcp-apis/apis/new)",
+      "expected": "The Role field opens a list of the workspace roles (Admin, Member — both exist under Settings > Members > Roles) so the key's permissions can be chosen, as the field's own help text says: \\\"What this API can do: Select a user role to define its permissions.\\\"",
+      "actual": "The Role field is greyed out with a not-allowed cursor and does not react to clicks or keyboard: no list opens. The role is fixed to Admin, so no API key can be created with the Member role and every key gets full Admin permissions, while the API Keys list shows a \\\"Role\\\" column and the help text says the role is selectable.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev.",
+        "Open Settings > MCP & APIs and click the API tab.",
+        "Click \"Create API key\" (link at the bottom right of the API Keys list) — URL /settings/mcp-apis/apis/new.",
+        "Type a name in the Name field, then click the Role field that shows \"Admin\"."
+      ],
+      "reason": "Works as designed. The selector lists only roles flagged canBeAssignedToApiKeys (SettingsDevelopersRoleSelector L31-L44). The default Member role is created with `canBeAssignedToApiKeys: false` (role.service L442), so Admin is the only eligible role, and the shared Select component disables itself when it has a single option (Select L143-L148) - that is the greyed field in run1-04/shot-2.png. A role becomes selectable here once it is allowed for API keys in the role settings; the agent did not create or enable such a role."
+    },
+    {
+      "name": "Logs tab shows only an \"Upgrade to access audit logs\" card under the filters",
+      "summary": "Nothing is listed at all: below the filter card there is only the \"Upgrade to access audit logs\" card. No table, no rows, no loading indicator and no \"no results\" message, with any filter combination (default filters, and with Start date = Nov 1, 2026 set). (on /settings/general#logs)",
+      "expected": "The Logs tab shows the application log entries for the selected period, or at least an explicit empty state (\"No logs found for this period\") telling the person the filters matched nothing.",
+      "actual": "Nothing is listed at all: below the filter card there is only the \"Upgrade to access audit logs\" card. No table, no rows, no loading indicator and no \"no results\" message, with any filter combination (default filters, and with Start date = Nov 1, 2026 set).",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open Settings > General > Logs (/settings/general#logs).",
+        "Look at the page below the filter card (Table: Page Views, Page name, Workspace members, Period).",
+        "Set a Start date (e.g. Nov 1 of the current year in the calendar) and look below the filters again."
+      ],
+      "reason": "Works as designed (plan gating). The selected table is \"Page Views\" (run1-07/shot-1.png), an audit log type. renderResults returns the upgrade card whenever the table is not Application logs and the workspace lacks the AUDIT_LOGS entitlement (SettingsLogs L192-L195); the card itself says \"Only application logs are available on your current plan. Other log types require an Enterprise subscription.\" That card is the explicit state for this plan; a result list or \"no results\" message is not expected."
+    },
+    {
+      "name": "Renaming a field in one tab sends another tab's open field page to the 404 page",
+      "summary": "Tab B silently navigates itself to /not-found and shows the 404 page \\\"Off the beaten path — The page you're seeking is either gone or never was\\\", although the field still exists under its new name (agent12-fourth) and any edit in progress in that tab is discarded with no message. Seen twice out of two tries (with agent12-renamed and agent12-second). (on /settings/objects/agent12Things/agent12Second)",
+      "expected": "Tab B either keeps the field form (the field still exists, only renamed) or tells the user the field was renamed and refreshes to it. It should not claim the record is gone.",
+      "actual": "Tab B silently navigates itself to /not-found and shows the 404 page \\\"Off the beaten path — The page you're seeking is either gone or never was\\\", although the field still exists under its new name (agent12-fourth) and any edit in progress in that tab is discarded with no message. Seen twice out of two tries (with agent12-renamed and agent12-second).",
+      "reproSteps": [
+        "Tab B: open https://5500-ihwe0ejky0mc6llacv6bz.e2b.app/settings/objects/agent12Things/agent12Second — the edit page of the custom Text field \"agent12-second\" of the object \"Agent12 Things\" (created with Settings > Data model > + Add object, singular \"agent12 Thing\").",
+        "Tab B stays on that page; it shows the field form with Name = agent12-second.",
+        "Tab A: open https://5500-ihwe0ejky0mc6llacv6bz.e2b.app/settings/objects/agent12Things and click the field row \"agent12-second\".",
+        "Tab A: change Name from \"agent12-second\" to \"agent12-fourth\" and click Save; the list shows agent12-fourth.",
+        "Return to tab B without touching it."
+      ],
+      "reason": "Consequence of a deliberate design, in a two-tab setup the agent built itself. A field's settings page is addressed by the field's API name (/settings/objects/:objectNamePlural/:fieldName) and the page looks the field up by that name (SettingsObjectFieldEdit L105-L109); when none matches it navigates to NotFound (L132-L136). Renaming a custom field with synced label changes its API name, so after the live metadata refresh the old address in tab B points to a field that no longer exists under that name, and the app answers with its standard not-found page (run1-09/shot-4.png; shot-3.png is the form before the rename). The same tab that performs the rename is handled (newNameDuringSave). No data is lost: the form in tab B was untouched. Following a rename across tabs would be nicer, but its absence is not a malfunction."
+    },
+    {
+      "name": "Object Settings preview card shows \"Lorem ipsum\" for an object with no records",
+      "summary": "The preview card's body line reads \\\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum magna enim, dapibus non e...\\\" — leftover placeholder text. An object that has records (People) shows a real record instead, so the empty case exposes the mock copy. (on /settings/objects/agent4Things#settings)",
+      "expected": "The preview shows a neutral sample or a clean empty state, not lorem ipsum filler text in a shipping product.",
+      "actual": "The preview card's body line reads \\\"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum magna enim, dapibus non e...\\\" — leftover placeholder text. An object that has records (People) shows a real record instead, so the empty case exposes the mock copy.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev and open Settings > Data model (/settings/objects).",
+        "Click \"+ Add object\", type agent4 Thing in Singular, click Save (this creates the custom object \"Agent4 Things\" with no records).",
+        "On the object's page click the \"Settings\" tab (/settings/objects/agent4Things#settings).",
+        "Look at the \"Options\" section: in the \"Preview\" card under \"Person/Agent4 Thing\" the record line reads \"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum magna enim, dapibus non e...\"."
+      ],
+      "reason": "Deliberate sample data. The Preview card (run1-10/shot-2.png) shows an example record when the object has none, and the example value defined for a Text field is this Lorem ipsum sentence: SETTINGS_NON_COMPOSITE_FIELD_TYPE_CONFIGS[TEXT].exampleValues (L67-L71). The same example values feed every field-type preview in the data model settings. It is filler text inside a card labelled \"Preview\", chosen in source, not leftover copy in a real screen."
+    },
+    {
+      "name": "Typing in Singular re-derives the Plural name, replacing a custom plural saved earlier",
+      "summary": "The Plural field is immediately replaced with the derived 'Agent1 Things' while typing the Singular; on blur that derived value is saved (the object becomes 'Agent1 Things' everywhere). The user's saved custom plural is lost without notice. (on /settings/objects/agent1Zorbs#settings)",
+      "expected": "Editing the Singular name keeps the Plural name the user saved earlier ('Agent1 Zorbs'), or asks before replacing it.",
+      "actual": "The Plural field is immediately replaced with the derived 'Agent1 Things' while typing the Singular; on blur that derived value is saved (the object becomes 'Agent1 Things' everywhere). The user's saved custom plural is lost without notice.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and go to Settings > Data model, open the custom object created for this test (object 'Agent1 Gadget', address /settings/objects/agent1Gadgets#settings).",
+        "Open the Settings tab of the object. Set Plural to 'agent1 Zorbs' and click outside the field (the save is automatic; the address becomes /settings/objects/agent1Zorbs and the breadcrumb reads 'Agent1 Zorbs').",
+        "Now click into the Singular field and type 'agent1 Thing'."
+      ],
+      "reason": "Deliberate rule in the form, and not silent. Every change of the Singular input calls fillLabelPlural, which sets Plural to pluralize(singular) and, when labels and API names are synced, the names too (SettingsDataModelObjectAboutForm L108-L119, L201-L204). The Plural field sits next to Singular and changes while the user types: in run1-14/shot-5.png the Singular input is still focused, Plural already reads \"Agent1 Things\" and the page header still reads \"Agent1 Zorbs\", i.e. nothing is saved until the field loses focus, so the user sees the new plural before it is stored and can retype it. For the usual case (plural is the regular plural of the singular) this is exactly the wanted behaviour; the form has no notion of a \"custom\" plural. A guard for hand-edited plurals would be a reasonable improvement, but the current behaviour is the designed one."
+    },
+    {
+      "name": "Escape does not close the \"Workspace Deletion\" dialog once text is typed in its confirmation field",
+      "summary": "The dialog stays open; Escape does nothing while the confirmation field holds text. It only closes with the \\\"Cancel\\\" button. Seen 3 of 3 times with text in the field. (on /settings/general)",
+      "expected": "Escape closes the dialog, as it does when the confirmation field is empty (verified: opening the dialog and pressing Escape with an empty field closes it).",
+      "actual": "The dialog stays open; Escape does nothing while the confirmation field holds text. It only closes with the \\\"Cancel\\\" button. Seen 3 of 3 times with text in the field.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open /settings/general",
+        "In the \"Danger zone\" section click the \"Delete workspace\" button; the \"Workspace Deletion\" dialog opens",
+        "Type wrong@example.com into the dialog's confirmation field (placeholder \"tim@apple.dev\")",
+        "Press the Escape key"
+      ],
+      "reason": "Cannot be confirmed from the evidence and the source says the opposite. The screenshots only show the dialog open with \"wrong@example.com\" typed (run2-04/shot-1.png, shot-4.png) and empty (shot-3.png); a key press cannot be seen in a still, and video.webm is truncated: it ends with the dialog just opened, before any typing or Escape. In source the confirmation input is rendered with disableHotkeys (ConfirmationModal L160-L169), so focusing it pushes nothing on the focus stack (SettingsTextInput L55-L71) and the modal stays the focused element; its Escape hotkey is registered with form tags enabled and closes the modal (ModalHotkeysAndClickOutsideEffect L31-L40, useHotkeysOnFocusedElement L36-L38), with no dependence on the field content. A human must check on v2.26.1: Settings > General > Delete workspace, click the confirmation field, type a few characters with real key presses, press Escape once. If the dialog stays open it is a real sev 3 defect (dead key); if it closes, the report is a tooling artifact (e.g. a modifier left pressed after typing \"@\")."
+    },
+    {
+      "name": "Data model object table at phone width: Fields and Records columns are off-screen",
+      "summary": "At 390 px the object table is 520 px wide inside a 390 px viewport. The 'Fields' column header and its numbers are cut off at the right edge and the 'Records' column (with all record counts) is entirely off-screen with no horizontal way to reach it. The same happens to every row: e.g. 'Agent15 Flow Objects  Custom  11  [0 off-screen]'. (on /settings/objects)",
+      "expected": "At phone width the Objects table fits the screen: all four columns (Name, App, Fields, Records) are visible, or the table can be scrolled sideways to reach them, so a person can read the field and record counts of each object.",
+      "actual": "At 390 px the object table is 520 px wide inside a 390 px viewport. The 'Fields' column header and its numbers are cut off at the right edge and the 'Records' column (with all record counts) is entirely off-screen with no horizontal way to reach it. The same happens to every row: e.g. 'Agent15 Flow Objects  Custom  11  [0 off-screen]'.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev.",
+        "Set the browser to a phone size, 390 x 844.",
+        "Open Settings > Data model (/settings/objects).",
+        "Look at the object list under 'Objects' and read the columns after Name and App."
+      ],
+      "reason": "Designed mobile layout, and the report shows no failed attempt to scroll. Below 768 px the table is deliberately given a 520 px minimum width inside a wrapper with overflow-x: auto and touch scrolling (SettingsObjectTable L53-L64, SETTINGS_OBJECT_TABLE_ROW_MOBILE_MIN_WIDTH L10), with the Name cell kept sticky (L217), i.e. the columns are reached by swiping sideways - exactly the alternative the report itself lists as acceptable. The 520 px measured by the agent is that constant. Evidence is two static screenshots (run2-06/shot-1.png, shot-2.png) with no swipe or scroll tried; overlay scrollbars are not drawn at rest."
+    },
+    {
+      "name": "New Webhook: removing the only filter leaves an empty \"Select entity\" row and disables Save",
+      "summary": "The \\\"All Objects\\\" row is emptied in place: it turns into \\\"Select entity\\\" + \\\"All\\\" with no trash icon, Save becomes disabled (the form is treated as invalid), and there is no remove control left to delete that leftover row and no error message explaining what is missing. Saving the webhook is impossible until the user finds the hidden step of picking an entity again in the dropdown. (on /settings/mcp-apis/webhooks/new)",
+      "expected": "\\\"Remove filter\\\" removes that filter row, the remaining form stays valid (the endpoint URL is filled), and Save stays enabled so the webhook can be created.",
+      "actual": "The \\\"All Objects\\\" row is emptied in place: it turns into \\\"Select entity\\\" + \\\"All\\\" with no trash icon, Save becomes disabled (the form is treated as invalid), and there is no remove control left to delete that leftover row and no error message explaining what is missing. Saving the webhook is impossible until the user finds the hidden step of picking an entity again in the dropdown.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev, open Settings > MCP & APIs, open the Webhooks tab and click \"Create webhook\".",
+        "Type https://example.com/agent9-hook3 in \"Endpoint URL\" — the top-right \"Save\" button becomes enabled.",
+        "In the Filters section, click the trash button (\"Remove filter\") at the right of the row showing \"All Objects\" / \"All\".",
+        "Look at the Filters section and at the top-right \"Save\" button (its disabled state can be confirmed: clicking it does nothing)."
+      ],
+      "reason": "Designed validation, and the description of the row is a misreading. The empty \"Select entity / All\" row is not the removed row emptied in place: it is the standing add-a-filter row that is on the form from the start (run2-11/shot-3.png shows it under \"All Objects\" before the click) and is re-appended by addEmptyOperationIfNecessary after every change (L23-L28), which is why it never has a trash icon. The trash click did remove the \"All Objects\" filter (run2-11/shot-2.png). Save is then disabled because the schema requires at least one complete operation (webhookFormSchema L13-L27; canSave = isValid, useWebhookForm L91-L94): a webhook with no event filter would never fire. Picking an entity in the remaining row re-enables Save. An inline hint would be nicer, but nothing is broken."
+    },
+    {
+      "name": "AI > Models: \"Default model\" shows Smart Model and Fast Model rows with no selection and nothing to click",
+      "summary": "Both models are plain, unclickable rows: no radio button, checkmark, highlight or \"Default\" badge marks which one is in use, and clicking anywhere on the \"Fast Model\" row or its text changes nothing (no selection, no request, no toast). Reproduced on a fresh load and twice by clicking. Because the write-up of each model is a description (\"Used for chats, agents, and complex reasoning\"), the section cannot be read either as a choice or as a statement of the current default. (on /settings/ai#models)",
+      "expected": "The \"Default model\" section shows which model is currently the workspace default (a selected/checked state on one of the two) and lets the person pick the other one.",
+      "actual": "Both models are plain, unclickable rows: no radio button, checkmark, highlight or \"Default\" badge marks which one is in use, and clicking anywhere on the \"Fast Model\" row or its text changes nothing (no selection, no request, no toast). Reproduced on a fresh load and twice by clicking. Because the write-up of each model is a description (\"Used for chats, agents, and complex reasoning\"), the section cannot be read either as a choice or as a statement of the current default.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open Settings > AI (/settings/ai).",
+        "Click the Models tab (/settings/ai#models).",
+        "Look at the \"Default model\" section (subtitle: \"The default AI model used for chats, agents, and workflows\").",
+        "Click the \"Fast Model\" row, then its text: nothing is selected or highlighted."
+      ],
+      "reason": "Environment plus a misreading of the section. Smart Model and Fast Model are not two alternatives to choose between: they are two separate settings, each with its own model dropdown on the right of the row (SettingsAiModelsTab L120-L152). The dropdowns are missing in run2-13/shot-1.png because the benchmark instance has no AI model configured: the option list is built from the enabled models (L86-L98) and the shared Select renders nothing when it has no option to show (Select L185-L187). With a provider configured each row shows its picker. The rows themselves are not meant to be clickable."
+    },
+    {
+      "name": "Admin Panel: General shows current v2.26.1 / latest v2.62.2 while Health shows inferred version 2.26.0 and \"Up to date\"",
+      "summary": "The two sub-tabs disagree. General > About lists \"Current version v2.26.1\" and \"Latest version v2.62.2\". Health > Upgrade Status lists \"Inferred version 2.26.0\" (a different current version) and reports both \"Instance status: Up to date\" and \"Workspaces status: Up to date\", although the latest version shown on General is v2.62.2 while the running one is v2.26.x. (on /settings/admin-panel)",
+      "expected": "One and the same current version on both sub-tabs, and an instance that is dozens of versions behind the \"Latest version\" is not reported as \"Up to date\".",
+      "actual": "The two sub-tabs disagree. General > About lists \"Current version v2.26.1\" and \"Latest version v2.62.2\". Health > Upgrade Status lists \"Inferred version 2.26.0\" (a different current version) and reports both \"Instance status: Up to date\" and \"Workspaces status: Up to date\", although the latest version shown on General is v2.62.2 while the running one is v2.26.x.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev.",
+        "Open Settings > Admin Panel (address https://5500-itdsz1qc0x1tnrxqhh3rc.e2b.app/settings/admin-panel).",
+        "On the General tab read the About block: Current version v2.26.1, Latest version v2.62.2.",
+        "Click the Health tab and read Upgrade Status: Inferred version 2.26.0, Instance status Up to date, Workspaces status Up to date."
+      ],
+      "reason": "Three different measures, each labelled, not a contradiction. General > About compares the running build (v2.26.1) with the newest published release (run2-15/frame-4.jpg). Health > Upgrade Status (run2-15/shot-4.png) is about upgrade commands, as its subtitle says (\"Upgrade health across instance and workspaces\"): health is UP_TO_DATE when the last executed upgrade command is the last one the installed code expects (deriveHealth, upgrade-status.service L72-L88), i.e. the database is fully migrated for this build, not that no newer release exists. \"Inferred version\" is derived from that command cursor (L112-L115), and commands are named per minor release, so a patch build 2.26.1 correctly infers 2.26.0; the label itself says inferred. The image is simply older than the newest release at test time."
+    },
+    {
+      "name": "Communication > Channels: the \"Domain\" column is empty on every row",
+      "summary": "The Domain column holds no value for any channel — support@20202020.dev.twenty.local, contact@20202020.pending.dev.twenty.local and my agent7-test@example.com all show nothing there, and each row's Domain cell is rendered empty in the DOM. (on /settings/communications)",
+      "expected": "Each channel row shows the domain part of its address (e.g. example.com) in the \\\"Domain\\\" column, as the header promises.",
+      "actual": "The Domain column holds no value for any channel — support@20202020.dev.twenty.local, contact@20202020.pending.dev.twenty.local and my agent7-test@example.com all show nothing there, and each row's Domain cell is rendered empty in the DOM.",
+      "reproSteps": [
+        "Sign in and open Settings → Communication (the sidebar link goes to /settings/communications, not /settings/communication).",
+        "Read the \"Channels\" table with the \"Email\" and \"Domain\" column headers.",
+        "Compare the addresses listed (support@20202020.dev.twenty.local, contact@20202020.pending.dev.twenty.local, agent7-test@example.com created by me) with the Domain column.",
+        "Reload the page and read the table again."
+      ],
+      "reason": "Plan gating on this instance, and the column is not meant to repeat the domain part of the address. The Domain cell shows the verification status chip of the sending domain that matches the channel address, and renders nothing when no such domain is returned (SettingsWorkspaceEmailChannelDomainStatusCell L18-L34). The domains come from getEmailingDomains, which on a self-hosted instance throws \"Email group requires an Enterprise plan\" unless a valid Enterprise key is present (emailing-domain.resolver L88-L99, email-group-access.service L22-L33). The benchmark instance has no Enterprise key (other tabs show the upgrade cards), so the query returns nothing and every cell is blank (run3-10/shot-1.png); the seeded 20202020.dev.twenty.local domains exist and would show Verified / Pending with the plan active."
+    },
+    {
+      "name": "Email channel without a sender name: header reads \"Sender name\" and there is no Sender name section",
+      "summary": "The page title (centre of the settings header, above the content) reads literally \\\"Sender name\\\", the field's label, and the \\\"Sender name\\\" section is missing from the page altogether; only Shared email and Forwarding address are shown. The channel I created with a display name (agent7-test@example.com) shows \\\"Agent7 Support\\\" as its title and a Sender name section. (on /settings/email/email-group/20202020-5a1e-4b2c-9d3e-200000000001)",
+      "expected": "The header shows an identifying value for the channel (its sender name, or its email address when no sender name is set) and the Sender name section is shown, saying it is not set.",
+      "actual": "The page title (centre of the settings header, above the content) reads literally \\\"Sender name\\\", the field's label, and the \\\"Sender name\\\" section is missing from the page altogether; only Shared email and Forwarding address are shown. The channel I created with a display name (agent7-test@example.com) shows \\\"Agent7 Support\\\" as its title and a Sender name section.",
+      "reproSteps": [
+        "Sign in and open Settings → Communication (/settings/communications).",
+        "In the Channels list, click the row \"support@20202020.dev.twenty.local\".",
+        "Read the title in the middle of the page header and the sections below the breadcrumb.",
+        "Reload the page and look again."
+      ],
+      "reason": "Works as designed. The header of this page is not a static title but an editable title field bound to the channel's sender name, with placeholder \"Sender name\" (SettingsWorkspaceCommunicationGroupChannelDetail L166-L179); the shared TitleInput shows its placeholder while the value is empty (TitleInput L228). The seeded channel has no sender name, so the header shows the prompt to type one (run3-11/shot-1.png), while the breadcrumb identifies the channel by its address. The read-only \"Sender name\" section is rendered only when a name exists (L242-L255), which is why the agent's own channel, created with a name, shows both."
+    },
+    {
+      "name": "Sidebar Link item to example.com shows a red glyph instead of a favicon",
+      "summary": "The entry renders a broken-image placeholder (red torn-image glyph); the console logs 'Failed to load resource: 404' for GET https://twenty-icons.com/example.com, and no fallback icon is drawn. (on /settings/layout (Layout customization) and the workspace sidebar)",
+      "expected": "A Link sidebar entry shows a usable icon (the site's favicon, or a default link icon when the favicon cannot be loaded).",
+      "actual": "The entry renders a broken-image placeholder (red torn-image glyph); the console logs 'Failed to load resource: 404' for GET https://twenty-icons.com/example.com, and no fallback icon is drawn.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open /settings/layout",
+        "Click 'Customize' in the 'Customize layout' card",
+        "Click 'Add menu item' at the bottom of the sidebar, then 'Link'",
+        "Set the label to 'agent9-link' (URL stays https://www.example.com)",
+        "Click 'Save'",
+        "Look at the workspace sidebar: under 'agent9-folder' the entry 'agent9-link' shows a red broken-image glyph instead of an icon"
+      ],
+      "reason": "The evidence shows the designed fallback, not a broken image. For a Link item the app tries the site favicon and, on load error, switches to a default globe icon on a tile tinted with the item colour (LinkIconWithLinkOverlay L82-L111, onError L100-L103; DefaultIcon = IconWorld, NavigationMenuItemIcon L99-L112); the default colour of Link items is red (NavigationMenuItemDefaultColorLink L1). Enlarged, run3-12/shot-2.png shows exactly that: a red globe on a light red tile with the grey link badge at its corner. The 404 in the console is the favicon lookup for example.com, which has none, and is the case this fallback handles."
+    }
+  ]
+}

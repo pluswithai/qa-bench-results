@@ -1,0 +1,107 @@
+{
+  "bugs": [
+    {
+      "name": "Sidebar Reviewers dropdown no longer closes on Escape once a user has been clicked",
+      "summary": "The dropdown stays open with maya checkmarked; Escape does nothing. It only closes when the \\\"Reviewers\\\" header itself is clicked. Happened 2 of 2 times after picking a user (and 0 of 1 when nothing was picked). (on /eval/harbor-handbook/pulls/14)",
+      "expected": "Escape closes the Reviewers dropdown, as it does when the dropdown is opened and Escape is pressed without picking anyone (the selection is only saved when the dropdown closes).",
+      "actual": "The dropdown stays open with maya checkmarked; Escape does nothing. It only closes when the \\\"Reviewers\\\" header itself is clicked. Happened 2 of 2 times after picking a user (and 0 of 1 when nothing was picked).",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-iotjkrbhq2ztebrw6o97y.e2b.app/eval/harbor-handbook/pulls/14 (PR \"agent14-sidebar: review and assignee test PR\")",
+        "In the right sidebar click the \"Reviewers\" header — a dropdown with a \"Filter Reviewer\" field and the users alex and maya opens",
+        "Click \"maya\" in the dropdown list so a checkmark appears next to her",
+        "Press the Escape key"
+      ],
+      "severity": 3
+    },
+    {
+      "name": "A web-editor commit made on a new branch absorbs files that landed on main meanwhile, so the commit and its pull request list other people's files as its own changes",
+      "summary": "Files Changed says \\\"2 changed files with 2 additions and 0 deletions\\\" and lists agent13-counts-a.md as a new file added by this pull request (+1, whole file \\\"a\\\"), next to agent3-rebase-notes.md. The header still says \\\"Commits 1\\\", and /eval/harbor-handbook/commits/branch/agent3-merge-b contains no commit for agent13-counts-a.md. The wrong extra file is still listed after the pull request was merged (rebase then fast-forward). (on /eval/harbor-handbook/pulls/19/files)",
+      "expected": "The Files Changed tab shows only the file the pull request adds (agent3-rebase-notes.md), matching its Commits tab (1 commit) and the branch agent3-merge-b, which has no commit touching agent13-counts-a.md. A file that already exists on main and was never touched by the branch must not be listed as changed by the pull request.",
+      "actual": "Files Changed says \\\"2 changed files with 2 additions and 0 deletions\\\" and lists agent13-counts-a.md as a new file added by this pull request (+1, whole file \\\"a\\\"), next to agent3-rebase-notes.md. The header still says \\\"Commits 1\\\", and /eval/harbor-handbook/commits/branch/agent3-merge-b contains no commit for agent13-counts-a.md. The wrong extra file is still listed after the pull request was merged (rebase then fast-forward).",
+      "reproSteps": [
+        "Open https://5503-iotjkrbhq2ztebrw6o97y.e2b.app/eval/harbor-handbook/compare/main...agent3-merge-b and click \"New Pull Request\", then \"Create Pull Request\" (pull request #19 \"Add agent3-rebase-notes.md\", one commit adding only the file agent3-rebase-notes.md).",
+        "While the pull request is open, another commit lands on main that adds the file agent13-counts-a.md (main's commit 66fbc667db \"Add agent13-counts-a.md\", visible on /eval/harbor-handbook/commits/branch/main).",
+        "Open the pull request's \"Files Changed\" tab (address above) and read the file list."
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Pull request header shows a '+5' diffstat while the same header says 0 commits and the Commits / Files Changed badges are empty",
+      "summary": "Both pages show \"wants to merge 0 commits\", an empty \"Commits\" tab badge and an empty \"Files Changed\" badge (only a \"-\"), yet the top-right of the same header block still shows a green diffstat of \"+5\" — the page contradicts itself about how much the pull request changes. (on /eval/harbor-handbook/pulls/6)",
+      "expected": "A pull request with 0 commits and no changed files should not show a nonzero diffstat (\"+5\") in its header; the diffstat should be 0 or hidden, as the Commits and Files Changed counters are.",
+      "actual": "Both pages show \"wants to merge 0 commits\", an empty \"Commits\" tab badge and an empty \"Files Changed\" badge (only a \"-\"), yet the top-right of the same header block still shows a green diffstat of \"+5\" — the page contradicts itself about how much the pull request changes.",
+      "reproSteps": [
+        "Sign in as eval and open https://5503-iotjkrbhq2ztebrw6o97y.e2b.app/eval/harbor-handbook/pulls/6 (agent4-close-reopen test PR, head docs/release-owners -> main; its commit is already in main after PR #7 was merged).",
+        "Read the header line and the tab counters, then the diffstat in the top-right corner of the same header block.",
+        "Repeat on https://5503-iotjkrbhq2ztebrw6o97y.e2b.app/eval/harbor-handbook/pulls/5 (agent6-inline-comments-test, same head branch): same contradiction."
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Diff summary ('N changed files with X additions and Y deletions') ignores the active whitespace filter, so it disagrees with the diff shown below it",
+      "summary": "The summary line stays \"5 changed files with 17 additions and 1 deletions\" and the tab strip still shows \"+17 −1\", while the docs/releases.md file header decreases to 8 and its diff has no deletions at all — the five file badges add up to 16 additions and 0 deletions. Line 4's trailing-whitespace change disappears from the diff, but the totals above the list still count it. The mismatch persists after a reload, and with the whitespace choice remembered the tab's \"+17 −1\" and the sum of the per-file badges never agree. (on /eval/harbor-handbook/pulls/25/files)",
+      "expected": "The \"N changed files with X additions and Y deletions\" line and the \"+X −Y\" beside the Files Changed tab describe the diff actually listed, so they match the per-file counts (16 additions, 0 deletions with whitespace at EOL ignored)",
+      "actual": "The summary line stays \"5 changed files with 17 additions and 1 deletions\" and the tab strip still shows \"+17 −1\", while the docs/releases.md file header decreases to 8 and its diff has no deletions at all — the five file badges add up to 16 additions and 0 deletions. Line 4's trailing-whitespace change disappears from the diff, but the totals above the list still count it. The mismatch persists after a reload, and with the whitespace choice remembered the tab's \"+17 −1\" and the sum of the per-file badges never agree.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /eval/harbor-handbook/pulls/25/files (PR \"agent7 files tab checks\", branch agent7-files-test; it changes docs/releases.md and adds four files)",
+        "Note the summary above the list: \"5 changed files with 17 additions and 1 deletions\", the tab strip value \"+17 -1\", and the \"10\" badge on the docs/releases.md file header (a trailing-whitespace change on line 4 counts as one addition and one deletion)",
+        "Click the whitespace (eye) button in the toolbar and choose \"Ignore changes in whitespace at EOL\"",
+        "Reload the page and read the summary, the tab strip and the docs/releases.md file header again"
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Sort menu of the repository pull request list ends with an empty 'Label' heading",
+      "summary": "The open Sort menu lists its eight sort orders and then one more entry, \"Label\", placed under \"Farthest due date\". It is not a sort order, it is styled like the other options, and clicking it does nothing: the menu stays open and neither the list nor the sort changes. (on /eval/harbor-handbook/pulls)",
+      "expected": "The Sort menu contains only the sort orders (Newest, Oldest, Recently updated, Least recently updated, Most commented, Least commented, Nearest due date, Farthest due date).",
+      "actual": "The open Sort menu lists its eight sort orders and then one more entry, \"Label\", placed under \"Farthest due date\". It is not a sort order, it is styled like the other options, and clicking it does nothing: the menu stays open and neither the list nor the sort changes.",
+      "reproSteps": [
+        "Sign in as eval and open /eval/harbor-handbook/pulls",
+        "In the filter row above the list (Label, Milestone, Project, Author, Assignee, Type, Sort) click \"Sort\"",
+        "Read the bottom of the opened menu, below \"Farthest due date\"",
+        "Click that \"Label\" entry: nothing happens and the menu stays open"
+      ],
+      "severity": 1
+    },
+    {
+      "name": "Repository settings accept a disabled merge style as 'Default Merge Style'; pull requests then silently use another style",
+      "summary": "'Default Merge Style' always lists all five styles regardless of the ticked 'Merge Styles'. After saving with only 'Create squash commit' enabled and default 'Create merge commit', the settings page keeps and displays the disabled style as the default, and the PR merge box silently falls back to 'Create squash commit' — the stored default is never applied and the settings page misreports it. (on /eval/harbor-handbook/settings (Advanced Settings → Pull Requests))",
+      "expected": "The 'Default Merge Style' dropdown should offer only the merge styles enabled in 'Merge Styles' (or the save should refuse/repair a default that is disabled), so the saved default is a style that is actually allowed and the PR merge box uses it.",
+      "actual": "'Default Merge Style' always lists all five styles regardless of the ticked 'Merge Styles'. After saving with only 'Create squash commit' enabled and default 'Create merge commit', the settings page keeps and displays the disabled style as the default, and the PR merge box silently falls back to 'Create squash commit' — the stored default is never applied and the settings page misreports it.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-iyhuwnqi1q5k6kqzc08au.e2b.app/eval/harbor-handbook/settings",
+        "Scroll to the Advanced Settings panel, section 'Pull Requests' → 'Merge Styles'.",
+        "Tick only 'Create squash commit' (untick 'Create merge commit', 'Rebase then fast-forward', 'Rebase then create merge commit', 'Fast-forward only'; 'Manually merged' stays unticked), open 'Default Merge Style' and choose 'Create merge commit', then click 'Update Settings'.",
+        "Reload the page and read the same section: only 'Create squash commit' is ticked, but 'Default Merge Style' still shows 'Create merge commit'.",
+        "Open https://5503-iyhuwnqi1q5k6kqzc08au.e2b.app/eval/harbor-handbook/pulls/20 (PR 'agent12 settings merge style PR'): the merge button reads 'Create squash commit', not the configured default."
+      ],
+      "severity": 3
+    },
+    {
+      "name": "Creating a pull request without permission answers 'Push Failed: The push was rejected. Review the Git Hooks…' although nothing was pushed",
+      "summary": "A red toast says \\\"Push Failed: The push was rejected. Review the Git Hooks for this repository. You must be a collaborator to create pull request.\\\" The POST to /agent15org/agent15repo/compare/main...agent15-branch-2 answers 400 Bad Request and the console logs a failed resource; the form stays on screen with the title still filled in. Nothing was pushed and no pull request was created, so the \\\"Push Failed / Git Hooks\\\" wording describes an action that never happened. (on /agent15org/agent15repo/compare/main...agent15-branch-2)",
+      "expected": "Either no create form is offered to a user without write access (the compare page/button should say that alex cannot open a pull request in this repository), or the failure is stated plainly, e.g. \"You must be a collaborator to create pull request\", without mentioning push or Git hooks.",
+      "actual": "A red toast says \\\"Push Failed: The push was rejected. Review the Git Hooks for this repository. You must be a collaborator to create pull request.\\\" The POST to /agent15org/agent15repo/compare/main...agent15-branch-2 answers 400 Bad Request and the console logs a failed resource; the form stays on screen with the title still filled in. Nothing was pushed and no pull request was created, so the \\\"Push Failed / Git Hooks\\\" wording describes an action that never happened.",
+      "reproSteps": [
+        "Sign out of eval and sign in as alex (alex / momentic-contributor-1), who is not a member of the organization agent15org.",
+        "Open https://5503-i6dtbtklp3c8hdj643mx8.e2b.app/agent15org/agent15repo/compare/main...agent15-branch-2 (branch agent15-branch-2 of the public org repo agent15org/agent15repo against main).",
+        "Click the \"New Pull Request\" button to open the create form.",
+        "Type \"agent15-alex-pr third file\" in the Title field and click \"Create Pull Request\"."
+      ],
+      "severity": 1
+    },
+    {
+      "name": "At phone width the compare page's branch dropdown is wider than the screen with a long branch name and the page scrolls sideways",
+      "summary": "The open dropdown is wider than the 390px screen: the option \\\"eval:agentAE-a-deliberately-extremely-long-branch-name-for-wrapping-1\\\" is cut off at the right edge (only \\\"...-for-wra\\\" visible) and the whole page overflows sideways — scrolling the page right is the only way to read the end of the branch name, and the page stays shifted so the left of the compare form is then clipped. (on /eval/harbor-handbook/compare/main...agentAE-a-deliberately-extremely-long-branch-name-for-wrapping-1)",
+      "expected": "At phone width the branch dropdown should stay inside the screen and wrap or truncate the long branch name so the whole choice can be read without horizontal page scrolling.",
+      "actual": "The open dropdown is wider than the 390px screen: the option \\\"eval:agentAE-a-deliberately-extremely-long-branch-name-for-wrapping-1\\\" is cut off at the right edge (only \\\"...-for-wra\\\" visible) and the whole page overflows sideways — scrolling the page right is the only way to read the end of the branch name, and the page stays shifted so the left of the compare form is then clipped.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1, open https://5503-i6dtbtklp3c8hdj643mx8.e2b.app/eval/harbor-handbook/_new/main/, create the file docs/agentAE-longbranch.md with one line, choose \"Create a new branch for this commit and start a pull request\" with the branch name agentAE-a-deliberately-extremely-long-branch-name-for-wrapping-1 and click \"Propose file change\"",
+        "Set the browser to 390x844 and open https://5503-i6dtbtklp3c8hdj643mx8.e2b.app/eval/harbor-handbook/compare/main...agentAE-a-deliberately-extremely-long-branch-name-for-wrapping-1",
+        "Click the \"pull from: eval:agentAE-a-deliberately-extremely-long-branch-name-for-wrapping-1\" selector to open the branch dropdown",
+        "Read the first option in the dropdown and try to scroll the page sideways"
+      ],
+      "severity": 1
+    }
+  ]
+}

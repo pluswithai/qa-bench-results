@@ -1,0 +1,92 @@
+{
+  "bugs": [
+    {
+      "name": "Marking a notification unread from the Read tab throws you out of the Read view to the Unread list",
+      "summary": "The page navigates to /notifications?page=1 — the q=read filter is dropped and the person is dumped on the Unread list, where the notification now appears with an Unread count of 1. Done twice from /notifications?q=read, same result both times. (on /notifications?q=read)",
+      "expected": "The notification becomes unread and the page stays in the Read view (address /notifications?q=read), the row disappearing from that list; the Unread tab count goes up.",
+      "actual": "The page navigates to /notifications?page=1 — the q=read filter is dropped and the person is dumped on the Unread list, where the notification now appears with an Unread count of 1. Done twice from /notifications?q=read, same result both times.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-iqgs3fdkdmn70ntvor14g.e2b.app/notifications?q=read (the Read tab).",
+        "Hover the notification row \"eval/harbor-handbook #1 Expand the onboarding checklist\" so the two action buttons appear on its right.",
+        "Click the bell button \"Mark as unread\".",
+        "Watch the address bar and the list that is shown."
+      ]
+    },
+    {
+      "name": "Watching search treats \"%\" and \"_\" as wildcards and lists every repository",
+      "summary": "The search lists all three watched repositories (agent13-alpha-notes, agent13-zulu-book, harbor-handbook) even though none of their names or descriptions contain \"%\". The same happens with a single underscore \"_\": all repositories are listed. The search treats SQL LIKE wildcards % and _ as match-anything instead of literal text. (on /notifications/watching)",
+      "expected": "No repository matches the literal text \"%\", so the list should show the empty state 'No matching results found.', as it does for a normal non-matching word such as zzz.",
+      "actual": "The search lists all three watched repositories (agent13-alpha-notes, agent13-zulu-book, harbor-handbook) even though none of their names or descriptions contain \"%\". The same happens with a single underscore \"_\": all repositories are listed. The search treats SQL LIKE wildcards % and _ as match-anything instead of literal text.",
+      "reproSteps": [
+        "Open https://5503-iqgs3fdkdmn70ntvor14g.e2b.app/notifications/watching while signed in as eval (the Watching list shows harbor-handbook, agent13-zulu-book and agent13-alpha-notes).",
+        "Click the 'Search repos...' box and type a single percent sign: %",
+        "Click the magnifier button 'Search...' (or press Enter)."
+      ]
+    },
+    {
+      "name": "Pinned notification cannot be unpinned: the pin button disappears once a notification is pinned",
+      "summary": "After pinning, the row only offers \"Mark as read\". There is no unpin control anywhere (Unread view, Read view), so the pin is permanent for that notification; the only way it disappears is by marking the notification read/unread, which silently discards the pin. (on /notifications)",
+      "expected": "A notification that is pinned can be unpinned again - the row offers an unpin control (as the row offered \"Pin notification\" before), so the pin state can be undone.",
+      "actual": "After pinning, the row only offers \"Mark as read\". There is no unpin control anywhere (Unread view, Read view), so the pin is permanent for that notification; the only way it disappears is by marking the notification read/unread, which silently discards the pin.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /notifications (the Unread list with at least one notification, e.g. the row for eval/harbor-handbook #7).",
+        "Hover the notification row: two icons appear at its right, a pin and a check mark.",
+        "Click the pin icon. The page reloads and the row now shows a blue pin icon after the issue number, and the pin icon in its action area is gone.",
+        "Hover the pinned row again: only the check mark (Mark as read) is offered - no unpin control.",
+        "Open /notifications?q=read: the same pinned row is listed there too, still with no unpin control; clicking its check mark (Mark as read) silently drops the pin instead of unpinning it."
+      ]
+    },
+    {
+      "name": "After signing out, Back shows the signed-in notifications page with the notification titles",
+      "summary": "The browser goes back to /notifications?q=pinned and renders the whole signed-in notifications page again: the notification row \"eval/harbor-handbook #8 agent3-notif-alpha\" with its time, the Unread/Read tab bar, the notification bell and the eval avatar in the top bar. The session is really gone — clicking the notification row then redirects to /user/login — but the notification content is shown as if still signed in (seen 2 times: once via ?q=read after signing out of eval, once via ?q=pinned). (on /notifications?q=pinned)",
+      "expected": "After signing out, pressing Back must not show the signed-in notifications page: the browser should land on the sign-in page (or a page with no notification titles, no bell and no avatar).",
+      "actual": "The browser goes back to /notifications?q=pinned and renders the whole signed-in notifications page again: the notification row \"eval/harbor-handbook #8 agent3-notif-alpha\" with its time, the Unread/Read tab bar, the notification bell and the eval avatar in the top bar. The session is really gone — clicking the notification row then redirects to /user/login — but the notification content is shown as if still signed in (seen 2 times: once via ?q=read after signing out of eval, once via ?q=pinned).",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Open https://5503-iqgs3fdkdmn70ntvor14g.e2b.app/notifications?q=pinned (a notification is listed, e.g. 'eval/harbor-handbook #8 agent3-notif-alpha').",
+        "Click the avatar in the top-right corner, then click 'Sign Out'. The home page with a Sign In button is shown.",
+        "Press the browser's Back button."
+      ]
+    },
+    {
+      "name": "Pinning a notification that was already read puts it back into the Unread list",
+      "summary": "Pinning a read notification changes its read state: the row for eval/harbor-handbook #7, which was in the Read list, appears at the top of the Unread list (with the blue pin icon) after the pin is clicked, so a notification the user has already read is presented as unread again - and it is still listed in the Read view at the same time. (on /notifications)",
+      "expected": "Pinning a read notification keeps it read: it stays in the Read view and does not appear in the Unread view.",
+      "actual": "Pinning a read notification changes its read state: the row for eval/harbor-handbook #7, which was in the Read list, appears at the top of the Unread list (with the blue pin icon) after the pin is clicked, so a notification the user has already read is presented as unread again - and it is still listed in the Read view at the same time.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /notifications?q=read (the Read view with several notifications, e.g. the row for eval/harbor-handbook #7).",
+        "Hover a read notification row that is not pinned: a pin icon and a bell (Mark as unread) icon appear at its right.",
+        "Click the pin icon.",
+        "The page reloads and the notification that was read is now listed at the top of the Unread list with the blue pin icon.",
+        "Open /notifications?q=read: the same pinned notification is listed in the Read view as well, so it is shown as both unread and read."
+      ]
+    },
+    {
+      "name": "Read notifications are not ordered newest-first: a 2-minute-old row sits below 6-minute-old rows",
+      "summary": "The Read list is not in newest-first order: 'eval/harbor-handbook #9 agent4-maya-notif check' (2 minutes ago) is listed below 'eval/harbor-handbook #8 agent3-notif-alpha' and 'eval/harbor-handbook #7 agent4-notif-two check' (both 6 minutes ago), and '#1' (2 minutes ago) sits below the 6-minute-old '#8'. Both rows involved carry no pin, so pinning does not explain it. The exact stored times are #8 15:03:52, #1 15:07:31, #7 15:03:25, #9 15:07:06, #6 15:03:13 — not descending. The Unread list of the same account is strictly newest-first, so the two lists disagree. (on /notifications?q=read)",
+      "expected": "Rows are listed newest first, as in the Unread view, so the row at the top is the most recent event.",
+      "actual": "The Read list is not in newest-first order: 'eval/harbor-handbook #9 agent4-maya-notif check' (2 minutes ago) is listed below 'eval/harbor-handbook #8 agent3-notif-alpha' and 'eval/harbor-handbook #7 agent4-notif-two check' (both 6 minutes ago), and '#1' (2 minutes ago) sits below the 6-minute-old '#8'. Both rows involved carry no pin, so pinning does not explain it. The exact stored times are #8 15:03:52, #1 15:07:31, #7 15:03:25, #9 15:07:06, #6 15:03:13 — not descending. The Unread list of the same account is strictly newest-first, so the two lists disagree.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Open /notifications?q=read (the 'Read' tab).",
+        "Read the relative times on the right of the rows from top to bottom: 5 minutes ago, 1 minute ago, 6 minutes ago, 2 minutes ago, 6 minutes ago.",
+        "Note that the rows showing '2 minutes ago' ('eval/harbor-handbook #9 agent4-maya-notif check' and '#1 Expand the onboarding checklist') come below rows showing '6 minutes ago' ('#8 agent3-notif-alpha', '#7 agent4-notif-two check'), and that #7 and #9 carry no pin icon.",
+        "Reload the page: the same order comes back."
+      ]
+    },
+    {
+      "name": "After Back the Watching Filter still shows the previous filter and re-applies it, hiding the repos that match the search",
+      "summary": "After Back the address is ?q=harbor&sort=recentupdate and the unfiltered result is listed, but the Filter menu still shows the \"Private\" radio selected. Choosing \"Not Archived\" then sends ?q=harbor&archived=0&private=1&sort=recentupdate and the page shows \"No matching results found.\" even though eval/harbor-handbook is not archived and matches \"harbor\". The stale filter left behind by Back is silently re-applied, so a filter the person never chose this time changes the result. (on /notifications/watching)",
+      "expected": "After Back the Filter control should match the address (no filter), and choosing \"Not Archived\" should send ?q=harbor&archived=0 and list eval/harbor-handbook.",
+      "actual": "After Back the address is ?q=harbor&sort=recentupdate and the unfiltered result is listed, but the Filter menu still shows the \"Private\" radio selected. Choosing \"Not Archived\" then sends ?q=harbor&archived=0&private=1&sort=recentupdate and the page shows \"No matching results found.\" even though eval/harbor-handbook is not archived and matches \"harbor\". The stale filter left behind by Back is silently re-applied, so a filter the person never chose this time changes the result.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-iqgs3fdkdmn70ntvor14g.e2b.app/notifications/watching",
+        "Type harbor in 'Search repos...' and press Enter (address becomes ?q=harbor&sort=recentupdate, eval/harbor-handbook is listed)",
+        "Open the Filter menu and choose Private (address becomes ?q=harbor&private=1..., list says 'No matching results found.')",
+        "Press the browser Back button (address returns to ?q=harbor&sort=recentupdate and eval/harbor-handbook is listed again)",
+        "Open the Filter menu: the 'Private' radio is still selected even though the address has no private parameter and the list is unfiltered",
+        "Choose 'Not Archived': the address becomes ?q=harbor&archived=0&private=1&sort=recentupdate and the page shows 'No matching results found.'"
+      ]
+    }
+  ]
+}

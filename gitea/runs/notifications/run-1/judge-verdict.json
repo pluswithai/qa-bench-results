@@ -1,0 +1,126 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "gitea/areas/notifications",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "7c2564e8e895f8ee6014bbf4afbc7a12307dd23d3088098598bbe12e6bd16cc4",
+    "known_invalid_sha256": "995af98e3ec66dc6ca50c42ed5d5c7c33d90931c9854bf7444b7d8b2a214c230",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "16",
+    "bugs": "7",
+    "flags": "0",
+    "known_hits": "2",
+    "extra_known_hits": "0",
+    "unverified": "4",
+    "outside_area_known_hits": "0",
+    "outside_area_known_invalid": "0",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "",
+    "outside_area_ground_truth_sha256": "47db07b83af13b7c7dd75acd1b523ed86e8107b60e6f33878e8fb5b68a2acbe2",
+    "outside_area_known_invalid_sha256": "72e79c4023c85c9101fbf2b7613d3daf78b07fded510d117ab5b26f6ac3103f9",
+    "duplicates": "0",
+    "duplicate_known_hits": "0",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "1",
+    "known_misses": "1",
+    "precision": "0.6666666666666666",
+    "recall": "0.125",
+    "findings_per_minute": "0.3162674417729049",
+    "correct_findings_per_minute": "0.09036212622082998",
+    "severity_1": "0",
+    "severity_3": "2",
+    "severity_5": "0",
+    "severity_sum": "6",
+    "score": "5",
+    "duration_seconds": "1327.99",
+    "partial": "false",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 5,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Matches the Read-tab row action dropping q=read and redirecting to Unread after Mark as unread."
+      },
+      {
+        "groundTruthIndex": 0,
+        "reproStepsIndex": 0,
+        "findingIndex": 4,
+        "reason": "Matches the claimed read-state change when pinning an already-read notification. Evidence is weaker because it shows list placement, not the action and unread-count changes."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 6,
+        "reproStepsIndex": 0,
+        "findingIndex": 2,
+        "reason": "Matches the rejected missing-Unpin claim. Mark as read is the intended way to remove a pin."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 1,
+        "reason": "No supplied entry describes Watching search interpreting percent signs or underscores as wildcards."
+      },
+      {
+        "findingIndex": 3,
+        "reason": "No supplied entry covers browser Back restoring notification content after logout; this differs from retaining private-repository notifications after access revocation."
+      },
+      {
+        "findingIndex": 5,
+        "reason": "No supplied entry describes incorrect chronological ordering of Read notifications."
+      },
+      {
+        "findingIndex": 6,
+        "reason": "No supplied entry describes browser Back retaining and subsequently reapplying a stale Watching privacy filter."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 3,
+        "reason": "The search returns repositories that do not match the requested literal text."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "The described impact is an inability to undo pinning independently of changing notification status."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 3,
+        "reason": "The restored page displays stale authenticated state and notification content after logout."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 3,
+        "reason": "The list presents notifications in an incorrect chronological order."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 3,
+        "reason": "A stale filter is submitted unexpectedly and hides repositories that should match."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

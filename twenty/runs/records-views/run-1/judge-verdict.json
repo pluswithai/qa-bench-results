@@ -1,0 +1,201 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "twenty/areas/records-views",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "f6bf34cc9c5ffb213b1c7c92570fb31c53105c9358a226b68015b5e593d9f56a",
+    "known_invalid_sha256": "fa129877140c0372d6209562491a9238c58edae2cab556edfc320b14972bccab",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "83",
+    "bugs": "12",
+    "flags": "0",
+    "known_hits": "5",
+    "extra_known_hits": "0",
+    "unverified": "4",
+    "outside_area_known_hits": "1",
+    "outside_area_known_invalid": "0",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "1",
+    "outside_area_ground_truth_sha256": "f3456299419b269b88f0ddc32ec53ab80fbf3ec14a32ac6ae1366aa22bd3a43a",
+    "outside_area_known_invalid_sha256": "e51afd4a5be9203d46a29a1087513447454829f8cacf9feb7379d606574f27e1",
+    "duplicates": "0",
+    "duplicate_known_hits": "0",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "2",
+    "known_misses": "2",
+    "precision": "0.7142857142857143",
+    "recall": "0.060240963855421686",
+    "findings_per_minute": "0.4000128893042109",
+    "correct_findings_per_minute": "0.1666720372100879",
+    "severity_1": "1",
+    "severity_3": "4",
+    "severity_5": "0",
+    "severity_sum": "13",
+    "score": "11",
+    "duration_seconds": "1799.942",
+    "partial": "true",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 35,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "The Name Contains filter interprets a literal percent sign as a SQL wildcard, matching the reviewed text-filter defect."
+      },
+      {
+        "groundTruthIndex": 1,
+        "reproStepsIndex": 0,
+        "findingIndex": 5,
+        "reason": "Creating an empty-name view produces icon-only selector entries and an unnamed header, matching the reviewed bug."
+      },
+      {
+        "groundTruthIndex": 32,
+        "reproStepsIndex": 0,
+        "findingIndex": 6,
+        "reason": "The Account Owner picker rejects a multiword first-and-last-name query while individual name parts find the member, matching the reviewed search failure."
+      },
+      {
+        "groundTruthIndex": 77,
+        "reproStepsIndex": 0,
+        "findingIndex": 7,
+        "reason": "Matches the built-in By Stage board losing all configured columns after an Owner-to-Stage round trip and reload while retaining its record count."
+      },
+      {
+        "groundTruthIndex": 20,
+        "reproStepsIndex": 0,
+        "findingIndex": 3,
+        "reason": "Selecting a second row replaces the first selection instead of adding to it, matching the reviewed multi-selection failure despite using People rather than Companies."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 7,
+        "reproStepsIndex": 0,
+        "findingIndex": 2,
+        "reason": "Matches the rejected Opportunities Owner-grouping claim: owner groups must be explicitly added before their records appear."
+      },
+      {
+        "knownInvalidIndex": 18,
+        "reproStepsIndex": 0,
+        "findingIndex": 11,
+        "reason": "Matches the rejected mobile bulk-action dead-end claim: the count and desktop bar are hidden, but selection actions remain available through the command menu."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 1,
+        "reason": "No reviewed entry describes the Table Sort panel direction dropdown failing to apply or retain its selection."
+      },
+      {
+        "findingIndex": 4,
+        "reason": "Idle selection loss is not established as the reviewed unrelated-view-rename defect; the claimed background-refresh cause is unverified."
+      },
+      {
+        "findingIndex": 8,
+        "reason": "No reviewed entry covers Created by text filtering returning no matches for displayed creator names."
+      },
+      {
+        "findingIndex": 9,
+        "reason": "Losing manual column order during a grouping-field round trip differs from the reviewed alphabetical-order reset on reload and incorrect drag-order defects."
+      },
+      {
+        "findingIndex": 10,
+        "reason": "No reviewed entry describes accepting another object's viewId and rendering a blank list; the saved-view layout/grouping failures have different conditions."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 3,
+        "reason": "Changing the sort direction does not perform the requested sorting."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "The described impact is disappearance of records from the grouped result set."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 3,
+        "reason": "Selected records and their bulk-action context disappear without user deselection."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 3,
+        "reason": "The filter excludes records that the described creator-name condition should match."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 3,
+        "reason": "Changing grouping unexpectedly replaces the board's configured column order."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 5,
+        "reason": "The Companies record area is persistently blank and unusable at the supplied URL."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 3,
+        "reason": "The finding claims selected records cannot be acted on, a functional limitation rather than merely a hidden count."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [
+      {
+        "findingIndex": 4,
+        "reference": {
+          "name": "Edit actions selected-record context resets automatically",
+          "summary": "Selecting the Record(s) selected context in Companies > Edit actions automatically reverts to No record selected, deselects the row, and removes the selected-record action set without further input.",
+          "expected": "After choosing Record(s) selected, the dropdown and selected-record action panel remain in that context until the user changes it.",
+          "actual": "The selection initially took effect: the dropdown showed Record(s) selected, one company row was checked, and record-specific actions appeared. On the independent repeat, about 2.8 seconds later and without user input, the dropdown changed to No record selected, the row was unchecked, and the panel returned to unselected actions. The same reset also occurred on the first attempt.",
+          "reproSteps": [
+            [
+              "Start signed in to the authorized Tim Apple workspace using the provided saved authenticated session; do not change authentication details.",
+              "Open /settings/layout and click Customize.",
+              "On the Companies view at /objects/companies?viewId=76ab92b8-5254-4f7c-9ed1-35a713200052, open Edit actions.",
+              "Open the No record selected context dropdown and choose Record(s) selected. Confirm the dropdown, selected table row, and record-specific actions update.",
+              "Without further interaction, wait about 3 seconds. Observe the dropdown return to No record selected, the row become unchecked, and the panel return to unselected actions. The same behavior was independently observed again during a 10-second wait.",
+              "Click Cancel to exit layout customization without saving."
+            ]
+          ],
+          "severity": 3
+        },
+        "reason": "Both describe row selection and selected-record actions clearing automatically without input. This finding reaches the failure through ordinary People-list selection rather than Edit actions."
+      }
+    ],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

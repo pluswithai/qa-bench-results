@@ -1,0 +1,225 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "findings": 19,
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 27,
+        "reproStepsIndex": 0,
+        "findingIndex": 3,
+        "reason": "Matches the repository total being covered by Unadopted Repositories at 390px."
+      },
+      {
+        "groundTruthIndex": 5,
+        "reproStepsIndex": null,
+        "findingIndex": 4,
+        "reason": "Matches the diagnosis button obscuring the Stacktrace tab, but reaches the shared toolbar through Performance Trace rather than the recorded Stacktrace page."
+      },
+      {
+        "groundTruthIndex": 17,
+        "reproStepsIndex": 0,
+        "findingIndex": 9,
+        "reason": "Matches applying a User Accounts filter dropping the selected sort and restoring alphabetical order."
+      },
+      {
+        "groundTruthIndex": 21,
+        "reproStepsIndex": 0,
+        "findingIndex": 12,
+        "reason": "Matches Back restoring earlier user results while retaining the later unmatched search text."
+      },
+      {
+        "groundTruthIndex": 3,
+        "reproStepsIndex": 0,
+        "findingIndex": 15,
+        "reason": "Matches silently clearing a nonempty editor override lacking the mapping delimiter; the valid-entry comparison adds supporting evidence."
+      },
+      {
+        "groundTruthIndex": 1,
+        "reproStepsIndex": 0,
+        "findingIndex": 17,
+        "reason": "Matches the archive-cleanup Cron Tasks label ending in doubled punctuation; inspecting Maintenance Operations is an extra step."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 1,
+        "reproStepsIndex": 0,
+        "findingIndex": 2,
+        "reason": "Matches the rejected claim that Trace must load a list by default. It does not identify the separately accepted lack of guidance."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 0,
+        "reason": "Accepting and retaining -1 differs from silently changing values below -1 to -1, and no workers exceeding the configured maximum are demonstrated."
+      },
+      {
+        "findingIndex": 1,
+        "reason": "No entry describes a nonexistent queue returning a blank 404 page."
+      },
+      {
+        "findingIndex": 5,
+        "reason": "No entry describes the Monitoring sidebar collapsing or losing its current-page marker on queue details."
+      },
+      {
+        "findingIndex": 6,
+        "reason": "No entry describes a Statistics release count disagreeing with repository release views."
+      },
+      {
+        "findingIndex": 7,
+        "reason": "No entry describes clipped queue-detail columns and an unreachable Remove all button at tablet width."
+      },
+      {
+        "findingIndex": 8,
+        "reason": "No entry describes cached administrator data becoming visible through Back after logout; the recorded Back bugs concern search-field mismatches."
+      },
+      {
+        "findingIndex": 10,
+        "reason": "No entry describes percent and underscore being interpreted as User Accounts search wildcards."
+      },
+      {
+        "findingIndex": 11,
+        "reason": "No entry describes an empty avatar submission reporting a successful update."
+      },
+      {
+        "findingIndex": 13,
+        "reason": "No entry describes incorrect singular/plural wording in commit and tag list headers."
+      },
+      {
+        "findingIndex": 14,
+        "reason": "No entry describes the mobile navigation admin badge covering the account avatar."
+      },
+      {
+        "findingIndex": 16,
+        "reason": "No entry describes queue-table captions and values rendering as separate lists at 320px."
+      },
+      {
+        "findingIndex": 18,
+        "reason": "No entry describes Enter on organization creation triggering a leave-page prompt and preventing validation feedback."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 3,
+        "reason": "Describes accepting and persisting an allegedly invalid worker limit."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 5,
+        "reason": "The destination is completely blank, with no error message or recovery controls."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "Alleges missing default content, but the page remains usable and its tabs load the lists."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 1,
+        "reason": "Missing navigation highlighting and automatic expansion are minor usability defects."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 3,
+        "reason": "Reports an incorrect administrative statistic."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 3,
+        "reason": "The clipping makes an action button unreachable, not merely visually imperfect."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 3,
+        "reason": "Describes administrator account data remaining visible after sign-out through cached navigation."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 3,
+        "reason": "Reports search results that do not match the requested literal characters."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 3,
+        "reason": "Reports misleading submission success when no avatar update occurred."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 1,
+        "reason": "Incorrect pluralization is a copy defect."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 1,
+        "reason": "The badge overlap is a visual presentation defect."
+      },
+      {
+        "findingIndex": 15,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 16,
+        "severity": 1,
+        "reason": "The reported failure is presentation and readability, without changed data or a failed action."
+      },
+      {
+        "findingIndex": 17,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 18,
+        "severity": 3,
+        "reason": "Keyboard submission behaves differently from clicking the button and fails to display validation feedback."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [
+      {
+        "findingIndex": 13,
+        "reference": {
+          "name": "Tags page uses plural grammar when one tag is listed",
+          "summary": "A repository with one tag displays the heading `1 Tags` while the nearby tab correctly displays `1 Tag`.",
+          "expected": "The tag heading should use singular grammar when exactly one tag exists.",
+          "actual": "A repository with one tag displays the heading `1 Tags` while the nearby tab correctly displays `1 Tag`.",
+          "reproSteps": [
+            [
+              "Open an authenticated repository that contains exactly one tag.",
+              "Open the repository's Tags page.",
+              "Observe that the list heading says `1 Tags` while the nearby tab says `1 Tag`."
+            ]
+          ],
+          "severity": 1
+        },
+        "reason": "The tag-heading portion exactly matches the accepted “1 Tags” heading beside a correctly singular “1 Tag” tab."
+      }
+    ],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

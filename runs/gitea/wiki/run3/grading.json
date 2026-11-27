@@ -1,0 +1,244 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "findings": 18,
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 11,
+        "reproStepsIndex": 0,
+        "findingIndex": 1,
+        "reason": "Same stale-editor overwrite: saving an older editor silently removes content saved meanwhile in another tab."
+      },
+      {
+        "groundTruthIndex": 5,
+        "reproStepsIndex": null,
+        "findingIndex": 2,
+        "reason": "Same long-title overlap hiding the Code button, but reached directly after creation at 390px rather than by reselecting the page at 320px."
+      },
+      {
+        "groundTruthIndex": 2,
+        "reproStepsIndex": 0,
+        "findingIndex": 8,
+        "reason": "Same unchecked rename to an existing title, silently replacing the target page's content."
+      },
+      {
+        "groundTruthIndex": 1,
+        "reproStepsIndex": 0,
+        "findingIndex": 9,
+        "reason": "Same missing mobile navigation to revision diffs: SHA links disappear and no remaining control opens the diff."
+      },
+      {
+        "groundTruthIndex": 13,
+        "reproStepsIndex": null,
+        "findingIndex": 10,
+        "reason": "Same uncapped open Page picker overflowing and shifting the document, but reproduced at desktop width rather than the phone-width case."
+      },
+      {
+        "groundTruthIndex": 20,
+        "reproStepsIndex": 0,
+        "findingIndex": 12,
+        "reason": "Same whitespace-only new-page title rejection resetting the submitted body to Welcome to the Wiki."
+      },
+      {
+        "groundTruthIndex": 16,
+        "reproStepsIndex": null,
+        "findingIndex": 16,
+        "reason": "Same leading horizontal-rule parsing failure swallowing rules and paragraph breaks, reproduced on an ordinary page rather than a shared _Footer."
+      },
+      {
+        "groundTruthIndex": 21,
+        "reproStepsIndex": 0,
+        "findingIndex": 17,
+        "reason": "Same stale editor silently recreating a page deleted in another tab, with no deletion or conflict warning."
+      },
+      {
+        "groundTruthIndex": 0,
+        "reproStepsIndex": 0,
+        "findingIndex": 3,
+        "reason": "Same loss of visible pre-rename revisions. The reproduction inconsistently describes three saves but a two-revision baseline."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 11,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Same root-relative wiki-link behavior: the supplied repository path is resolved relative to the wiki, duplicating the prefix and opening Pages."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 4,
+        "reason": "No entry covers horizontal overflow and displaced Last updated dates in the Pages index; the listed overflow bugs concern other controls."
+      },
+      {
+        "findingIndex": 5,
+        "reason": "No entry covers Escape failing to close the table-size popup and triggering a JavaScript error banner."
+      },
+      {
+        "findingIndex": 6,
+        "reason": "No entry covers an empty whitespace-filtered revision diff with a summary still counting changes."
+      },
+      {
+        "findingIndex": 7,
+        "reason": "No entry covers incorrect singular/plural wording in commit diff summaries."
+      },
+      {
+        "findingIndex": 11,
+        "reason": "No entry covers ArrowDown clearing the visible query while leaving the Page picker filtered."
+      },
+      {
+        "findingIndex": 13,
+        "reason": "No entry covers deleting an already-deleted page from a stale view; stale-editor recreation after deletion is a different failure."
+      },
+      {
+        "findingIndex": 14,
+        "reason": "No entry covers the revision-history header using Commits for a single revision."
+      },
+      {
+        "findingIndex": 15,
+        "reason": "No entry covers wide tables being clipped inside _Sidebar; the sidebar entries describe different failures."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 3,
+        "reason": "The described links navigate to the wrong destination."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 1,
+        "reason": "The described failure is layout overflow with information reachable by horizontal scrolling."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 3,
+        "reason": "Escape fails to dismiss the popup, but other dismissal methods remain and the editor is not unusable."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 3,
+        "reason": "The diff viewer displays no changes despite reporting a changed file, without explaining the omission."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 1,
+        "reason": "This is a grammatical copy defect without functional impact."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 3,
+        "reason": "The displayed filter and resulting page list become inconsistent, hiding pages unexpectedly."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 3,
+        "reason": "Deletion fails silently and leaves a misleading stale view; the 500 is not a full-page failure."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 1,
+        "reason": "This is a pluralization defect with correct revision data."
+      },
+      {
+        "findingIndex": 15,
+        "severity": 1,
+        "reason": "The described defect is presentation clipping of table content."
+      },
+      {
+        "findingIndex": 16,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 17,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [
+      {
+        "findingIndex": 7,
+        "reference": {
+          "name": "Commit detail summary uses incorrect singular/plural grammar for one changed file",
+          "summary": "Commit detail and branch comparison diff summaries use plural “files” when exactly one file changed.",
+          "expected": "Diff summaries should use singular “file” when exactly one file changed.",
+          "actual": "A commit changing one file displays “1 changed files with 1 additions and 0 deletions”. Comparing docs/release-owners against main also displays “1 changed files with 5 additions and 0 deletions”.",
+          "reproSteps": [
+            [
+              "Open an authenticated repository's commit history.",
+              "Open a commit that changes exactly one file.",
+              "Read the changed-files summary above the diff and observe that it says `1 changed files with 1 additions and 0 deletions`.",
+              "Reported comparison-page variant: open eval/harbor-handbook → Branches and choose New Pull Request beside docs/release-owners, with main as the base.",
+              "Read the comparison summary and observe “1 changed files with 5 additions and 0 deletions”."
+            ]
+          ],
+          "severity": 1
+        },
+        "reason": "Matches the singular/plural defect in one-file commit diff summaries. It is reached through wiki revision history rather than either listed repository-code route."
+      },
+      {
+        "findingIndex": 14,
+        "reference": {
+          "name": "File history shows the grammatically incorrect count label “1 Commits” when there is exactly one commit.",
+          "summary": "File history shows the grammatically incorrect count label “1 Commits” when there is exactly one commit.",
+          "expected": "The history count uses singular wording for one commit, such as “1 Commit.”",
+          "actual": "The history page displays “1 Commits” above its single-commit listing.",
+          "reproSteps": [
+            [
+              "/",
+              "Use only a fresh repository and file created for this reproduction; keep all seeded and other-run data read-only.",
+              "Sign in as the admin account and create a fresh, uniquely named admin-owned repository for this run; do not reuse seeded or other-run repositories or files.",
+              "On the repository Code page, choose New File and create docs/field-notes.md with short Markdown content, then commit directly to the main branch.",
+              "Open the new file's History view."
+            ]
+          ],
+          "severity": 1
+        },
+        "reason": "Matches the history-heading pluralization defect, displaying '1 Commits' above one revision. The wiki revision-history route differs from the listed repository file-History flow."
+      }
+    ],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "bugs": [
+    {
+      "name": "SQL error box shows the database error including the '-- Metabase:: userID ... queryHash' remark",
+      "summary": "The error panel shows the raw database text including the internal header Metabase prepends to native queries: 'Syntax error in SQL statement \"-- Metabase:: userID: 1 queryType: native queryHash: 6ff0fec3ca35952e7b6f7e9b92c0c402648ac4aa112dd38bbb2d4314867c6eb7\\u0000aSELECT id, total FROM orders WHERE id = {{my min}}[*]\" [42000-214]'. The person sees an internal tracking comment, an internal hash and their numeric user ID instead of a readable message about the unrecognised variable. (on /question (native SQL editor))",
+      "expected": "A human-readable error (for example that \"{{my min}}\" is not a valid variable name / that the variable must be defined), without the internal '-- Metabase:: userID ... queryHash ...' line and without the raw internal hash in the UI.",
+      "actual": "The error panel shows the raw database text including the internal header Metabase prepends to native queries: 'Syntax error in SQL statement \"-- Metabase:: userID: 1 queryType: native queryHash: 6ff0fec3ca35952e7b6f7e9b92c0c402648ac4aa112dd38bbb2d4314867c6eb7\\u0000aSELECT id, total FROM orders WHERE id = {{my min}}[*]\" [42000-214]'. The person sees an internal tracking comment, an internal hash and their numeric user ID instead of a readable message about the unrecognised variable.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai, click New → SQL query.",
+        "In the SQL editor type: SELECT id, total FROM orders WHERE id = {{my min}} (a variable name containing a space).",
+        "Press Ctrl+Enter and read the error box."
+      ],
+      "reason": "Works as designed. '{{my min}}' is not a valid variable name, so the text goes to H2 unchanged and H2 returns a syntax error that quotes the statement it received. Metabase documents that errors shown in the SQL editor are the database's own (writing-sql.md L93-95). The leading comment is the query remark Metabase adds on purpose for DBAs (query_processor/util.clj L31-47, injected in sql_jdbc/execute.clj L749-751 and controlled by the include-user-id-and-hash database option, L767). It only reveals the running user's own id and the hash of their own query to themselves."
+    },
+    {
+      "name": "A custom column can be named like an existing table column ('Total'), giving two columns with the same label",
+      "summary": "The name 'Total' is accepted silently and the column picker (and the results table) list two columns with the identical label 'Total' — the Orders.Total column and the computed [Quantity] * 2 — with nothing in the label, the icon, or a warning to say which is which. Picking one for a filter, sort or summarize can silently use the other column. (on /question/notebook)",
+      "expected": "A custom column that would collide with an existing column name should be refused or renamed (as happens between two custom columns, where 'agent4-net' becomes 'agent4-net (1)'), so that every column in the result and in the filter/sort/summarize pickers can be told apart.",
+      "actual": "The name 'Total' is accepted silently and the column picker (and the results table) list two columns with the identical label 'Total' — the Orders.Total column and the computed [Quantity] * 2 — with nothing in the label, the icon, or a warning to say which is which. Picking one for a filter, sort or summarize can silently use the other column.",
+      "reproSteps": [
+        "Sign in with eval@momentic.ai / momentic-eval-1 and open /question/notebook",
+        "In 'Search for tables and more…' choose Sample Database → Orders",
+        "Click the 'Custom column' (+) icon under the Data step, type the expression [Quantity] * 2 and give it the name Total, then click Done (no warning is shown, although Total is already a column of Orders)",
+        "Click the 'Filter' button of the Data step to open the column picker and read the Orders list: 'Total' appears once among the base columns",
+        "Scroll the same list to the bottom (after 'Combined ID, User ID'): a second entry, also labelled 'Total', is the custom column",
+        "Compare with a duplicate among custom columns: naming a second custom column 'agent4-net' is automatically changed to 'agent4-net (1)'"
+      ],
+      "reason": "Deliberate product decision visible in source: the name-conflict check in lib/expression.cljc is commented out with the note that it was removed as part of fixing #39059 and might return for collisions between expressions, 'probably not with tables or earlier stages' (L276-279, L317-322). The screenshots show both columns present with correct values (Orders.Total 39.72 and the custom Total = Quantity*2 = 4), so nothing is computed wrongly; the claim that picking one 'can silently use the other' is not demonstrated."
+    },
+    {
+      "name": "Switching the database keeps the previous result rows on screen and hides the row count",
+      "summary": "The grid still shows the rows (IDs 1 and 2) produced by Sample Database's ORDERS, now under the 'Release operations' database label, and the footer's row count disappears, leaving only the duration ('6ms') - so nothing on screen says those rows are stale or where they came from. Re-running then fails with 'ERROR: relation \"orders\" does not exist', proving the displayed rows cannot come from the selected database. Seen both times I switched databases. (on /question (native SQL editor))",
+      "expected": "Changing the database resets the run state: the old results are cleared (or clearly marked as belonging to the previous database), and the footer keeps telling the truth about what is shown, as the data reference does (it switches to Release operations, whose only table is release_requests).",
+      "actual": "The grid still shows the rows (IDs 1 and 2) produced by Sample Database's ORDERS, now under the 'Release operations' database label, and the footer's row count disappears, leaving only the duration ('6ms') - so nothing on screen says those rows are stale or where they came from. Re-running then fails with 'ERROR: relation \"orders\" does not exist', proving the displayed rows cannot come from the selected database. Seen both times I switched databases.",
+      "reproSteps": [
+        "Sign in, open New → SQL query, pick 'Sample Database'.",
+        "Type SELECT ID FROM ORDERS LIMIT 2 in the code editor and press Ctrl+Enter (or the Run button). The grid shows the two IDs 1 and 2 and the footer says 'Showing 2 rows'.",
+        "Click the database selector at the top-left of the editor ('Sample Database') and choose 'Release operations'.",
+        "Watch the results pane and the footer, then press Ctrl+Enter again."
+      ],
+      "reason": "This is the designed 'result is out of date' state, the same one shown after any edit to the query. shot-2 shows the Run button turned into the blue play button ('Get Answer') after the switch, which is how the app marks results as not matching the current query (RunButton.tsx L60-80; getIsResultDirty in selectors.js L482-514). The row count is hidden on purpose for a dirty native result (QuestionRowCount.tsx L85-87). Re-running then gives the correct Postgres error (shot-3). Nothing is run against the wrong database and nothing is saved wrongly."
+    }
+  ]
+}

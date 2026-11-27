@@ -1,0 +1,448 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "gitea/areas/repository-code",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "954e9c30da4e66f83fcf722aa1ae7677a179755c833328c1d69c5fcb760c087c",
+    "known_invalid_sha256": "31be65e5a16f0e03d29644373c00e0122623a1dc8132470a6767973f436e660b",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "65",
+    "bugs": "32",
+    "flags": "0",
+    "known_hits": "13",
+    "extra_known_hits": "1",
+    "unverified": "14",
+    "outside_area_known_hits": "4",
+    "outside_area_known_invalid": "0",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "1",
+    "outside_area_ground_truth_sha256": "47db07b83af13b7c7dd75acd1b523ed86e8107b60e6f33878e8fb5b68a2acbe2",
+    "outside_area_known_invalid_sha256": "72e79c4023c85c9101fbf2b7613d3daf78b07fded510d117ab5b26f6ac3103f9",
+    "duplicates": "0",
+    "duplicate_known_hits": "0",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "0",
+    "known_misses": "0",
+    "precision": "1",
+    "recall": "0.2",
+    "findings_per_minute": "1.17267376948654",
+    "correct_findings_per_minute": "0.47639871885390683",
+    "severity_1": "7",
+    "severity_3": "4",
+    "severity_5": "2",
+    "severity_sum": "29",
+    "score": "29",
+    "duration_seconds": "1637.284",
+    "partial": "false",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 23,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Matches the empty-name Create new branch dialog closing without validation or creating a branch."
+      },
+      {
+        "groundTruthIndex": 0,
+        "reproStepsIndex": 0,
+        "findingIndex": 1,
+        "reason": "Matches submitting an invalid regular expression and receiving a full-page 500 with internal diagnostics."
+      },
+      {
+        "groundTruthIndex": 22,
+        "reproStepsIndex": 0,
+        "findingIndex": 3,
+        "reason": "Matches invalid branch renaming displaying form.To instead of a readable field name."
+      },
+      {
+        "groundTruthIndex": 24,
+        "reproStepsIndex": null,
+        "findingIndex": 5,
+        "reason": "Matches the explicitly covered stale commit-count variant after a web-editor deletion, rather than the recorded Sync fork reproduction."
+      },
+      {
+        "groundTruthIndex": 9,
+        "reproStepsIndex": null,
+        "findingIndex": 7,
+        "reason": "Matches the incorrect single-commit label '1 Commits', but demonstrates it in comparison rather than file history."
+      },
+      {
+        "groundTruthIndex": 10,
+        "reproStepsIndex": 0,
+        "findingIndex": 9,
+        "reason": "Matches unequal refs being labeled equal when the compare side has no commits ahead. The finding also reproduces the recorded branch-reversal route."
+      },
+      {
+        "groundTruthIndex": 24,
+        "reproStepsIndex": 0,
+        "findingIndex": 10,
+        "reason": "Matches Sync fork updating the head and files while leaving the old commit count until reload."
+      },
+      {
+        "groundTruthIndex": 1,
+        "reproStepsIndex": 0,
+        "findingIndex": 12,
+        "reason": "Matches a one-file commit displaying the plural phrase '1 changed files'."
+      },
+      {
+        "groundTruthIndex": 36,
+        "reproStepsIndex": null,
+        "findingIndex": 15,
+        "reason": "Matches choosing a new branch with the current branch's name and silently committing to that branch. This uses New File rather than the recorded existing-file edit."
+      },
+      {
+        "groundTruthIndex": 52,
+        "reproStepsIndex": null,
+        "findingIndex": 20,
+        "reason": "Matches Apply Patch returning with its submit button disabled until patch text changes. The rejection comes from patch application rather than an invalid branch name."
+      },
+      {
+        "groundTruthIndex": 6,
+        "reproStepsIndex": 0,
+        "findingIndex": 23,
+        "reason": "Matches the New File commit-summary placeholder retaining the literal {filename} token after a filename is entered."
+      },
+      {
+        "groundTruthIndex": 61,
+        "reproStepsIndex": null,
+        "findingIndex": 25,
+        "reason": "Matches the header line count exceeding the numbered file lines by one, demonstrated in Blame rather than the recorded file-view route."
+      },
+      {
+        "groundTruthIndex": 12,
+        "reproStepsIndex": 0,
+        "findingIndex": 28,
+        "reason": "Matches the branch RSS channel link omitting /src/ and opening a 404. Reaching the same feed from history is an insignificant setup difference."
+      },
+      {
+        "groundTruthIndex": 11,
+        "reproStepsIndex": 0,
+        "findingIndex": 4,
+        "reason": "Matches Exact searches with leading hyphens returning lines lacking the required literal query. The claim that every line matches is broader than the reviewed evidence."
+      }
+    ],
+    "invalidMatches": [],
+    "unverified": [
+      {
+        "findingIndex": 2,
+        "reason": "No entry covers the exposed form.TagName key during tag creation; the branch-rename field-key defect is different."
+      },
+      {
+        "findingIndex": 6,
+        "reason": "No entry covers tag searches interpreting percent and underscore as wildcards. The reviewed branch-percent bug loses matching results instead."
+      },
+      {
+        "findingIndex": 8,
+        "reason": "No entry covers Escape failing to dismiss the Code clone popup."
+      },
+      {
+        "findingIndex": 11,
+        "reason": "No entry covers the singular tag-count label; reviewed pluralization defects concern commits or changed files."
+      },
+      {
+        "findingIndex": 13,
+        "reason": "Returning every branch for '%' differs from the reviewed bug where matching percent-ending substrings hide an existing branch."
+      },
+      {
+        "findingIndex": 14,
+        "reason": "No entry covers inaccessible tag-row actions at phone width; the reviewed overflow concerns branch-row controls at tablet width."
+      },
+      {
+        "findingIndex": 16,
+        "reason": "No entry covers a new-branch commit combining current file contents with a stale parent and attributing intervening changes to that commit."
+      },
+      {
+        "findingIndex": 17,
+        "reason": "No entry covers long tag names overflowing the Tags page."
+      },
+      {
+        "findingIndex": 18,
+        "reason": "No entry covers rendering a delete form for an already nonexistent file."
+      },
+      {
+        "findingIndex": 19,
+        "reason": "No entry covers long tag labels widening the commit-history table and pushing its Date column offscreen."
+      },
+      {
+        "findingIndex": 21,
+        "reason": "An empty upload silently returning to Code differs from the reviewed empty-directory submission that redirects to a nonexistent path and 404."
+      },
+      {
+        "findingIndex": 22,
+        "reason": "No entry covers this empty upload-summary placeholder; it differs from New File exposing the literal {filename} token."
+      },
+      {
+        "findingIndex": 24,
+        "reason": "No entry covers a rendered diff omitting a newline-related deletion and disagreeing with the raw patch."
+      },
+      {
+        "findingIndex": 26,
+        "reason": "No entry covers long tag labels overflowing the commit's containment panel."
+      },
+      {
+        "findingIndex": 27,
+        "reason": "No entry covers escaped HTML markup in repository RSS titles; the reviewed RSS defects concern broken channel URLs."
+      },
+      {
+        "findingIndex": 29,
+        "reason": "No entry covers Add File actions from Blame treating the current file path as a destination directory."
+      },
+      {
+        "findingIndex": 30,
+        "reason": "No entry covers a whitespace-only diff becoming blank without explanation. The reviewed filtered-diff bugs involve a selected file filter."
+      },
+      {
+        "findingIndex": 31,
+        "reason": "No entry covers commit-graph messages disappearing and dates clipping at phone width."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 5,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 1,
+        "reason": "Validation correctly rejects the name, but its message exposes an internal field label."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 3,
+        "reason": "Search returns tags that do not contain the requested literal query."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 1,
+        "reason": "This is a keyboard-usability issue; clicking still dismisses the popup."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 1,
+        "reason": "This is a grammatical inconsistency without an incorrect numeric count."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 3,
+        "reason": "The search produces incorrect filtering results."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 3,
+        "reason": "The layout makes actions, including Delete Tag, unreachable."
+      },
+      {
+        "findingIndex": 15,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 16,
+        "severity": 3,
+        "reason": "The described commit has incorrect ancestry and includes changes outside the user's edit."
+      },
+      {
+        "findingIndex": 17,
+        "severity": 1,
+        "reason": "The described impact is text overflow and horizontal scrolling."
+      },
+      {
+        "findingIndex": 18,
+        "severity": 1,
+        "reason": "Missing-file feedback is delayed until submission, which correctly refuses the deletion."
+      },
+      {
+        "findingIndex": 19,
+        "severity": 1,
+        "reason": "This is a layout and readability defect with horizontal scrolling available."
+      },
+      {
+        "findingIndex": 20,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 21,
+        "severity": 3,
+        "reason": "Submission exits the form without validation feedback or a completed operation."
+      },
+      {
+        "findingIndex": 22,
+        "severity": 1,
+        "reason": "The described impact is placeholder wording, not an incorrect upload destination."
+      },
+      {
+        "findingIndex": 23,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 24,
+        "severity": 3,
+        "reason": "The rendered diff incorrectly represents the committed changes."
+      },
+      {
+        "findingIndex": 25,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 26,
+        "severity": 1,
+        "reason": "The described impact is visual overflow and horizontal scrolling."
+      },
+      {
+        "findingIndex": 27,
+        "severity": 1,
+        "reason": "The claim concerns unreadable title formatting, not a raw error dump or broken feed page."
+      },
+      {
+        "findingIndex": 28,
+        "severity": 5,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 29,
+        "severity": 3,
+        "reason": "The action opens the editor with an invalid destination through an existing file."
+      },
+      {
+        "findingIndex": 30,
+        "severity": 1,
+        "reason": "Whitespace is hidden as requested, but the empty state and summary lack explanatory presentation."
+      },
+      {
+        "findingIndex": 31,
+        "severity": 1,
+        "reason": "The described failure is responsive presentation hiding text and clipping columns."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [
+      {
+        "findingIndex": 2,
+        "reference": {
+          "name": "Release tag name validation error shows an internal field key",
+          "summary": "On New Release, an invalid, empty or too-long tag name shows an error that names the field with the internal key form.TagName instead of the visible 'Tag name' label.",
+          "expected": "The tag name validation error names the Tag name field in readable language.",
+          "actual": "Entering tagcreate-invalid..name as the tag name and clicking Create Tag Only showed 'form.TagName must be a well-formed Git reference name.' Empty and over-long tag names show the same raw key.",
+          "reproSteps": [
+            [
+              "Open a repository's New Release page.",
+              "Enter tagcreate-invalid..name as the tag name and click Create Tag Only (or Publish Release).",
+              "Read the validation error."
+            ]
+          ],
+          "severity": 1
+        },
+        "reason": "Matches the tag-validation message exposing form.TagName instead of the readable field label."
+      },
+      {
+        "findingIndex": 6,
+        "reference": {
+          "name": "Tag search treats underscores and percent signs as wildcards",
+          "summary": "The Tags page search passes the query to the database LIKE pattern unescaped, so '_' matches any single character and '%' matches anything. Searching a_b also lists a-b and axb tags, v1_0_0 finds v1.0.0, and searching % or _ lists every tag.",
+          "expected": "Tag search treats '_' and '%' as literal characters, so it only lists tags whose names contain them.",
+          "actual": "With tags rel-a_b, rel-a-b and rel-axb, searching a_b listed all three ('3 Tags'), while a-b listed only rel-a-b. Searching % or _ listed all 5 tags, including ones with no percent sign or underscore. On harbor-handbook, v1_0_0 returned v1.0.0.",
+          "reproSteps": [
+            [
+              "In a repository, create tags rel-a_b, rel-a-b and rel-axb (New Release > Create Tag Only).",
+              "Open the repository's Tags page, search for a_b and note the results.",
+              "Search for a-b and compare.",
+              "Search for % and check whether tags without a percent sign are listed."
+            ]
+          ],
+          "severity": 3
+        },
+        "reason": "Matches Tags search interpreting percent signs and underscores as wildcards rather than literal characters."
+      },
+      {
+        "findingIndex": 11,
+        "reference": {
+          "name": "Tags page uses plural grammar when one tag is listed",
+          "summary": "A repository with one tag displays the heading `1 Tags` while the nearby tab correctly displays `1 Tag`.",
+          "expected": "The tag heading should use singular grammar when exactly one tag exists.",
+          "actual": "A repository with one tag displays the heading `1 Tags` while the nearby tab correctly displays `1 Tag`.",
+          "reproSteps": [
+            [
+              "Open an authenticated repository that contains exactly one tag.",
+              "Open the repository's Tags page.",
+              "Observe that the list heading says `1 Tags` while the nearby tab says `1 Tag`."
+            ]
+          ],
+          "severity": 1
+        },
+        "reason": "Matches the single-tag list heading saying 1 Tags while the nearby tab correctly says 1 Tag."
+      },
+      {
+        "findingIndex": 14,
+        "reference": {
+          "name": "Mobile tag row clips release and delete actions that scrolling cannot reveal",
+          "summary": "At a 390×844 viewport, the tag row clips New Release and leaves Delete Tag outside the visible row; ordinary horizontal scrolling on the row and page does not expose the actions.",
+          "expected": "Authorized tag-row actions remain accessible through the rendered UI at a narrow viewport, whether by responsive layout or ordinary scrolling.",
+          "actual": "The v1.0.0 row displays only a clipped beginning of New Release and leaves Delete Tag offscreen. Horizontal scrolling attempts on the row and page do not reveal the hidden controls.",
+          "reproSteps": [
+            [
+              "Sign in with code-write and release-write access to an unarchived repository. Use a tag without an associated published release so New Release and Delete Tag apply; the recorded run used the seeded v1.0.0 tag.",
+              "Set the browser viewport to 390×844 CSS pixels.",
+              "Open the repository Tags page and search for the tag. The recorded path was /eval/harbor-handbook/tags?q=v1.0.0.",
+              "Inspect the tag action row: only the beginning of New Release is visible and Delete Tag is offscreen.",
+              "Attempt ordinary horizontal scrolling on the row and page. Observe that the actions remain clipped or hidden; no tag deletion or release creation is necessary to inspect the defect."
+            ]
+          ],
+          "severity": 3
+        },
+        "reason": "Matches mobile tag rows clipping New Release and making Delete Tag unreachable even through horizontal scrolling."
+      }
+    ],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

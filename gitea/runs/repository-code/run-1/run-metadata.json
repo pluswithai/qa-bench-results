@@ -1,0 +1,15 @@
+{
+  "fixture": "gitea/areas/repository-code",
+  "run": 1,
+  "started_at": "2026-11-23T15:27:34.270Z",
+  "duration_seconds": 1601.879,
+  "time_limit_seconds": 1800,
+  "stop_reason": "completed",
+  "credits": {
+    "total": 1418,
+    "testing_team": 1094,
+    "verification": 324,
+    "findings_verified": 54
+  },
+  "team_container_errors": 0
+}

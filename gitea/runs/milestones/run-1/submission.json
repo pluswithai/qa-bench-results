@@ -1,0 +1,217 @@
+{
+  "fixture": "gitea/areas/milestones",
+  "run": 1,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 347,
+      "name": "A title made only of spaces creates a milestone with a blank name",
+      "summary": "The milestone is created. The green message reads 'The milestone \\\" \\\" has been created.' and the list now has an entry with no readable title, only its icons, progress bar and 'Edit / Close / Delete' links. The counter went from 2 Open to 3 Open. (on /eval/harbor-handbook/milestones/new)",
+      "expected": "The title should be trimmed and a title of only whitespace should be refused like an empty one (the browser already refuses a fully empty field with 'Please fill out this field.'), or at least the milestone should not be created with a blank name.",
+      "actual": "The milestone is created. The green message reads 'The milestone \\\" \\\" has been created.' and the list now has an entry with no readable title, only its icons, progress bar and 'Edit / Close / Delete' links. The counter went from 2 Open to 3 Open.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /eval/harbor-handbook/milestones",
+        "Click the green 'New Milestone' button (goes to /eval/harbor-handbook/milestones/new)",
+        "Type three spaces in the 'Title' field and leave 'Due Date' and 'Description' empty",
+        "Click 'Create Milestone'"
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 437,
+      "name": "A milestone due date of 0001-01-01 is shown as a bare \"-\" instead of the date",
+      "summary": "Both the list row and the detail page show a calendar icon followed by a lone \"-\", a raw placeholder instead of a date. The value is intact in the edit form (0001-01-01). (on /eval/harbor-handbook/milestones and /eval/harbor-handbook/milestone/13)",
+      "expected": "The date entered, 01/01/0001, should be shown in the milestone row and on the detail page (or the app should refuse such a date when it is entered).",
+      "actual": "Both the list row and the detail page show a calendar icon followed by a lone \"-\", a raw placeholder instead of a date. The value is intact in the edit form (0001-01-01).",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-iohkuh32xzq8xr64ijdg1.e2b.app/eval/harbor-handbook/milestones/new",
+        "Type 'agent8-min' in Title and type 01/01/0001 into the Due Date field (the field shows 01/01/0001)",
+        "Click Create Milestone",
+        "Look at the new row 'agent8-min' in the repo milestone list: after the calendar icon only a '-' is displayed instead of a date",
+        "Open 'agent8-min' (https://5503-iohkuh32xzq8xr64ijdg1.e2b.app/eval/harbor-handbook/milestone/13): the header also shows only the calendar icon followed by '-'",
+        "Open Edit Milestone: the Due Date field still contains 01/01/0001, so the date was saved"
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 438,
+      "name": "Searching the milestone list silently discards the chosen sort order",
+      "summary": "The list comes back sorted by due date (agent8-min, agent15-alpha, agent3-detail, agent5-close-test, agent6-alpha, agent7-alpha, agent10-alpha, agent4-alpha, agent8-today...) and the address drops the sort parameter to ?state=open&q=agent; opening the Sort dropdown shows \\\"Earliest due date\\\" marked active. The chosen sort is lost without a word. (on /eval/harbor-handbook/milestones)",
+      "expected": "The search narrows the list but keeps the sort order the person chose: results stay in Name order, and the Sort dropdown still marks \\\"Name\\\" as the current choice (sort=name kept in the address along with q=agent).",
+      "actual": "The list comes back sorted by due date (agent8-min, agent15-alpha, agent3-detail, agent5-close-test, agent6-alpha, agent7-alpha, agent10-alpha, agent4-alpha, agent8-today...) and the address drops the sort parameter to ?state=open&q=agent; opening the Sort dropdown shows \\\"Earliest due date\\\" marked active. The chosen sort is lost without a word.",
+      "reproSteps": [
+        "Open https://5503-iohkuh32xzq8xr64ijdg1.e2b.app/eval/harbor-handbook/milestones (signed in as eval).",
+        "Click the Sort dropdown above the list and choose \"Name\". The list reorders by name descending; the address becomes ...?sort=name&state=open&q=.",
+        "Click into the \"Search...\" box, type agent and press Enter."
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 509,
+      "name": "Milestone search treats \"%\" and \"_\" as wildcards and returns every milestone",
+      "summary": "Both characters are passed to the database LIKE pattern unescaped: '%' returns all milestones (15 results) and '_' returns all milestones (14 Open / 2 Closed), although none of the milestone names contains a percent sign or an underscore. The search box shows the character typed and the result area is simply the whole list. (on /eval/harbor-handbook/milestones)",
+      "expected": "The search matches the literal text typed: '%' finds only milestones whose name contains '%' (none exist, so no results) and '_' finds only milestones whose name contains an underscore (none exist, so no results).",
+      "actual": "Both characters are passed to the database LIKE pattern unescaped: '%' returns all milestones (15 results) and '_' returns all milestones (14 Open / 2 Closed), although none of the milestone names contains a percent sign or an underscore. The search box shows the character typed and the result area is simply the whole list.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-iohkuh32xzq8xr64ijdg1.e2b.app/eval/harbor-handbook/milestones",
+        "Type a single % into the 'Search...' box above the milestone list and press Enter (URL becomes ?state=open&q=%25)",
+        "Observe the list: all 15 milestones are listed although none of their names contains a percent sign",
+        "Replace the search text with a single underscore _ and press Enter (URL becomes ?state=open&q=_) - again the whole list is shown (14 Open / 2 Closed)"
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 527,
+      "name": "Closing a milestone from its page opens a \"Closed\" milestone list that shows the open milestones",
+      "summary": "The app redirects to /eval/harbor-handbook/milestones?state=close with the \\\"3 Closed\\\" tab highlighted, but the list shows the 16 open milestones (repro-agent8-min, Handbook 1.1, agent14-alpha, ...), each with a \\\"Close\\\" action instead of \\\"Open\\\". The just-closed milestone agent13-mobile is not in the list. Clicking the \\\"3 Closed\\\" tab (state=closed) then shows the 3 real closed milestones. (on /eval/harbor-handbook/milestones?state=close)",
+      "expected": "After closing, the list should show the closed milestones (the milestone just closed first), as the \"3 Closed\" tab does when clicked directly (it lists agent15-doubleclick, agent5-close-test, agent13-mobile).",
+      "actual": "The app redirects to /eval/harbor-handbook/milestones?state=close with the \\\"3 Closed\\\" tab highlighted, but the list shows the 16 open milestones (repro-agent8-min, Handbook 1.1, agent14-alpha, ...), each with a \\\"Close\\\" action instead of \\\"Open\\\". The just-closed milestone agent13-mobile is not in the list. Clicking the \\\"3 Closed\\\" tab (state=closed) then shows the 3 real closed milestones.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and set the window to 390x844.",
+        "Create a milestone: open /eval/harbor-handbook/milestones, click \"New Milestone\", title \"agent13-mobile\", due date 04/10/2026, click \"Create Milestone\".",
+        "Open the new milestone (its title link in the list) so that /eval/harbor-handbook/milestone/20 is shown.",
+        "Click the \"Close\" button next to the milestone title on the detail page.",
+        "Look at the URL and at the highlighted tab, then read the rows of the list; finally click the \"3 Closed\" tab."
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 547,
+      "name": "Sorting milestones by \"Name\" shows them in reverse alphabetical order (Z to A)",
+      "summary": "The list comes back in reverse alphabetical order: repro-agent8-min, agent8-today, agent8-min, agent7-alpha, agent6-alpha, agent5-close-test, agent4-beta renamed, agent3-detail, agent2-date9999, agent2-date1970, agent2-basic …, agent14-beta, agent14-alpha, agent10-alpha, Handbook 1.1, then the entries with an empty name. A->Z order never appears, and the sort menu has no other alphabetical option to get it. (on /eval/harbor-handbook/milestones)",
+      "expected": "The milestones are listed alphabetically from A to Z (agent10-alpha, agent14-alpha, agent14-beta, agent2-basic …, agent3-detail … Handbook 1.1), which is what the \"Name\" option promises.",
+      "actual": "The list comes back in reverse alphabetical order: repro-agent8-min, agent8-today, agent8-min, agent7-alpha, agent6-alpha, agent5-close-test, agent4-beta renamed, agent3-detail, agent2-date9999, agent2-date1970, agent2-basic …, agent14-beta, agent14-alpha, agent10-alpha, Handbook 1.1, then the entries with an empty name. A->Z order never appears, and the sort menu has no other alphabetical option to get it.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-iohkuh32xzq8xr64ijdg1.e2b.app/eval/harbor-handbook/milestones (17 open, 3 closed milestones exist)",
+        "Click the 'Sort' dropdown on the right above the list and choose 'Name' (URL becomes ?sort=name&state=open&q=)",
+        "Read the order of the milestone cards: repro-agent8-min is first and 'Handbook 1.1' comes near the bottom"
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 557,
+      "name": "\"Open\" tab on a milestone detail page lists closed issues too",
+      "summary": "The page reloads to /eval/harbor-handbook/milestone/7?type=all&state=all&milestone=7 and the list shows both the open issue #9 and the closed issue #6 (shown with the red closed check mark and \\\"was closed\\\"), while the \\\"Open\\\" tab is displayed as the active one. The count above it still says \\\"1 Open 1 Closed\\\". The sibling \\\"1 Closed\\\" tab does filter correctly, so the two tabs of the same control behave differently. (on /eval/harbor-handbook/milestone/7)",
+      "expected": "The \\\"Open\\\" tab keeps only open issues in the list (the same list as the page's default view): just #9.",
+      "actual": "The page reloads to /eval/harbor-handbook/milestone/7?type=all&state=all&milestone=7 and the list shows both the open issue #9 and the closed issue #6 (shown with the red closed check mark and \\\"was closed\\\"), while the \\\"Open\\\" tab is displayed as the active one. The count above it still says \\\"1 Open 1 Closed\\\". The sibling \\\"1 Closed\\\" tab does filter correctly, so the two tabs of the same control behave differently.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Open https://5503-iohkuh32xzq8xr64ijdg1.e2b.app/eval/harbor-handbook/milestone/7 (my milestone \"agent3-detail\", with 1 open issue #9 \"agent3-item-two\" and 1 closed issue #6 \"agent3-item-one\").",
+        "On loading the page the list shows only the open issue #9, as expected.",
+        "Click the \"1 Open\" tab next to \"1 Closed\"."
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 615,
+      "name": "Search by an accented letter lists a milestone while the Open/Closed tab counters say 0",
+      "summary": "The tabs read \"0 Open\" and \"0 Closed\" while the only listed milestone, agent2-basic …, is an open one, so the list shows 1 item next to a count of 0. Searching for an emoji that matches the same milestone (e.g. 🎉) shows \"1 Open\" correctly, so only accented/multi-byte letters break the counters. (on /eval/harbor-handbook/milestones)",
+      "expected": "The Open tab count matches the number of open milestones listed for the search - \"1 Open\" - as it does for the emoji or the plain text part of the same milestone name.",
+      "actual": "The tabs read \"0 Open\" and \"0 Closed\" while the only listed milestone, agent2-basic …, is an open one, so the list shows 1 item next to a count of 0. Searching for an emoji that matches the same milestone (e.g. 🎉) shows \"1 Open\" correctly, so only accented/multi-byte letters break the counters.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-iohkuh32xzq8xr64ijdg1.e2b.app/eval/harbor-handbook/milestones",
+        "In the 'Search...' box type José (a milestone in this repo is named agent2-basic <b>x</b> & \"q\" José 🎉) and press Enter",
+        "One open milestone is listed under the tabs, but the tabs themselves read '0 Open' and '0 Closed'",
+        "Repeat with just the character é (URL ?state=open&q=%C3%A9): again the milestone is listed while the tabs read '0 Open'"
+      ]
+    },
+    {
+      "index": 8,
+      "reported_at_seconds": 733,
+      "name": "At 768px the global milestone list lets a long milestone title overlap the repo name, the meta line and the progress bar",
+      "summary": "The row falls apart: the title \"agent14-AAAA…\" wraps mid-word into two lines and overlaps the grey \"eval/harbor-handbook\" repo chip, the \"Updated / No due date\" meta line is pushed under it, and the \"0%\" together with the progress bar is placed above the meta line and overlapping the title block. The row is unreadable and the list column (the search box above ends at x≈665) does not contain the row. No other row's layout is affected. (on /milestones)",
+      "expected": "The title wraps or is ellipsized inside its row without touching the repo name, the meta line stays below the title, and the percentage and progress bar stay on the row's right side in one line, as they do at 1440px.",
+      "actual": "The row falls apart: the title \"agent14-AAAA…\" wraps mid-word into two lines and overlaps the grey \"eval/harbor-handbook\" repo chip, the \"Updated / No due date\" meta line is pushed under it, and the \"0%\" together with the progress bar is placed above the meta line and overlapping the title block. The row is unreadable and the list column (the search box above ends at x≈665) does not contain the row. No other row's layout is affected.",
+      "reproSteps": [
+        "Signed in as eval, create a milestone in eval/harbor-handbook whose title is one long word, e.g. agent14-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA (the field allows 50 characters; this is 49).",
+        "Open the global milestone list at https://5503-iohkuh32xzq8xr64ijdg1.e2b.app/milestones?state=open&sort=&q=agent14 (the repository filter panel is on the left).",
+        "Set the window to a tablet width: 768 × 1024 and look at the row of the milestone whose title is the long word."
+      ]
+    },
+    {
+      "index": 9,
+      "reported_at_seconds": 758,
+      "name": "Choosing the \"Name\" sort silently drops the repository filter on the organization milestone list",
+      "summary": "The filter is silently dropped: the list shows all 4 milestones including agent9-delta from agent9-repo2, the counter jumps to \\\"4 Open\\\", both repository entries in the left filter look selected again, and the address becomes ?sort=name&state=open&q= without the repos parameter (the other sort options keep repos=[...]). (on /org/agent9-hunt-org/milestones)",
+      "expected": "The repository filter stays applied: only the 3 milestones of agent9-repo are listed, the counter stays \\\"3 Open\\\", and the URL keeps the repos selection like every other sort option does.",
+      "actual": "The filter is silently dropped: the list shows all 4 milestones including agent9-delta from agent9-repo2, the counter jumps to \\\"4 Open\\\", both repository entries in the left filter look selected again, and the address becomes ?sort=name&state=open&q= without the repos parameter (the other sort options keep repos=[...]).",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-iohkuh32xzq8xr64ijdg1.e2b.app/org/agent9-hunt-org/milestones (organization agent9-hunt-org has two repositories: agent9-repo with 3 open milestones agent9-alpha, agent9-beta, agent9-gamma, and agent9-repo2 with 1 open milestone agent9-delta). The list shows 4 Open.",
+        "In the left \"In your repositories\" filter, click the entry \"agent9-hunt-org/agent9-repo2\" (badge 1) to deselect it: the list narrows to the 3 milestones of agent9-repo and the counter reads \"3 Open\".",
+        "Click \"Sort\" above the list and choose \"Name\"."
+      ]
+    },
+    {
+      "index": 10,
+      "reported_at_seconds": 785,
+      "name": "Milestone detail title with a long word runs off the right edge at phone width",
+      "summary": "The heading overflows the page: its box runs from x=8 to x=410 while the viewport is 390px wide. The long word does not break, so the second line \"supercalifragilisticexpialidocious-\" is cut off at the right edge of the screen (the trailing characters are not visible and the text cannot be read in full). (on /eval/harbor-handbook/milestone/20)",
+      "expected": "The milestone title wraps inside the page width (or breaks the long word) so the whole title is readable, with no content outside the 390px viewport.",
+      "actual": "The heading overflows the page: its box runs from x=8 to x=410 while the viewport is 390px wide. The long word does not break, so the second line \"supercalifragilisticexpialidocious-\" is cut off at the right edge of the screen (the trailing characters are not visible and the text cannot be read in full).",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and set the browser window to 390x844.",
+        "Create a milestone whose title has no space in the second half: open /eval/harbor-handbook/milestones, click \"New Milestone\", title \"agent13-mobile-supercalifragilisticexpialidocious-title-with-no-spaces-0123456789\", click \"Create Milestone\". (The title field stops at 50 characters, so the stored title is \"agent13-mobile-supercalifragilisticexpialidocious-\".)",
+        "Open /eval/harbor-handbook/milestone/20 (the milestone \"agent13-mobile-supercalifragilisticexpialidocious-\") and look at the page heading."
+      ]
+    },
+    {
+      "index": 11,
+      "reported_at_seconds": 839,
+      "name": "Pressing Enter to submit the New Milestone form raises a browser \"leave page\" confirmation and creates nothing if dismissed",
+      "summary": "A browser beforeunload confirmation (\"leave this page?\") appears instead of a plain submit. If the person chooses to stay, nothing is sent: still on /eval/harbor-handbook/milestones/new with the title 'agent2-entercancel' in the field, and searching the milestone list for 'agent2-entercancel' afterwards shows 0 Open / 0 Closed — no milestone exists. Submitting the very same form with a mouse click on 'Create Milestone' never shows the confirmation and creates the milestone at once. (on /eval/harbor-handbook/milestones/new)",
+      "expected": "Pressing Enter in the Title field submits the form and creates the milestone, exactly like clicking 'Create Milestone' — with no 'leave page' confirmation.",
+      "actual": "A browser beforeunload confirmation (\"leave this page?\") appears instead of a plain submit. If the person chooses to stay, nothing is sent: still on /eval/harbor-handbook/milestones/new with the title 'agent2-entercancel' in the field, and searching the milestone list for 'agent2-entercancel' afterwards shows 0 Open / 0 Closed — no milestone exists. Submitting the very same form with a mouse click on 'Create Milestone' never shows the confirmation and creates the milestone at once.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /eval/harbor-handbook/milestones/new",
+        "Type 'agent2-entercancel' into the 'Title' field",
+        "With the cursor still in the 'Title' field, press Enter instead of clicking 'Create Milestone'",
+        "The browser raises its leave-page / unsaved-changes confirmation; choose to stay on the page",
+        "The form is still displayed with the title filled in and no milestone was created (searching the milestone list for 'agent2-entercancel' gives 0 Open, 0 Closed)"
+      ]
+    },
+    {
+      "index": 12,
+      "reported_at_seconds": 862,
+      "name": "Markdown link to an absolute path in a milestone description is prefixed with the repo path and lands on 404",
+      "summary": "The rendered link points to /eval/harbor-handbook/eval/harbor-handbook/issues — the repository path is prepended to the absolute path — and opening it answers \"404 Not Found. The page you are trying to reach either does not exist or you are not authorized to view it.\" So a link written correctly in the description is broken when clicked. (on /eval/harbor-handbook/milestones)",
+      "expected": "A link written as [link to issues](/eval/harbor-handbook/issues) should render as href=\"/eval/harbor-handbook/issues\" and open the repository's issue list.",
+      "actual": "The rendered link points to /eval/harbor-handbook/eval/harbor-handbook/issues — the repository path is prepended to the absolute path — and opening it answers \"404 Not Found. The page you are trying to reach either does not exist or you are not authorized to view it.\" So a link written correctly in the description is broken when clicked.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /eval/harbor-handbook/milestones/new.",
+        "Title: agent12-detail. Description: a Markdown link on its own line: [link to issues](/eval/harbor-handbook/issues)",
+        "Click \"Create Milestone\".",
+        "Open /eval/harbor-handbook/milestones?q=agent12-detail&state=open: the description shows the link \"A link to issues\".",
+        "Click that link: the browser goes to /eval/harbor-handbook/eval/harbor-handbook/issues and the page answers 404 Not Found."
+      ]
+    },
+    {
+      "index": 13,
+      "reported_at_seconds": 1046,
+      "name": "A page number beyond the last page shows an empty milestone list with no message, while the pager marks page 3 as current",
+      "summary": "The page shows the counters (e.g. \\\"42 Open\\\" / \\\"12 Closed\\\"), a pager with page 3 highlighted as the current page, and a completely blank list area: no milestone rows and no message such as \\\"no milestones found\\\". Nothing tells the person that the requested page does not exist. (on /milestones)",
+      "expected": "Either the list falls back to the last/valid page, or the page says in words that this page has no results and offers a way back to page 1; the pager should not claim page 3 is the current page while a page=9999 address is shown.",
+      "actual": "The page shows the counters (e.g. \\\"42 Open\\\" / \\\"12 Closed\\\"), a pager with page 3 highlighted as the current page, and a completely blank list area: no milestone rows and no message such as \\\"no milestones found\\\". Nothing tells the person that the requested page does not exist.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open https://5503-iohkuh32xzq8xr64ijdg1.e2b.app/milestones?state=open&sort=name (the Open tab, sorted by name, shows 3 pages of milestones)",
+        "Change the address to https://5503-iohkuh32xzq8xr64ijdg1.e2b.app/milestones?page=9999&state=open&sort=name and load it",
+        "Look at the list area and the pager"
+      ]
+    },
+    {
+      "index": 14,
+      "reported_at_seconds": 1075,
+      "name": "Saving a stale edit form in a second tab silently reverts the title and due date saved in the first tab",
+      "summary": "No warning and no conflict check: tab B saves the whole form, so its stale title agent1-twotab and due date 2026-12-15 overwrite tab A's newer title and due date. The message reads Milestone \"agent1-twotab\" has been updated and the detail page then shows the old title with the old date Dec 15, 2026 and only tab B's description. Tab A's edit is silently lost. (on /eval/harbor-handbook/milestones/57/edit)",
+      "expected": "Either the app notices the milestone changed after tab B's form was opened and refuses/warns (e.g. \"this milestone has been modified since you opened it\"), or tab B's save applies only what tab B changed and keeps tab A's title agent1-twotab-A-title and due date 2026-12-20. In no case should tab A's saved data be silently reverted.",
+      "actual": "No warning and no conflict check: tab B saves the whole form, so its stale title agent1-twotab and due date 2026-12-15 overwrite tab A's newer title and due date. The message reads Milestone \"agent1-twotab\" has been updated and the detail page then shows the old title with the old date Dec 15, 2026 and only tab B's description. Tab A's edit is silently lost.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and create a throw-away milestone: open https://5503-iohkuh32xzq8xr64ijdg1.e2b.app/eval/harbor-handbook/milestones/new, title agent1-twotab, due date 2026-12-15, description 'agent1 original description', click Create Milestone (my record is id 57)",
+        "Open the edit form https://5503-iohkuh32xzq8xr64ijdg1.e2b.app/eval/harbor-handbook/milestones/57/edit in this tab and in a second tab",
+        "In the first tab change the title to agent1-twotab-A-title and the due date to 2026-12-20, click Update Milestone (message: Milestone \"agent1-twotab-A-title\" has been updated)",
+        "In the second tab, which still shows the old title agent1-twotab and date 12/15/2026, change only the description to 'agent1 description edited in tab B' and click Update Milestone",
+        "Open https://5503-iohkuh32xzq8xr64ijdg1.e2b.app/eval/harbor-handbook/milestone/57 : the title is agent1-twotab again and the due date Dec 15, 2026 - the first tab's save is gone"
+      ]
+    }
+  ]
+}

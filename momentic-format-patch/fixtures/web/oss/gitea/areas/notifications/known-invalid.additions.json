@@ -1,0 +1,31 @@
+{
+  "bugs": [
+    {
+      "name": "After sign-out, browser Back shows the cached signed-in notifications page",
+      "summary": "The browser goes back to /notifications?q=pinned and renders the whole signed-in notifications page again: the notification row \"eval/harbor-handbook #8 agent3-notif-alpha\" with its time, the Unread/Read tab bar, the notification bell and the eval avatar in the top bar. The session is really gone — clicking the notification row then redirects to /user/login — but the notification content is shown as if still signed in (seen 2 times: once via ?q=read after signing out of eval, once via ?q=pinned). (on /notifications?q=pinned)",
+      "expected": "After signing out, pressing Back must not show the signed-in notifications page: the browser should land on the sign-in page (or a page with no notification titles, no bell and no avatar).",
+      "actual": "The browser goes back to /notifications?q=pinned and renders the whole signed-in notifications page again: the notification row \"eval/harbor-handbook #8 agent3-notif-alpha\" with its time, the Unread/Read tab bar, the notification bell and the eval avatar in the top bar. The session is really gone — clicking the notification row then redirects to /user/login — but the notification content is shown as if still signed in (seen 2 times: once via ?q=read after signing out of eval, once via ?q=pinned).",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1.",
+        "Open https://5503-iqgs3fdkdmn70ntvor14g.e2b.app/notifications?q=pinned (a notification is listed, e.g. 'eval/harbor-handbook #8 agent3-notif-alpha').",
+        "Click the avatar in the top-right corner, then click 'Sign Out'. The home page with a Sign In button is shown.",
+        "Press the browser's Back button."
+      ],
+      "reason": "The session is really ended (the finding itself notes the next click redirects to /user/login); what Back shows is the browser's own cached copy. Gitea deliberately sends 'max-age=0, private, must-revalidate' instead of 'no-store' and says why in the source, so cached history pages are a chosen trade-off, the same header policy GitHub uses."
+    },
+    {
+      "name": "Pinning a notification clears its unread count",
+      "summary": "The pin also marks the notification as read: right after the click the bell badge and the \\\"Unread\\\" tab count both disappear (1 → none), the row is gone from /notifications?q=unread (\\\"No unread notifications.\\\") and appears under /notifications?q=read. The unread state is silently lost and unpinning does not bring it back. Seen on the row of eval/harbor-handbook #4 and of eval/harbor-handbook #1. (on /notifications)",
+      "expected": "Pinning only pins: the notification keeps its unread state, the bell and \\\"Unread\\\" tab count stay 1 and the row stays in the Unread tab, with a pinned marker.",
+      "actual": "The pin also marks the notification as read: right after the click the bell badge and the \\\"Unread\\\" tab count both disappear (1 → none), the row is gone from /notifications?q=unread (\\\"No unread notifications.\\\") and appears under /notifications?q=read. The unread state is silently lost and unpinning does not bring it back. Seen on the row of eval/harbor-handbook #4 and of eval/harbor-handbook #1.",
+      "reproSteps": [
+        "Sign in as alex / momentic-contributor-1 (the same happens on eval).",
+        "Open https://5503-iousaqru19me2ux8s0kmc.e2b.app/notifications?q=unread — there is 1 unread notification (eval/harbor-handbook #4 \"Review the release ownership proposal\"); the bell badge and the \"Unread\" tab both show 1.",
+        "Hover that row so its two icons appear and click the pin icon (\"Pin notification\").",
+        "Look at the bell and the \"Unread\" tab badge, then open /notifications?q=read and /notifications?q=unread.",
+        "Repeat with a second notification: on /notifications?q=read hover eval/harbor-handbook #1 and click \"Mark as unread\" (badge goes back to 1), then on the list hover it and click \"Pin notification\"."
+      ],
+      "reason": "In Gitea a notification has one status with three exclusive values (unread, read, pinned), so pinning replaces 'unread' and the badge counts only status unread; pinned rows are deliberately listed in both tabs. The screenshots also contradict the report's claim that the row leaves the Unread tab: it stays there with a pin icon."
+    }
+  ]
+}

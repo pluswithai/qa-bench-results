@@ -1,0 +1,219 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "findings": 20,
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 14,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Entering a worker cap below -1 reports success but silently stores -1; the different queue and negative value are insignificant."
+      },
+      {
+        "groundTruthIndex": 5,
+        "reproStepsIndex": 0,
+        "findingIndex": 4,
+        "reason": "The diagnosis-report button obscures the Stacktrace tab at 390px; the additional tablet observations extend the same overlap defect."
+      },
+      {
+        "groundTruthIndex": 9,
+        "reproStepsIndex": 0,
+        "findingIndex": 5,
+        "reason": "Matches the combined mobile User Accounts and Repositories heading-total overlap; the organization observation is additional."
+      },
+      {
+        "groundTruthIndex": 3,
+        "reproStepsIndex": 0,
+        "findingIndex": 8,
+        "reason": "Malformed editor mappings without '=' are silently discarded on Save, including clearing the field when no valid mapping remains."
+      },
+      {
+        "groundTruthIndex": 17,
+        "reproStepsIndex": 0,
+        "findingIndex": 10,
+        "reason": "Applying a User Accounts filter removes the selected sort parameter and resets the ordering."
+      },
+      {
+        "groundTruthIndex": 20,
+        "reproStepsIndex": 0,
+        "findingIndex": 12,
+        "reason": "Browser Back restores earlier repository results while retaining the later search text; an initially unfiltered list is an insignificant setup difference."
+      },
+      {
+        "groundTruthIndex": 10,
+        "reproStepsIndex": 0,
+        "findingIndex": 15,
+        "reason": "Matches the organization Follow label splitting mid-word at 390px; directly opening the organization does not change the reproduction."
+      },
+      {
+        "groundTruthIndex": 18,
+        "reproStepsIndex": 0,
+        "findingIndex": 16,
+        "reason": "The primary organization search reproduction drops the selected sort; the user-list observation is additional."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 1,
+        "reproStepsIndex": 0,
+        "findingIndex": 2,
+        "reason": "Challenges the intentionally empty default diagnostic list, rather than specifically identifying missing guidance to select a trace tab."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 1,
+        "reason": "No reviewed entry covers SQL wildcard interpretation in user searches."
+      },
+      {
+        "findingIndex": 3,
+        "reason": "No reviewed entry covers empty-body 404 responses for unknown queue IDs."
+      },
+      {
+        "findingIndex": 6,
+        "reason": "No reviewed entry covers the collapsed Monitoring sidebar and missing current-page highlight on queue details."
+      },
+      {
+        "findingIndex": 7,
+        "reason": "No reviewed entry covers an allegedly incorrect release count in monitoring statistics."
+      },
+      {
+        "findingIndex": 9,
+        "reason": "No reviewed entry covers browser Back exposing a cached administrator page after logout."
+      },
+      {
+        "findingIndex": 11,
+        "reason": "No reviewed entry covers queue-table headers and values becoming separate mobile blocks."
+      },
+      {
+        "findingIndex": 13,
+        "reason": "No reviewed entry covers long editor names overflowing the repository clone menu."
+      },
+      {
+        "findingIndex": 14,
+        "reason": "No reviewed entry covers an invalid dashboard update version; comparing installed and advertised versions alone does not establish that the latter is impossible."
+      },
+      {
+        "findingIndex": 17,
+        "reason": "No reviewed entry covers organization deletion issuing an additional POST to a null endpoint."
+      },
+      {
+        "findingIndex": 18,
+        "reason": "No reviewed entry covers repository-table columns and delete controls becoming unreachable at tablet width."
+      },
+      {
+        "findingIndex": 19,
+        "reason": "No reviewed entry covers nonexistent administrator user URLs silently redirecting to the user inventory."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 3,
+        "reason": "Search returns users that do not literally match the entered query."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "Describes missing diagnostic output on initial load, although the tabs still provide it."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 5,
+        "reason": "The requested page is completely blank, without navigation, explanation, or recovery controls."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 1,
+        "reason": "This is a navigation-indicator and minor usability defect; destinations remain accessible."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 3,
+        "reason": "The statistics report an incorrect aggregate count according to the described inventory checks."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 3,
+        "reason": "A signed-out browser displays cached administrative information, including user email addresses."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 1,
+        "reason": "The responsive presentation makes label-value associations difficult to read, without changing the values."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 1,
+        "reason": "The editor label overflows and is clipped; no broken action is described."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 3,
+        "reason": "The claim describes an incorrect update-availability result, not merely a formatting problem."
+      },
+      {
+        "findingIndex": 15,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 16,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 17,
+        "severity": 3,
+        "reason": "Submission sends an unintended failing request, although the actual deletion succeeds."
+      },
+      {
+        "findingIndex": 18,
+        "severity": 3,
+        "reason": "Clipping prevents use of the per-repository delete action, beyond cosmetic truncation."
+      },
+      {
+        "findingIndex": 19,
+        "severity": 3,
+        "reason": "The navigation returns an unrelated list instead of a not-found result or explanatory message."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

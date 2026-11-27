@@ -1,0 +1,389 @@
+{
+  "fixture": "metabase/areas/dashboards",
+  "run": 1,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 213,
+      "name": "Clicking a chart legend item on a dashboard card navigates away to the question instead of hiding the series",
+      "summary": "The dashboard is left entirely: the browser goes to /question#<base64> and the question builder opens with the breadcrumb \\\"Started from Revenue and orders over time\\\". The series is never hidden. Happens with both legend labels (\\\"Revenue\\\" and \\\"Orders\\\"), 2 of 2 tries. (on /dashboard/1)",
+      "expected": "Clicking a legend item toggles that series on the chart (hide/show) and keeps the person on the dashboard, as the neighbouring small \\\"Hide series\\\" dot does.",
+      "actual": "The dashboard is left entirely: the browser goes to /question#<base64> and the question builder opens with the breadcrumb \\\"Started from Revenue and orders over time\\\". The series is never hidden. Happens with both legend labels (\\\"Revenue\\\" and \\\"Orders\\\"), 2 of 2 tries.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open https://5501-iu5qaxtlo2oqrkbh4xt5i.e2b.app/dashboard/1 (E-commerce Insights, Overview tab).",
+        "In the card \"Revenue and orders over time\" move the mouse to the legend row under the title; the legend items \"Revenue\" and \"Orders\" react on hover (the other series dims), so they are interactive series controls.",
+        "Click the legend label \"Revenue\" (or \"Orders\")."
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 215,
+      "name": "Dashboard Info panel History tab shows the raw value \"undefined modified this.\"",
+      "summary": "The history entry reads \\\"undefined modified this.\\\" with \\\"a few seconds ago\\\" underneath — the raw JavaScript value undefined is printed instead of the editor's name. (on /dashboard/1)",
+      "expected": "The history list names who made the revision, e.g. \\\"Harbor Admin modified this.\\\" plus a timestamp.",
+      "actual": "The history entry reads \\\"undefined modified this.\\\" with \\\"a few seconds ago\\\" underneath — the raw JavaScript value undefined is printed instead of the editor's name.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1 and open https://5501-iu5qaxtlo2oqrkbh4xt5i.e2b.app/dashboard/1 (\"E-commerce Insights\").",
+        "Click the info icon (\"More info\") in the dashboard header, top right, next to the bookmark icon.",
+        "In the Info side panel click the \"History\" tab."
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 219,
+      "name": "A non-numeric dashboard address (/dashboard/abc) spins on \"Loading…\" forever",
+      "summary": "The page stays on the spinner with the text \\\"Loading…\\\" indefinitely and makes no dashboard request at all (no 404, no error message). The person is stuck with no way to tell whether it is still working. (on /dashboard/abc)",
+      "expected": "Like /dashboard/999999, the app says in words that the page could not be found (\\\"We're a little lost… The page you asked for couldn't be found.\\\") and offers a way on.",
+      "actual": "The page stays on the spinner with the text \\\"Loading…\\\" indefinitely and makes no dashboard request at all (no 404, no error message). The person is stuck with no way to tell whether it is still working.",
+      "reproSteps": [
+        "Sign in with eval@momentic.ai / momentic-eval-1.",
+        "In the address bar open https://5501-iu5qaxtlo2oqrkbh4xt5i.e2b.app/dashboard/abc directly.",
+        "Wait 8 seconds and look at the page."
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 259,
+      "name": "Dashboard filter \"Product Category\" does not filter the \"Product breakdown\" card, while the page text says it is filtered",
+      "summary": "The \\\"Product breakdown\\\" donut keeps the unfiltered data: Doohickey 23.88%, Gadget 26.54%, Gizmo 15.85%, Widget 33.73% and total 2,852 - identical to before the filter was applied - while the scatter card next to it correctly drops to Widget only. The same happens with the default 3 selections, where the donut still lists Gizmo although Gizmo is unticked. The page text above the cards claims \\\"Find below a breakdown of products and their performance, filtered now for Widget\\\". (on /dashboard/1?tab=2-portfolio-performance)",
+      "expected": "The whole tab is filtered to Widget (the filter button reads \\\"Product Category: Widget\\\" and the text says \\\"filtered now for Widget\\\"), so the \\\"Product breakdown\\\" card should show only Widget, like the scatter card next to it.",
+      "actual": "The \\\"Product breakdown\\\" donut keeps the unfiltered data: Doohickey 23.88%, Gadget 26.54%, Gizmo 15.85%, Widget 33.73% and total 2,852 - identical to before the filter was applied - while the scatter card next to it correctly drops to Widget only. The same happens with the default 3 selections, where the donut still lists Gizmo although Gizmo is unticked. The page text above the cards claims \\\"Find below a breakdown of products and their performance, filtered now for Widget\\\".",
+      "reproSteps": [
+        "Open /dashboard/1 (E-commerce Insights) and click the \"Portfolio Performance\" tab.",
+        "Click the \"Product Category\" filter button at the top left.",
+        "Untick \"Doohickey\" and \"Gadget\" so that only \"Widget\" is ticked, then click \"Update filter\".",
+        "Look at the \"Product breakdown\" donut card on the left and at the neighbouring \"Total order amount vs. discount given\" card."
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 325,
+      "name": "Card titled \"Orders according to sources per quarter\" shows revenue amounts, not order counts",
+      "summary": "The pivot's values are money amounts with cents, identical to the revenue figures elsewhere on the same dashboard: Row totals for Q4 2026 is 67,863.4, exactly the number on the \\\"Revenue per quarter\\\" card, and Q3 2026 is 56,686.65, exactly the Revenue value shown in the \\\"Revenue and orders over time\\\" tooltip. Grand totals 247,412.89 is the sum of those revenue figures. The card's own info tooltip says \\\"Orders placed per quarter broken down by source\\\", so a reader takes 67,863.4 for a count of orders in Q4 2026. (on /dashboard/1)",
+      "expected": "A card titled and described as counting orders per source should show order counts per source per quarter, on the same scale as the Orders numbers elsewhere (hundreds), not currency amounts matching the Revenue cards.",
+      "actual": "The pivot's values are money amounts with cents, identical to the revenue figures elsewhere on the same dashboard: Row totals for Q4 2026 is 67,863.4, exactly the number on the \\\"Revenue per quarter\\\" card, and Q3 2026 is 56,686.65, exactly the Revenue value shown in the \\\"Revenue and orders over time\\\" tooltip. Grand totals 247,412.89 is the sum of those revenue figures. The card's own info tooltip says \\\"Orders placed per quarter broken down by source\\\", so a reader takes 67,863.4 for a count of orders in Q4 2026.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open https://5501-iu5qaxtlo2oqrkbh4xt5i.e2b.app/dashboard/1 (Overview tab).",
+        "Scroll down to the card titled \"Orders according to sources per quarter\" and read its rows: Date / Affiliate / Facebook / Google / Organic / Twitter / Row totals.",
+        "Compare its Row totals column with the \"Revenue per quarter\" scalar card at the top right (67,863.4) and with the tooltip of the \"Revenue and orders over time\" chart (Revenue Q3 2026 = 56,686.65).",
+        "Hover the info icon next to the card title and read the card description."
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 370,
+      "name": "Duplicating a dashboard silently drops its link cards",
+      "summary": "The copy is missing the link card on Tab 1; only the heading and the Tab 2 text card are copied. The API shows the original dashboard has 3 dashcards (heading, link, text) while the copy has only 2 (heading, text), so the link card is lost for good, not just not rendered. (on /dashboard/4-agent7-dash)",
+      "expected": "The duplicated dashboard carries every card of the original, including the link card, so the copy looks the same as the original.",
+      "actual": "The copy is missing the link card on Tab 1; only the heading and the Tab 2 text card are copied. The API shows the original dashboard has 3 dashcards (heading, link, text) while the copy has only 2 (heading, text), so the link card is lost for good, not just not rendered.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai, open /dashboard/4-agent7-dash (dashboard 'agent7-dash' in Our analytics).",
+        "Its Tab 1 contains a heading card 'agent7 heading' and below it a link card showing https://5501-iu5qaxtlo2oqrkbh4xt5i.e2b.app/dashboard/1 (screenshot 1).",
+        "Click the '...' (Move, trash, and more) button in the dashboard header, then 'Duplicate'.",
+        "In the dialog, set Name to 'agent7-dash copy' and click 'Duplicate'.",
+        "The copy opens at /dashboard/13-agent7-dash-copy on Tab 1: only 'agent7 heading' is there, the link card is gone (screenshot 2). Tab 2 kept its text card."
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 396,
+      "name": "Table card \"Customer survey responses\" is wider than its card and the Body column text is cut off",
+      "summary": "The \\\"Body\\\" column is 780px wide, which makes the table wider than its card (card 1048px wide, table columns about 1465px). Nothing scrolls: the row text runs past the card's right edge and is cut by the page edge, e.g. row 353 shows \\\"Light amber. The nose offers up walnut bread, spelt flour, and a green, malty note. Ove\\\" and stops there. No ellipsis and no way to read the rest of the answer. rows 352, 351, 350, 349 ... all cut the same way. (on /dashboard/1 (Portfolio Performance tab))",
+      "expected": "The table fits its card (or scrolls inside it), and a long answer is shortened with an ellipsis / shown in full on hover, so nothing is cut off at the card or page edge.",
+      "actual": "The \\\"Body\\\" column is 780px wide, which makes the table wider than its card (card 1048px wide, table columns about 1465px). Nothing scrolls: the row text runs past the card's right edge and is cut by the page edge, e.g. row 353 shows \\\"Light amber. The nose offers up walnut bread, spelt flour, and a green, malty note. Ove\\\" and stops there. No ellipsis and no way to read the rest of the answer. rows 352, 351, 350, 349 ... all cut the same way.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open https://5501-iu5qaxtlo2oqrkbh4xt5i.e2b.app/dashboard/1",
+        "Click the tab \"Portfolio Performance\" and scroll down to the \"Customer survey responses\" table card.",
+        "Read the rightmost column \"Body\": the answers run past the card's right edge and are cut off at the page edge."
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 409,
+      "name": "A link card with a URL that has no scheme (www.example.com) is saved as a relative link and opens Metabase's \"We're a little lost…\" 404 page",
+      "summary": "The scheme-less text is accepted and saved. In view the card reads \\\"www.example.com\\\" but its anchor href is literally \\\"www.example.com\\\" (a relative URL, target _self), so clicking it navigates inside the app to https://5501-iu5qaxtlo2oqrkbh4xt5i.e2b.app/www.example.com and shows Metabase's \\\"We're a little lost… The page you asked for couldn't be found.\\\" The card's text promises an external site, the link goes nowhere. In the same dashboard a card entered as https://example.com/agent4-report?x=1#frag stores the exact URL and opens it in a new tab, so only scheme-less URLs are mishandled. (on /dashboard/3-agent4-link-cards)",
+      "expected": "Either the card is rejected/refused at input time, or the card links to the site it names: clicking it opens https://www.example.com (the card text and its target agree).",
+      "actual": "The scheme-less text is accepted and saved. In view the card reads \\\"www.example.com\\\" but its anchor href is literally \\\"www.example.com\\\" (a relative URL, target _self), so clicking it navigates inside the app to https://5501-iu5qaxtlo2oqrkbh4xt5i.e2b.app/www.example.com and shows Metabase's \\\"We're a little lost… The page you asked for couldn't be found.\\\" The card's text promises an external site, the link goes nowhere. In the same dashboard a card entered as https://example.com/agent4-report?x=1#frag stores the exact URL and opens it in a new tab, so only scheme-less URLs are mishandled.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1 and open https://5501-iu5qaxtlo2oqrkbh4xt5i.e2b.app/dashboard/3-agent4-link-cards",
+        "Click the pencil \"Edit dashboard\" button in the top-right toolbar",
+        "Click the chain icon \"Add a link or iframe\" button, then \"Link\" in its dropdown",
+        "In the new link card's URL input (placeholder https://example.com) type www.example.com",
+        "Click an empty part of the dashboard grid to finish the card, then click \"Save\"",
+        "In view mode, click the link card that reads \"www.example.com\""
+      ]
+    },
+    {
+      "index": 8,
+      "reported_at_seconds": 468,
+      "name": "\"Duplicate\" in a dashboard tab's menu does nothing (uncaught TypeError)",
+      "summary": "Nothing happens: no tab is added, the menu stays open, and the console shows an uncaught page error 'Cannot read properties of undefined (reading '21')'. The tab strip is unchanged (Overview, Portfolio Performance, Website Analysis, agent5…, Tab 5). Repeating the click throws the same error. (on /dashboard/1)",
+      "expected": "A copy of the tab (with its cards) is added to the tab strip, e.g. as 'Portfolio Performance 2', and can be saved.",
+      "actual": "Nothing happens: no tab is added, the menu stays open, and the console shows an uncaught page error 'Cannot read properties of undefined (reading '21')'. The tab strip is unchanged (Overview, Portfolio Performance, Website Analysis, agent5…, Tab 5). Repeating the click throws the same error.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open https://5501-iu5qaxtlo2oqrkbh4xt5i.e2b.app/dashboard/1",
+        "Click the pencil 'Edit dashboard' button at the top right of the dashboard",
+        "Click the small down-arrow next to the tab 'Portfolio Performance' in the tab strip",
+        "In the menu (Rename / Duplicate / Delete) click 'Duplicate'"
+      ]
+    },
+    {
+      "index": 9,
+      "reported_at_seconds": 472,
+      "name": "New dashboard with a spaces-only name shows a raw validation string and renames the button to \\\"Failed\\\"",
+      "summary": "The save is refused with a raw schema message under the field — \\\"Value must be a non-blank string.\\\" — and the primary button's label changes from \\\"Create\\\" to \\\"Failed\\\" and stays that way. Nothing tells the person in plain words that the name may not be blank or only spaces, and the button now reads like a status rather than an action. The POST /api/dashboard returns 400 and two console errors are logged. (on /collection/root (New → Dashboard dialog))",
+      "expected": "The Create button stays disabled for a blank/whitespace-only name, or the dialog refuses it with a plain message such as \\\"Name can't be blank\\\", and the button keeps its label so the person can correct the name and try again.",
+      "actual": "The save is refused with a raw schema message under the field — \\\"Value must be a non-blank string.\\\" — and the primary button's label changes from \\\"Create\\\" to \\\"Failed\\\" and stays that way. Nothing tells the person in plain words that the name may not be blank or only spaces, and the button now reads like a status rather than an action. The POST /api/dashboard returns 400 and two console errors are logged.",
+      "reproSteps": [
+        "Sign in with eval@momentic.ai / momentic-eval-1.",
+        "On /collection/root click \"New\" in the top bar, then \"Dashboard\" in the menu.",
+        "Type three spaces into the Name field of the \"New dashboard\" dialog and click \"Create\"."
+      ]
+    },
+    {
+      "index": 10,
+      "reported_at_seconds": 528,
+      "name": "\"More info\" in fullscreen mode shows no Info panel although the button turns active",
+      "summary": "Nothing appears: no panel is rendered, while the \\\"More info\\\" button is left in its active/disabled pressed state. Exiting fullscreen afterwards makes the Info panel appear, so the click was registered but the panel is not shown in fullscreen mode. (on /dashboard/1 (fullscreen mode))",
+      "expected": "The Info side panel (Description / Creator and last editor / Saved in) opens, as it does in the normal dashboard view.",
+      "actual": "Nothing appears: no panel is rendered, while the \\\"More info\\\" button is left in its active/disabled pressed state. Exiting fullscreen afterwards makes the Info panel appear, so the click was registered but the panel is not shown in fullscreen mode.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open https://5501-iu5qaxtlo2oqrkbh4xt5i.e2b.app/dashboard/1",
+        "Switch to the \"Portfolio Performance\" tab",
+        "Open the \"…\" menu at the top right (after the Bookmark icon) and choose \"Enter fullscreen\"",
+        "In the fullscreen header click the \"More info\" (i) button at the top right"
+      ]
+    },
+    {
+      "index": 11,
+      "reported_at_seconds": 617,
+      "name": "Saving a stale second tab silently deletes a card added in the other tab, with no conflict warning",
+      "summary": "Saving from the stale tab overwrote the dashboard with its old copy: the text card \"agent14-evidence-card-from-tab2\" added and saved from the other tab disappeared, and the dashboard kept only the heading added from the stale tab. No conflict warning, no confirmation dialog and no error appeared in either tab; the stale tab reported a normal successful save. Reloading the other tab shows the lost card is really gone from the server. The same happened on a first run with the dashboard title: tab 2 renamed it and saved, then tab 1 (opened before that rename) saved its own older state and silently put the old title back. (on /dashboard/14-agent14-persist)",
+      "expected": "When the dashboard has been changed by the other tab since the stale tab loaded it, saving in the stale tab should notice the newer version and warn (for example \"This dashboard was changed by someone else\"), instead of silently discarding the other tab's card.",
+      "actual": "Saving from the stale tab overwrote the dashboard with its old copy: the text card \"agent14-evidence-card-from-tab2\" added and saved from the other tab disappeared, and the dashboard kept only the heading added from the stale tab. No conflict warning, no confirmation dialog and no error appeared in either tab; the stale tab reported a normal successful save. Reloading the other tab shows the lost card is really gone from the server. The same happened on a first run with the dashboard title: tab 2 renamed it and saved, then tab 1 (opened before that rename) saved its own older state and silently put the old title back.",
+      "reproSteps": [
+        "Open /dashboard/14-agent14-persist (dashboard named \"agent14-persist\", with a \"Release requests\" card) in two browser tabs of the same signed-in session.",
+        "In the first tab click the pencil \"Edit dashboard\" button and leave that tab open in edit mode without saving.",
+        "In the second tab click the pencil \"Edit dashboard\", click the T (\"Add a heading or text box\") button, choose \"Text\", type \"agent14-evidence-card-from-tab2\" and click \"Save\". The text card is on the dashboard.",
+        "Go back to the first (stale) tab, which still shows the dashboard without that text card, click the T button, choose \"Heading\", type \"agent14-evidence-heading-tab1\" and click \"Save\".",
+        "Look at the saved dashboard in the first tab, then reload the second tab."
+      ]
+    },
+    {
+      "index": 12,
+      "reported_at_seconds": 625,
+      "name": "A link card saved with an empty URL shows \"Choose a link\" and clicking it navigates the viewer away to the Metabase home page",
+      "summary": "The empty card is kept: in view mode it renders as a card reading \\\"Choose a link\\\" with a question-mark icon, and its anchor has an empty href (href=\\\"\\\"). Clicking it leaves the dashboard and loads the Metabase home page (address becomes https://5501-iu5qaxtlo2oqrkbh4xt5i.e2b.app/) instead of doing nothing or taking the person to a link. Viewers of the dashboard get a dead control that navigates them away. (on /dashboard/3-agent4-link-cards)",
+      "expected": "An empty link card is not saved (discarded when the editor clicks away, like an unfinished card), or at worst it shows a clear placeholder that does nothing when clicked. It must not navigate the viewer to another page.",
+      "actual": "The empty card is kept: in view mode it renders as a card reading \\\"Choose a link\\\" with a question-mark icon, and its anchor has an empty href (href=\\\"\\\"). Clicking it leaves the dashboard and loads the Metabase home page (address becomes https://5501-iu5qaxtlo2oqrkbh4xt5i.e2b.app/) instead of doing nothing or taking the person to a link. Viewers of the dashboard get a dead control that navigates them away.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1 and open https://5501-iu5qaxtlo2oqrkbh4xt5i.e2b.app/dashboard/3-agent4-link-cards",
+        "Click the pencil \"Edit dashboard\" button",
+        "Click the chain icon \"Add a link or iframe\" button and choose \"Link\" in the dropdown",
+        "Leave the new card's URL input empty and click an empty part of the dashboard grid (the empty card stays, showing the grey placeholder https://example.com)",
+        "Click \"Save\"",
+        "In view mode click the right-most card of the second row, which reads \"Choose a link\" with a question-mark icon"
+      ]
+    },
+    {
+      "index": 13,
+      "reported_at_seconds": 630,
+      "name": "Info panel hides the dashboard's creator for member accounts and logs a 403",
+      "summary": "As the member jordan, the block shows only the last-editor line (\\\"November 23, 2026 by Harbor Admin\\\"); the creator line is missing with no message, and opening the panel fires GET /api/user/13371338 → 403 Forbidden (console error \\\"Failed to load resource: 403\\\"). As admin eval the same panel shows both lines, so the same dashboard is described differently depending on the account. (on /dashboard/1)",
+      "expected": "The Info panel shows the same information to every account that can open the dashboard: who created it and who last edited it, under the heading \\\"Creator and last editor\\\".",
+      "actual": "As the member jordan, the block shows only the last-editor line (\\\"November 23, 2026 by Harbor Admin\\\"); the creator line is missing with no message, and opening the panel fires GET /api/user/13371338 → 403 Forbidden (console error \\\"Failed to load resource: 403\\\"). As admin eval the same panel shows both lines, so the same dashboard is described differently depending on the account.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1, open /dashboard/1 (E-commerce Insights) and click the \"More info\" (i) button in the top right.",
+        "Read the \"Creator and last editor\" block: it lists two entries (\"November 23, 2026 by Metabase Internal\" and \"November 23, 2026 by Harbor Admin\").",
+        "Sign out, sign in as jordan@example.test / momentic-eval-1 (member), open /dashboard/1 again and click \"More info\".",
+        "Read the same \"Creator and last editor\" block and the browser console/network."
+      ]
+    },
+    {
+      "index": 14,
+      "reported_at_seconds": 669,
+      "name": "In edit mode at phone width the \"Add a chart\" panel squeezes the dashboard into a 12px sliver of clipped text and the tab bar disappears",
+      "summary": "The \\\"Add a chart\\\" panel spans the full width and the dashboard underneath is squeezed into a ~12px sliver on the left edge, where fragments of the empty-state text (single letters like \\\"e\\\", \\\"n\\\", \\\"o\\\", \\\"y\\\") are drawn clipped behind the panel. The dashboard tab bar (Tab 1 / the long tab / Tab 3) is not rendered at all in this state, and Escape does not close the panel. (on /dashboard/17-agent13-responsive-dashboard#edit)",
+      "expected": "On a phone-sized window the \\\"Add a chart\\\" sidebar should overlay the dashboard (or replace it) at full width, with the dashboard content hidden or laid out at a usable width, and the dashboard tab bar should stay visible/usable.",
+      "actual": "The \\\"Add a chart\\\" panel spans the full width and the dashboard underneath is squeezed into a ~12px sliver on the left edge, where fragments of the empty-state text (single letters like \\\"e\\\", \\\"n\\\", \\\"o\\\", \\\"y\\\") are drawn clipped behind the panel. The dashboard tab bar (Tab 1 / the long tab / Tab 3) is not rendered at all in this state, and Escape does not close the panel.",
+      "reproSteps": [
+        "Sign in with eval@momentic.ai / momentic-eval-1.",
+        "Open /dashboard/17-agent13-responsive-dashboard (a dashboard I created, any dashboard works).",
+        "Click the pencil \"Edit dashboard\" button to enter edit mode and open the \"Add a chart\" side panel.",
+        "Resize the window to 390x844 (phone).",
+        "Look at the left edge of the page and at the row under the title where the dashboard tabs should be."
+      ]
+    },
+    {
+      "index": 15,
+      "reported_at_seconds": 689,
+      "name": "Dashboard title breaks mid-word into six lines in a ~100px column at tablet width in edit mode",
+      "summary": "The title is confined to a ~100px column and breaks mid-word into six lines (\\\"agent\\\" / \\\"13-\\\" / \\\"respo\\\" / \\\"nsive-\\\" / \\\"dashb\\\" / \\\"oard\\\") while about 400px of empty space sits to the right of the edit toolbar on the same row. (on /dashboard/17-agent13-responsive-dashboard#edit)",
+      "expected": "The dashboard title keeps a readable width (wraps at word boundaries, or the toolbar moves to its own row) at tablet width, as it does at 1280px where it stays on one line.",
+      "actual": "The title is confined to a ~100px column and breaks mid-word into six lines (\\\"agent\\\" / \\\"13-\\\" / \\\"respo\\\" / \\\"nsive-\\\" / \\\"dashb\\\" / \\\"oard\\\") while about 400px of empty space sits to the right of the edit toolbar on the same row.",
+      "reproSteps": [
+        "Sign in with eval@momentic.ai / momentic-eval-1 and open /dashboard/17-agent13-responsive-dashboard.",
+        "Click the pencil \"Edit dashboard\" button so the \"Add a chart\" side panel is open.",
+        "Resize the window to a tablet size, 820x1180.",
+        "Look at the dashboard title under the blue \"You're editing this dashboard.\" banner."
+      ]
+    },
+    {
+      "index": 16,
+      "reported_at_seconds": 735,
+      "name": "Text card on /dashboard/1 cuts off its last line at phone width and only scrolls inside an invisible scroll area",
+      "summary": "The card clips the text: the last line \\\"growth in the number of orders\\\" is cut in half by the card's bottom edge. The rest only becomes readable by scrolling inside the card with the mouse wheel, and there is no scrollbar or other hint that the card scrolls (scrolling brings the last line into view but then cuts the first line instead). (on /dashboard/1)",
+      "expected": "The text card grows with its text at phone width (the sentence takes 3 lines instead of 2), so the whole sentence is visible without scrolling inside the card, or the card shows a visible scrollbar / truncation indicator.",
+      "actual": "The card clips the text: the last line \\\"growth in the number of orders\\\" is cut in half by the card's bottom edge. The rest only becomes readable by scrolling inside the card with the mouse wheel, and there is no scrollbar or other hint that the card scrolls (scrolling brings the last line into view but then cuts the first line instead).",
+      "reproSteps": [
+        "Sign in with eval@momentic.ai / momentic-eval-1 and open /dashboard/1 (E-commerce Insights).",
+        "Resize the window to a phone size, 390x844.",
+        "Scroll to the section \"Overall Business Health\" and read the text card under it: \"Business KPIs look strong based on the consistent MoM revenue growth following the growth in the number of orders\".",
+        "Look at the line \"growth in the number of orders\" at the bottom edge of the card."
+      ]
+    },
+    {
+      "index": 17,
+      "reported_at_seconds": 746,
+      "name": "Website Analysis funnel cards ignore the Date Range filter (same totals with and without it)",
+      "summary": "With Date Range = Previous 30 days applied (chip \"Date Range: Previous 30 days\" visible), the \"User flow diagram\" and \"Checkout funnel\" cards show exactly the same numbers as without any date filter — Create Item 1,071 / Invite 1,063 / Subscribe 1,051 / Signup 1,024 / Checkout 975, funnel percentages 99.25 % / 98.13 % / 95.61 % / 91.04 % — while other cards on the same tab do react to the same filter (\"Number of subscriptions\" and \"Subscription seats over time\" switch from numbers to \"No results!\"). The same numbers came back after a reload with the filter still set, so the date filter is silently ignored by these two cards while the page shows it as applied. (on /dashboard/1 (Website Analysis tab))",
+      "expected": "With \"Date Range: Previous 30 days\" applied the funnel cards show the numbers for that 30-day window (different from the unfiltered totals), as the other cards on the tab do — or the page says the filter does not apply to them.",
+      "actual": "With Date Range = Previous 30 days applied (chip \"Date Range: Previous 30 days\" visible), the \"User flow diagram\" and \"Checkout funnel\" cards show exactly the same numbers as without any date filter — Create Item 1,071 / Invite 1,063 / Subscribe 1,051 / Signup 1,024 / Checkout 975, funnel percentages 99.25 % / 98.13 % / 95.61 % / 91.04 % — while other cards on the same tab do react to the same filter (\"Number of subscriptions\" and \"Subscription seats over time\" switch from numbers to \"No results!\"). The same numbers came back after a reload with the filter still set, so the date filter is silently ignored by these two cards while the page shows it as applied.",
+      "reproSteps": [
+        "Sign in and open /dashboard/1 (E-commerce Insights).",
+        "Click the 'Website Analysis' tab and note the 'User flow diagram' and 'Checkout funnel' numbers with no filter: 1,071 / 1,063 / 1,051 / 1,024 / 975 (screenshot s17).",
+        "Go to the 'Overview' tab, open the 'Date Range' filter, choose 'Previous 30 days'.",
+        "Go back to the 'Website Analysis' tab (the filter bar shows 'Date Range: Previous 30 days').",
+        "Compare the two funnel cards and the subscription cards (screenshot s19)."
+      ]
+    },
+    {
+      "index": 18,
+      "reported_at_seconds": 767,
+      "name": "A save that is not authenticated turns the dashboard into a blank white page and the edit is lost without any message",
+      "summary": "The save request (PUT /api/dashboard/6) was answered 401 Unauthenticated and the whole app went to a blank white page (title still \\\"Metabase\\\"): no error message, no redirect to the sign-in form, no notice that the edit was not saved. After reloading and signing in again the dashboard still showed the old text card, so the edit was silently lost. The console logged \\\"Request entities,dashboards,6,update failed: {status: 401, data: Unauthenticated}\\\". (on /dashboard/6-agent11-dash)",
+      "expected": "When the save cannot be authenticated, the person is told the change was not saved (an error message or a redirect to the sign-in page). The unsaved edit is not silently discarded behind a blank page.",
+      "actual": "The save request (PUT /api/dashboard/6) was answered 401 Unauthenticated and the whole app went to a blank white page (title still \\\"Metabase\\\"): no error message, no redirect to the sign-in form, no notice that the edit was not saved. After reloading and signing in again the dashboard still showed the old text card, so the edit was silently lost. The console logged \\\"Request entities,dashboards,6,update failed: {status: 401, data: Unauthenticated}\\\".",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai / momentic-eval-1 and open the dashboard /dashboard/6-agent11-dash (my own dashboard, one heading card and one text card).",
+        "Click the pencil \"Edit dashboard\", click the text card \"maya edited this text card\", type \"(eval)\" at the end of it.",
+        "Click \"Save\" in the blue \"You're editing this dashboard.\" banner after the session behind the tab has ended (in my run the session had already been invalidated, so the save hit an unauthenticated request).",
+        "Watch the page, then reload and read the console/network."
+      ]
+    },
+    {
+      "index": 19,
+      "reported_at_seconds": 809,
+      "name": "Search treats % and _ as wildcards: typing just \"%\" returns all 95 items instead of nothing",
+      "summary": "Typing just \\\"%\\\" answers \\\"View and filter all 95 results\\\" and lists dashboards such as agent14-tab1-stale, agent7-only-dash, agent12 / a&b, agent2-dash - none of them contains a \\\"%\\\". Typing \\\"_\\\" answers \\\"View and filter all 96 results\\\" and lists the same kind of unrelated dashboards. The character is treated as a wildcard, so the search returns almost the whole site instead of matching the text the person typed. (on /collection/root (global search))",
+      "expected": "The search treats \\\"%\\\" and \\\"_\\\" as literal characters and shows only items whose name or description contains that character - in this case no results, with the empty-state wording.",
+      "actual": "Typing just \\\"%\\\" answers \\\"View and filter all 95 results\\\" and lists dashboards such as agent14-tab1-stale, agent7-only-dash, agent12 / a&b, agent2-dash - none of them contains a \\\"%\\\". Typing \\\"_\\\" answers \\\"View and filter all 96 results\\\" and lists the same kind of unrelated dashboards. The character is treated as a wildcard, so the search returns almost the whole site instead of matching the text the person typed.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and open https://5501-iu5qaxtlo2oqrkbh4xt5i.e2b.app/collection/root",
+        "Click the \"Search\" button in the top bar (the field \"Search for anything…\" opens).",
+        "Type a single % into the field and read the results.",
+        "Replace it with a single _ and read the results again."
+      ]
+    },
+    {
+      "index": 20,
+      "reported_at_seconds": 986,
+      "name": "A long unbroken word in a text card is cut off at the card edge instead of wrapping",
+      "summary": "The long word is not wrapped or broken at the card edge: the line runs to the right edge and the rest of the word (and anything after it on that line) is simply cut off, with no ellipsis, no scrollbar and no tooltip. Measured in the page: the paragraph's content is 1113px wide inside a 292px card at phone width, and it is cut the same way at 1440px. Only \"and a normal sentence after it.\" on the following line is fully readable. (on /dashboard/10-agent1-double-create)",
+      "expected": "The text card wraps or breaks the long word so all of the text the person wrote is readable (as text cards do for normal sentences), without overflowing or losing characters.",
+      "actual": "The long word is not wrapped or broken at the card edge: the line runs to the right edge and the rest of the word (and anything after it on that line) is simply cut off, with no ellipsis, no scrollbar and no tooltip. Measured in the page: the paragraph's content is 1113px wide inside a 292px card at phone width, and it is cut the same way at 1440px. Only \"and a normal sentence after it.\" on the following line is fully readable.",
+      "reproSteps": [
+        "Open /dashboard/10-agent1-double-create and click the pencil \"Edit dashboard\" button",
+        "Click the \"T\" (Add a heading or text box) button and choose \"Text\"",
+        "Type: agent1 long unbroken word: agent1verylongunbrokenword followed by 127 x characters, then \" and a normal sentence after it.\" (any long unbroken token does it)",
+        "Click \"Save\" and look at the text card at 1440px wide and at 320px wide (browser window resized)"
+      ]
+    },
+    {
+      "index": 21,
+      "reported_at_seconds": 996,
+      "name": "The \\\"+ New\\\" button is missing at phone width and nothing in the menu replaces it",
+      "summary": "The app bar shows only the menu (hamburger), logo, search and settings; the \\\"New\\\" button is gone. The hamburger's sidebar does not contain it either (Home, Getting started, Collections, Data, Trash only), so nothing on the page creates a question, dashboard or document. Only \\\"Create a new collection\\\" and \\\"Upload data\\\" remain in the collection header. (on /collection/root at 390×844)",
+      "expected": "The \\\"+ New\\\" button stays reachable at phone width (in the app bar or inside the menu), so a phone user can create a question, dashboard or document as they can on a desktop.",
+      "actual": "The app bar shows only the menu (hamburger), logo, search and settings; the \\\"New\\\" button is gone. The hamburger's sidebar does not contain it either (Home, Getting started, Collections, Data, Trash only), so nothing on the page creates a question, dashboard or document. Only \\\"Create a new collection\\\" and \\\"Upload data\\\" remain in the collection header.",
+      "reproSteps": [
+        "Sign in with eval@momentic.ai / momentic-eval-1.",
+        "Open /collection/root at the desktop size and note the \"+ New\" button at the top right of the bar.",
+        "Set the window to a phone size, 390 × 844, and open /collection/root again.",
+        "Look at the app bar and open the hamburger menu to look for a way to create something."
+      ]
+    },
+    {
+      "index": 22,
+      "reported_at_seconds": 1024,
+      "name": "An Iframe card is saved with an empty snippet and then only shows \\\"There was a problem rendering this content.\\\"",
+      "summary": "Clicking 'Done' with the snippet box empty creates the card anyway, with no validation message at the field and no warning: the card immediately shows only \"There was a problem rendering this content.\" (a lock icon and that one sentence). It saves like that (PUT /api/dashboard/25 → 200) and after a reload the dashboard shows the same broken card with the same generic message and no hint of what is wrong. (on /dashboard/25-agent6-iframe)",
+      "expected": "The empty snippet is refused with a message next to the snippet box (e.g. that a URL/iframe snippet is required), or at least the card says what is missing instead of a generic rendering error; no broken card is saved.",
+      "actual": "Clicking 'Done' with the snippet box empty creates the card anyway, with no validation message at the field and no warning: the card immediately shows only \"There was a problem rendering this content.\" (a lock icon and that one sentence). It saves like that (PUT /api/dashboard/25 → 200) and after a reload the dashboard shows the same broken card with the same generic message and no hint of what is wrong.",
+      "reproSteps": [
+        "Sign in as eval@momentic.ai and go to /collection/root.",
+        "In my own dashboard /dashboard/25-agent6-iframe press 'Edit dashboard' (URL gets #edit).",
+        "Click the link/embed icon in the edit toolbar (the icon with a chevron next to the 'T' text button) and choose 'Iframe'.",
+        "Leave the 'Paste your snippet here' box completely empty and click 'Done'.",
+        "Click 'Save', then reload the page."
+      ]
+    },
+    {
+      "index": 23,
+      "reported_at_seconds": 1177,
+      "name": "Duplicate opens with a name over the 254-character limit it then refuses",
+      "summary": "The dialog opens already invalid: the prefilled name is 266 characters (\\\"<name> - Duplicate\\\" on top of the 254-character name), a red \\\"Must be 254 characters or less\\\" appears immediately, and the \\\"Duplicate\\\" button is disabled. The person cannot duplicate the dashboard without first shortening the generated name by hand. (on /dashboard/19/copy)",
+      "expected": "The Duplicate dialog opens with a valid, shorter default name (for example the name truncated so that \\\" - Duplicate\\\" still fits in 254 characters) and the Duplicate button enabled, as it is for dashboards with a shorter name.",
+      "actual": "The dialog opens already invalid: the prefilled name is 266 characters (\\\"<name> - Duplicate\\\" on top of the 254-character name), a red \\\"Must be 254 characters or less\\\" appears immediately, and the \\\"Duplicate\\\" button is disabled. The person cannot duplicate the dashboard without first shortening the generated name by hand.",
+      "reproSteps": [
+        "Sign in with eval@momentic.ai / momentic-eval-1.",
+        "Open the dashboard whose name is at the 254-character limit: /dashboard/19 (name starts \"agent12-0123456…\").",
+        "Click the \"…\" (Move, trash, and more…) button at the top right, then \"Duplicate\"."
+      ]
+    },
+    {
+      "index": 24,
+      "reported_at_seconds": 1281,
+      "name": "With Date Range \\\"Previous 3 months\\\" the subscription cards say \\\"No results!\\\" while \\\"Most recent subscription\\\" lists 64 subscriptions created October 31, 2026",
+      "summary": "\\\"Number of subscriptions\\\" and \\\"Subscription seats over time\\\" both show the empty state \\\"No results!\\\", while the \\\"Most recent subscription\\\" card right next to them lists subscription ID 1487, Plan Basic, Created At October 31, 2026, 10:41 PM and says \\\"Item 1 of 64\\\" - i.e. 64 subscriptions exist inside the same three-month window the other two cards report as empty. (on /dashboard/1?tab=3-website-analysis)",
+      "expected": "All cards on the tab should show the same window: if the window (Previous 3 months, i.e. Aug-Nov 2026) contains 64 subscriptions, \\\"Number of subscriptions\\\" and \\\"Subscription seats over time\\\" should show them instead of \\\"No results!\\\", or the subscription card should be empty too.",
+      "actual": "\\\"Number of subscriptions\\\" and \\\"Subscription seats over time\\\" both show the empty state \\\"No results!\\\", while the \\\"Most recent subscription\\\" card right next to them lists subscription ID 1487, Plan Basic, Created At October 31, 2026, 10:41 PM and says \\\"Item 1 of 64\\\" - i.e. 64 subscriptions exist inside the same three-month window the other two cards report as empty.",
+      "reproSteps": [
+        "Open /dashboard/1 (E-commerce Insights) and click the \"Website Analysis\" tab.",
+        "Click the \"Date Range\" filter at the top left and choose \"Previous 3 months\".",
+        "Scroll down so the cards \"Number of subscriptions\", \"Subscription seats over time\" and \"Most recent subscription\" are in view.",
+        "Compare the empty state of the two subscription cards with the subscription record and the \"Item 1 of 64\" counter of the \"Most recent subscription\" card.",
+        "Scroll inside the \"Most recent subscription\" card to see the Created At value."
+      ]
+    },
+    {
+      "index": 25,
+      "reported_at_seconds": 1311,
+      "name": "Website Analysis: \\\"Number of subscriptions\\\" is dated March-June 2022 while the same page's subscription data runs to October 2026",
+      "summary": "The \\\"Number of subscriptions\\\" line chart has only four points, labelled March 2022 (160), April 2022 (313), May 2022 (321) and June 2022 (257) - nothing after June 2022, although its own sum (1,051) matches the \\\"Subscribe\\\" step of the funnel next to it. On the same screen \\\"Subscription seats over time\\\" shows 2023: 4,412, 2024: 4,249, 2025: 4,680, 2026: 1,932 (total 15,273) with no 2022 bar at all, and \\\"Most recent subscription\\\" lists a subscription created October 31, 2026 (152 rows). So the chart that counts subscriptions is dated entirely in 2022 while the rest of the page's subscription data is dated 2023-2026. (on /dashboard/1?tab=3-website-analysis)",
+      "expected": "The subscriptions counted on this tab should be dated consistently: a chart that counts subscriptions up to the latest one in the table should reach the months near October 2026, like the seats-per-year and most-recent-subscription cards, instead of ending in June 2022.",
+      "actual": "The \\\"Number of subscriptions\\\" line chart has only four points, labelled March 2022 (160), April 2022 (313), May 2022 (321) and June 2022 (257) - nothing after June 2022, although its own sum (1,051) matches the \\\"Subscribe\\\" step of the funnel next to it. On the same screen \\\"Subscription seats over time\\\" shows 2023: 4,412, 2024: 4,249, 2025: 4,680, 2026: 1,932 (total 15,273) with no 2022 bar at all, and \\\"Most recent subscription\\\" lists a subscription created October 31, 2026 (152 rows). So the chart that counts subscriptions is dated entirely in 2022 while the rest of the page's subscription data is dated 2023-2026.",
+      "reproSteps": [
+        "Open /dashboard/1 (E-commerce Insights) and click the \"Website Analysis\" tab (no filter applied).",
+        "Look at the \"Number of subscriptions\" card: four points labelled March 2022, April 2022, May 2022, June 2022.",
+        "Compare with \"Subscription seats over time\" (bars 2023, 2024, 2025, 2026) and \"Most recent subscription\" (Created At October 31, 2026, Item 1 of 152) on the same screen."
+      ]
+    },
+    {
+      "index": 26,
+      "reported_at_seconds": 1334,
+      "name": "The only tab of a dashboard cannot be renamed: its menu offers only \"Duplicate\" while every tab of a multi-tab dashboard offers \"Rename\"",
+      "summary": "With only one tab, the tab's chevron menu holds just \\\"Duplicate\\\" — no \\\"Rename\\\" (and no Delete) — and clicking/double-clicking the tab name does not open an editor either, so the tab keeps the name \\\"Tab 1\\\" for good. As soon as a second tab exists the same menu shows Rename / Duplicate / Delete, so renaming is only available when there are two or more tabs. (on /dashboard/17-agent13-responsive-dashboard#edit)",
+      "expected": "The tab menu offers \\\"Rename\\\" for the dashboard's only tab too (as it does for every tab when there are two or more), so a dashboard with a single tab can be given a meaningful tab name.",
+      "actual": "With only one tab, the tab's chevron menu holds just \\\"Duplicate\\\" — no \\\"Rename\\\" (and no Delete) — and clicking/double-clicking the tab name does not open an editor either, so the tab keeps the name \\\"Tab 1\\\" for good. As soon as a second tab exists the same menu shows Rename / Duplicate / Delete, so renaming is only available when there are two or more tabs.",
+      "reproSteps": [
+        "Sign in with eval@momentic.ai / momentic-eval-1 and open /dashboard/17-agent13-responsive-dashboard.",
+        "Click the pencil \"Edit dashboard\" button, then delete every tab but the first one (each remaining tab's chevron > Delete) so the tab bar shows only \"Tab 1\".",
+        "Click the small chevron-down right of \"Tab 1\" and read the menu: it contains only \"Duplicate\".",
+        "Click the text \"Tab 1\" itself (once and double-click): nothing becomes editable.",
+        "Now click the \"+\" at the end of the tab bar to add a second tab and open that new tab's chevron: the menu now contains Rename, Duplicate and Delete."
+      ]
+    }
+  ]
+}

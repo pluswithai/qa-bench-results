@@ -1,0 +1,32 @@
+{
+  "bugs": [
+    {
+      "name": "New Milestone: pressing Enter in Title raises the browser leave-page prompt; if dismissed, nothing is created",
+      "summary": "A browser beforeunload confirmation (\"leave this page?\") appears instead of a plain submit. If the person chooses to stay, nothing is sent: still on /eval/harbor-handbook/milestones/new with the title 'agent2-entercancel' in the field, and searching the milestone list for 'agent2-entercancel' afterwards shows 0 Open / 0 Closed — no milestone exists. Submitting the very same form with a mouse click on 'Create Milestone' never shows the confirmation and creates the milestone at once. (on /eval/harbor-handbook/milestones/new)",
+      "expected": "Pressing Enter in the Title field submits the form and creates the milestone, exactly like clicking 'Create Milestone' — with no 'leave page' confirmation.",
+      "actual": "A browser beforeunload confirmation (\"leave this page?\") appears instead of a plain submit. If the person chooses to stay, nothing is sent: still on /eval/harbor-handbook/milestones/new with the title 'agent2-entercancel' in the field, and searching the milestone list for 'agent2-entercancel' afterwards shows 0 Open / 0 Closed — no milestone exists. Submitting the very same form with a mouse click on 'Create Milestone' never shows the confirmation and creates the milestone at once.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /eval/harbor-handbook/milestones/new",
+        "Type 'agent2-entercancel' into the 'Title' field",
+        "With the cursor still in the 'Title' field, press Enter instead of clicking 'Create Milestone'",
+        "The browser raises its leave-page / unsaved-changes confirmation; choose to stay on the page",
+        "The form is still displayed with the title filled in and no milestone was created (searching the milestone list for 'agent2-entercancel' gives 0 Open, 0 Closed)"
+      ],
+      "reason": "The cause is a real race in Gitea's dirty-form script: submit clears the 'dirty' class, then the Enter keyup re-marks the form dirty (fieldEvents include keyup; Gitea's own comment at jquery.are-you-sure.ts:209-211 admits it), so the prompt fires only when keyup is handled before the navigation starts. In a local harness running that exact script the prompt appeared 5/5 with keyDown+keyUp sent back-to-back or with the main thread blocked 200 ms, but 0/20 with a human-length key hold (30-150 ms) or a normal Playwright press on an idle page - so a human should press Enter by hand at normal speed on /milestones/new in stock 1.24.7: no prompt = reject as automation key-timing artifact (my lean), prompt = accept at severity 3."
+    },
+    {
+      "name": "Saving a stale milestone edit form in a second tab overwrites the title and due date saved in the first tab (last write wins)",
+      "summary": "No warning and no conflict check: tab B saves the whole form, so its stale title agent1-twotab and due date 2026-12-15 overwrite tab A's newer title and due date. The message reads Milestone \"agent1-twotab\" has been updated and the detail page then shows the old title with the old date Dec 15, 2026 and only tab B's description. Tab A's edit is silently lost. (on /eval/harbor-handbook/milestones/57/edit)",
+      "expected": "Either the app notices the milestone changed after tab B's form was opened and refuses/warns (e.g. \"this milestone has been modified since you opened it\"), or tab B's save applies only what tab B changed and keeps tab A's title agent1-twotab-A-title and due date 2026-12-20. In no case should tab A's saved data be silently reverted.",
+      "actual": "No warning and no conflict check: tab B saves the whole form, so its stale title agent1-twotab and due date 2026-12-15 overwrite tab A's newer title and due date. The message reads Milestone \"agent1-twotab\" has been updated and the detail page then shows the old title with the old date Dec 15, 2026 and only tab B's description. Tab A's edit is silently lost.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and create a throw-away milestone: open https://5503-iohkuh32xzq8xr64ijdg1.e2b.app/eval/harbor-handbook/milestones/new, title agent1-twotab, due date 2026-12-15, description 'agent1 original description', click Create Milestone (my record is id 57)",
+        "Open the edit form https://5503-iohkuh32xzq8xr64ijdg1.e2b.app/eval/harbor-handbook/milestones/57/edit in this tab and in a second tab",
+        "In the first tab change the title to agent1-twotab-A-title and the due date to 2026-12-20, click Update Milestone (message: Milestone \"agent1-twotab-A-title\" has been updated)",
+        "In the second tab, which still shows the old title agent1-twotab and date 12/15/2026, change only the description to 'agent1 description edited in tab B' and click Update Milestone",
+        "Open https://5503-iohkuh32xzq8xr64ijdg1.e2b.app/eval/harbor-handbook/milestone/57 : the title is agent1-twotab again and the due date Dec 15, 2026 - the first tab's save is gone"
+      ],
+      "reason": "The second tab's form showed the old title and date and the app saved exactly what that form displayed: EditMilestonePost assigns Name, Content and DeadlineUnix from the posted form with no version field. Gitea only does edit-conflict detection for issue/comment content (content_version / ErrIssueAlreadyChanged in routers/web/repo/issue.go) and promises none for milestones, so this is the absence of an optional concurrency feature, not a broken behaviour."
+    }
+  ]
+}

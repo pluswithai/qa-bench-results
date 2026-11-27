@@ -1,0 +1,232 @@
+{
+  "fixture": "twenty/areas/workflows",
+  "run": 1,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 398,
+      "name": "Workflow editor loses all its header actions (Add a Node, See Runs, Test, Discard Draft, Activate) at tablet and phone widths",
+      "summary": "At 768 and 390 px wide all editor actions disappear. The header only shows the breadcrumb and the global \\\"Command Menu\\\" button; there is no overflow menu for the workflow actions. The workflow can be opened but not tested, activated/deactivated, discarded or extended with Add a Node. (on /object/workflow/c95c78b4-48d2-56f6-8e15-36ff8572f1d8 (Quick Lead workflow editor))",
+      "expected": "The workflow editor keeps its actions reachable at 768 and 390 px: Add a Node, See Runs, Test and Activate/Deactivate (or a visible overflow menu that contains them), so a workflow can be edited and tested on a tablet or phone.",
+      "actual": "At 768 and 390 px wide all editor actions disappear. The header only shows the breadcrumb and the global \\\"Command Menu\\\" button; there is no overflow menu for the workflow actions. The workflow can be opened but not tested, activated/deactivated, discarded or extended with Add a Node.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev",
+        "Open /objects/workflows and click the workflow \"Quick Lead\"",
+        "At a 1440px-wide window the editor header shows: + Add a Node, See Runs, Test, Discard Draft, Activate (and the favourite/chevron/menu icons)",
+        "Resize the window to 768x1024 (tablet)",
+        "Look at the editor header: only the breadcrumb \"Workflows / Quick Lead (2/3)\" and the \"Command Menu\" button remain",
+        "Search the whole page for Test / Add a Node / Activate / See Runs / Discard — none exist anywhere in the page tree (also at 390x844)"
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 407,
+      "name": "At phone width (390px) the workflow editor canvas shows no nodes — the graph is rendered outside the visible canvas",
+      "summary": "The workflow graph is drawn outside the canvas: the node column (trigger, Quick Lead Form, Create Company, Create Person) sits at x≈384-546 px while the canvas container spans x≈12-378 px, so at 390 px width the canvas looks completely empty — only the \\\"Draft\\\" badge and the sync banner are visible. Dragging inside the canvas pans very slowly: after two drags only ~6px slivers of the node cards appear at the right edge, so the graph cannot be viewed or edited. (on /object/workflow/c95c78b4-48d2-56f6-8e15-36ff8572f1d8 (Quick Lead workflow editor))",
+      "expected": "At 390 px width the workflow graph is fitted inside the visible canvas so its nodes can be seen and clicked (or the canvas starts panned so the trigger node is visible).",
+      "actual": "The workflow graph is drawn outside the canvas: the node column (trigger, Quick Lead Form, Create Company, Create Person) sits at x≈384-546 px while the canvas container spans x≈12-378 px, so at 390 px width the canvas looks completely empty — only the \\\"Draft\\\" badge and the sync banner are visible. Dragging inside the canvas pans very slowly: after two drags only ~6px slivers of the node cards appear at the right edge, so the graph cannot be viewed or edited.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev",
+        "Open /objects/workflows and click the workflow \"Quick Lead\"",
+        "Set the window to 390x844 (phone)",
+        "Look at the canvas area: it is empty, only the yellow \"Draft\" badge is shown",
+        "Drag inside the canvas from right to left twice"
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 413,
+      "name": "Name filter treats % and _ as wildcards: \"Contains %\" returns every workflow",
+      "summary": "% and _ act as SQL LIKE wildcards: both match every workflow, so the list and both counts (5) claim 5 matches for a search text that appears in no record. Searching for a literal % or _ (e.g. in a workflow name) can never work, and the filter silently shows records that do not match what was typed. (on /objects/workflows)",
+      "expected": "A \"Contains\" name filter with the literal text % or _ should return only workflows whose name contains that character (here: none, so the 'No Workflow found' empty state with count 0, as with zzz-no-match).",
+      "actual": "% and _ act as SQL LIKE wildcards: both match every workflow, so the list and both counts (5) claim 5 matches for a search text that appears in no record. Searching for a literal % or _ (e.g. in a workflow name) can never work, and the filter silently shows records that do not match what was typed.",
+      "reproSteps": [
+        "Open https://5500-ia9vrv4csx3pgsgypfjej.e2b.app/objects/workflows (signed in as tim@apple.dev).",
+        "Click the Filter button (top right of the view).",
+        "In the filter field picker click Name.",
+        "Keep the operator Contains and type zzz-no-match in the Name value field — the list shows the 'No Workflow found' empty state, so the filter works for plain text.",
+        "Replace the value with a single % — the list immediately shows all 5 workflows (agent15-afly, agent12-twotab, agent9-trigger-test, Quick Lead, Create company when adding a new person) with the header count 'All Workflows · 5' and the footer 'Count all 5', though none of these names contains a %.",
+        "Replace the value with a single _ — all 5 workflows are returned again although no name contains an underscore."
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 415,
+      "name": "Opening a nonexistent workflow by its address shows an empty \"Untitled (0/0)\" editor with no not-found message",
+      "summary": "The editor renders as if an empty workflow named \"Untitled\" with 0 nodes existed: blank canvas, no message, no error, toolbar actions missing. With a malformed id the only feedback is a raw duplicated toast \"Invalid value for UUID: \\\"not-a-workflow-id\\\"\" and the same blank editor stays on screen. (on /object/workflow/{id})",
+      "expected": "A workflow id that does not exist should show a proper not-found state (\\\"This workflow does not exist\\\" / \\\"Record not found\\\") with a way back to the workflow list, and a malformed id should not surface a raw GraphQL validation message.",
+      "actual": "The editor renders as if an empty workflow named \"Untitled\" with 0 nodes existed: blank canvas, no message, no error, toolbar actions missing. With a malformed id the only feedback is a raw duplicated toast \"Invalid value for UUID: \\\"not-a-workflow-id\\\"\" and the same blank editor stays on screen.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev.",
+        "Type the address https://5500-ia9vrv4csx3pgsgypfjej.e2b.app/object/workflow/00000000-0000-4000-8000-000000000000 in the browser and press Enter.",
+        "Observe the workflow editor: breadcrumb reads \"Workflows / Untitled (0/0)\", the canvas is completely blank and every toolbar button (Add a Node, See Runs, Deactivate, Add to Favorites) is missing.",
+        "Repeat with a malformed id: https://5500-ia9vrv4csx3pgsgypfjej.e2b.app/object/workflow/not-a-workflow-id — a raw red toast \"Invalid value for UUID: \"not-a-workflow-id\"\" is shown twice and the same blank \"Untitled (0/0)\" editor remains."
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 676,
+      "name": "Sort panel's \"Descending\" option does not reverse the list — arrow stays \"↑\" and rows stay ascending",
+      "summary": "Nothing changes: the chip keeps showing \"↑Name\" and the rows stay in ascending name order (all v1 rows first, the v2 row last). Reopening the Sort panel shows the direction selector back at \"Ascending\". Only flipping the direction from the sort chip's own small menu (clicking the \"↑Name\" chip and choosing \"Sort\") actually reverses the list and its arrow. Happened 2 times out of 2 tries. (on /objects/workflowVersions)",
+      "expected": "The list should be re-sorted by name in descending order (v2 rows first, v1 rows last) and the sort chip should show the descending arrow \"↓Name\", as it does when the direction is flipped from the sort chip's own menu.",
+      "actual": "Nothing changes: the chip keeps showing \"↑Name\" and the rows stay in ascending name order (all v1 rows first, the v2 row last). Reopening the Sort panel shows the direction selector back at \"Ascending\". Only flipping the direction from the sort chip's own small menu (clicking the \"↑Name\" chip and choosing \"Sort\") actually reverses the list and its arrow. Happened 2 times out of 2 tries.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open /objects/workflowVersions (the \"Versions\" list).",
+        "Click the \"Sort\" button at the top right of the list.",
+        "In the opened Sort panel, click the field \"Name\" to sort by Name. The chip above the list then reads \"↑Name\" and the rows are ordered by the version name ascending (v1 rows first, the v2 row(s) last).",
+        "With the Sort panel still open, click the direction selector that reads \"Ascending\" and choose \"Descending\".",
+        "Close the panel (Escape) and look at the list and at the sort chip."
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 852,
+      "name": "Reloading a workflow editor blanks its name field, and the next click erases the workflow's name",
+      "summary": "After a reload the header name field is empty (placeholder 'Name' shown) although the record still has its name (browser tab title 'agent12-name-home - Workflow'). Clicking anywhere that blurs the field sends an update that stores an empty name: the header turns into 'Workflows / Untitled' and the workflow loses its name for everyone. (on /object/workflow/5b450f33-80ab-4f18-8a19-546ecb39e9bb)",
+      "expected": "After a reload the workflow editor shows the workflow's name (agent12-name-home) in the header name field, and clicking in the canvas does not change the stored name.",
+      "actual": "After a reload the header name field is empty (placeholder 'Name' shown) although the record still has its name (browser tab title 'agent12-name-home - Workflow'). Clicking anywhere that blurs the field sends an update that stores an empty name: the header turns into 'Workflows / Untitled' and the workflow loses its name for everyone.",
+      "reproSteps": [
+        "Go to /objects/workflows and click '+ New Workflow'. The editor opens with the name field focused and the placeholder 'Name' shown.",
+        "Type 'agent12-name-home' into the name field and press Enter. The header becomes 'Workflows / agent12-name-home (2/18)'.",
+        "Reload the page (F5 / browser reload) and wait for the canvas.",
+        "Observe the header: it shows 'Workflows / Name (2/18)' - the name field is empty and shows the placeholder, even though the browser tab title still reads 'agent12-name-home - Workflow'.",
+        "Click on the empty canvas area next to the 'Add a Trigger' node.",
+        "Observe the header: it now shows 'Workflows / Untitled (2/18)' and the browser tab title is just 'Workflow'; the workflow's name has been overwritten with an empty value."
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 877,
+      "name": "Delay action accepts a negative \"Days\" value and the test run then fails with a bare \"Invalid Configuration\" and an empty flow",
+      "summary": "The Delay action accepts -1 in \"Days\" with no validation message and saves it. Running \"Test\" then produces a run that fails with a centred red pill \"Invalid Configuration\" only: the Flow tab of the run shows no steps at all (neither the trigger nor any action), and the run's Home tab shows just status \"Failed\" with no error text, so nothing points to the Delay action or the negative value. With Days set back to 0 the same run shows its steps and the chain proceeds to the next action's own error. (on /object/workflow/a47f60c2-8594-404b-a94a-8e6b61646af7 (workflow \"agent4-flow\"))",
+      "expected": "The Days/Hours/Minutes/Seconds fields of a Delay action should refuse a negative number (a message next to the field, or clamping to 0), and when a workflow cannot run the run should still show its steps and name the action that is misconfigured.",
+      "actual": "The Delay action accepts -1 in \"Days\" with no validation message and saves it. Running \"Test\" then produces a run that fails with a centred red pill \"Invalid Configuration\" only: the Flow tab of the run shows no steps at all (neither the trigger nor any action), and the run's Home tab shows just status \"Failed\" with no error text, so nothing points to the Delay action or the negative value. With Days set back to 0 the same run shows its steps and the chain proceeds to the next action's own error.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open the workflow \"agent4-flow\" at /object/workflow/a47f60c2-8594-404b-a94a-8e6b61646af7 (any workflow with a \"Launch manually\" trigger and one Delay action works).",
+        "Click the \"Delay\" action node on the canvas to open its panel.",
+        "Type -1 into the \"Days\" field and click elsewhere in the panel so the value is saved (the field keeps -1, no error is shown).",
+        "Click \"Test\" in the workflow header.",
+        "Read the run panel that opens on the right: its Flow tab is empty except \"Invalid Configuration\"; the Home tab reports status \"Failed\" with no error message."
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 997,
+      "name": "See Runs on a Workflow Version record opens the whole Workflow Runs list instead of that version's runs",
+      "summary": "The full Workflow Runs list opens with no filter chip: the count is the workspace total (Runs · 21, then Runs · 22 on the repeat) and runs of other workflows (agent4-flow, agent9-trigger-test, Create company when adding a new person) are listed next to Quick Lead runs. The address briefly carries filter[recordStore][IS][selectedRecordIds][0]=<version id>, but it is dropped and nothing is filtered. (on /object/workflowVersion/0a8721af-30b4-44fd-9ff1-a42afc581195)",
+      "expected": "The Workflow Runs list opens filtered to the runs of the version you came from (Quick Lead v2), with a filter chip naming it and a count that matches those runs.",
+      "actual": "The full Workflow Runs list opens with no filter chip: the count is the workspace total (Runs · 21, then Runs · 22 on the repeat) and runs of other workflows (agent4-flow, agent9-trigger-test, Create company when adding a new person) are listed next to Quick Lead runs. The address briefly carries filter[recordStore][IS][selectedRecordIds][0]=<version id>, but it is dropped and nothing is filtered.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open /objects/workflowVersions",
+        "Open the draft version record named v2 whose Workflow is Quick Lead (address /object/workflowVersion/0a8721af-30b4-44fd-9ff1-a42afc581195)",
+        "In the record header click the button See Runs",
+        "Read the count and the Workflow column of the Workflow Runs list that opens"
+      ]
+    },
+    {
+      "index": 8,
+      "reported_at_seconds": 1087,
+      "name": "Schedule trigger accepts hour 25 (limit stated as 0–23), silently drops the schedule preview and still activates",
+      "summary": "Hour 25 is accepted with no error message; the \\\"Schedule\\\" and \\\"Upcoming execution time (UTC)\\\" blocks disappear entirely, leaving no indication that the value is invalid, and \\\"Activate\\\" succeeds — the workflow turns Active with the out-of-range hour saved as its schedule. (on /object/workflow/fff88a6e-a714-42e5-863b-51748a3907fb)",
+      "expected": "The hour field should refuse a value outside 0–23 with a validation message next to it (its own placeholder states the limit), and the workflow should not be activateable with an invalid schedule; the schedule preview should stay consistent.",
+      "actual": "Hour 25 is accepted with no error message; the \\\"Schedule\\\" and \\\"Upcoming execution time (UTC)\\\" blocks disappear entirely, leaving no indication that the value is invalid, and \\\"Activate\\\" succeeds — the workflow turns Active with the out-of-range hour saved as its schedule.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open /objects/workflows",
+        "Click \"+ New Workflow\", name it \"agent9-schedule\", click the Trigger node \"Add a Trigger\" and choose \"On a schedule\"",
+        "In the trigger panel note the fields: Trigger interval \"Days\", Days between triggers 1, Trigger at hour (UTC) 0 with placeholder \"Enter number between 0 and 23\", Trigger at minute (UTC) 0; the panel shows \"Schedule: at 00:00 UTC every day\" and three \"Upcoming execution time (UTC)\" entries",
+        "Type 25 into \"Trigger at hour (UTC)\"",
+        "Add an action with the \"+\" under the trigger and pick \"Create Record\", then click \"Activate\" in the header"
+      ]
+    },
+    {
+      "index": 9,
+      "reported_at_seconds": 1134,
+      "name": "Closing the Test panel without submitting leaves the workflow run stuck in \"Running\" forever, and every Test click creates another orphan run",
+      "summary": "Each Test click creates a new workflow run immediately (RunWorkflowVersion fires on the click, before Submit), and closing the panel without submitting leaves the run at status \\\"Running\\\". Runs #4, #5 and #6 - Quick Lead were still \\\"Running\\\" in /objects/workflowRuns after 5+ minutes (checked at 1440 px after a reload), while runs of the same workflow completed normally in under a second. Nothing in the run list or the run record offers a way to cancel or finish them. (on /object/workflow/c95c78b4-48d2-56f6-8e15-36ff8572f1d8 (Quick Lead) and /objects/workflowRuns)",
+      "expected": "A test run that is abandoned before the form is submitted should be ended (cancelled/failed) when the test panel is closed, and clicking Test again while a test is pending should reuse or not duplicate the run — a workflow run should never stay \"Running\" indefinitely, since a Quick Lead run normally finishes in under a second.",
+      "actual": "Each Test click creates a new workflow run immediately (RunWorkflowVersion fires on the click, before Submit), and closing the panel without submitting leaves the run at status \\\"Running\\\". Runs #4, #5 and #6 - Quick Lead were still \\\"Running\\\" in /objects/workflowRuns after 5+ minutes (checked at 1440 px after a reload), while runs of the same workflow completed normally in under a second. Nothing in the run list or the run record offers a way to cancel or finish them.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open the workflow editor /object/workflow/c95c78b4-48d2-56f6-8e15-36ff8572f1d8 (Quick Lead).",
+        "Click the \"Test\" button at the top right of the editor: the test side panel opens on the right with the \"Quick Lead Form\" (First name, Last Name, Email, Job title, Company name, Company domain, all empty).",
+        "Without filling anything and without clicking \"Submit\", close the panel with the \"X\" (Close side panel) button at the top right of the panel.",
+        "Click \"Test\" again, close the panel again without submitting (I did this a second time).",
+        "Open /objects/workflowRuns and use See Runs from the editor, or the filter Workflow = Quick Lead, and watch the new runs (#4, #5, #6 - Quick Lead) for several minutes."
+      ]
+    },
+    {
+      "index": 10,
+      "reported_at_seconds": 1143,
+      "name": "Favorites sidebar keeps the old workflow name after the workflow is renamed",
+      "summary": "The Favorites entry in the left sidebar keeps the previous label. The breadcrumb shows the new name (\"Untitled\", later \"agent11-editor-renamed\") while Favorites still shows \"agent11-editor (Duplicate) · Workflow\" — the same record with two different names on the same screen, and the old name survives a full page reload. (on /object/workflow/799d9852-2fc1-447e-b790-42b765153761)",
+      "expected": "After a rename, every place that shows the workflow uses the new name; the Favorites entry should read the same name as the breadcrumb and the workflow list.",
+      "actual": "The Favorites entry in the left sidebar keeps the previous label. The breadcrumb shows the new name (\"Untitled\", later \"agent11-editor-renamed\") while Favorites still shows \"agent11-editor (Duplicate) · Workflow\" — the same record with two different names on the same screen, and the old name survives a full page reload.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open the workflow named \"agent11-editor (Duplicate)\".",
+        "Click the heart (Add to Favorites) in the editor toolbar: a Favorites entry appears in the left sidebar reading \"agent11-editor (Duplicate) · Workflow\".",
+        "Click the workflow name in the breadcrumb to edit it, clear it and press Enter (first attempt), or type a new name such as \"agent11-editor-renamed\" and press Enter (second attempt).",
+        "Compare the breadcrumb with the Favorites entry: the breadcrumb shows the new name, the Favorites entry still shows \"agent11-editor (Duplicate)\" — also after reloading the page."
+      ]
+    },
+    {
+      "index": 11,
+      "reported_at_seconds": 1242,
+      "name": "\"Discard Draft\" always fails on a newly created workflow (\"The initial version of a workflow can not be deleted\")",
+      "summary": "Nothing is discarded: the workflow stays in Draft and a red toast says \\\"The initial version of a workflow can not be deleted\\\". The console throws an uncaught page error with the same text and the DeleteOneWorkflowVersion GraphQL request aborts. The button therefore never works on any newly created workflow, which is exactly the state in which a user decides to abandon it. (on /object/workflow/{id})",
+      "expected": "The draft of a freshly created workflow is discarded (or, if this is not allowed, the control is not offered in that state) and the workflow is gone/changed accordingly.",
+      "actual": "Nothing is discarded: the workflow stays in Draft and a red toast says \\\"The initial version of a workflow can not be deleted\\\". The console throws an uncaught page error with the same text and the DeleteOneWorkflowVersion GraphQL request aborts. The button therefore never works on any newly created workflow, which is exactly the state in which a user decides to abandon it.",
+      "reproSteps": [
+        "Go to /objects/workflows and click \"+ New Workflow\" (top right); a new workflow opens in the editor with an empty Name field and the \"Draft\" badge.",
+        "Do not add a trigger or an action.",
+        "Click the \"Discard Draft\" button in the top right of the editor.",
+        "Observe the red toast at the bottom right and that the workflow keeps its \"Draft\" badge.",
+        "Reproduced on a second new workflow (same steps, another workflow from \"+ New Workflow\")."
+      ]
+    },
+    {
+      "index": 12,
+      "reported_at_seconds": 1437,
+      "name": "Restored workflow loses its status in the Workflows list while the editor and Workflow Versions still say Draft",
+      "summary": "The row \\\"agent8-toggle (Duplicate)\\\" shows nothing at all in the Statuses column (the cell is empty between the name and \\\"Created by\\\"), although the editor badge and its v1 in Workflow Versions both read \\\"Draft\\\". Its \\\"Created by\\\" also reads \\\"System\\\" instead of the user who duplicated it. (on /objects/workflows)",
+      "expected": "The restored workflow keeps its status: the Statuses column for \\\"agent8-toggle (Duplicate)\\\" should show the same value as the editor badge and as its version's Version status in Workflow Versions (\\\"Draft\\\").",
+      "actual": "The row \\\"agent8-toggle (Duplicate)\\\" shows nothing at all in the Statuses column (the cell is empty between the name and \\\"Created by\\\"), although the editor badge and its v1 in Workflow Versions both read \\\"Draft\\\". Its \\\"Created by\\\" also reads \\\"System\\\" instead of the user who duplicated it.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open /objects/workflows.",
+        "Open my workflow \"agent8-toggle (Duplicate)\" (address /object/workflow/9975c043-e01b-4a49-b37c-ef032b96de25); its badge in the editor says \"Draft\" and Workflow Versions lists its v1 with Version status \"Draft\".",
+        "Click the \"...\" menu at the top right and choose \"Delete Workflow\" (it deletes immediately, no confirm).",
+        "In the red banner \"This record has been deleted\" click \"Restore\".",
+        "Go back to /objects/workflows and look at the row \"agent8-toggle (Duplicate)\".",
+        "Compare with the row \"agent8-toggle\", which shows \"Deactivated\", and with Workflow Versions, where v1 of \"agent8-toggle (Duplicate)\" shows \"Draft\"."
+      ]
+    },
+    {
+      "index": 13,
+      "reported_at_seconds": 1528,
+      "name": "Name tooltip with a very long workflow name expands to cover almost the whole screen",
+      "summary": "The tooltip renders the whole 10,000-character name unclamped: a dark box about 500 px wide and 690 px tall covering most of the page, hiding the canvas, the header buttons and the fields panel until the mouse moves away. Same on the version record page and in the workflow editor breadcrumb. (on /object/workflow/a3c16a4e-1ed7-4f84-ad4d-d2d237a9b62b (also /object/workflowVersion/48354bea-f230-4d74-96c6-e091753e96c3))",
+      "expected": "A tooltip for a long name should stay small — clamped width and a few lines (or a scrollable/truncated tooltip) — and never cover the record's fields or the editor canvas and toolbar.",
+      "actual": "The tooltip renders the whole 10,000-character name unclamped: a dark box about 500 px wide and 690 px tall covering most of the page, hiding the canvas, the header buttons and the fields panel until the mouse moves away. Same on the version record page and in the workflow editor breadcrumb.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev, open /objects/workflowVersions.",
+        "Open the version record whose Workflow is \"agent1-long5000 XXXXX…\" (row v1, /object/workflowVersion/48354bea-f230-4d74-96c6-e091753e96c3).",
+        "Hover the truncated \"Workflow\" field value in the Fields panel: a dark tooltip appears showing the full name as a huge block (screenshot 1).",
+        "Click \"See Workflow\" and hover the workflow name in the editor breadcrumb (top left): the same dark block covers the canvas from the top bar to the bottom of the window (screenshot 2).",
+        "Move the mouse away and it disappears."
+      ]
+    },
+    {
+      "index": 14,
+      "reported_at_seconds": 1540,
+      "name": "Workflow Version record shows the trigger as a raw, cut-off JSON string in the 'Version trigger' field",
+      "summary": "The field prints the raw serialized trigger config, cut off at the panel edge with no ellipsis and no way to read the rest: '{\"name\":\"Launch manually\",\"typ'. Hovering the value shows no tooltip and clicking it does not expand it, so the rest of the value (type, position, settings) cannot be read at any width (390, 768 and 1280 all show the same clipped string). (on /object/workflowVersion/9848f20a-e657-4c65-8020-086617bce3e7)",
+      "expected": "The Version trigger field should show a readable value (for example the trigger name 'Launch manually'), or the full text should be reachable (expand on click or a tooltip) so the configured trigger can be read from the version record.",
+      "actual": "The field prints the raw serialized trigger config, cut off at the panel edge with no ellipsis and no way to read the rest: '{\"name\":\"Launch manually\",\"typ'. Hovering the value shows no tooltip and clicking it does not expand it, so the rest of the value (type, position, settings) cannot be read at any width (390, 768 and 1280 all show the same clipped string).",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open /objects/workflowVersions.",
+        "Click the 'v1' name of any version row (for example the version whose Workflow column is 'agent15-a11y') to open the version record.",
+        "On the Home tab, read the 'Version trigger' field in the General section: it shows {\"name\":\"Launch manually\",\"typ and the rest is cut off.",
+        "Repeat at 768 and at 390 width: the same clipped string is shown, and hovering or clicking the value does not reveal the full text."
+      ]
+    }
+  ]
+}

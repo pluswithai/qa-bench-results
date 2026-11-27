@@ -1,0 +1,101 @@
+{
+  "bugs": [
+    {
+      "name": "Watching repo search treats % and _ as SQL wildcards, so it returns repos that do not contain the typed character",
+      "summary": "Both searches return the full watched list: 'harbor-handbook' (name and description contain neither % nor _) and 'agent14-alpha' are shown for q=%. The wildcard characters are passed into the query pattern, so the results do not match the typed search text. (on /notifications/watching)",
+      "expected": "A text search for the character '%' (or '_') should only list watched repos whose name or description actually contains that character; since no watched repo contains '%' or '_', the page should show the empty state 'No matching results found.'",
+      "actual": "Both searches return the full watched list: 'harbor-handbook' (name and description contain neither % nor _) and 'agent14-alpha' are shown for q=%. The wildcard characters are passed into the query pattern, so the results do not match the typed search text.",
+      "reproSteps": [
+        "Sign in as eval (password momentic-eval-1) and open https://5503-i1xa88mcu1dyhjiujxncx.e2b.app/notifications/watching",
+        "In the 'Search repos...' box type a single percent sign: %",
+        "Click the magnifier 'Search...' button (URL becomes .../notifications/watching?q=%25&sort=recentupdate)",
+        "Repeat with an underscore: _ in the same box and the same Search button"
+      ]
+    },
+    {
+      "name": "A pinned notification cannot be unpinned: the pin control disappears once it is pinned",
+      "summary": "After pinning, only the 'Mark as read' (check) button is left — no pin/unpin button at all, in the Unread view and in the Read view. The notification keeps its pin badge next to 'eval/harbor-handbook #1' with no way to remove it; the only thing that clears the pin is marking the notification read, which is a different action. (on /notifications)",
+      "expected": "A pinned notification shows a control to undo the pin (an 'Unpin notification' button), so the pin can be removed from the list.",
+      "actual": "After pinning, only the 'Mark as read' (check) button is left — no pin/unpin button at all, in the Unread view and in the Read view. The notification keeps its pin badge next to 'eval/harbor-handbook #1' with no way to remove it; the only thing that clears the pin is marking the notification read, which is a different action.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /notifications.",
+        "Hover the notification 'eval/harbor-handbook #1 Expand the onboarding checklist' so its buttons appear.",
+        "Click the pin button (tooltip 'Pin notification').",
+        "Hover the same notification again and look at the buttons."
+      ]
+    },
+    {
+      "name": "Pinned notification is listed in the Unread list while the Unread counter and bell badge show 0, and appears in the Read list too",
+      "summary": "The pinned notification keeps showing in the list under the Unread tab, but the Unread tab has no counter (the \"1\" that was there is gone) and the bell in the navbar shows no unread badge; opening /notifications?q=read shows the same pinned notification in the Read list too. So the same notification is presented as neither unread nor read while being listed under both filters, and the Unread list contradicts the unread count. (on /notifications)",
+      "expected": "The Unread view lists only notifications counted as unread: either the pinned notification is not listed there, or the Unread counter and the bell badge count it (at least 1). The Read view should not list a notification that was never read.",
+      "actual": "The pinned notification keeps showing in the list under the Unread tab, but the Unread tab has no counter (the \"1\" that was there is gone) and the bell in the navbar shows no unread badge; opening /notifications?q=read shows the same pinned notification in the Read list too. So the same notification is presented as neither unread nor read while being listed under both filters, and the Unread list contradicts the unread count.",
+      "reproSteps": [
+        "Sign in as eval / momentic-eval-1 and open /notifications (the tab reads 'Unread 1' and the bell shows a '1' badge).",
+        "Hover the notification 'eval/harbor-handbook #1 Expand the onboarding checklist' and click the pin button (tooltip 'Pin notification').",
+        "Look at the Unread tab, the bell icon and the list: the notification is still listed, but the Unread counter and the bell badge are gone.",
+        "Open /notifications?q=read: the same pinned notification is listed in the Read list, although it was never marked read."
+      ]
+    },
+    {
+      "name": "Watching: after browser Back the Filter dropdown still shows \"Archived\" selected while the list is unfiltered",
+      "summary": "The list is unfiltered (harbor-handbook is shown, address has no archived parameter) but the Filter dropdown still shows the \\\"Archived\\\" radio selected. The control claims a filter that is not applied, so the page contradicts itself. (on /notifications/watching)",
+      "expected": "After Back the page should come back fully consistent with its address: no filter applied, so the Filter dropdown should show no selected filter (and harbour-handbook, which is not archived, is listed).",
+      "actual": "The list is unfiltered (harbor-handbook is shown, address has no archived parameter) but the Filter dropdown still shows the \\\"Archived\\\" radio selected. The control claims a filter that is not applied, so the page contradicts itself.",
+      "reproSteps": [
+        "Sign in as eval and open /notifications/watching.",
+        "Type \"hand\" into the \"Search repos...\" field and press Enter (URL becomes /notifications/watching?q=hand&sort=recentupdate).",
+        "Click the \"Filter\" dropdown and choose \"Archived\" (URL becomes ...?q=hand&archived=1&sort=recentupdate, list shows \"No matching results found.\").",
+        "Press the browser Back button once (URL returns to ...?q=hand&sort=recentupdate).",
+        "Click the \"Filter\" dropdown again and look at the radio buttons, then look at the list."
+      ]
+    },
+    {
+      "name": "\\\"Mark as unread\\\" in the Read view drops the Read filter and throws you into the Unread view",
+      "summary": "The page comes back at /notifications?page=1 — the ?q=read filter is gone, the Unread tab becomes active and the notification is listed there. The user is moved out of the Read view they were working in; the per-item control itself carries its view (data-q=\\\"read\\\") but the view is not kept in the address. (on /notifications?q=read)",
+      "expected": "After the action the Read view is kept (address stays /notifications?q=read, or ?q=read&page=1) and only the notification leaves that list.",
+      "actual": "The page comes back at /notifications?page=1 — the ?q=read filter is gone, the Unread tab becomes active and the notification is listed there. The user is moved out of the Read view they were working in; the per-item control itself carries its view (data-q=\\\"read\\\") but the view is not kept in the address.",
+      "reproSteps": [
+        "Sign in as eval and open /notifications?q=read (the Read tab is active and lists \"eval/harbor-handbook #1 — Expand the onboarding checklist\").",
+        "Hover that notification row so its action icons appear and click the bell icon (tooltip \"Mark as unread\").",
+        "Look at the address bar and the active tab after the page reloads."
+      ]
+    },
+    {
+      "name": "Bell badge never updates while the page is open: a new unread notification leaves the badge at 0 (console: JSON.parse error every ~20 s)",
+      "summary": "The bell in the open tab keeps showing no badge (count 0) after 30+ seconds; only a page reload makes the badge appear. On every page the console logs an uncaught 'SyntaxError: \\\"[object Object]\\\" is not valid JSON at JSON.parse (<anonymous>) at bp (assets/js/index.js:30:72394) MessageEvent' about every 20 seconds, which is the notification-count poll failing, so the badge never refreshes live. (on / (dashboard) and /notifications)",
+      "expected": "The bell badge in the already-open tab shows 1 within a few seconds of the unread notification existing (the page polls the server for the unread count), without a reload.",
+      "actual": "The bell in the open tab keeps showing no badge (count 0) after 30+ seconds; only a page reload makes the badge appear. On every page the console logs an uncaught 'SyntaxError: \\\"[object Object]\\\" is not valid JSON at JSON.parse (<anonymous>) at bp (assets/js/index.js:30:72394) MessageEvent' about every 20 seconds, which is the notification-count poll failing, so the badge never refreshes live.",
+      "reproSteps": [
+        "Sign in as eval (username eval / password momentic-eval-1).",
+        "Open tab 1 at https://5503-i1xa88mcu1dyhjiujxncx.e2b.app/ (dashboard). The bell in the navbar shows no unread badge.",
+        "Open tab 2 at https://5503-i1xa88mcu1dyhjiujxncx.e2b.app/notifications?q=read, hover the row 'eval/harbor-handbook #1 Expand the onboarding checklist' and click the bell icon 'Mark as unread'. Tab 2 now shows Unread 1 and the navbar bell shows a badge 1.",
+        "Go back to tab 1 (dashboard) and leave it alone for 30+ seconds without reloading.",
+        "Look at the bell in tab 1's navbar; then reload tab 1."
+      ]
+    },
+    {
+      "name": "Watching: after browser Back the search box keeps the typed term while the list shows every watched repo",
+      "summary": "The URL goes back to /notifications/watching and the list shows all 4 repos, including harbor-handbook which does not contain 'agent', but the search field still displays 'agent' — the page looks searched while it is not. Reproduced 2 of 2 times. (on /notifications/watching)",
+      "expected": "After Back the page returns to the unfiltered Watching list, so the search field should be empty (or the list should still be filtered by 'agent'); the control and the list should describe the same thing.",
+      "actual": "The URL goes back to /notifications/watching and the list shows all 4 repos, including harbor-handbook which does not contain 'agent', but the search field still displays 'agent' — the page looks searched while it is not. Reproduced 2 of 2 times.",
+      "reproSteps": [
+        "Go to https://5503-i1xa88mcu1dyhjiujxncx.e2b.app/notifications/watching as eval (4 watched repos: agent12-watchlab, harbor-handbook, agent14-zulu, agent14-alpha).",
+        "Type 'agent' into the 'Search repos...' field and press Enter — the list narrows to 3 repos (agent12-watchlab, agent14-zulu, agent14-alpha), URL becomes ?q=agent&sort=recentupdate.",
+        "Press the browser Back button."
+      ]
+    },
+    {
+      "name": "Unread notifications are not listed newest-first: a \"1 minute ago\" row sits below a \"4 minutes ago\" row, and the two pinned rows are split top and bottom",
+      "summary": "The rows are listed in this order with these times (exact times from the row timestamps): eval/agent12-watchlab #2 \"agent1-delivery-probe in watched repo\" 18:08:34 (\"4 minutes ago\"), eval/agent12-watchlab #3 \"agent2 watch-delivery probe 1\" 18:11:51 (\"1 minute ago\"), eval/harbor-handbook #2 \"Clarify release ownership\" 18:10:30 (\"2 minutes ago\"), eval/harbor-handbook #12 \"agent7 probe 4\" 18:08:41, eval/harbor-handbook #1 \"Expand the onboarding checklist\" 18:05:59 (\"6 minutes ago\"). So the two newest notifications (\"now\" and \"2 minutes ago\") sit below a row that is 4 minutes old. In the same list the two pinned rows (a blue pin next to the repo name on watchlab #2 and on harbor-handbook #1) are split: one at the top and one at the bottom, with unpinned rows in between. (on /notifications?q=unread)",
+      "expected": "The Unread list runs newest event first (18:11:51, 18:10:30, 18:08:41, 18:08:34, 18:05:59), the way the Read list does, and the pinned rows are either grouped on top or placed consistently by time.",
+      "actual": "The rows are listed in this order with these times (exact times from the row timestamps): eval/agent12-watchlab #2 \"agent1-delivery-probe in watched repo\" 18:08:34 (\"4 minutes ago\"), eval/agent12-watchlab #3 \"agent2 watch-delivery probe 1\" 18:11:51 (\"1 minute ago\"), eval/harbor-handbook #2 \"Clarify release ownership\" 18:10:30 (\"2 minutes ago\"), eval/harbor-handbook #12 \"agent7 probe 4\" 18:08:41, eval/harbor-handbook #1 \"Expand the onboarding checklist\" 18:05:59 (\"6 minutes ago\"). So the two newest notifications (\"now\" and \"2 minutes ago\") sit below a row that is 4 minutes old. In the same list the two pinned rows (a blue pin next to the repo name on watchlab #2 and on harbor-handbook #1) are split: one at the top and one at the bottom, with unpinned rows in between.",
+      "reproSteps": [
+        "Sign in as eval and open /notifications (the Unread view is shown).",
+        "Read the rows top to bottom with the time at the right of each: 1) eval/agent12-watchlab #2 \"agent1-delivery-probe in watched repo\" — 4 minutes ago, 2) eval/agent12-watchlab #3 \"agent2 watch-delivery probe 1\" — 1 minute ago, 3) eval/harbor-handbook #2 \"Clarify release ownership\" — 2 minutes ago, 4) eval/harbor-handbook #12 \"agent7 probe 4\" — 4 minutes ago, 5) eval/harbor-handbook #1 \"Expand the onboarding checklist\" — 6 minutes ago.",
+        "Note that the two rows carrying the blue pin badge next to the repo name are row 1 (watchlab #2) and row 5 (harbor-handbook #1).",
+        "Reload the page: the same five rows come back in the same order, so it is not a one-off.",
+        "For contrast, open the Read view (/notifications?q=read): there the rows run strictly newest first (4, 4, 4, 4, 6 minutes with descending event times)."
+      ]
+    }
+  ]
+}

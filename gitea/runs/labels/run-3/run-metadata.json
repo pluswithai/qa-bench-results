@@ -1,0 +1,15 @@
+{
+  "fixture": "gitea/areas/labels",
+  "run": 3,
+  "started_at": "2026-11-23T17:33:27.009Z",
+  "duration_seconds": 1741.042,
+  "time_limit_seconds": 1800,
+  "stop_reason": "completed",
+  "credits": {
+    "total": 1290,
+    "testing_team": 1098,
+    "verification": 192,
+    "findings_verified": 32
+  },
+  "team_container_errors": 0
+}

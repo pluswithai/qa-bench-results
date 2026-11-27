@@ -1,0 +1,181 @@
+{
+  "fixture": "twenty/areas/records-views",
+  "run": 2,
+  "time_limit_seconds": 1800,
+  "findings": [
+    {
+      "index": 0,
+      "reported_at_seconds": 507,
+      "name": "Selecting records then opening the Filter (or Sort) panel silently clears the selection",
+      "summary": "Every row checkbox goes back to empty and the row highlight disappears as soon as the Filter panel opens; the same happens with the Sort panel. The selection is lost silently — the app shows no count of selected rows and no notice that the selection was dropped. (on /objects/companies)",
+      "expected": "The selected row stays selected while the Filter panel is open (the selection is independent of the filter panel), so the person can select records and then refine the list without losing their selection.",
+      "actual": "Every row checkbox goes back to empty and the row highlight disappears as soon as the Filter panel opens; the same happens with the Sort panel. The selection is lost silently — the app shows no count of selected rows and no notice that the selection was dropped.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open /objects/companies (any width, tried at 768px).",
+        "Tick the checkbox at the start of the first data row (Google): the checkbox and the row turn blue/selected.",
+        "Click the Filter button in the view toolbar to the right of the view name.",
+        "Look at the row checkboxes in the list behind the panel."
+      ]
+    },
+    {
+      "index": 1,
+      "reported_at_seconds": 516,
+      "name": "Grouping the Tasks board by Assignee hides all 1,800 tasks and shows only an empty \"No Value\" column",
+      "summary": "The board collapses to a single empty 'No Value' column with no cards at all, and the view header count becomes 0 after a reload (still 1,800 before it), even though the same view's table shows 1,800 tasks with assignees. The Group panel also keeps showing 'Group by: Status' while the board is visibly grouped by something else. (on /objects/tasks?viewId=ea1548a8-b03a-4c88-b999-d09a305231e8)",
+      "expected": "Grouping the board by Assignee should split the 1,800 tasks into one column per assignee (plus a 'No Value' column for tasks without an assignee), and the record count in the header should stay 1,800.",
+      "actual": "The board collapses to a single empty 'No Value' column with no cards at all, and the view header count becomes 0 after a reload (still 1,800 before it), even though the same view's table shows 1,800 tasks with assignees. The Group panel also keeps showing 'Group by: Status' while the board is visibly grouped by something else.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev / tim@apple.dev and open /objects/tasks (table layout, view 'All Tasks' says 1,800).",
+        "Click the view name 'All Tasks · 1,800' and choose 'By Status' — the Kanban board appears with the To do / In progress / Done columns and cards.",
+        "Click 'Options' (top right) → 'Group' → 'Group by: Status'.",
+        "In the field list choose 'Assignee'.",
+        "Observe the board: it becomes a single column 'No Value' with no cards; the view header still says '1,800'. After reloading the page the header says 'By Status · 0'.",
+        "Open the same records in the table view 'All Tasks' — it still lists 1,800 tasks, many of them with an assignee (Jony Ive, Phil Schiler, Tim Apple), so the records exist."
+      ]
+    },
+    {
+      "index": 2,
+      "reported_at_seconds": 595,
+      "name": "Opening a record address that doesn't exist leaves the record header stuck on loading placeholders with no message",
+      "summary": "The page opens as a company record titled \"Companies / Untitled (0/0)\": the header shows two grey skeleton blocks (avatar and name) that never resolve, every field shows only its placeholder (\"Domain Name\", \"Account Owner\", \"Address\", \"Linkedin\", ...) and the timeline says \"No activity yet\". No not-found message is shown. With the all-zero UUID three red toasts \"Invalid value for UUID: \\\"00000000-0000-0000-0000-000000000000\\\"\" also appear and the console logs 'useFindManyRecords for \\\"companies\\\" error : CombinedGraphQLErrors: Invalid UUID value' — raw errors on screen. (on /object/company/8f1c2b65-1234-4a9b-9c3d-1a2b3c4d5e6f)",
+      "expected": "A record that does not exist should show an empty/not-found state (\"record not found\" or a 404 like the one /objects/nonexistentobject shows), not a half-loaded record page.",
+      "actual": "The page opens as a company record titled \"Companies / Untitled (0/0)\": the header shows two grey skeleton blocks (avatar and name) that never resolve, every field shows only its placeholder (\"Domain Name\", \"Account Owner\", \"Address\", \"Linkedin\", ...) and the timeline says \"No activity yet\". No not-found message is shown. With the all-zero UUID three red toasts \"Invalid value for UUID: \\\"00000000-0000-0000-0000-000000000000\\\"\" also appear and the console logs 'useFindManyRecords for \\\"companies\\\" error : CombinedGraphQLErrors: Invalid UUID value' — raw errors on screen.",
+      "reproSteps": [
+        "Signed in as tim@apple.dev, go to https://5500-i6ealdtlbctm7qodvu2we.e2b.app/object/company/8f1c2b65-1234-4a9b-9c3d-1a2b3c4d5e6f (a well-formed UUID that no company has)",
+        "Wait 4-8 seconds and watch the record panel on the left",
+        "Repeat once with https://5500-i6ealdtlbctm7qodvu2we.e2b.app/object/company/00000000-0000-0000-0000-000000000000"
+      ]
+    },
+    {
+      "index": 3,
+      "reported_at_seconds": 743,
+      "name": "Scrolling the Companies list while more records load clears the \"599 selected\" selection",
+      "summary": "The selection is silently wiped: the header goes back to \"Companies\" with no \"N selected\", the bulk action bar (Update) disappears, and the newly loaded rows are unticked while the ones already on screen are unticked too. (on /objects/companies)",
+      "expected": "The selection survives scrolling: the header keeps showing \"599 selected\", the bulk action bar stays, and all rows (already loaded and newly loaded) stay ticked.",
+      "actual": "The selection is silently wiped: the header goes back to \"Companies\" with no \"N selected\", the bulk action bar (Update) disappears, and the newly loaded rows are unticked while the ones already on screen are unticked too.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev and open /objects/companies.",
+        "Reload the page so only the first rows are loaded.",
+        "Click the 'Select all rows' checkbox in the table header - the header shows '599 selected' and the rows are ticked.",
+        "Scroll the records list down quickly (a few thousand pixels) so the next page of records loads (loading placeholder rows appear).",
+        "Wait for the new rows to load and look at the header and the checkboxes."
+      ]
+    },
+    {
+      "index": 4,
+      "reported_at_seconds": 751,
+      "name": "Advanced filter's value input is off-screen at 390px, so a filter value cannot be typed",
+      "summary": "At 390px the rule row is wider than the popup: only \\\"Where\\\", the field (\\\"Name\\\") and the operator (\\\"Contains\\\") fit. The \\\"Enter value\\\" input sits entirely outside the visible popup (its box starts at x=375 in a 390px viewport) and can only be reached by scrolling the popup sideways, which nothing indicates. The Filter popup also overlaps the record list it is filtering. (on /objects/people)",
+      "expected": "The advanced filter rule wraps to the popup width at 390px so the field, the operator and the value input are all visible and usable.",
+      "actual": "At 390px the rule row is wider than the popup: only \\\"Where\\\", the field (\\\"Name\\\") and the operator (\\\"Contains\\\") fit. The \\\"Enter value\\\" input sits entirely outside the visible popup (its box starts at x=375 in a 390px viewport) and can only be reached by scrolling the popup sideways, which nothing indicates. The Filter popup also overlaps the record list it is filtering.",
+      "reproSteps": [
+        "Sign in and open https://5500-i6ealdtlbctm7qodvu2we.e2b.app/objects/people",
+        "Set the window to 390x844",
+        "Click \"Filter\" in the view bar, then choose \"Advanced filter\" at the bottom of the popup",
+        "Look at the filter rule row \"Where | Name | Contains\": there is no value input after \"Contains\"",
+        "Compare with the same step at 1280px wide, where the row shows \"Where | Name | Contains | Enter value\""
+      ]
+    },
+    {
+      "index": 5,
+      "reported_at_seconds": 801,
+      "name": "Sort direction set to \"Descending\" in the Sort panel is not applied to the list and is not kept",
+      "summary": "The direction select shows \"Descending\" but nothing else changes: the list behind the panel keeps the ascending order (Acquia, ActiveCampaign, Addeppar, Aderant…), the sort chip in the toolbar still shows \"↑ Name\", and when the Sort panel is closed and reopened it shows \"Ascending\" again — the choice is neither applied nor kept. (on /objects/companies)",
+      "expected": "Choosing \"Descending\" re-sorts the list from Z to A, the sort chip changes to a down arrow, and \"Descending\" stays selected the next time the Sort panel is opened.",
+      "actual": "The direction select shows \"Descending\" but nothing else changes: the list behind the panel keeps the ascending order (Acquia, ActiveCampaign, Addeppar, Aderant…), the sort chip in the toolbar still shows \"↑ Name\", and when the Sort panel is closed and reopened it shows \"Ascending\" again — the choice is neither applied nor kept.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev, open /objects/companies (tried at 390px wide, but the panel is the same at every width).",
+        "Create a view of your own so the shared view is not changed: click the view name at the top left, pick \"Add view\", name it \"agent13-view\", keep View type Table, click Create.",
+        "Click Sort in the view toolbar, click \"Name\" in the Visible fields list: the list sorts A-Z and the toolbar shows the chip \"↑ Name\".",
+        "Click Sort again, click the direction button that reads \"Ascending\", choose \"Descending\" in the dropdown.",
+        "Look at the rows behind the panel, then press Escape and look at the sort chip and the order again."
+      ]
+    },
+    {
+      "index": 6,
+      "reported_at_seconds": 1025,
+      "name": "Sorting Companies by Name A→Z is case-sensitive: lowercase names land after all uppercase ones",
+      "summary": "The order follows raw character codes (uppercase before lowercase). The 25 filtered rows run ACS Technologies, ASG Technologies, Akamai Technologies, Art Technology Group, Aspen Technology, Bottomline Technologies, CA Technologies, Calypso Technology, ... Vitech Systems Group, and then the very last row is \\\"eQ Technologic\\\". In the unfiltered list the same happens: lowercase-initial companies (eQ Technologic, iManage, insightsoftware, webOS, uTest) all sit at the bottom end of the A→Z list, and descending starts with webOS, uTest, project44. (on /objects/companies (record table, agent1-companies-sort view))",
+      "expected": "With an A→Z Name sort, names should be in alphabetical order ignoring letter case: the lowercase-initial \\\"eQ Technologic\\\" should sit among the E names (e.g. between \\\"Duck Creek Technologies\\\" and \\\"Infotech\\\"), not after \\\"Vitech Systems Group\\\".",
+      "actual": "The order follows raw character codes (uppercase before lowercase). The 25 filtered rows run ACS Technologies, ASG Technologies, Akamai Technologies, Art Technology Group, Aspen Technology, Bottomline Technologies, CA Technologies, Calypso Technology, ... Vitech Systems Group, and then the very last row is \\\"eQ Technologic\\\". In the unfiltered list the same happens: lowercase-initial companies (eQ Technologic, iManage, insightsoftware, webOS, uTest) all sit at the bottom end of the A→Z list, and descending starts with webOS, uTest, project44.",
+      "reproSteps": [
+        "Open https://5500-i6ealdtlbctm7qodvu2we.e2b.app/objects/companies and sign in with tim@apple.dev / tim@apple.dev.",
+        "Click the Name column header in the table, then choose \"Sort\" from the small menu, to add an ascending Name sort (the toolbar shows the chip \"Name\" with an up arrow).",
+        "Open the Filter button, choose the field Name, operator Contains, and type \"Tech\" in the value field; the view chip shows 25 records.",
+        "Scroll the table to its last rows."
+      ]
+    },
+    {
+      "index": 7,
+      "reported_at_seconds": 1069,
+      "name": "Advanced filter \"Name contains\" treats % and _ as wildcards and returns all 1,200 people",
+      "summary": "Both % and _ return all 1,200 records: the header count stays \"All People · 1,200\" and every row is listed, so the typed value is used as a SQL LIKE wildcard instead of literal text. (on /objects/people (advanced filter))",
+      "expected": "\"Contains\" compares the text literally: no person's name contains a % or _ character, so the view should show 0 results (empty state) and the count should be 0.",
+      "actual": "Both % and _ return all 1,200 records: the header count stays \"All People · 1,200\" and every row is listed, so the typed value is used as a SQL LIKE wildcard instead of literal text.",
+      "reproSteps": [
+        "Open https://5500-i6ealdtlbctm7qodvu2we.e2b.app/objects/people (All People view, 1,200 records).",
+        "Click Filter, then click \"Advanced filter\" at the bottom of the panel.",
+        "In the rule \"Where / Name / Contains\", click the \"Enter value\" field and type a single % character.",
+        "Observe the count chip and the list.",
+        "Clear the field and type a single _ character instead."
+      ]
+    },
+    {
+      "index": 8,
+      "reported_at_seconds": 1141,
+      "name": "At 390 and 768 the page header is missing, so a selected record has no \"N selected\" indicator or bulk actions",
+      "summary": "At 390px (and at 768px) the page header is not rendered at all: only the hamburger, a ⋮ and the view toolbar remain. Ticking Google's row checkbox leaves an indeterminate header checkbox and nothing else — no \"Companies → 1 selected\", no \"Send Email\", no \"+ New Company\" — so the person gets no feedback about the selection and no way to act on it. The same selection at 1280px shows \"Companies → 1 selected\", \"Send Email\" and \"+ New Company\". (on /objects/companies)",
+      "expected": "The record page header (object name, \\\"N selected\\\" indicator and the selection actions such as \\\"Send Email\\\") stays available at phone and tablet widths, as it is at 1280px.",
+      "actual": "At 390px (and at 768px) the page header is not rendered at all: only the hamburger, a ⋮ and the view toolbar remain. Ticking Google's row checkbox leaves an indeterminate header checkbox and nothing else — no \"Companies → 1 selected\", no \"Send Email\", no \"+ New Company\" — so the person gets no feedback about the selection and no way to act on it. The same selection at 1280px shows \"Companies → 1 selected\", \"Send Email\" and \"+ New Company\".",
+      "reproSteps": [
+        "Sign in and open https://5500-i6ealdtlbctm7qodvu2we.e2b.app/objects/companies",
+        "Set the window to 390x844",
+        "Tick the row checkbox on the first row (Google): the row is ticked, the header checkbox becomes indeterminate",
+        "Look at the top of the page: there is no page title, no \"1 selected\" indicator and no selection actions (Send Email / New Company) anywhere",
+        "Set the window to 1280x720 without changing anything: the header now reads \"Companies → 1 selected\" and offers \"Send Email\" and \"+ New Company\"",
+        "The same happens at 768x1024, where the header is also missing"
+      ]
+    },
+    {
+      "index": 9,
+      "reported_at_seconds": 1157,
+      "name": "Calendar \\\"Choose Date\\\" popup offers no days - a specific date cannot be picked",
+      "summary": "The popup has only a month select, a year select and two arrow buttons; no day grid is rendered (an empty table with zero height sits under the selects). A person can jump to a month but never to a specific day, so in the Day layout there is no way to reach a given date except clicking \\\"Next period\\\" one day at a time. (on /objects/tasks?viewId=5e2d1a25-a88b-4836-beab-4991056c7715)",
+      "expected": "The \\\"Choose Date\\\" popup shows a day grid (or a day field) so a date can be picked, and picking it moves the calendar to that date.",
+      "actual": "The popup has only a month select, a year select and two arrow buttons; no day grid is rendered (an empty table with zero height sits under the selects). A person can jump to a month but never to a specific day, so in the Day layout there is no way to reach a given date except clicking \\\"Next period\\\" one day at a time.",
+      "reproSteps": [
+        "Sign in as tim@apple.dev, open Tasks (/objects/tasks) and pick the saved view \"agent7-calendar\" (Calendar layout, Due Date field).",
+        "In the calendar toolbar click the period button next to the \"Month\"/\"Week\" dropdown, e.g. \"November 2026\" (in Week layout it reads \"Nov 22 – 28, 2026\").",
+        "Look at the \"Choose Date\" popup that opens under the toolbar: only \"November\" (truncated to \"Novem...\") and \"2026\" selects plus two arrows, no days."
+      ]
+    },
+    {
+      "index": 10,
+      "reported_at_seconds": 1283,
+      "name": "At 390px the sort chip's remove \"×\" is clipped, so a phone user cannot drop a sort from the chip",
+      "summary": "The chip shows only \"↑ Name · Fir…\" and no × button is painted at its right end, so the sort cannot be removed from the chip; the only way back is the \"Reset\" button, which also discards every other change (filters, advanced rules) on the view. (on /objects/people)",
+      "expected": "The sort chip keeps its remove \"×\" button at the right end, as it does at desktop width, so the sort can be removed on a phone.",
+      "actual": "The chip shows only \"↑ Name · Fir…\" and no × button is painted at its right end, so the sort cannot be removed from the chip; the only way back is the \"Reset\" button, which also discards every other change (filters, advanced rules) on the view.",
+      "reproSteps": [
+        "Set the browser viewport to 390 x 844 (phone).",
+        "Open https://5500-i6ealdtlbctm7qodvu2we.e2b.app/objects/people.",
+        "Click Sort at the top right of the list and choose the Name field in the Sort panel.",
+        "Look at the sort chip that appears at the left of the view bar, next to \"+ Add filter\"."
+      ]
+    },
+    {
+      "index": 11,
+      "reported_at_seconds": 1633,
+      "name": "The list filter \"Search any field\" finds nothing for a name that is visible in the Relations and Assignee columns",
+      "summary": "The list goes to \"All Tasks · 0\" with the empty state \"No Task found / No records matching the filter criteria were found.\", although \"Kimberly Gordon\" is shown in the Relations column and \"Kimberly Edwards\" in the Assignee column of the unfiltered list. A term that is in a text field works: \"Any field: portfolio\" returns 150 tasks (\"Share portfolio samples\"). So the \"Search any field\" filter only matches some field types, not relation/people fields. (on /objects/tasks)",
+      "expected": "A filter presented as \"Search any field\" should also find records whose Relation or Assignee field shows the value, or the control should say it searches only text fields.",
+      "actual": "The list goes to \"All Tasks · 0\" with the empty state \"No Task found / No records matching the filter criteria were found.\", although \"Kimberly Gordon\" is shown in the Relations column and \"Kimberly Edwards\" in the Assignee column of the unfiltered list. A term that is in a text field works: \"Any field: portfolio\" returns 150 tasks (\"Share portfolio samples\"). So the \"Search any field\" filter only matches some field types, not relation/people fields.",
+      "reproSteps": [
+        "Signed in as tim@apple.dev, open /objects/tasks (All Tasks · 1,800) and note rows whose Relations column reads \"Kimberly Gordon\" and a row whose Assignee reads \"Kimberly Edwards\"",
+        "Click Filter, then \"Search any field\" at the bottom of the field list, type Kimberly and press Enter",
+        "Read the list and the record count",
+        "Compare: change the value to portfolio and press Enter — this one returns 150 rows"
+      ]
+    }
+  ]
+}

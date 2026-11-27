@@ -1,0 +1,257 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "findings": 22,
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 0,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Same invalid-regexp submission replacing repository search with a full-page 500 and internal diagnostics; the malformed pattern differs only as test data."
+      },
+      {
+        "groundTruthIndex": 23,
+        "reproStepsIndex": 0,
+        "findingIndex": 3,
+        "reason": "Same Branches-page Create new branch dialog closing silently when Confirm is clicked with an empty required name."
+      },
+      {
+        "groundTruthIndex": 6,
+        "reproStepsIndex": 0,
+        "findingIndex": 7,
+        "reason": "Same unresolved 'Add {filename}' placeholder after entering a filename in New File; creating a disposable branch is incidental setup."
+      },
+      {
+        "groundTruthIndex": 14,
+        "reproStepsIndex": 0,
+        "findingIndex": 10,
+        "reason": "Same branch-row delete control overflowing the table at 768 × 1024; the finding additionally describes clipped button text."
+      },
+      {
+        "groundTruthIndex": 12,
+        "reproStepsIndex": 0,
+        "findingIndex": 11,
+        "reason": "Same main-branch RSS channel link omitting '/src/' and opening a 404, reached through the Branches-page RSS icon."
+      },
+      {
+        "groundTruthIndex": 9,
+        "reproStepsIndex": null,
+        "findingIndex": 13,
+        "reason": "Same '1 Commits' singular-count grammar failure, observed in the comparison commit list rather than through the reviewed file-History flow."
+      },
+      {
+        "groundTruthIndex": 61,
+        "reproStepsIndex": 0,
+        "findingIndex": 15,
+        "reason": "Same trailing-newline discrepancy between the file header's line count and the source view's numbered lines; existing files replace fixture-creation setup."
+      },
+      {
+        "groundTruthIndex": 60,
+        "reproStepsIndex": 0,
+        "findingIndex": 16,
+        "reason": "Same code-search line link navigating to rendered Markdown without selecting or revealing the target line, not the rejected no-navigation claim."
+      },
+      {
+        "groundTruthIndex": 24,
+        "reproStepsIndex": null,
+        "findingIndex": 18,
+        "reason": "Matches the stale Code-page commit count after a web-editor deletion described in entry 24. The provided repro case uses Sync fork instead."
+      },
+      {
+        "groundTruthIndex": 11,
+        "reproStepsIndex": 0,
+        "findingIndex": 8,
+        "reason": "Exact searches for leading-hyphen terms return lines lacking the literal term, matching the hyphen-loss failure. The claimed option-parsing mechanism is not established."
+      }
+    ],
+    "invalidMatches": [],
+    "unverified": [
+      {
+        "findingIndex": 1,
+        "reason": "No reviewed entry covers the file finder silently displaying an empty result area for a nonexistent branch."
+      },
+      {
+        "findingIndex": 2,
+        "reason": "No entry covers a first patch submission falsely reporting changed contents. Entry 52 instead concerns a disabled button after correcting an invalid branch name."
+      },
+      {
+        "findingIndex": 4,
+        "reason": "No reviewed entry covers the Tags header saying '1 Tags'; the reviewed pluralization defects concern different count labels."
+      },
+      {
+        "findingIndex": 5,
+        "reason": "Unlike entry 8, this empty upload has no new destination directory and returns to an existing Code page rather than a 404."
+      },
+      {
+        "findingIndex": 6,
+        "reason": "No reviewed entry covers a branch-row identity differing from the latest commit's author."
+      },
+      {
+        "findingIndex": 9,
+        "reason": "No reviewed entry covers invalid tag creation using branch-name wording; entry 22 concerns an internal field key during branch rename."
+      },
+      {
+        "findingIndex": 12,
+        "reason": "No reviewed entry covers a directory suffix being incorrectly prepended to file-finder result destinations."
+      },
+      {
+        "findingIndex": 14,
+        "reason": "No entry covers rename-only edits leaving Commit Changes disabled. Entry 21 instead reports an incorrect preview while committing remains enabled."
+      },
+      {
+        "findingIndex": 17,
+        "reason": "Entry 2 loses genuinely matching percent-containing branches; this finding instead reports unrelated branches falsely matching '%' and '_'."
+      },
+      {
+        "findingIndex": 19,
+        "reason": "No reviewed entry covers aggregate diff statistics remaining unfiltered after whitespace changes are hidden; entry 53 concerns file-filtered views instead."
+      },
+      {
+        "findingIndex": 20,
+        "reason": "No reviewed entry covers escaped HTML in repository activity-feed titles. Feed-reader rendering is inferred from the XML rather than demonstrated."
+      },
+      {
+        "findingIndex": 21,
+        "reason": "No reviewed entry covers submitting an editor after its branch is deleted; the reviewed stale-file cases concern different operations and failures."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 5,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 1,
+        "reason": "The described defect is missing invalid-reference or empty-state feedback in an otherwise rendered finder."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "A valid patch is rejected, and the disabled submit button prevents the suggested retry."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 1,
+        "reason": "This is a singular/plural copy defect without functional impact."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 3,
+        "reason": "An empty submission silently exits the form and discards the entered commit message."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 3,
+        "reason": "As described, the branch listing attributes the commit to the wrong person."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 1,
+        "reason": "The invalid tag is correctly rejected, but the validation message names the wrong reference type."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 5,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 12,
+        "severity": 5,
+        "reason": "The described result links consistently open unusable 404 pages."
+      },
+      {
+        "findingIndex": 13,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 14,
+        "severity": 3,
+        "reason": "A filename-only rename cannot be committed without also changing file contents."
+      },
+      {
+        "findingIndex": 15,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 16,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 17,
+        "severity": 3,
+        "reason": "Branch search returns incorrect results for the entered literal characters."
+      },
+      {
+        "findingIndex": 18,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 19,
+        "severity": 1,
+        "reason": "The described impact is inconsistent presentation of aggregate and visible diff statistics; filtering itself works."
+      },
+      {
+        "findingIndex": 20,
+        "severity": 1,
+        "reason": "Escaped markup affects feed-title readability and presentation, without a described feed-loading failure."
+      },
+      {
+        "findingIndex": 21,
+        "severity": 5,
+        "reason": "Submitting replaces the editor with a full-page 404 and removes access to the unsaved text."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [
+      {
+        "findingIndex": 4,
+        "reference": {
+          "name": "Tags page uses plural grammar when one tag is listed",
+          "summary": "A repository with one tag displays the heading `1 Tags` while the nearby tab correctly displays `1 Tag`.",
+          "expected": "The tag heading should use singular grammar when exactly one tag exists.",
+          "actual": "A repository with one tag displays the heading `1 Tags` while the nearby tab correctly displays `1 Tag`.",
+          "reproSteps": [
+            [
+              "Open an authenticated repository that contains exactly one tag.",
+              "Open the repository's Tags page.",
+              "Observe that the list heading says `1 Tags` while the nearby tab says `1 Tag`."
+            ]
+          ],
+          "severity": 1
+        },
+        "reason": "Matches the Tags heading displaying “1 Tags” while the nearby tab correctly displays “1 Tag,” using the same Tags-page flow."
+      }
+    ],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

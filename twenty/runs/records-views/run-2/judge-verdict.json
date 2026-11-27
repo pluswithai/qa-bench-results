@@ -1,0 +1,177 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "twenty/areas/records-views",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "f6bf34cc9c5ffb213b1c7c92570fb31c53105c9358a226b68015b5e593d9f56a",
+    "known_invalid_sha256": "fa129877140c0372d6209562491a9238c58edae2cab556edfc320b14972bccab",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "83",
+    "bugs": "12",
+    "flags": "0",
+    "known_hits": "3",
+    "extra_known_hits": "0",
+    "unverified": "6",
+    "outside_area_known_hits": "0",
+    "outside_area_known_invalid": "0",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "",
+    "outside_area_ground_truth_sha256": "f3456299419b269b88f0ddc32ec53ab80fbf3ec14a32ac6ae1366aa22bd3a43a",
+    "outside_area_known_invalid_sha256": "e51afd4a5be9203d46a29a1087513447454829f8cacf9feb7379d606574f27e1",
+    "duplicates": "0",
+    "duplicate_known_hits": "0",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "3",
+    "known_misses": "3",
+    "precision": "0.5",
+    "recall": "0.03614457831325301",
+    "findings_per_minute": "0.4000055556327171",
+    "correct_findings_per_minute": "0.10000138890817928",
+    "severity_1": "0",
+    "severity_3": "3",
+    "severity_5": "0",
+    "severity_sum": "9",
+    "score": "6",
+    "duration_seconds": "1799.975",
+    "partial": "true",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 30,
+        "reproStepsIndex": null,
+        "findingIndex": 6,
+        "reason": "Reports the same case-sensitive Table Name ordering documented in the Table/Kanban inconsistency. It exposes the Table behavior directly rather than comparing layouts."
+      },
+      {
+        "groundTruthIndex": 35,
+        "reproStepsIndex": 0,
+        "findingIndex": 7,
+        "reason": "Matches UI Name Contains interpreting percent and underscore as SQL wildcards instead of literal text. The different query strings and existing test records are insignificant."
+      },
+      {
+        "groundTruthIndex": 46,
+        "reproStepsIndex": null,
+        "findingIndex": 11,
+        "reason": "Matches Search any field omitting displayed relation values while own-text searches work. This finding uses Task Relations and Assignee instead of People's linked Company."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 5,
+        "reproStepsIndex": null,
+        "findingIndex": 1,
+        "reason": "Matches the rejected claim that Assignee grouping hides populated Tasks because assignee groups are not configured. This finding uses Kanban rather than the reference's Table flow."
+      },
+      {
+        "knownInvalidIndex": 18,
+        "reproStepsIndex": null,
+        "findingIndex": 8,
+        "reason": "Matches the rejected mobile bulk-action dead-end claim: the selection header is hidden, but actions remain available through the command menu. This finding uses Companies rather than People."
+      },
+      {
+        "knownInvalidIndex": 0,
+        "reproStepsIndex": null,
+        "findingIndex": 9,
+        "reason": "Matches the intentionally header-only calendar date picker with no selectable day grid. The finding opens it in Month or Week rather than the reference's Day flow."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 0,
+        "reason": "No reviewed entry describes selection clearing when opening Filter or Sort. The unrelated-view-rename and command-menu cases have different triggers."
+      },
+      {
+        "findingIndex": 2,
+        "reason": "No reviewed entry covers nonexistent record URLs remaining in a skeleton state or displaying UUID errors."
+      },
+      {
+        "findingIndex": 3,
+        "reason": "No reviewed entry covers pagination scrolling wiping selection. The reviewed large-scroll defect changes only the header checkbox while preserving selected records and count."
+      },
+      {
+        "findingIndex": 4,
+        "reason": "No reviewed entry describes a horizontally overflowing advanced-filter value input. The mobile Date-filter clipping entry concerns different controls and behavior."
+      },
+      {
+        "findingIndex": 5,
+        "reason": "No reviewed entry describes a Table sort-direction choice immediately failing to apply and reverting when its panel reopens."
+      },
+      {
+        "findingIndex": 10,
+        "reason": "No reviewed entry covers the sort chip's remove control being clipped at mobile width."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 3,
+        "reason": "Selected records and their bulk-action context are lost during an unrelated panel interaction."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 3,
+        "reason": "The described impact is an incorrect empty result set that makes existing tasks inaccessible in that view."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 5,
+        "reason": "The record page remains unusable, and the all-zero UUID variant exposes raw technical errors."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 3,
+        "reason": "Scrolling clears the selected result set and removes bulk actions."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 1,
+        "reason": "The input is inconveniently hidden but remains reachable through horizontal scrolling."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 3,
+        "reason": "Choosing Descending neither changes the record order nor retains the requested direction."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 3,
+        "reason": "The finding claims selected records have no available bulk actions, a functional limitation beyond the hidden count."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 1,
+        "reason": "Date navigation still works; the described limitation is the absence of a direct day-selection shortcut."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 3,
+        "reason": "The claimed clipping prevents independent sort removal and forces a reset that also discards other pending changes."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}

@@ -1,0 +1,181 @@
+{
+  "judge": "gpt-6.1-sol/high",
+  "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+  "scores": {
+    "fixture": "gitea/areas/labels",
+    "agent": "Pluswithai",
+    "ground_truth_sha256": "87b5258fc85782372c044b3338f2e7deb7206ceb8ed8163bb465394a742af86a",
+    "known_invalid_sha256": "855c5101a0fbba2e242de39e2d383e14739ddbeac8ef84b8d3e6d5b5c047ca58",
+    "judge": "gpt-6.1-sol/high",
+    "grading_method_sha256": "fddd8579ceea9f39827fd4021bb50d2953f0b05b66e5db6d5334855e636c95cd",
+    "ground_truth": "32",
+    "bugs": "12",
+    "flags": "0",
+    "known_hits": "6",
+    "extra_known_hits": "1",
+    "unverified": "4",
+    "outside_area_known_hits": "0",
+    "outside_area_known_invalid": "0",
+    "outside_area_duplicates": "0",
+    "outside_area_precision": "",
+    "outside_area_ground_truth_sha256": "47db07b83af13b7c7dd75acd1b523ed86e8107b60e6f33878e8fb5b68a2acbe2",
+    "outside_area_known_invalid_sha256": "72e79c4023c85c9101fbf2b7613d3daf78b07fded510d117ab5b26f6ac3103f9",
+    "duplicates": "0",
+    "duplicate_known_hits": "0",
+    "duplicate_known_invalid": "0",
+    "known_invalid": "1",
+    "known_misses": "1",
+    "precision": "0.875",
+    "recall": "0.1875",
+    "findings_per_minute": "0.43547763731607875",
+    "correct_findings_per_minute": "0.21773881865803937",
+    "severity_1": "4",
+    "severity_3": "2",
+    "severity_5": "0",
+    "severity_sum": "10",
+    "score": "9",
+    "duration_seconds": "1653.357",
+    "partial": "false",
+    "time_limit_ms": "1800000"
+  },
+  "assessment": {
+    "matches": [
+      {
+        "groundTruthIndex": 8,
+        "reproStepsIndex": 0,
+        "findingIndex": 0,
+        "reason": "Matches repository labels accepting whitespace-only names and saving visibly nameless rows through New Label."
+      },
+      {
+        "groundTruthIndex": 5,
+        "reproStepsIndex": 1,
+        "findingIndex": 1,
+        "reason": "Matches narrow-width label badges and descriptions colliding with usage metadata. The organization Labels flow corresponds to case 1."
+      },
+      {
+        "groundTruthIndex": 13,
+        "reproStepsIndex": 0,
+        "findingIndex": 5,
+        "reason": "Matches a long assigned label overflowing the issue sidebar and being clipped at the viewport edge. Different label text and viewport widths do not change the reproduction."
+      },
+      {
+        "groundTruthIndex": 24,
+        "reproStepsIndex": null,
+        "findingIndex": 6,
+        "reason": "Matches deleting a label discarding the selected sorting and restoring alphabetical order. This uses repository labels and reverse-alphabetical sorting rather than the reviewed organization flow."
+      },
+      {
+        "groundTruthIndex": 11,
+        "reproStepsIndex": null,
+        "findingIndex": 8,
+        "reason": "Matches the Label filter panel opening mostly off the left edge at phone width and hiding its controls. This reproduction uses Pull Requests rather than Issues."
+      },
+      {
+        "groundTruthIndex": 6,
+        "reproStepsIndex": null,
+        "findingIndex": 11,
+        "reason": "Matches the exact singular-count wording defect, “1 open issues/pull requests.” This reproduction inspects repository labels rather than organization labels."
+      },
+      {
+        "groundTruthIndex": 13,
+        "reproStepsIndex": null,
+        "findingIndex": 10,
+        "reason": "Matches a long assigned-label badge extending beyond its container and the right viewport edge without wrapping. It occurs on an issue-list row rather than in the issue sidebar."
+      }
+    ],
+    "invalidMatches": [
+      {
+        "knownInvalidIndex": 1,
+        "reproStepsIndex": null,
+        "findingIndex": 3,
+        "reason": "The tested plain name, agent1-dblclick, leaves Exclusive disabled and unchecked, matching the rejected unscoped-name behavior. This flow creates or edits a plain label rather than renaming an exclusive one."
+      }
+    ],
+    "unverified": [
+      {
+        "findingIndex": 2,
+        "reason": "No reviewed entry describes label selections remaining unsaved until the sidebar picker closes. This differs from timeline-event merging."
+      },
+      {
+        "findingIndex": 4,
+        "reason": "No reviewed entry covers saving a stale label edit after another tab deletes the label, resulting in a bare Not Found page."
+      },
+      {
+        "findingIndex": 7,
+        "reason": "No reviewed entry describes hue selection failing to populate an empty Color field. The rejected hue-picker report concerns a JavaScript error instead."
+      },
+      {
+        "findingIndex": 9,
+        "reason": "Clipping label options inside the sidebar picker is distinct from an assigned badge overflowing the sidebar or the entire filter panel opening off-screen; no reviewed entry covers it."
+      }
+    ],
+    "severities": [
+      {
+        "findingIndex": 0,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 1,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 2,
+        "severity": 3,
+        "reason": "An apparently selected label is lost on reload instead of being assigned."
+      },
+      {
+        "findingIndex": 3,
+        "severity": 3,
+        "reason": "The claim describes a checkbox that cannot change or save state, although that restriction is intended."
+      },
+      {
+        "findingIndex": 4,
+        "severity": 5,
+        "reason": "Saving replaces the application with an otherwise blank error page without navigation."
+      },
+      {
+        "findingIndex": 5,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 6,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 7,
+        "severity": 3,
+        "reason": "The color interaction fails to set a value and consequently prevents saving."
+      },
+      {
+        "findingIndex": 8,
+        "severity": 3,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 9,
+        "severity": 1,
+        "reason": "The report describes clipped option text without demonstrating a failed selection."
+      },
+      {
+        "findingIndex": 10,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      },
+      {
+        "findingIndex": 11,
+        "severity": 1,
+        "reason": "Stored ground-truth severity; independent of the judge's impact estimate."
+      }
+    ],
+    "duplicates": []
+  },
+  "outsideArea": {
+    "knownHits": [],
+    "knownInvalid": [],
+    "duplicates": []
+  }
+}
