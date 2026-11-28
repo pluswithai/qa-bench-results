@@ -25,7 +25,7 @@ The benchmark's labels were built from the findings of the agents Momentic ran: 
 3. We went through every verdict and changed the ones we disagreed with, some after checking them by hand on a clean copy of the app. Each published verdict carries the reason behind the final call.
 4. In each run, an accepted bug counts as correct with its severity, a rejected one as incorrect, and a second report of the same bug in the same run as a duplicate.
 
-Addresses and parameters the app does not generate itself (typed or edited by the agent) are treated as input, as in [OWASP WSTG-ERRH-01](https://wstg.owasp.org/latest/4-Web_Application_Security_Testing/08-Error_Handling/01-Improper_Error_Handling/): if the app breaks on them (error page, blank page, endless loading, raw error), the finding counts; if it handles them (a default view, a redirect or a not-found message), it does not. A response that comes from the test sandbox's proxy rather than from the app is a test-environment effect.
+Addresses and parameters the app does not generate itself (typed or edited by the agent) are treated as input, as in [OWASP WSTG-ERRH-01](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/08-Testing_for_Error_Handling/01-Testing_For_Improper_Error_Handling): if the app breaks on them (error page, blank page, endless loading, raw error), the finding counts; if it handles them (a default view, a redirect or a not-found message), it does not. A response that comes from the test sandbox's proxy rather than from the app is a test-environment effect.
 
 ## Incidents
 
